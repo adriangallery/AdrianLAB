@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       name: `AdrianLAB #${tokenId}`,
       description: "AdrianLAB es una colección de NFTs generativos con rasgos únicos.",
       image: `${baseUrl}/api/render/${tokenId}`,
-      external_url: `https://adrianlab.com/token/${tokenId}`,
+      external_url: `${baseUrl}/token/${tokenId}`,
       attributes: [
         {
           trait_type: "Ejemplo",
