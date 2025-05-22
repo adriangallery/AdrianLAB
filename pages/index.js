@@ -29,6 +29,21 @@ export default function Home() {
             <h2>Metadatos &rarr;</h2>
             <p>API para obtener metadatos. Ejemplo: /api/metadata/1</p>
           </a>
+          
+          <a href="/api/trait/1" className={styles.card}>
+            <h2>Traits &rarr;</h2>
+            <p>API para visualizar traits individuales. Ejemplo: /api/trait/1</p>
+          </a>
+          
+          <a href="/api/trait/metadata/1" className={styles.card}>
+            <h2>Metadatos de Traits &rarr;</h2>
+            <p>API para metadatos de traits. Ejemplo: /api/trait/metadata/1</p>
+          </a>
+          
+          <a href="/api/traits/preview/1" className={styles.card}>
+            <h2>Preview de Packs &rarr;</h2>
+            <p>API para ver traits en un pack. Ejemplo: /api/traits/preview/1</p>
+          </a>
         </div>
       </main>
 
