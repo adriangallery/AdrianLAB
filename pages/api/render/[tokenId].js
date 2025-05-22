@@ -6,7 +6,13 @@ import { getTokenTraits } from '../../../lib/blockchain.js';
 
 export default async function handler(req, res) {
   try {
-    const { tokenId } = req.query;
+    // Extract tokenId, removing .png extension if present
+    let { tokenId } = req.query;
+    
+    // Remove .png extension if present
+    if (tokenId && tokenId.endsWith('.png')) {
+      tokenId = tokenId.replace('.png', '');
+    }
     
     // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {

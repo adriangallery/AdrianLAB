@@ -14,15 +14,13 @@ export default async function handler(req, res) {
       const tokenData = await getTokenTraits(parseInt(tokenId));
       
       // Build base URL for images
-      const baseUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}`
-        : 'https://adrianlab.vercel.app';
+      const baseUrl = 'https://adrianlab.vercel.app';
       
       // Token metadata
       const metadata = {
         name: `BareAdrian #${tokenId}`,
         description: `A ${tokenData.bodyTypeName} BareAdrian from the AdrianLab collection`,
-        image: `${baseUrl}/api/render/${tokenId}`,
+        image: `${baseUrl}/api/render/${tokenId}.png`,
         external_url: `${baseUrl}/token/${tokenId}`,
         attributes: [
           {
