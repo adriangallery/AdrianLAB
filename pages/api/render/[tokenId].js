@@ -87,8 +87,39 @@ async function drawLayer(ctx, category, traitId, tokenData) {
         imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', 'basic.png');
       }
     } else {
-      // For other layers, use the normal system
-      imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
+      // For other layers, map traitId to the correct filename
+      let fileName = `${traitId}.png`;
+      
+      // Map traitId to actual file names
+      if (category === "BACKGROUND") {
+        if (traitId === 1) fileName = "blue.png";
+        else if (traitId === 2) fileName = "green.png";
+        else if (traitId === 3) fileName = "red.png";
+      } else if (category === "MOUTH") {
+        if (traitId === 1) fileName = "smile.png";
+        else if (traitId === 2) fileName = "serious.png";
+        else if (traitId === 3) fileName = "surprised.png";
+      } else if (category === "EYES") {
+        // Map eye trait IDs to filenames
+        if (traitId === 1) fileName = "normal.png";
+        else if (traitId === 2) fileName = "cool.png";
+        else if (traitId === 3) fileName = "laser.png";
+      } else if (category === "HEAD") {
+        // Map head trait IDs to filenames
+        if (traitId === 1) fileName = "hat.png";
+        else if (traitId === 2) fileName = "cap.png";
+      } else if (category === "CLOTHING") {
+        // Map clothing trait IDs to filenames
+        if (traitId === 1) fileName = "lab_coat.png";
+        else if (traitId === 2) fileName = "suit.png";
+        else if (traitId === 3) fileName = "casual.png";
+      } else if (category === "ACCESSORIES") {
+        // Map accessories trait IDs to filenames
+        if (traitId === 1) fileName = "glasses.png";
+        else if (traitId === 2) fileName = "watch.png";
+      }
+      
+      imagePath = path.join(process.cwd(), 'public', 'traits', category, fileName);
     }
     
     // Check if file exists
