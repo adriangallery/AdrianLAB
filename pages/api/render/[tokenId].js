@@ -1,0 +1,1 @@
+// API endpoint para renderizar tokens por tokenId 
