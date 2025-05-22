@@ -2,6 +2,7 @@
 import { createCanvas, loadImage } from 'canvas';
 import fs from 'fs';
 import path from 'path';
+import { getTokenTraits } from '../../../lib/blockchain.js';
 
 export default async function handler(req, res) {
   try {
@@ -10,6 +11,16 @@ export default async function handler(req, res) {
     // Verificar que el tokenId es válido
     if (!tokenId || isNaN(parseInt(tokenId))) {
       return res.status(400).json({ error: 'Token ID inválido' });
+    }
+    
+    // Obtener datos del token desde la blockchain (simulado)
+    let tokenData;
+    try {
+      tokenData = await getTokenTraits(parseInt(tokenId));
+    } catch (error) {
+      console.error(`Error obteniendo datos del token ${tokenId}:`, error);
+      // Si hay error en obtener los datos, usamos el SVG de respaldo
+      return renderFallbackSVG(res, tokenId);
     }
     
     // Comprobar si podemos usar imágenes PNG
@@ -21,21 +32,21 @@ export default async function handler(req, res) {
         const canvas = createCanvas(1000, 1000);
         const ctx = canvas.getContext('2d');
         
-        // Mapeo simple de tokenId a rasgos para pruebas
-        // En el futuro, esto vendría de la blockchain
-        const traits = getTraitsForToken(parseInt(tokenId));
-        
-        // Dibujar cada capa en orden
-        if (traits.BACKGROUND) await drawLayer(ctx, 'BACKGROUND', traits.BACKGROUND);
-        if (traits.BASE) await drawLayer(ctx, 'BASE', traits.BASE);
-        if (traits.EYES) await drawLayer(ctx, 'EYES', traits.EYES);
-        if (traits.MOUTH) await drawLayer(ctx, 'MOUTH', traits.MOUTH);
-        if (traits.HEAD) await drawLayer(ctx, 'HEAD', traits.HEAD);
-        if (traits.CLOTHING) await drawLayer(ctx, 'CLOTHING', traits.CLOTHING);
-        if (traits.ACCESSORIES) await drawLayer(ctx, 'ACCESSORIES', traits.ACCESSORIES);
+        // Dibujar cada capa en orden según los traits del token
+        for (let i = 0; i < tokenData.categories.length; i++) {
+          const category = tokenData.categories[i];
+          const traitId = tokenData.traitIds[i];
+          
+          // Solo dibujar si el traitId es mayor que 0 (0 = no trait)
+          if (traitId > 0) {
+            await drawLayer(ctx, category, traitId, tokenData);
+          }
+        }
         
         // Aplicar efecto de mutación si existe
-        if (traits.MUTATION) await applyMutationEffect(ctx, traits.MUTATION);
+        if (tokenData.mutationLevel > 0) {
+          await applyMutationEffect(ctx, tokenData.mutationLevel);
+        }
         
         // Convertir a buffer PNG
         const buffer = canvas.toBuffer('image/png');
@@ -46,33 +57,39 @@ export default async function handler(req, res) {
       } catch (error) {
         console.error('Error rendering PNG:', error);
         // Si falla, volvemos al SVG de respaldo
+        return renderFallbackSVG(res, tokenId);
       }
+    } else {
+      return renderFallbackSVG(res, tokenId);
     }
-    
-    // Por defecto o como respaldo, devolvemos SVG
-    const svg = `
-    <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#f0f0f0"/>
-      <text x="50%" y="50%" font-family="Arial" font-size="24" fill="black" text-anchor="middle">
-        Token ID: ${tokenId}
-      </text>
-      <text x="50%" y="60%" font-family="Arial" font-size="16" fill="black" text-anchor="middle">
-        API en desarrollo
-      </text>
-    </svg>
-    `;
-    
-    res.setHeader('Content-Type', 'image/svg+xml');
-    return res.status(200).send(svg);
   } catch (error) {
     console.error('Error al renderizar token:', error);
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
 
-async function drawLayer(ctx, category, traitId) {
+async function drawLayer(ctx, category, traitId, tokenData) {
   try {
-    const imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
+    let imagePath;
+    
+    // Si es la capa BASE, usar el body type específico
+    if (category === "BASE") {
+      if (tokenData.bodyTypeId > 0) {
+        // Usar imagen específica del body type
+        imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeName.toLowerCase()}.png`);
+        
+        // Fallback a imagen por ID si no existe por nombre
+        if (!fs.existsSync(imagePath)) {
+          imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `body_${tokenData.bodyTypeId}.png`);
+        }
+      } else {
+        // Body type básico
+        imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', 'basic.png');
+      }
+    } else {
+      // Para otras capas, usar el sistema normal
+      imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
+    }
     
     // Check if file exists
     if (!fs.existsSync(imagePath)) {
@@ -118,19 +135,20 @@ async function applyMutationEffect(ctx, mutationLevel) {
   }
 }
 
-// Función temporal para asignar rasgos basados en tokenId
-function getTraitsForToken(tokenId) {
-  // Para pruebas, usamos el tokenId como semilla para generar rasgos
-  const traits = {
-    BACKGROUND: 'blue',
-    BASE: 'normal',
-    EYES: 'normal',
-    MOUTH: 'smile',
-    HEAD: 'normal',
-    CLOTHING: 'lab_coat',
-    ACCESSORIES: 'glasses',
-    MUTATION: tokenId > 5 ? 1 : 0  // Aplicar mutación leve para tokens > 5
-  };
+function renderFallbackSVG(res, tokenId) {
+  // Por defecto o como respaldo, devolvemos SVG
+  const svg = `
+  <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="#f0f0f0"/>
+    <text x="50%" y="50%" font-family="Arial" font-size="24" fill="black" text-anchor="middle">
+      BareAdrian #${tokenId}
+    </text>
+    <text x="50%" y="60%" font-family="Arial" font-size="16" fill="black" text-anchor="middle">
+      API en desarrollo
+    </text>
+  </svg>
+  `;
   
-  return traits;
+  res.setHeader('Content-Type', 'image/svg+xml');
+  return res.status(200).send(svg);
 }
