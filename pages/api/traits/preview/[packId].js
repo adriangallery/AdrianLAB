@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     // Get pack trait pools from contract
     const traitPools = await getPackTraitPools(packId);
     
-    // Construcción de la URL base para imágenes
+    // Build the base URL for images
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}`
       : 'https://adrianlab.vercel.app';

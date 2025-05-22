@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Trait not found' });
     }
     
-    // Construcción de la URL base para imágenes
+    // Build the base URL for images
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}`
       : 'https://adrianlab.vercel.app';

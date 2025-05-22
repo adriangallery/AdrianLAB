@@ -6,43 +6,43 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>AdrianLAB Renderer</title>
-        <meta name="description" content="AdrianLAB NFT Renderer y Metadatos" />
+        <meta name="description" content="AdrianLAB NFT Renderer and Metadata" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Bienvenido a <span className={styles.highlight}>AdrianLAB</span>
+          Welcome to <span className={styles.highlight}>AdrianLAB</span>
         </h1>
 
         <p className={styles.description}>
-          Servidor de renderizado y metadatos para la colección AdrianLAB NFT
+          Rendering and metadata server for AdrianLAB NFT collection
         </p>
 
         <div className={styles.grid}>
           <a href="/api/render/1" className={styles.card}>
-            <h2>Renderizado &rarr;</h2>
-            <p>API para renderizar tokens. Ejemplo: /api/render/1</p>
+            <h2>Rendering &rarr;</h2>
+            <p>API for token rendering. Example: /api/render/1</p>
           </a>
 
           <a href="/api/metadata/1" className={styles.card}>
-            <h2>Metadatos &rarr;</h2>
-            <p>API para obtener metadatos. Ejemplo: /api/metadata/1</p>
+            <h2>Metadata &rarr;</h2>
+            <p>API for token metadata. Example: /api/metadata/1</p>
           </a>
           
           <a href="/api/trait/1" className={styles.card}>
             <h2>Traits &rarr;</h2>
-            <p>API para visualizar traits individuales. Ejemplo: /api/trait/1</p>
+            <p>API for individual trait visualization. Example: /api/trait/1</p>
           </a>
           
           <a href="/api/trait/metadata/1" className={styles.card}>
-            <h2>Metadatos de Traits &rarr;</h2>
-            <p>API para metadatos de traits. Ejemplo: /api/trait/metadata/1</p>
+            <h2>Trait Metadata &rarr;</h2>
+            <p>API for trait metadata. Example: /api/trait/metadata/1</p>
           </a>
           
           <a href="/api/traits/preview/1" className={styles.card}>
-            <h2>Preview de Packs &rarr;</h2>
-            <p>API para ver traits en un pack. Ejemplo: /api/traits/preview/1</p>
+            <h2>Pack Preview &rarr;</h2>
+            <p>API for viewing traits in a pack. Example: /api/traits/preview/1</p>
           </a>
         </div>
       </main>

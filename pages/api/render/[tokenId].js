@@ -1,4 +1,4 @@
-// API endpoint para renderizar tokens por tokenId
+// API endpoint for rendering tokens by tokenId
 import { createCanvas, loadImage } from 'canvas';
 import fs from 'fs';
 import path from 'path';
@@ -8,63 +8,63 @@ export default async function handler(req, res) {
   try {
     const { tokenId } = req.query;
     
-    // Verificar que el tokenId es válido
+    // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
-      return res.status(400).json({ error: 'Token ID inválido' });
+      return res.status(400).json({ error: 'Invalid token ID' });
     }
     
-    // Obtener datos del token desde la blockchain (simulado)
+    // Get token data from blockchain (simulated)
     let tokenData;
     try {
       tokenData = await getTokenTraits(parseInt(tokenId));
     } catch (error) {
-      console.error(`Error obteniendo datos del token ${tokenId}:`, error);
-      // Si hay error en obtener los datos, usamos el SVG de respaldo
+      console.error(`Error getting token data ${tokenId}:`, error);
+      // If there's an error getting the data, use the fallback SVG
       return renderFallbackSVG(res, tokenId);
     }
     
-    // Comprobar si podemos usar imágenes PNG
+    // Check if we can use PNG images
     const traitsFolderExists = fs.existsSync(path.join(process.cwd(), 'public', 'traits'));
     
     if (traitsFolderExists) {
       try {
-        // Crear un canvas para la imagen
+        // Create a canvas for the image
         const canvas = createCanvas(1000, 1000);
         const ctx = canvas.getContext('2d');
         
-        // Dibujar cada capa en orden según los traits del token
+        // Draw each layer in order according to token traits
         for (let i = 0; i < tokenData.categories.length; i++) {
           const category = tokenData.categories[i];
           const traitId = tokenData.traitIds[i];
           
-          // Solo dibujar si el traitId es mayor que 0 (0 = no trait)
+          // Only draw if traitId is greater than 0 (0 = no trait)
           if (traitId > 0) {
             await drawLayer(ctx, category, traitId, tokenData);
           }
         }
         
-        // Aplicar efecto de mutación si existe
+        // Apply mutation effect if it exists
         if (tokenData.mutationLevel > 0) {
           await applyMutationEffect(ctx, tokenData.mutationLevel);
         }
         
-        // Convertir a buffer PNG
+        // Convert to PNG buffer
         const buffer = canvas.toBuffer('image/png');
         
-        // Enviar la imagen
+        // Send the image
         res.setHeader('Content-Type', 'image/png');
         return res.status(200).send(buffer);
       } catch (error) {
         console.error('Error rendering PNG:', error);
-        // Si falla, volvemos al SVG de respaldo
+        // If it fails, return to the fallback SVG
         return renderFallbackSVG(res, tokenId);
       }
     } else {
       return renderFallbackSVG(res, tokenId);
     }
   } catch (error) {
-    console.error('Error al renderizar token:', error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error rendering token:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
 
@@ -72,22 +72,22 @@ async function drawLayer(ctx, category, traitId, tokenData) {
   try {
     let imagePath;
     
-    // Si es la capa BASE, usar el body type específico
+    // If it's the BASE layer, use the specific body type
     if (category === "BASE") {
       if (tokenData.bodyTypeId > 0) {
-        // Usar imagen específica del body type
+        // Use specific body type image
         imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeName.toLowerCase()}.png`);
         
-        // Fallback a imagen por ID si no existe por nombre
+        // Fallback to image by ID if it doesn't exist by name
         if (!fs.existsSync(imagePath)) {
           imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `body_${tokenData.bodyTypeId}.png`);
         }
       } else {
-        // Body type básico
+        // Basic body type
         imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', 'basic.png');
       }
     } else {
-      // Para otras capas, usar el sistema normal
+      // For other layers, use the normal system
       imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
     }
     
@@ -136,7 +136,7 @@ async function applyMutationEffect(ctx, mutationLevel) {
 }
 
 function renderFallbackSVG(res, tokenId) {
-  // Por defecto o como respaldo, devolvemos SVG
+  // Default or fallback, return SVG
   const svg = `
   <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
     <rect width="100%" height="100%" fill="#f0f0f0"/>
@@ -144,7 +144,7 @@ function renderFallbackSVG(res, tokenId) {
       BareAdrian #${tokenId}
     </text>
     <text x="50%" y="60%" font-family="Arial" font-size="16" fill="black" text-anchor="middle">
-      API en desarrollo
+      API in development
     </text>
   </svg>
   `;

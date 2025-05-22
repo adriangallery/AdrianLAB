@@ -36,8 +36,8 @@ export default async function handler(req, res) {
     // Clear with transparent background
     ctx.clearRect(0, 0, 500, 500);
     
-    // Para esta versión de prueba, mapeamos nombres a archivos existentes
-    // En el modelo de nombres de prueba, "Blue Sky" se mapea a "blue.png"
+    // For this test version, we map names to existing files
+    // In the test naming model, "Blue Sky" maps to "blue.png"
     let fileName;
     if (assetInfo.name.includes("Blue")) fileName = "blue.png";
     else if (assetInfo.name.includes("Green")) fileName = "green.png";
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       const traitImage = await loadImage(imagePath);
       ctx.drawImage(traitImage, 0, 0, 500, 500);
       
-      // Agregar nombre del trait como overlay
+      // Add trait name as overlay
       ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       ctx.fillRect(0, 450, 500, 50);
       

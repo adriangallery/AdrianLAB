@@ -4,21 +4,21 @@ export default async function handler(req, res) {
   try {
     const { tokenId } = req.query;
     
-    // Verificar que el tokenId es válido
+    // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
-      return res.status(400).json({ error: 'Token ID inválido' });
+      return res.status(400).json({ error: 'Invalid token ID' });
     }
     
     try {
-      // Obtener datos del token desde la blockchain (simulado)
+      // Get token data from blockchain (simulated)
       const tokenData = await getTokenTraits(parseInt(tokenId));
       
-      // Construcción de la URL base para imágenes
+      // Build base URL for images
       const baseUrl = process.env.VERCEL_URL 
         ? `https://${process.env.VERCEL_URL}`
         : 'https://adrianlab.vercel.app';
       
-      // Ejemplo de metadatos para el token
+      // Token metadata
       const metadata = {
         name: `BareAdrian #${tokenId}`,
         description: `A ${tokenData.bodyTypeName} BareAdrian from the AdrianLab collection`,
@@ -48,9 +48,9 @@ export default async function handler(req, res) {
         ]
       };
       
-      // Añadir rareza del body type si no es básico
+      // Add body type rarity if not basic
       if (tokenData.bodyTypeId > 0) {
-        // Calcular rareza basada en el bodyTypeId
+        // Calculate rarity based on bodyTypeId
         const rarityPercentage = await getRarityPercentage(tokenData.bodyTypeId);
         metadata.attributes.push({
           trait_type: "Body Rarity",
@@ -58,13 +58,13 @@ export default async function handler(req, res) {
         });
       }
       
-      // Añadir rasgos del token como atributos
+      // Add token traits as attributes
       for (let i = 0; i < tokenData.categories.length; i++) {
         const category = tokenData.categories[i];
         const traitId = tokenData.traitIds[i];
         
-        // Solo añadir si tiene un trait asignado (traitId > 0)
-        if (traitId > 0 && category !== "BASE") { // BASE ya está representado como Body Type
+        // Only add if it has an assigned trait (traitId > 0)
+        if (traitId > 0 && category !== "BASE") { // BASE is already represented as Body Type
           metadata.attributes.push({
             trait_type: category.charAt(0) + category.slice(1).toLowerCase(), // Format: "Background", "Eyes", etc.
             value: `#${traitId}`
@@ -72,15 +72,15 @@ export default async function handler(req, res) {
         }
       }
       
-      // Configurar headers para permitir caché
+      // Configure headers to allow cache
       res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
       return res.status(200).json(metadata);
     } catch (error) {
-      console.error(`Error obteniendo datos del token ${tokenId}:`, error);
+      console.error(`Error getting token data ${tokenId}:`, error);
       return res.status(404).json({ error: 'Token not found or data unavailable' });
     }
   } catch (error) {
-    console.error('Error al obtener metadata:', error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error getting metadata:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
