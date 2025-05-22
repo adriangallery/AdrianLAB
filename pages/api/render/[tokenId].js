@@ -1,9 +1,4 @@
-import { createCanvas, loadImage } from 'canvas';
-import { getTokenTraits } from '../../../lib/blockchain.js';
-import { getCachedResult, setCachedResult } from '../../../lib/cache.js';
-import path from 'path';
-import fs from 'fs';
-import { getCachedRender } from '../../../lib/cache';
+// API endpoint para renderizar tokens por tokenId
 
 export default async function handler(req, res) {
   try {
