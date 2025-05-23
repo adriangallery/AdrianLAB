@@ -1,8 +1,9 @@
 // API endpoint for rendering tokens by tokenId
-import { createCanvas, loadImage } from 'canvas';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
+import { createCanvas, loadImage, Image } from 'canvas';
 import { getTokenTraits } from '../../../lib/blockchain.js';
+import { Resvg } from '@resvg/resvg-js';
 
 export default async function handler(req, res) {
   try {
@@ -37,6 +38,10 @@ export default async function handler(req, res) {
         // Create a canvas for the image
         const canvas = createCanvas(1000, 1000);
         const ctx = canvas.getContext('2d');
+        
+        // Configure for high quality rendering
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         
         // Special handling for token 1 to showcase transparency
         if (parseInt(tokenId) === 1) {
@@ -92,8 +97,8 @@ export default async function handler(req, res) {
           await applyMutationEffect(ctx, tokenData.mutationLevel);
         }
         
-        // Convert to PNG buffer
-        const buffer = canvas.toBuffer('image/png');
+        // Convert to PNG buffer with high quality settings
+        const buffer = canvas.toBuffer('image/png', { compressionLevel: 6, quality: 1.0 });
         
         // Send the image
         res.setHeader('Content-Type', 'image/png');
@@ -137,34 +142,60 @@ async function drawLayer(ctx, category, traitId, tokenData) {
       svgPath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.svg`);
     }
     
-    // Check if SVG file exists first, then fallback to PNG
-    let filePath = null;
-    let isSvg = false;
-    
+    // SVG support - check if SVG exists first (preferred for vector quality)
     if (fs.existsSync(svgPath)) {
-      filePath = svgPath;
-      isSvg = true;
-      console.log(`Using SVG file: ${svgPath}`);
-    } else if (fs.existsSync(imagePath)) {
-      filePath = imagePath;
-      console.log(`Using PNG file: ${imagePath}`);
-    } else {
-      console.warn(`Image not found: ${imagePath} or ${svgPath}`);
-      
-      // If the image doesn't exist, try to create a basic representation
-      if (parseInt(tokenData.tokenId) === 1) {
-        // Token 1 special handling with colored placeholders
-        handleMissingImage(ctx, category, traitId);
+      try {
+        // Read the SVG file
+        const svgContent = fs.readFileSync(svgPath, 'utf8');
+        
+        // Create a new canvas for the SVG rendering to ensure highest quality
+        const svgCanvas = createCanvas(1000, 1000);
+        const svgCtx = svgCanvas.getContext('2d');
+        
+        // Parse the SVG string
+        const svg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          },
+          font: {
+            loadSystemFonts: true
+          },
+          imageRendering: 1, // High quality
+          logLevel: 'error'
+        });
+        
+        // Render the SVG to a PNG buffer
+        const svgPngBuffer = svg.render().asPng();
+        
+        // Load the PNG buffer as an image
+        const svgImage = new Image();
+        svgImage.src = svgPngBuffer;
+        
+        // Draw the SVG image onto the canvas with high quality settings
+        svgCtx.imageSmoothingEnabled = true;
+        svgCtx.imageSmoothingQuality = 'high';
+        svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
+        
+        // Now draw the rendered SVG onto the main canvas
+        ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
+        
+        return; // Successfully rendered SVG
+      } catch (svgError) {
+        console.error(`Error processing SVG: ${svgPath}`, svgError);
+        // Fall back to PNG if SVG fails
       }
-      return;
     }
     
-    // Load and draw the image
-    const image = await loadImage(filePath);
-    ctx.drawImage(image, 0, 0, 1000, 1000);
-    
+    // Fallback to PNG
+    if (fs.existsSync(imagePath)) {
+      const img = await loadImage(imagePath);
+      ctx.drawImage(img, 0, 0, 1000, 1000);
+    } else {
+      console.error(`Trait image not found: ${imagePath}`);
+    }
   } catch (error) {
-    console.error(`Error loading layer ${category}/${traitId}:`, error);
+    console.error(`Error drawing layer: ${category}/${traitId}`, error);
   }
 }
 
