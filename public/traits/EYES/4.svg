@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1000" height="1000" viewBox="0 0 1000 1000" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
     <!-- Lentes mejorados con vectores definidos para mejor escalabilidad -->
     <g id="classic-glasses">
         <!-- Marco exterior izquierdo -->
-        <ellipse cx="350" cy="400" rx="80" ry="80" fill="none" stroke="black" stroke-width="15"/>
+        <ellipse cx="350" cy="400" rx="80" ry="80" fill="none" stroke="black" stroke-width="15" shape-rendering="geometricPrecision"/>
         
         <!-- Marco exterior derecho -->
-        <ellipse cx="650" cy="400" rx="80" ry="80" fill="none" stroke="black" stroke-width="15"/>
+        <ellipse cx="650" cy="400" rx="80" ry="80" fill="none" stroke="black" stroke-width="15" shape-rendering="geometricPrecision"/>
         
         <!-- Puente entre los lentes -->
-        <line x1="430" y1="400" x2="570" y2="400" stroke="black" stroke-width="15" stroke-linecap="round"/>
+        <line x1="430" y1="400" x2="570" y2="400" stroke="black" stroke-width="15" stroke-linecap="round" shape-rendering="geometricPrecision"/>
         
         <!-- Patillas laterales -->
-        <line x1="270" y1="400" x2="230" y2="380" stroke="black" stroke-width="12" stroke-linecap="round"/>
-        <line x1="730" y1="400" x2="770" y2="380" stroke="black" stroke-width="12" stroke-linecap="round"/>
+        <line x1="270" y1="400" x2="230" y2="380" stroke="black" stroke-width="12" stroke-linecap="round" shape-rendering="geometricPrecision"/>
+        <line x1="730" y1="400" x2="770" y2="380" stroke="black" stroke-width="12" stroke-linecap="round" shape-rendering="geometricPrecision"/>
         
         <!-- Detalles interiores - reflejo de luz en lentes -->
-        <ellipse cx="330" cy="380" rx="20" ry="10" fill="rgba(255,255,255,0.5)" transform="rotate(-30 330 380)"/>
-        <ellipse cx="630" cy="380" rx="20" ry="10" fill="rgba(255,255,255,0.5)" transform="rotate(-30 630 380)"/>
+        <ellipse cx="330" cy="380" rx="20" ry="10" fill="rgba(255,255,255,0.5)" transform="rotate(-30 330 380)" shape-rendering="geometricPrecision"/>
+        <ellipse cx="630" cy="380" rx="20" ry="10" fill="rgba(255,255,255,0.5)" transform="rotate(-30 630 380)" shape-rendering="geometricPrecision"/>
     </g>
 </svg>
