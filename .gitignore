@@ -29,3 +29,4 @@ yarn-error.log*
 # vercel
 .vercel 
 .vercel
+token1_*.png
