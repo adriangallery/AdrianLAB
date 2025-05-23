@@ -118,78 +118,125 @@ export default async function handler(req, res) {
 async function drawLayer(ctx, category, traitId, tokenData) {
   try {
     let imagePath;
+    let svgPath;
     
     // If it's the BASE layer, use the specific body type
     if (category === "BASE") {
       if (tokenData.bodyTypeId > 0) {
         // Use body type ID directly as filename
         imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeId}.png`);
+        svgPath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeId}.svg`);
       } else {
         // Basic body type (ID 0)
         imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', '0.png');
+        svgPath = path.join(process.cwd(), 'public', 'traits', 'BASE', '0.svg');
       }
     } else {
       // For other layers, use trait ID directly as filename
       imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
+      svgPath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.svg`);
     }
     
-    // Check if file exists
-    if (!fs.existsSync(imagePath)) {
-      console.warn(`Image not found: ${imagePath}`);
+    // Check if SVG file exists first, then fallback to PNG
+    let filePath = null;
+    let isSvg = false;
+    
+    if (fs.existsSync(svgPath)) {
+      filePath = svgPath;
+      isSvg = true;
+      console.log(`Using SVG file: ${svgPath}`);
+    } else if (fs.existsSync(imagePath)) {
+      filePath = imagePath;
+      console.log(`Using PNG file: ${imagePath}`);
+    } else {
+      console.warn(`Image not found: ${imagePath} or ${svgPath}`);
+      
       // If the image doesn't exist, try to create a basic representation
-      if (tokenData.tokenId === 1) {
-        // For token 1, use colored placeholder shapes to ensure visibility
-        if (category === 'BACKGROUND') {
-          // Create a semi-transparent blue background
-          const gradient = ctx.createRadialGradient(500, 500, 0, 500, 500, 800);
-          gradient.addColorStop(0, 'rgba(0, 0, 255, 0.4)');
-          gradient.addColorStop(1, 'rgba(0, 0, 255, 0.1)');
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, 0, 1000, 1000);
-          
-          // Add blue stripes to make it visually distinct
-          ctx.strokeStyle = 'rgba(0, 0, 200, 0.5)';
-          ctx.lineWidth = 3;
-          for (let i = 0; i < 1000; i += 80) {
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, 1000);
-            ctx.stroke();
-          }
-        } else if (category === 'MOUTH') {
-          // Draw a simple red smile
-          ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-          ctx.beginPath();
-          ctx.arc(500, 600, 150, 0.1 * Math.PI, 0.9 * Math.PI, false);
-          ctx.lineWidth = 15;
-          ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
-          ctx.stroke();
-        } else if (category === 'BASE') {
-          // Draw a simple green silhouette
-          ctx.fillStyle = 'rgba(0, 180, 0, 0.6)';
-          // Head
-          ctx.beginPath();
-          ctx.arc(500, 300, 150, 0, 2 * Math.PI);
-          ctx.fill();
-          // Body
-          ctx.beginPath();
-          ctx.moveTo(350, 450);
-          ctx.lineTo(650, 450);
-          ctx.lineTo(600, 800);
-          ctx.lineTo(400, 800);
-          ctx.closePath();
-          ctx.fill();
-        }
+      if (parseInt(tokenData.tokenId) === 1) {
+        // Token 1 special handling with colored placeholders
+        handleMissingImage(ctx, category, traitId);
       }
       return;
     }
     
     // Load and draw the image
-    const image = await loadImage(imagePath);
+    const image = await loadImage(filePath);
     ctx.drawImage(image, 0, 0, 1000, 1000);
     
   } catch (error) {
     console.error(`Error loading layer ${category}/${traitId}:`, error);
+  }
+}
+
+// Helper function to handle missing images for token 1
+function handleMissingImage(ctx, category, traitId) {
+  if (category === 'BACKGROUND') {
+    // Create a semi-transparent blue background
+    const gradient = ctx.createRadialGradient(500, 500, 0, 500, 500, 800);
+    gradient.addColorStop(0, 'rgba(0, 0, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(0, 0, 255, 0.1)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1000, 1000);
+    
+    // Add blue stripes to make it visually distinct
+    ctx.strokeStyle = 'rgba(0, 0, 200, 0.5)';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 1000; i += 80) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, 1000);
+      ctx.stroke();
+    }
+  } else if (category === 'MOUTH') {
+    // Draw a simple red smile
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.beginPath();
+    ctx.arc(500, 600, 150, 0.1 * Math.PI, 0.9 * Math.PI, false);
+    ctx.lineWidth = 15;
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.stroke();
+  } else if (category === 'BASE') {
+    // Draw a simple green silhouette
+    ctx.fillStyle = 'rgba(0, 180, 0, 0.6)';
+    // Head
+    ctx.beginPath();
+    ctx.arc(500, 300, 150, 0, 2 * Math.PI);
+    ctx.fill();
+    // Body
+    ctx.beginPath();
+    ctx.moveTo(350, 450);
+    ctx.lineTo(650, 450);
+    ctx.lineTo(600, 800);
+    ctx.lineTo(400, 800);
+    ctx.closePath();
+    ctx.fill();
+  } else if (category === 'EYES') {
+    // Draw simple eyes
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    // Left eye
+    ctx.beginPath();
+    ctx.arc(400, 300, 30, 0, 2 * Math.PI);
+    ctx.fill();
+    // Right eye
+    ctx.beginPath();
+    ctx.arc(600, 300, 30, 0, 2 * Math.PI);
+    ctx.fill();
+  } else if (category === 'HEAD') {
+    // Draw a simple hat
+    ctx.fillStyle = 'rgba(100, 50, 0, 0.8)';
+    ctx.beginPath();
+    ctx.ellipse(500, 200, 200, 50, 0, 0, 2 * Math.PI);
+    ctx.fill();
+  } else if (category === 'CLOTHING') {
+    // Draw a simple shirt
+    ctx.fillStyle = 'rgba(50, 50, 200, 0.7)';
+    ctx.beginPath();
+    ctx.moveTo(350, 450);
+    ctx.lineTo(650, 450);
+    ctx.lineTo(680, 700);
+    ctx.lineTo(320, 700);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 
