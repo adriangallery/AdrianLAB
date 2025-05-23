@@ -218,6 +218,28 @@ function handleMissingImage(ctx, category, traitId) {
       ctx.lineTo(i, 1000);
       ctx.stroke();
     }
+  } else if (category === 'SKIN') {
+    // Draw a simple skin layer in peach color
+    ctx.fillStyle = 'rgba(255, 222, 173, 0.8)';
+    // Upper body skin
+    ctx.beginPath();
+    ctx.arc(500, 300, 120, 0, 2 * Math.PI);
+    ctx.fill();
+    // Torso skin
+    ctx.beginPath();
+    ctx.moveTo(380, 420);
+    ctx.lineTo(620, 420);
+    ctx.lineTo(580, 700);
+    ctx.lineTo(420, 700);
+    ctx.closePath();
+    ctx.fill();
+    // Arms skin
+    ctx.beginPath();
+    ctx.arc(380, 450, 30, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(620, 450, 30, 0, 2 * Math.PI);
+    ctx.fill();
   } else if (category === 'MOUTH') {
     // Draw a simple red smile
     ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
