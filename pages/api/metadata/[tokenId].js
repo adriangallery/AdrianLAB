@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       const metadata = {
         name: `BareAdrian #${tokenId}`,
         description: `A ${tokenData.bodyTypeName} BareAdrian from the AdrianLab collection`,
-        image: `${baseUrl}/api/render/${tokenId}.png`,
+        image: `${baseUrl}/api/render/${tokenId}.png?v=${tokenData.version || 1}`,
         external_url: `${baseUrl}/token/${tokenId}`,
         attributes: [
           {
