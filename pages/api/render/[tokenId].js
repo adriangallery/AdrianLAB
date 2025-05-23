@@ -142,51 +142,60 @@ async function drawLayer(ctx, category, traitId, tokenData) {
       svgPath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.svg`);
     }
     
-    // Check if SVG exists first
+    // SVG support - check if SVG exists first (preferred for vector quality)
     if (fs.existsSync(svgPath)) {
-      // Use high-quality SVG rendering
-      const svgContent = fs.readFileSync(svgPath, 'utf8');
-      
-      // Use Resvg for high-quality rendering
-      const resvg = new Resvg(svgContent, {
-        fitTo: {
-          mode: 'width',
-          value: 1000,
-        },
-        font: {
-          loadSystemFonts: false,
-        },
-        shapeRendering: 1, // crispEdges mode for pixel-perfect rendering
-        textRendering: 1, // geometricPrecision
-        imageRendering: 1, // optimizeQuality
-        antialias: true,
-      });
-      
-      const pngData = resvg.render();
-      const pngBuffer = pngData.asPng();
-      
-      // Convert PNG to image and draw it
-      const svgImage = new Image();
-      svgImage.src = pngBuffer;
-      ctx.drawImage(svgImage, 0, 0, 1000, 1000);
-      
-      return true;
-    } 
-    // Fallback to PNG if available
-    else if (fs.existsSync(imagePath)) {
-      const image = await loadImage(imagePath);
-      ctx.drawImage(image, 0, 0, 1000, 1000);
-      return true;
-    } 
-    // Handle case where neither image exists
-    else {
-      // Use handleMissingImage to create a fallback for this layer
-      handleMissingImage(ctx, category, traitId);
-      return true;
+      try {
+        // Read the SVG file
+        const svgContent = fs.readFileSync(svgPath, 'utf8');
+        
+        // Create a new canvas for the SVG rendering to ensure highest quality
+        const svgCanvas = createCanvas(1000, 1000);
+        const svgCtx = svgCanvas.getContext('2d');
+        
+        // Parse the SVG string
+        const svg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          },
+          font: {
+            loadSystemFonts: true
+          },
+          imageRendering: 1, // High quality
+          logLevel: 'error'
+        });
+        
+        // Render the SVG to a PNG buffer
+        const svgPngBuffer = svg.render().asPng();
+        
+        // Load the PNG buffer as an image
+        const svgImage = new Image();
+        svgImage.src = svgPngBuffer;
+        
+        // Draw the SVG image onto the canvas with high quality settings
+        svgCtx.imageSmoothingEnabled = true;
+        svgCtx.imageSmoothingQuality = 'high';
+        svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
+        
+        // Now draw the rendered SVG onto the main canvas
+        ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
+        
+        return; // Successfully rendered SVG
+      } catch (svgError) {
+        console.error(`Error processing SVG: ${svgPath}`, svgError);
+        // Fall back to PNG if SVG fails
+      }
+    }
+    
+    // Fallback to PNG
+    if (fs.existsSync(imagePath)) {
+      const img = await loadImage(imagePath);
+      ctx.drawImage(img, 0, 0, 1000, 1000);
+    } else {
+      console.error(`Trait image not found: ${imagePath}`);
     }
   } catch (error) {
-    console.error(`Error drawing layer ${category}/${traitId}:`, error);
-    return false;
+    console.error(`Error drawing layer: ${category}/${traitId}`, error);
   }
 }
 
