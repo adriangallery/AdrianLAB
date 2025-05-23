@@ -5,14 +5,14 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>AdrianLAB Renderer</title>
+        <title>🧪 AdrianLAB Renderer</title>
         <meta name="description" content="AdrianLAB NFT Renderer and Metadata" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <span className={styles.highlight}>AdrianLAB</span>
+          Welcome to <span className={styles.highlight}>🧪 AdrianLAB</span>
         </h1>
 
         <p className={styles.description}>
@@ -53,7 +53,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          AdrianLAB - {new Date().getFullYear()}
+          🧪 AdrianLAB - {new Date().getFullYear()}
         </a>
       </footer>
     </div>
