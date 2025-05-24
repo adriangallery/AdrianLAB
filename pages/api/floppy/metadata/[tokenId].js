@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     const metadata = {
       name: floppyData.name,
       description: floppyData.description,
-      image: `${baseUrl}/api/floppy/${tokenId}.png?v=${floppyData.version || 1}`,
+      image: `${baseUrl}/api/floppy/render/${tokenId}.png?v=${floppyData.version || 1}`,
       external_url: `${baseUrl}/floppy/${tokenId}`,
       attributes: [
         {
