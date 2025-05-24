@@ -16,17 +16,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'ID de token inválido' });
     }
     
-    // Obtener datos del FLOPPY DISK
-    let floppyData;
-    try {
-      floppyData = await getFloppyData(parseInt(tokenId));
-    } catch (error) {
-      console.error(`Error al obtener datos del FLOPPY DISK ${tokenId}:`, error);
-      return res.status(500).json({ error: 'Error al obtener datos del FLOPPY DISK' });
-    }
+    // Convertir a número
+    const tokenIdNum = parseInt(tokenId);
     
-    // Ruta a la imagen del FLOPPY DISK
-    const imagePath = path.join(process.cwd(), 'public', 'traits', 'FLOPPY', `${floppyData.image}.png`);
+    // Ruta a la imagen del FLOPPY DISK - Usar directamente el tokenId como nombre de archivo
+    const imagePath = path.join(process.cwd(), 'public', 'traits', 'FLOPPY', `${tokenIdNum}.png`);
     
     // Verificar que la imagen existe
     if (!fs.existsSync(imagePath)) {
