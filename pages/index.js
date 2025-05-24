@@ -44,6 +44,11 @@ export default function Home() {
             <h2>Pack Preview &rarr;</h2>
             <p>API for viewing traits in a pack. Example: /api/traits/preview/1</p>
           </a>
+          
+          <a href="/api/floppy/render/1" className={styles.card}>
+            <h2>FLOPPY DISKS &rarr;</h2>
+            <p>API for viewing FLOPPY DISK packs. Example: /api/floppy/render/1</p>
+          </a>
         </div>
       </main>
 
