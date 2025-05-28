@@ -1,4 +1,4 @@
-import { getTokenTraits, getRarityPercentage } from '../../../lib/blockchain.js';
+import { getRawTokenMetadata } from '../../../lib/blockchain.js';
 
 export default async function handler(req, res) {
   try {
@@ -10,66 +10,39 @@ export default async function handler(req, res) {
     }
     
     try {
-      // Get token data from blockchain (simulated)
-      const tokenData = await getTokenTraits(parseInt(tokenId));
-      
+      const tokenData = await getRawTokenMetadata(parseInt(tokenId));
+
+      // Simulación hasta tener datos reales de rarity
+      const rarity = "1.00%";
+
       // Build base URL for images
       const baseUrl = 'https://adrianlab.vercel.app';
-      
-      // Token metadata
+
+      // Calcular versión basada en los datos del token
+      const version = Date.now(); // Esto forzará una recarga en cada cambio
+
       const metadata = {
         name: `BareAdrian #${tokenId}`,
-        description: `A ${tokenData.bodyTypeName} BareAdrian from the AdrianLab collection`,
-        image: `${baseUrl}/api/render/${tokenId}.png?v=${tokenData.version || 1}`,
+        description: `A SVG Gen${tokenData.generation} BareAdrian from the AdrianLab collection`,
+        image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
         external_url: `${baseUrl}/token/${tokenId}`,
         attributes: [
-          {
-            trait_type: "Body Type",
-            value: tokenData.bodyTypeName
-          },
-          {
-            trait_type: "Generation",
-            value: tokenData.generation
-          },
-          {
-            trait_type: "Mutation Level", 
-            value: ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel]
-          },
-          {
-            trait_type: "Can Replicate",
-            value: tokenData.canReplicate ? "Yes" : "No"
-          },
-          {
-            trait_type: "Has Been Modified",
-            value: tokenData.hasBeenModified ? "Yes" : "No"
-          }
+          { trait_type: "Body Type", value: `SVG Gen${tokenData.generation}` },
+          { trait_type: "Generation", value: tokenData.generation },
+          { trait_type: "Mutation Level", value: ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
+          { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
+          { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" },
+          { trait_type: "Body Rarity", value: rarity },
+          { trait_type: "Background", value: "#1" },
+          { trait_type: "Adrian", value: "#1" },
+          { trait_type: "Skin", value: "#1" },
+          { trait_type: "Gear", value: "#1" },
+          { trait_type: "Head", value: "#1" },
+          { trait_type: "Mouth", value: "#1" },
+          { trait_type: "Eyes", value: "#1" }
         ]
       };
-      
-      // Add body type rarity if not basic
-      if (tokenData.bodyTypeId > 0) {
-        // Calculate rarity based on bodyTypeId
-        const rarityPercentage = await getRarityPercentage(tokenData.bodyTypeId);
-        metadata.attributes.push({
-          trait_type: "Body Rarity",
-          value: `${rarityPercentage}%`
-        });
-      }
-      
-      // Add token traits as attributes
-      for (let i = 0; i < tokenData.categories.length; i++) {
-        const category = tokenData.categories[i];
-        const traitId = tokenData.traitIds[i];
-        
-        // Only add if it has an assigned trait (traitId > 0)
-        if (traitId > 0 && category !== "BASE") { // BASE is already represented as Body Type
-          metadata.attributes.push({
-            trait_type: category.charAt(0) + category.slice(1).toLowerCase(), // Format: "Background", "Eyes", etc.
-            value: `#${traitId}`
-          });
-        }
-      }
-      
+
       // Configure headers to allow cache
       res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
       return res.status(200).json(metadata);
