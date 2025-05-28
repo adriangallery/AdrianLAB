@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       description: `An AdrianZero from the AdrianLAB collection`,
       image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       external_url: `${baseUrl}/token/${tokenId}`,
+      metadata_version: "2", // Versión actual de la metadata
       attributes: []
     };
     
