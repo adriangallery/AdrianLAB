@@ -2,7 +2,7 @@
 import path from 'path';
 import fs from 'fs';
 import { createCanvas, loadImage, Image } from 'canvas';
-import { getTokenTraits } from '../../../lib/blockchain.js';
+import { getRawTokenMetadata } from '../../../lib/blockchain.js';
 import { Resvg } from '@resvg/resvg-js';
 
 export default async function handler(req, res) {
@@ -20,306 +20,86 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
     
-    // Get token data from blockchain (simulated)
+    // Get token data from blockchain
     let tokenData;
     try {
-      tokenData = await getTokenTraits(parseInt(tokenId));
+      tokenData = await getRawTokenMetadata(parseInt(tokenId));
     } catch (error) {
       console.error(`Error getting token data ${tokenId}:`, error);
       // If there's an error getting the data, use the fallback SVG
       return renderFallbackSVG(res, tokenId);
     }
     
-    // Check if we can use PNG images
-    const traitsFolderExists = fs.existsSync(path.join(process.cwd(), 'public', 'traits'));
+    // Create a canvas for the image
+    const canvas = createCanvas(1000, 1000);
+    const ctx = canvas.getContext('2d');
     
-    if (traitsFolderExists) {
-      try {
-        // Create a canvas for the image
-        const canvas = createCanvas(1000, 1000);
-        const ctx = canvas.getContext('2d');
-        
-        // Configure for high quality rendering
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        
-        // Special handling for token 1 to showcase transparency
-        if (parseInt(tokenId) === 1) {
-          // Draw a checkered background to demonstrate transparency
-          ctx.fillStyle = '#F0F0F0';
-          ctx.fillRect(0, 0, 1000, 1000);
+    // Configure for high quality rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    
+    // Draw white background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, 1000, 1000);
+    
+    // Draw skin layer if skinId > 0
+    if (tokenData.skinId > 0) {
+      const skinPath = path.join(process.cwd(), 'public', 'traits', 'SKIN', `${tokenData.skinId}.svg`);
+      
+      if (fs.existsSync(skinPath)) {
+        try {
+          // Read the SVG file
+          const svgContent = fs.readFileSync(skinPath, 'utf8');
           
-          // Draw a grid pattern to make transparency obvious
-          ctx.strokeStyle = '#E0E0E0';
-          ctx.lineWidth = 2;
+          // Create a new canvas for the SVG rendering
+          const svgCanvas = createCanvas(1000, 1000);
+          const svgCtx = svgCanvas.getContext('2d');
           
-          for (let i = 0; i < 1000; i += 50) {
-            ctx.beginPath();
-            ctx.moveTo(0, i);
-            ctx.lineTo(1000, i);
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, 1000);
-            ctx.stroke();
-          }
+          // Parse the SVG string
+          const svg = new Resvg(svgContent, {
+            fitTo: {
+              mode: 'width',
+              value: 1000
+            },
+            font: {
+              loadSystemFonts: true
+            },
+            imageRendering: 1, // High quality
+            logLevel: 'error'
+          });
           
-          // Alternating pattern of darker squares
-          for (let y = 0; y < 1000; y += 100) {
-            for (let x = 0; x < 1000; x += 100) {
-              if ((x + y) % 200 === 0) {
-                ctx.fillStyle = '#E0E0E0';
-                ctx.fillRect(x, y, 50, 50);
-                ctx.fillRect(x + 50, y + 50, 50, 50);
-              }
-            }
-          }
-        } else {
-          // For other tokens, use a solid white background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, 1000, 1000);
+          // Render the SVG to a PNG buffer
+          const svgPngBuffer = svg.render().asPng();
+          
+          // Load the PNG buffer as an image
+          const svgImage = new Image();
+          svgImage.src = svgPngBuffer;
+          
+          // Draw the SVG image onto the canvas
+          svgCtx.imageSmoothingEnabled = true;
+          svgCtx.imageSmoothingQuality = 'high';
+          svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
+          
+          // Now draw the rendered SVG onto the main canvas
+          ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
+        } catch (svgError) {
+          console.error(`Error processing SVG: ${skinPath}`, svgError);
         }
-        
-        // Draw each layer in order according to token traits
-        for (let i = 0; i < tokenData.categories.length; i++) {
-          const category = tokenData.categories[i];
-          const traitId = tokenData.traitIds[i];
-          
-          // Only draw if traitId is greater than 0 (0 = no trait)
-          if (traitId > 0) {
-            await drawLayer(ctx, category, traitId, tokenData);
-          }
-        }
-        
-        // Apply mutation effect if it exists
-        if (tokenData.mutationLevel > 0) {
-          await applyMutationEffect(ctx, tokenData.mutationLevel);
-        }
-        
-        // Convert to PNG buffer with high quality settings
-        const buffer = canvas.toBuffer('image/png', { compressionLevel: 6, quality: 1.0 });
-        
-        // Send the image
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        return res.status(200).send(buffer);
-      } catch (error) {
-        console.error('Error rendering PNG:', error);
-        // If it fails, return to the fallback SVG
-        return renderFallbackSVG(res, tokenId);
       }
-    } else {
-      return renderFallbackSVG(res, tokenId);
     }
+    
+    // Convert to PNG buffer with high quality settings
+    const buffer = canvas.toBuffer('image/png', { compressionLevel: 6, quality: 1.0 });
+    
+    // Send the image
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    return res.status(200).send(buffer);
   } catch (error) {
     console.error('Error rendering token:', error);
     return res.status(500).json({ error: 'Internal server error' });
-  }
-}
-
-async function drawLayer(ctx, category, traitId, tokenData) {
-  try {
-    let imagePath;
-    let svgPath;
-    
-    // If it's the BASE layer, use the specific body type
-    if (category === "BASE") {
-      if (tokenData.bodyTypeId > 0) {
-        // Use body type ID directly as filename
-        imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeId}.png`);
-        svgPath = path.join(process.cwd(), 'public', 'traits', 'BASE', `${tokenData.bodyTypeId}.svg`);
-      } else {
-        // Basic body type (ID 0)
-        imagePath = path.join(process.cwd(), 'public', 'traits', 'BASE', '0.png');
-        svgPath = path.join(process.cwd(), 'public', 'traits', 'BASE', '0.svg');
-      }
-    } else {
-      // For other layers, use trait ID directly as filename
-      imagePath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.png`);
-      svgPath = path.join(process.cwd(), 'public', 'traits', category, `${traitId}.svg`);
-    }
-    
-    // SVG support - check if SVG exists first (preferred for vector quality)
-    if (fs.existsSync(svgPath)) {
-      try {
-        // Read the SVG file
-        const svgContent = fs.readFileSync(svgPath, 'utf8');
-        
-        // Create a new canvas for the SVG rendering to ensure highest quality
-        const svgCanvas = createCanvas(1000, 1000);
-        const svgCtx = svgCanvas.getContext('2d');
-        
-        // Parse the SVG string
-        const svg = new Resvg(svgContent, {
-          fitTo: {
-            mode: 'width',
-            value: 1000
-          },
-          font: {
-            loadSystemFonts: true
-          },
-          imageRendering: 1, // High quality
-          logLevel: 'error'
-        });
-        
-        // Render the SVG to a PNG buffer
-        const svgPngBuffer = svg.render().asPng();
-        
-        // Load the PNG buffer as an image
-        const svgImage = new Image();
-        svgImage.src = svgPngBuffer;
-        
-        // Draw the SVG image onto the canvas with high quality settings
-        svgCtx.imageSmoothingEnabled = true;
-        svgCtx.imageSmoothingQuality = 'high';
-        svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
-        
-        // Now draw the rendered SVG onto the main canvas
-        ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
-        
-        return; // Successfully rendered SVG
-      } catch (svgError) {
-        console.error(`Error processing SVG: ${svgPath}`, svgError);
-        // Fall back to PNG if SVG fails
-      }
-    }
-    
-    // Fallback to PNG
-    if (fs.existsSync(imagePath)) {
-      const img = await loadImage(imagePath);
-      ctx.drawImage(img, 0, 0, 1000, 1000);
-    } else {
-      console.error(`Trait image not found: ${imagePath}`);
-    }
-  } catch (error) {
-    console.error(`Error drawing layer: ${category}/${traitId}`, error);
-  }
-}
-
-// Helper function to handle missing images for token 1
-function handleMissingImage(ctx, category, traitId) {
-  if (category === 'BACKGROUND') {
-    // Create a semi-transparent blue background
-    const gradient = ctx.createRadialGradient(500, 500, 0, 500, 500, 800);
-    gradient.addColorStop(0, 'rgba(0, 0, 255, 0.4)');
-    gradient.addColorStop(1, 'rgba(0, 0, 255, 0.1)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 1000, 1000);
-    
-    // Add blue stripes to make it visually distinct
-    ctx.strokeStyle = 'rgba(0, 0, 200, 0.5)';
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 1000; i += 80) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, 1000);
-      ctx.stroke();
-    }
-  } else if (category === 'SKIN') {
-    // Draw a simple skin layer in peach color
-    ctx.fillStyle = 'rgba(255, 222, 173, 0.8)';
-    // Upper body skin
-    ctx.beginPath();
-    ctx.arc(500, 300, 120, 0, 2 * Math.PI);
-    ctx.fill();
-    // Torso skin
-    ctx.beginPath();
-    ctx.moveTo(380, 420);
-    ctx.lineTo(620, 420);
-    ctx.lineTo(580, 700);
-    ctx.lineTo(420, 700);
-    ctx.closePath();
-    ctx.fill();
-    // Arms skin
-    ctx.beginPath();
-    ctx.arc(380, 450, 30, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(620, 450, 30, 0, 2 * Math.PI);
-    ctx.fill();
-  } else if (category === 'MOUTH') {
-    // Draw a simple red smile
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-    ctx.beginPath();
-    ctx.arc(500, 600, 150, 0.1 * Math.PI, 0.9 * Math.PI, false);
-    ctx.lineWidth = 15;
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
-    ctx.stroke();
-  } else if (category === 'BASE') {
-    // Draw a simple green silhouette
-    ctx.fillStyle = 'rgba(0, 180, 0, 0.6)';
-    // Head
-    ctx.beginPath();
-    ctx.arc(500, 300, 150, 0, 2 * Math.PI);
-    ctx.fill();
-    // Body
-    ctx.beginPath();
-    ctx.moveTo(350, 450);
-    ctx.lineTo(650, 450);
-    ctx.lineTo(600, 800);
-    ctx.lineTo(400, 800);
-    ctx.closePath();
-    ctx.fill();
-  } else if (category === 'EYES') {
-    // Draw simple eyes
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    // Left eye
-    ctx.beginPath();
-    ctx.arc(400, 300, 30, 0, 2 * Math.PI);
-    ctx.fill();
-    // Right eye
-    ctx.beginPath();
-    ctx.arc(600, 300, 30, 0, 2 * Math.PI);
-    ctx.fill();
-  } else if (category === 'HEAD') {
-    // Draw a simple hat
-    ctx.fillStyle = 'rgba(100, 50, 0, 0.8)';
-    ctx.beginPath();
-    ctx.ellipse(500, 200, 200, 50, 0, 0, 2 * Math.PI);
-    ctx.fill();
-  } else if (category === 'CLOTHING') {
-    // Draw a simple shirt
-    ctx.fillStyle = 'rgba(50, 50, 200, 0.7)';
-    ctx.beginPath();
-    ctx.moveTo(350, 450);
-    ctx.lineTo(650, 450);
-    ctx.lineTo(680, 700);
-    ctx.lineTo(320, 700);
-    ctx.closePath();
-    ctx.fill();
-  }
-}
-
-async function applyMutationEffect(ctx, mutationLevel) {
-  try {
-    let mutationFile;
-    
-    switch (mutationLevel) {
-      case 1: // MILD
-        mutationFile = 'mild.png';
-        break;
-      case 2: // MODERATE  
-        mutationFile = 'moderate.png';
-        break;
-      case 3: // SEVERE
-        mutationFile = 'severe.png';
-        break;
-      default:
-        return;
-    }
-    
-    const mutationPath = path.join(process.cwd(), 'public', 'traits', 'MUTATION', mutationFile);
-    
-    if (fs.existsSync(mutationPath)) {
-      const mutationOverlay = await loadImage(mutationPath);
-      ctx.drawImage(mutationOverlay, 0, 0, 1000, 1000);
-    }
-    
-  } catch (error) {
-    console.error('Error applying mutation effect:', error);
   }
 }
 
