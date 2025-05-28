@@ -79,8 +79,12 @@ export default async function handler(req, res) {
       };
     }
 
-    // Configure headers to allow cache
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
     return res.status(200).json(baseMetadata);
   } catch (error) {
     console.error('Error getting metadata:', error);
