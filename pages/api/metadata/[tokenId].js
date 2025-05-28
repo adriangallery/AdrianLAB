@@ -41,8 +41,7 @@ export default async function handler(req, res) {
       ];
     } catch (error) {
       console.error(`Error getting token data ${tokenId}:`, error);
-      // Si falla la lectura del contrato, devolvemos error
-      return res.status(404).json({ error: 'Token not found or data unavailable' });
+      // Si falla la lectura del contrato, mantenemos la metadata base
     }
 
     // Configure headers to allow cache
