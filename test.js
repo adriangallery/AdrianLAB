@@ -34,7 +34,24 @@ const run = async () => {
     
     const info = await extensions.getCompleteTokenInfo(tokenId);
     console.log('\nInformación del token:');
-    console.log(JSON.stringify(info, null, 2));
+    
+    // Convertir BigNumber a números y formatear la salida
+    const formattedInfo = {
+      tokenId: info.tokenId.toNumber(),
+      generation: info.generation.toNumber(),
+      mutationLevel: info.mutationLevel,
+      canReplicate: info.canReplicate,
+      replicationCount: info.replicationCount.toNumber(),
+      lastReplication: info.lastReplication.toNumber(),
+      hasBeenModified: info.hasBeenModified,
+      skinId: info.skinId.toNumber(),
+      traits: info.traits.map(trait => ({
+        category: trait.category,
+        traitId: trait.traitId.toNumber()
+      }))
+    };
+    
+    console.log(JSON.stringify(formattedInfo, null, 2));
     
   } catch (error) {
     console.error('\nError:', error);

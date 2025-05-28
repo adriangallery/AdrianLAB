@@ -1,4 +1,5 @@
 import { getRawTokenMetadata } from '../../../lib/blockchain.js';
+import { getContracts } from '../../../lib/contracts.js';
 
 export default async function handler(req, res) {
   try {
@@ -10,6 +11,10 @@ export default async function handler(req, res) {
     }
     
     try {
+      // Test de conexión al contrato
+      const { extensions } = await getContracts();
+      console.log('Contrato EXTENSIONS conectado:', extensions.address);
+
       const tokenData = await getRawTokenMetadata(parseInt(tokenId));
 
       // Simulación hasta tener datos reales de rarity
