@@ -20,21 +20,7 @@ export default async function handler(req, res) {
       description: `A BareAdrian from the AdrianLab collection`,
       image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       external_url: `${baseUrl}/token/${tokenId}`,
-      attributes: [
-        { trait_type: "Body Type", value: "SVG" },
-        { trait_type: "Generation", value: "0" },
-        { trait_type: "Mutation Level", value: "None" },
-        { trait_type: "Can Replicate", value: "No" },
-        { trait_type: "Has Been Modified", value: "No" },
-        { trait_type: "Body Rarity", value: "1.00%" },
-        { trait_type: "Background", value: "#1" },
-        { trait_type: "Adrian", value: "#1" },
-        { trait_type: "Skin", value: "#1" },
-        { trait_type: "Gear", value: "#1" },
-        { trait_type: "Head", value: "#1" },
-        { trait_type: "Mouth", value: "#1" },
-        { trait_type: "Eyes", value: "#1" }
-      ]
+      attributes: []
     };
     
     try {
@@ -51,19 +37,12 @@ export default async function handler(req, res) {
         { trait_type: "Generation", value: tokenData.generation },
         { trait_type: "Mutation Level", value: ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
         { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
-        { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" },
-        { trait_type: "Body Rarity", value: "1.00%" },
-        { trait_type: "Background", value: "#1" },
-        { trait_type: "Adrian", value: "#1" },
-        { trait_type: "Skin", value: "#1" },
-        { trait_type: "Gear", value: "#1" },
-        { trait_type: "Head", value: "#1" },
-        { trait_type: "Mouth", value: "#1" },
-        { trait_type: "Eyes", value: "#1" }
+        { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" }
       ];
     } catch (error) {
       console.error(`Error getting token data ${tokenId}:`, error);
-      // Si falla la lectura del contrato, usamos la metadata base
+      // Si falla la lectura del contrato, devolvemos error
+      return res.status(404).json({ error: 'Token not found or data unavailable' });
     }
 
     // Configure headers to allow cache
