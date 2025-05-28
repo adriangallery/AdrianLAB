@@ -28,7 +28,24 @@ export default async function handler(req, res) {
       const { extensions } = await getContracts();
       console.log('Contrato EXTENSIONS conectado:', extensions.address);
 
-      const tokenData = await getRawTokenMetadata(parseInt(tokenId));
+      // Obtener datos crudos del contrato
+      const rawData = await extensions.getCompleteTokenInfo(tokenId);
+      console.log('Datos crudos del contrato:', JSON.stringify(rawData, null, 2));
+
+      // Convertir BigNumber a números
+      const tokenData = {
+        tokenId: rawData[0].toNumber(),
+        generation: rawData[1].toNumber(),
+        mutationLevel: rawData[2],
+        canReplicate: rawData[3],
+        replicationCount: rawData[4].toNumber(),
+        lastReplication: rawData[5].toNumber(),
+        hasBeenModified: rawData[6],
+        skinId: rawData[7].toNumber(),
+        traits: rawData[8] || []
+      };
+      
+      console.log('Datos procesados del token:', JSON.stringify(tokenData, null, 2));
       
       // Actualizar metadata con datos del contrato
       baseMetadata.description = `A SVG Gen${tokenData.generation} BareAdrian from the AdrianLab collection`;
