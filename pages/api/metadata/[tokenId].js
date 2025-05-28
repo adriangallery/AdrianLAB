@@ -16,8 +16,8 @@ export default async function handler(req, res) {
 
     // Metadata base que siempre se mostrará
     const baseMetadata = {
-      name: `BareAdrian #${tokenId}`,
-      description: `A BareAdrian from the AdrianLab collection`,
+      name: `AdrianZero #${tokenId}`,
+      description: `An AdrianZero from the AdrianLAB collection`,
       image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       external_url: `${baseUrl}/token/${tokenId}`,
       attributes: []
@@ -48,9 +48,9 @@ export default async function handler(req, res) {
       console.log('Datos procesados del token:', JSON.stringify(tokenData, null, 2));
       
       // Actualizar metadata con datos del contrato
-      baseMetadata.description = `A SVG Gen${tokenData.generation} BareAdrian from the AdrianLab collection`;
+      baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
       baseMetadata.attributes = [
-        { trait_type: "Body Type", value: `SVG Gen${tokenData.generation}` },
+        { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
         { trait_type: "Generation", value: tokenData.generation },
         { trait_type: "Mutation Level", value: ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
         { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
