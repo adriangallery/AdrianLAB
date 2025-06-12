@@ -28,15 +28,15 @@ export default async function handler(req, res) {
     try {
       // Test de conexión al contrato
       console.log('[metadata] Intentando conectar con el contrato de traits...');
-      const { extensions } = await getContracts();
+      const { traitsExtension } = await getContracts();
       console.log('[metadata] Contrato conectado:', {
-        address: extensions.address,
-        functions: Object.keys(extensions.functions)
+        address: traitsExtension.address,
+        functions: Object.keys(traitsExtension.functions)
       });
 
       // Obtener solo los traits equipados
       console.log('[metadata] Llamando a getAllEquippedTraits...');
-      const [categories, traitIds] = await extensions.getAllEquippedTraits(tokenId);
+      const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
       
       console.log('[metadata] Respuesta de getAllEquippedTraits:', {
         categories,
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
 
       // Añadir información de debug
       baseMetadata.debug = {
-        contractAddress: extensions.address,
+        contractAddress: traitsExtension.address,
         functionCalled: 'getAllEquippedTraits',
         timestamp: new Date().toISOString(),
         rawResponse: {
