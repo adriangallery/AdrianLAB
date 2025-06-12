@@ -26,38 +26,36 @@ export default async function handler(req, res) {
     
     try {
       // Test de conexión al contrato
-      const { extensions } = await getContracts();
-      console.log('Contrato EXTENSIONS conectado:', extensions.address);
+      const { extensions, core } = await getContracts();
+      console.log('Contratos conectados:', {
+        extensions: extensions.address,
+        core: core.address
+      });
 
-      // Obtener datos crudos del contrato
-      const rawData = await extensions.getCompleteTokenInfo(tokenId);
-      console.log('Datos crudos del contrato:', JSON.stringify(rawData, null, 2));
-
-      // Convertir BigNumber a números
-      const tokenData = {
-        tokenId: rawData[0].toNumber(),
-        generation: rawData[1].toNumber(),
-        mutationLevel: rawData[2],
-        canReplicate: rawData[3],
-        replicationCount: rawData[4].toNumber(),
-        lastReplication: rawData[5].toNumber(),
-        hasBeenModified: rawData[6],
-        skinId: rawData[7].toNumber(),
-        traits: rawData[8] || []
-      };
-      
-      console.log('Datos procesados del token:', JSON.stringify(tokenData, null, 2));
+      // Obtener datos del token
+      const tokenData = await getRawTokenMetadata(tokenId);
+      console.log('Datos del token:', JSON.stringify(tokenData, null, 2));
       
       // Actualizar metadata con datos del contrato
       baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
       baseMetadata.attributes = [
         { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
         { trait_type: "Generation", value: tokenData.generation },
-        { trait_type: "Mutation Level", value: ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
+        { trait_type: "Mutation Level", value: tokenData.mutationLevelName || ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
         { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
         { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" },
         { trait_type: "Skin", value: `#${tokenData.skinId}` }
       ];
+
+      // Añadir traits equipados como atributos
+      if (tokenData.traits && tokenData.traits.length > 0) {
+        tokenData.traits.forEach(trait => {
+          baseMetadata.attributes.push({
+            trait_type: trait.category,
+            value: `#${trait.traitId}`
+          });
+        });
+      }
     } catch (error) {
       console.error(`Error getting token data ${tokenId}:`, error);
     }
