@@ -2,21 +2,14 @@ import { getRawTokenMetadata } from '../../../lib/blockchain.js';
 import { getContracts } from '../../../lib/contracts.js';
 
 export default async function handler(req, res) {
-  const debug = {
-    steps: [],
-    errors: [],
-    contracts: null,
-    tokenData: null
-  };
-
   try {
     const { tokenId } = req.query;
-    debug.steps.push(`Iniciando request para token ${tokenId}`);
+    console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
     // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
-      debug.errors.push(`Token ID inválido: ${tokenId}`);
-      return res.status(400).json({ error: 'Invalid token ID', debug });
+      console.error(`[metadata] Token ID inválido: ${tokenId}`);
+      return res.status(400).json({ error: 'Invalid token ID' });
     }
 
     // Build base URL for images
@@ -35,22 +28,20 @@ export default async function handler(req, res) {
     
     try {
       // Test de conexión al contrato
-      debug.steps.push('Intentando conectar con los contratos...');
+      console.log('[metadata] Intentando conectar con los contratos...');
       const { extensions, core } = await getContracts();
-      debug.contracts = {
+      console.log('[metadata] Contratos conectados:', {
         extensions: extensions.address,
         core: core.address
-      };
-      debug.steps.push('Contratos conectados correctamente');
+      });
 
       // Obtener datos del token
-      debug.steps.push('Obteniendo datos del token...');
+      console.log('[metadata] Obteniendo datos del token...');
       const tokenData = await getRawTokenMetadata(tokenId);
-      debug.tokenData = tokenData;
-      debug.steps.push('Datos del token obtenidos correctamente');
+      console.log('[metadata] Datos del token:', JSON.stringify(tokenData, null, 2));
       
       // Actualizar metadata con datos del contrato
-      debug.steps.push('Actualizando metadata con datos del contrato...');
+      console.log('[metadata] Actualizando metadata con datos del contrato...');
       baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
       baseMetadata.attributes = [
         { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
@@ -62,7 +53,7 @@ export default async function handler(req, res) {
       ];
 
       // Añadir traits equipados como atributos
-      debug.steps.push('Añadiendo traits equipados...');
+      console.log('[metadata] Añadiendo traits equipados...');
       if (tokenData.traits && tokenData.traits.length > 0) {
         tokenData.traits.forEach(trait => {
           baseMetadata.attributes.push({
@@ -71,13 +62,10 @@ export default async function handler(req, res) {
           });
         });
       }
-      debug.steps.push('Metadata final generada correctamente');
+      console.log('[metadata] Metadata final:', JSON.stringify(baseMetadata, null, 2));
     } catch (error) {
-      debug.errors.push({
-        message: `Error obteniendo datos del token ${tokenId}`,
-        error: error.message,
-        stack: error.stack
-      });
+      console.error(`[metadata] Error obteniendo datos del token ${tokenId}:`, error);
+      console.error('[metadata] Stack trace:', error.stack);
     }
 
     // Configurar headers para evitar cache
@@ -86,20 +74,10 @@ export default async function handler(req, res) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
     
-    return res.status(200).json({
-      ...baseMetadata,
-      debug: process.env.NODE_ENV === 'development' ? debug : undefined
-    });
+    return res.status(200).json(baseMetadata);
   } catch (error) {
-    debug.errors.push({
-      message: 'Error general',
-      error: error.message,
-      stack: error.stack
-    });
-    return res.status(500).json({ 
-      error: 'Internal server error', 
-      details: error.message,
-      debug: process.env.NODE_ENV === 'development' ? debug : undefined
-    });
+    console.error('[metadata] Error general:', error);
+    console.error('[metadata] Stack trace:', error.stack);
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
