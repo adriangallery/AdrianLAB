@@ -2,14 +2,21 @@ import { getRawTokenMetadata } from '../../../lib/blockchain.js';
 import { getContracts } from '../../../lib/contracts.js';
 
 export default async function handler(req, res) {
+  const debug = {
+    steps: [],
+    errors: [],
+    contracts: null,
+    tokenData: null
+  };
+
   try {
     const { tokenId } = req.query;
-    console.log(`[metadata] Iniciando request para token ${tokenId}`);
+    debug.steps.push(`Iniciando request para token ${tokenId}`);
     
     // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
-      console.error(`[metadata] Token ID inválido: ${tokenId}`);
-      return res.status(400).json({ error: 'Invalid token ID' });
+      debug.errors.push(`Token ID inválido: ${tokenId}`);
+      return res.status(400).json({ error: 'Invalid token ID', debug });
     }
 
     // Build base URL for images
@@ -28,20 +35,22 @@ export default async function handler(req, res) {
     
     try {
       // Test de conexión al contrato
-      console.log('[metadata] Intentando conectar con los contratos...');
+      debug.steps.push('Intentando conectar con los contratos...');
       const { extensions, core } = await getContracts();
-      console.log('[metadata] Contratos conectados:', {
+      debug.contracts = {
         extensions: extensions.address,
         core: core.address
-      });
+      };
+      debug.steps.push('Contratos conectados correctamente');
 
       // Obtener datos del token
-      console.log('[metadata] Obteniendo datos del token...');
+      debug.steps.push('Obteniendo datos del token...');
       const tokenData = await getRawTokenMetadata(tokenId);
-      console.log('[metadata] Datos del token:', JSON.stringify(tokenData, null, 2));
+      debug.tokenData = tokenData;
+      debug.steps.push('Datos del token obtenidos correctamente');
       
       // Actualizar metadata con datos del contrato
-      console.log('[metadata] Actualizando metadata con datos del contrato...');
+      debug.steps.push('Actualizando metadata con datos del contrato...');
       baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
       baseMetadata.attributes = [
         { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
@@ -53,7 +62,7 @@ export default async function handler(req, res) {
       ];
 
       // Añadir traits equipados como atributos
-      console.log('[metadata] Añadiendo traits equipados...');
+      debug.steps.push('Añadiendo traits equipados...');
       if (tokenData.traits && tokenData.traits.length > 0) {
         tokenData.traits.forEach(trait => {
           baseMetadata.attributes.push({
@@ -62,10 +71,13 @@ export default async function handler(req, res) {
           });
         });
       }
-      console.log('[metadata] Metadata final:', JSON.stringify(baseMetadata, null, 2));
+      debug.steps.push('Metadata final generada correctamente');
     } catch (error) {
-      console.error(`[metadata] Error obteniendo datos del token ${tokenId}:`, error);
-      console.error('[metadata] Stack trace:', error.stack);
+      debug.errors.push({
+        message: `Error obteniendo datos del token ${tokenId}`,
+        error: error.message,
+        stack: error.stack
+      });
     }
 
     // Configurar headers para evitar cache
@@ -74,10 +86,20 @@ export default async function handler(req, res) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
     
-    return res.status(200).json(baseMetadata);
+    return res.status(200).json({
+      ...baseMetadata,
+      debug: process.env.NODE_ENV === 'development' ? debug : undefined
+    });
   } catch (error) {
-    console.error('[metadata] Error general:', error);
-    console.error('[metadata] Stack trace:', error.stack);
-    return res.status(500).json({ error: 'Internal server error', details: error.message });
+    debug.errors.push({
+      message: 'Error general',
+      error: error.message,
+      stack: error.stack
+    });
+    return res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message,
+      debug: process.env.NODE_ENV === 'development' ? debug : undefined
+    });
   }
 }
