@@ -41,70 +41,55 @@ export default async function handler(req, res) {
     // Draw white background
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, 1000, 1000);
-    
-    // Draw skin layer (including skinId 0)
-    const skinBasePath = path.join(process.cwd(), 'public', 'traits', 'SKIN', `${tokenData.skinId}`);
-    
-    // Try different file formats in order of preference
-    const formats = ['.svg', '.png', '.gif'];
-    let skinPath = null;
-    
-    // Find the first existing format
-    for (const format of formats) {
-      const testPath = skinBasePath + format;
-      if (fs.existsSync(testPath)) {
-        skinPath = testPath;
-        break;
-      }
-    }
-    
-    if (skinPath) {
-      try {
-        if (skinPath.endsWith('.svg')) {
-          // Handle SVG files
-          const svgContent = fs.readFileSync(skinPath, 'utf8');
-          
-          // Create a new canvas for the SVG rendering
-          const svgCanvas = createCanvas(1000, 1000);
-          const svgCtx = svgCanvas.getContext('2d');
-          
-          // Parse the SVG string
-          const svg = new Resvg(svgContent, {
-            fitTo: {
-              mode: 'width',
-              value: 1000
-            },
-            font: {
-              loadSystemFonts: true
-            },
-            imageRendering: 1, // High quality
-            logLevel: 'error'
-          });
-          
-          // Render the SVG to a PNG buffer
-          const svgPngBuffer = svg.render().asPng();
-          
-          // Load the PNG buffer as an image
-          const svgImage = new Image();
-          svgImage.src = svgPngBuffer;
-          
-          // Draw the SVG image onto the canvas
-          svgCtx.imageSmoothingEnabled = true;
-          svgCtx.imageSmoothingQuality = 'high';
-          svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
-          
-          // Now draw the rendered SVG onto the main canvas
-          ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
+
+    // Dibujar los traits en orden
+    if (tokenData.traits && tokenData.traits.length > 0) {
+      for (const trait of tokenData.traits) {
+        const traitPath = path.join(process.cwd(), 'public', 'traits', trait.category, `${trait.traitId}.svg`);
+        
+        if (fs.existsSync(traitPath)) {
+          try {
+            // Handle SVG files
+            const svgContent = fs.readFileSync(traitPath, 'utf8');
+            
+            // Create a new canvas for the SVG rendering
+            const svgCanvas = createCanvas(1000, 1000);
+            const svgCtx = svgCanvas.getContext('2d');
+            
+            // Parse the SVG string
+            const svg = new Resvg(svgContent, {
+              fitTo: {
+                mode: 'width',
+                value: 1000
+              },
+              font: {
+                loadSystemFonts: true
+              },
+              imageRendering: 1, // High quality
+              logLevel: 'error'
+            });
+            
+            // Render the SVG to a PNG buffer
+            const svgPngBuffer = svg.render().asPng();
+            
+            // Load the PNG buffer as an image
+            const svgImage = new Image();
+            svgImage.src = svgPngBuffer;
+            
+            // Draw the SVG image onto the canvas
+            svgCtx.imageSmoothingEnabled = true;
+            svgCtx.imageSmoothingQuality = 'high';
+            svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
+            
+            // Now draw the rendered SVG onto the main canvas
+            ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
+          } catch (error) {
+            console.error(`Error processing SVG: ${traitPath}`, error);
+          }
         } else {
-          // Handle PNG and GIF files
-          const image = await loadImage(skinPath);
-          ctx.drawImage(image, 0, 0, 1000, 1000);
+          console.error(`No image found for trait: ${trait.category}/${trait.traitId}`);
         }
-      } catch (error) {
-        console.error(`Error processing image: ${skinPath}`, error);
       }
-    } else {
-      console.error(`No image found for skin ID ${tokenData.skinId}`);
     }
     
     // Convert to PNG buffer with high quality settings
