@@ -35,37 +35,82 @@ export default async function handler(req, res) {
         core: core.address
       });
 
-      // Obtener datos del token
+      // Obtener datos del token con timeout
       console.log('[metadata] Obteniendo datos del token...');
-      const tokenData = await getRawTokenMetadata(tokenId);
-      console.log('[metadata] Datos del token:', JSON.stringify(tokenData, null, 2));
       
-      // Actualizar metadata con datos del contrato
-      console.log('[metadata] Actualizando metadata con datos del contrato...');
-      baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
-      baseMetadata.attributes = [
-        { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
-        { trait_type: "Generation", value: tokenData.generation },
-        { trait_type: "Mutation Level", value: tokenData.mutationLevelName || ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] },
-        { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
-        { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" },
-        { trait_type: "Skin", value: `#${tokenData.skinId}` }
-      ];
+      // Implementar timeout para evitar que se cuelgue
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout al obtener datos del token')), 10000);
+      });
+      
+      const tokenData = await Promise.race([
+        getRawTokenMetadata(tokenId),
+        timeoutPromise
+      ]);
+      
+      console.log('[metadata] Datos del token obtenidos:', JSON.stringify(tokenData, null, 2));
+      
+      if (tokenData) {
+        // Actualizar metadata con datos del contrato
+        console.log('[metadata] Actualizando metadata con datos del contrato...');
+        baseMetadata.description = `A Gen${tokenData.generation} AdrianZero from the AdrianLAB collection`;
+        
+        // Agregar atributos básicos siempre
+        baseMetadata.attributes = [
+          { trait_type: "Body Type", value: `Gen${tokenData.generation}` },
+          { trait_type: "Generation", value: tokenData.generation },
+          { trait_type: "Mutation Level", value: tokenData.mutationLevelName || ["None", "Mild", "Moderate", "Severe"][tokenData.mutationLevel] || "None" },
+          { trait_type: "Can Replicate", value: tokenData.canReplicate ? "Yes" : "No" },
+          { trait_type: "Has Been Modified", value: tokenData.hasBeenModified ? "Yes" : "No" },
+          { trait_type: "Skin", value: `#${tokenData.skinId}` }
+        ];
 
-      // Añadir traits equipados como atributos
-      console.log('[metadata] Añadiendo traits equipados...');
-      if (tokenData.traits && tokenData.traits.length > 0) {
-        tokenData.traits.forEach(trait => {
-          baseMetadata.attributes.push({
-            trait_type: trait.category,
-            value: `#${trait.traitId}`
+        // Añadir traits equipados como atributos
+        console.log('[metadata] Añadiendo traits equipados...');
+        if (tokenData.traits && Array.isArray(tokenData.traits) && tokenData.traits.length > 0) {
+          console.log('[metadata] Traits encontrados:', tokenData.traits);
+          tokenData.traits.forEach(trait => {
+            if (trait && trait.category && trait.traitId) {
+              baseMetadata.attributes.push({
+                trait_type: trait.category,
+                value: `#${trait.traitId}`
+              });
+              console.log('[metadata] Trait añadido:', trait.category, `#${trait.traitId}`);
+            }
           });
-        });
+        } else {
+          console.log('[metadata] No se encontraron traits equipados');
+        }
+        
+        console.log('[metadata] Metadata final con datos del contrato:', JSON.stringify(baseMetadata, null, 2));
       }
-      console.log('[metadata] Metadata final:', JSON.stringify(baseMetadata, null, 2));
-    } catch (error) {
-      console.error(`[metadata] Error obteniendo datos del token ${tokenId}:`, error);
-      console.error('[metadata] Stack trace:', error.stack);
+      
+    } catch (contractError) {
+      console.error(`[metadata] Error obteniendo datos del contrato para token ${tokenId}:`, contractError);
+      console.error('[metadata] Stack trace:', contractError.stack);
+      
+      // Información más detallada del error
+      if (contractError.message.includes('getTokenData is not a function')) {
+        console.error('[metadata] ERROR CRÍTICO: La función getTokenData no existe en el ABI del contrato');
+        console.error('[metadata] Verificar que el ABI de AdrianLabCore esté actualizado');
+      }
+      
+      if (contractError.message.includes('getAllEquippedTraits is not a function')) {
+        console.error('[metadata] ERROR CRÍTICO: La función getAllEquippedTraits no existe en el ABI del contrato');
+        console.error('[metadata] Verificar que el ABI de AdrianTraitsExtensions esté actualizado');
+      }
+      
+      // Continuar con metadata básica
+      console.log('[metadata] Continuando con metadata básica debido a errores del contrato');
+    }
+
+    // Agregar información de debug en metadata
+    if (process.env.NODE_ENV !== 'production') {
+      baseMetadata.debug = {
+        tokenDataObtained: tokenData !== null,
+        contractError: tokenData === null,
+        timestamp: new Date().toISOString()
+      };
     }
 
     // Configurar headers para evitar cache
@@ -78,6 +123,20 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('[metadata] Error general:', error);
     console.error('[metadata] Stack trace:', error.stack);
-    return res.status(500).json({ error: 'Internal server error', details: error.message });
+    
+    // Metadata de emergencia más completa
+    const emergencyMetadata = {
+      name: `AdrianZero #${req.query.tokenId || 'Unknown'}`,
+      description: `An AdrianZero from the AdrianLAB collection (Emergency Mode)`,
+      image: `https://adrianlab.vercel.app/api/render/${req.query.tokenId || 1}.png?v=${Date.now()}`,
+      external_url: `https://adrianlab.vercel.app/token/${req.query.tokenId || 1}`,
+      metadata_version: "2-emergency",
+      attributes: [
+        { trait_type: "Status", value: "Emergency Mode" },
+        { trait_type: "Error", value: "Contract data unavailable" }
+      ]
+    };
+    
+    return res.status(200).json(emergencyMetadata);
   }
 }
