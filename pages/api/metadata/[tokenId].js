@@ -26,18 +26,30 @@ export default async function handler(req, res) {
     };
     
     try {
-      // Test de conexión al contrato
-      console.log('[metadata] Intentando conectar con el contrato de traits...');
-      const { traitsExtension } = await getContracts();
-      console.log('[metadata] Contrato conectado:', {
-        address: traitsExtension.address,
-        functions: Object.keys(traitsExtension.functions)
+      // Test de conexión a contratos
+      console.log('[metadata] Intentando conectar con los contratos...');
+      const { core, traitsExtension } = await getContracts();
+      console.log('[metadata] Contratos conectados:', {
+        core: {
+          address: core.address,
+          functions: Object.keys(core.functions)
+        },
+        traitsExtension: {
+          address: traitsExtension.address,
+          functions: Object.keys(traitsExtension.functions)
+        }
       });
 
-      // Obtener solo los traits equipados
+      // Obtener datos del token
+      console.log('[metadata] Llamando a getTokenData...');
+      const tokenData = await core.getTokenData(tokenId);
+      console.log('[metadata] Respuesta de getTokenData:', {
+        result: tokenData.map(v => v.toString())
+      });
+
+      // Obtener traits equipados
       console.log('[metadata] Llamando a getAllEquippedTraits...');
       const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
-      
       console.log('[metadata] Respuesta de getAllEquippedTraits:', {
         categories,
         traitIds: traitIds.map(id => id.toString())
@@ -55,13 +67,22 @@ export default async function handler(req, res) {
 
       // Añadir información de debug
       baseMetadata.debug = {
-        contractAddress: traitsExtension.address,
-        functionCalled: 'getAllEquippedTraits',
-        timestamp: new Date().toISOString(),
-        rawResponse: {
-          categories,
-          traitIds: traitIds.map(id => id.toString())
-        }
+        contracts: {
+          core: {
+            address: core.address,
+            functionCalled: 'getTokenData',
+            result: tokenData.map(v => v.toString())
+          },
+          traitsExtension: {
+            address: traitsExtension.address,
+            functionCalled: 'getAllEquippedTraits',
+            result: {
+              categories,
+              traitIds: traitIds.map(id => id.toString())
+            }
+          }
+        },
+        timestamp: new Date().toISOString()
       };
 
     } catch (error) {
