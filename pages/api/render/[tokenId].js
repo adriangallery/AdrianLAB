@@ -92,7 +92,9 @@ export default async function handler(req, res) {
       // Con skin, usar combinación de generación y skin
       const skinType = skinIdStr === "1" ? "Medium" : 
                       skinIdStr === "2" ? "Dark" : 
-                      skinIdStr === "3" ? "Alien" : "Medium";
+                      skinIdStr === "3" ? "Alien" :
+                      skinIdStr === "4" ? "Light" :
+                      skinIdStr === "5" ? "Albino" : "Medium";
       baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
     }
 
