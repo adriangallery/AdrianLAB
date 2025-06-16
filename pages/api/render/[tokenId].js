@@ -4,121 +4,152 @@ import fs from 'fs';
 import { createCanvas, loadImage, Image } from 'canvas';
 import { getRawTokenMetadata } from '../../../lib/blockchain.js';
 import { Resvg } from '@resvg/resvg-js';
+import { getContracts } from '../../../lib/contracts.js';
+import { getTokenTraits } from '../../../lib/blockchain.js';
+import { renderSvgBuffer } from '@resvg/resvg-js';
 
 export default async function handler(req, res) {
   try {
-    // Extract tokenId, removing .png extension if present
-    let { tokenId } = req.query;
-    
-    // Remove .png extension if present
-    if (tokenId && tokenId.endsWith('.png')) {
-      tokenId = tokenId.replace('.png', '');
-    }
-    
+    const { tokenId } = req.query;
+    console.log(`[render] Iniciando renderizado para token ${tokenId}`);
+
     // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
+      console.error(`[render] Token ID inválido: ${tokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
     }
-    
-    // Get token data from blockchain
-    let tokenData;
-    try {
-      tokenData = await getRawTokenMetadata(parseInt(tokenId));
-    } catch (error) {
-      console.error(`Error getting token data ${tokenId}:`, error);
-      // If there's an error getting the data, use the fallback SVG
-      return renderFallbackSVG(res, tokenId);
-    }
-    
-        // Create a canvas for the image
-        const canvas = createCanvas(1000, 1000);
-        const ctx = canvas.getContext('2d');
-        
-        // Configure for high quality rendering
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        
-    // Draw white background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, 1000, 1000);
-    
-    // Draw skin layer (including skinId 0)
-    const skinBasePath = path.join(process.cwd(), 'public', 'traits', 'SKIN', `${tokenData.skinId}`);
-    
-    // Try different file formats in order of preference
-    const formats = ['.svg', '.png', '.gif'];
-    let skinPath = null;
-    
-    // Find the first existing format
-    for (const format of formats) {
-      const testPath = skinBasePath + format;
-      if (fs.existsSync(testPath)) {
-        skinPath = testPath;
-        break;
+
+    // Test de conexión a contratos
+    console.log('[render] Intentando conectar con los contratos...');
+    const { core, traitsExtension } = await getContracts();
+    console.log('[render] Contratos conectados:', {
+      core: {
+        address: core.address,
+        functions: Object.keys(core.functions)
+      },
+      traitsExtension: {
+        address: traitsExtension.address,
+        functions: Object.keys(traitsExtension.functions)
       }
-    }
-    
-    if (skinPath) {
+    });
+
+    // Obtener datos del token
+    console.log('[render] Llamando a getTokenData...');
+    const tokenData = await core.getTokenData(tokenId);
+    console.log('[render] Respuesta de getTokenData:', {
+      result: tokenData.map(v => v.toString())
+    });
+
+    // Obtener skin del token
+    console.log('[render] Llamando a getTokenSkin...');
+    const skinId = await core.getTokenSkin(tokenId);
+    console.log('[render] Respuesta de getTokenSkin:', {
+      skinId: skinId.toString()
+    });
+
+    // Obtener traits equipados
+    console.log('[render] Llamando a getAllEquippedTraits...');
+    const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+    console.log('[render] Respuesta de getAllEquippedTraits:', {
+      categories,
+      traitIds: traitIds.map(id => id.toString())
+    });
+
+    // Crear canvas
+    const canvas = createCanvas(1000, 1000);
+    const ctx = canvas.getContext('2d');
+
+    // Función para cargar y renderizar SVG
+    const loadAndRenderSvg = async (path) => {
       try {
-        if (skinPath.endsWith('.svg')) {
-          // Handle SVG files
-          const svgContent = fs.readFileSync(skinPath, 'utf8');
-        
-          // Create a new canvas for the SVG rendering
-        const svgCanvas = createCanvas(1000, 1000);
-        const svgCtx = svgCanvas.getContext('2d');
-        
-        // Parse the SVG string
-        const svg = new Resvg(svgContent, {
+        const svgBuffer = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app'}/traits/${path}`)
+          .then(res => res.arrayBuffer());
+        const pngBuffer = await renderSvgBuffer(Buffer.from(svgBuffer), {
           fitTo: {
             mode: 'width',
             value: 1000
-          },
-          font: {
-            loadSystemFonts: true
-          },
-          imageRendering: 1, // High quality
-          logLevel: 'error'
+          }
         });
-        
-        // Render the SVG to a PNG buffer
-        const svgPngBuffer = svg.render().asPng();
-        
-        // Load the PNG buffer as an image
-        const svgImage = new Image();
-        svgImage.src = svgPngBuffer;
-        
-          // Draw the SVG image onto the canvas
-        svgCtx.imageSmoothingEnabled = true;
-        svgCtx.imageSmoothingQuality = 'high';
-        svgCtx.drawImage(svgImage, 0, 0, 1000, 1000);
-        
-        // Now draw the rendered SVG onto the main canvas
-        ctx.drawImage(svgCanvas, 0, 0, 1000, 1000);
-        } else {
-          // Handle PNG and GIF files
-          const image = await loadImage(skinPath);
-          ctx.drawImage(image, 0, 0, 1000, 1000);
-        }
+        return loadImage(pngBuffer);
       } catch (error) {
-        console.error(`Error processing image: ${skinPath}`, error);
+        console.error(`[render] Error cargando SVG ${path}:`, error);
+        return null;
       }
-    } else {
-      console.error(`No image found for skin ID ${tokenData.skinId}`);
-}
+    };
 
-    // Convert to PNG buffer with high quality settings
-    const buffer = canvas.toBuffer('image/png', { compressionLevel: 6, quality: 1.0 });
-    
-    // Send the image
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    // Determinar la imagen base según generación y skin
+    const generation = tokenData[0].toString();
+    const skinIdStr = skinId.toString();
+    let baseImagePath;
+
+    if (skinIdStr === "0") {
+      // Sin skin, usar base según generación
+      baseImagePath = `SKIN/${generation}.svg`;
+    } else {
+      // Con skin, usar combinación de generación y skin
+      const skinType = skinIdStr === "1" ? "Medium" : 
+                      skinIdStr === "2" ? "Dark" : 
+                      skinIdStr === "3" ? "Alien" : "Medium";
+      baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
+    }
+
+    console.log('[render] Cargando imagen base:', baseImagePath);
+    const baseImage = await loadAndRenderSvg(baseImagePath);
+    if (baseImage) {
+      ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+    }
+
+    // Renderizar traits en orden
+    if (categories && categories.length > 0) {
+      for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        const traitId = traitIds[i].toString();
+        const traitPath = `${category}/${traitId}.svg`;
+        
+        console.log(`[render] Cargando trait: ${traitPath}`);
+        const traitImage = await loadAndRenderSvg(traitPath);
+        if (traitImage) {
+          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+        }
+      }
+    }
+
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    return res.status(200).send(buffer);
+    res.setHeader('Surrogate-Control', 'no-store');
+    
+    // Enviar imagen
+    const buffer = canvas.toBuffer('image/png');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
+
   } catch (error) {
-    console.error('Error rendering token:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('[render] Error:', error);
+    console.error('[render] Stack trace:', error.stack);
+    
+    // En caso de error, devolver una imagen de error
+    const canvas = createCanvas(1000, 1000);
+    const ctx = canvas.getContext('2d');
+    
+    // Fondo rojo
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, 1000, 1000);
+    
+    // Texto de error
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error Rendering Token', 500, 450);
+    ctx.font = '24px Arial';
+    ctx.fillText(error.message, 500, 500);
+    
+    const buffer = canvas.toBuffer('image/png');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
   }
 }
 
