@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       name: `AdrianZero #${tokenId}`,
       description: `An AdrianZero from the AdrianLAB collection`,
       image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
-      external_url: `${baseUrl}/render/${tokenId}.png?v=${version}`,
+      external_url: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       metadata_version: "2",
       attributes: []
     };
