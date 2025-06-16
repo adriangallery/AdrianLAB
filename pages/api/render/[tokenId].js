@@ -98,12 +98,23 @@ export default async function handler(req, res) {
     const generation = tokenData[0].toString();
     let baseImagePath;
 
+    console.log('[render] Datos para selección de skin:', {
+      generation,
+      skinIdStr,
+      isMutated: tokenData[2],
+      mutationLevel: tokenData[1].toString(),
+      mutationType: tokenData[3].toString(),
+      mutationStage: tokenData[4].toString()
+    });
+
     if (skinIdStr === "0,Zero") {
       // Para skin 0,Zero usar GEN0-Medium
       baseImagePath = `ADRIAN/GEN${generation}-Medium.svg`;
+      console.log('[render] Usando skin 0,Zero -> Medium');
     } else if (skinIdStr === "0") {
       // Sin skin, usar base según generación
       baseImagePath = `SKIN/${generation}.svg`;
+      console.log('[render] Usando skin base según generación');
     } else {
       // Con skin, usar combinación de generación y skin
       const skinType = skinIdStr === "1" ? "Dark" : 
@@ -112,6 +123,7 @@ export default async function handler(req, res) {
                       skinIdStr === "4" ? "Albino" :
                       skinIdStr === "5" ? "Medium" : "Medium";
       baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
+      console.log('[render] Usando skin personalizado:', { skinIdStr, skinType });
     }
 
     console.log('[render] Cargando imagen base:', baseImagePath);
