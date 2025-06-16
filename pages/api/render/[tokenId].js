@@ -5,12 +5,14 @@ import { Resvg } from '@resvg/resvg-js';
 
 export default async function handler(req, res) {
   try {
+    // Extraer tokenId de la ruta, eliminando .png si existe
     const { tokenId } = req.query;
-    console.log(`[render] Iniciando renderizado para token ${tokenId}`);
+    const cleanTokenId = tokenId.replace('.png', '');
+    console.log(`[render] Iniciando renderizado para token ${cleanTokenId}`);
 
     // Verify that tokenId is valid
-    if (!tokenId || isNaN(parseInt(tokenId))) {
-      console.error(`[render] Token ID inválido: ${tokenId}`);
+    if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
+      console.error(`[render] Token ID inválido: ${cleanTokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
@@ -20,7 +22,7 @@ export default async function handler(req, res) {
 
     // Obtener datos del token
     console.log('[render] Obteniendo datos del token...');
-    const tokenData = await core.getTokenData(tokenId);
+    const tokenData = await core.getTokenData(cleanTokenId);
     const [generation, mutationLevel, canReplicate, replicationCount, lastReplication, hasBeenModified] = tokenData;
     
     console.log('[render] TokenData:', {
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
 
     // Obtener skin del token
     console.log('[render] Obteniendo skin del token...');
-    const tokenSkinData = await core.getTokenSkin(tokenId);
+    const tokenSkinData = await core.getTokenSkin(cleanTokenId);
     const skinId = tokenSkinData[0].toString();
     const skinName = tokenSkinData[1];
     
@@ -43,7 +45,7 @@ export default async function handler(req, res) {
 
     // Obtener traits equipados
     console.log('[render] Obteniendo traits equipados...');
-    const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+    const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(cleanTokenId);
     console.log('[render] Traits equipados:', {
       categories,
       traitIds: traitIds.map(id => id.toString())
@@ -202,7 +204,7 @@ export default async function handler(req, res) {
     ctx.textAlign = 'center';
     ctx.fillText('Error Rendering', 500, 450);
     ctx.font = '24px Arial';
-    ctx.fillText(`Token #${req.query.tokenId || 'Unknown'}`, 500, 500);
+    ctx.fillText(`Token #${req.query.tokenId?.replace('.png', '') || 'Unknown'}`, 500, 500);
     ctx.font = '18px Arial';
     ctx.fillText(error.message.substring(0, 50), 500, 550);
     
