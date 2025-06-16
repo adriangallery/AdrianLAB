@@ -129,7 +129,10 @@ export default async function handler(req, res) {
     console.log('[render] Cargando imagen base:', baseImagePath);
     const baseImage = await loadAndRenderSvg(baseImagePath);
     if (baseImage) {
+      console.log('[render] Imagen base cargada correctamente');
       ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+    } else {
+      console.error('[render] Error al cargar la imagen base');
     }
 
     // Renderizar traits en orden
@@ -142,7 +145,10 @@ export default async function handler(req, res) {
         console.log(`[render] Cargando trait: ${traitPath}`);
         const traitImage = await loadAndRenderSvg(traitPath);
         if (traitImage) {
+          console.log(`[render] Trait ${traitPath} cargado correctamente`);
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+        } else {
+          console.error(`[render] Error al cargar el trait ${traitPath}`);
         }
       }
     }
