@@ -66,8 +66,18 @@ export default async function handler(req, res) {
     // Función para cargar y renderizar SVG
     const loadAndRenderSvg = async (path) => {
       try {
-        const svgBuffer = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app'}/traits/${path}`)
-          .then(res => res.arrayBuffer());
+        // Construir la URL correcta para las imágenes
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/traits/${path}`;
+        console.log(`[render] Intentando cargar imagen desde: ${imageUrl}`);
+
+        const svgBuffer = await fetch(imageUrl)
+          .then(res => {
+            if (!res.ok) {
+              throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.arrayBuffer();
+          });
         
         // Usar Resvg directamente en lugar de renderSvgBuffer
         const resvg = new Resvg(Buffer.from(svgBuffer), {
