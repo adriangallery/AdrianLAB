@@ -3,6 +3,41 @@ import { createCanvas, loadImage } from 'canvas';
 import { getContracts } from '../../../lib/contracts.js';
 import { Resvg } from '@resvg/resvg-js';
 
+// =============================================
+// SECCIÓN DE EXCEPCIONES ESPECIALES
+// =============================================
+
+// Mapeo de excepciones para traits de skin
+const SKIN_TRAIT_EXCEPTIONS = {
+  // Trait ID 37 (Normal)
+  37: {
+    GEN0: 'SKIN/OG_GEN0.svg',
+    GEN1: 'SKIN/OG_GEN1.svg',
+    GEN2: 'SKIN/OG_GEN2.svg'
+  },
+  // Trait ID 38 (3D)
+  38: {
+    GEN0: 'SKIN/OG_GEN0_3D.svg',
+    GEN1: 'SKIN/OG_GEN1_3D.svg',
+    GEN2: 'SKIN/OG_GEN2_3D.svg'
+  }
+};
+
+// Función para verificar si un trait es una excepción de skin
+const isSkinTraitException = (traitId) => {
+  return traitId in SKIN_TRAIT_EXCEPTIONS;
+};
+
+// Función para obtener la ruta del skin excepcional
+const getSkinTraitPath = (traitId, generation) => {
+  if (!isSkinTraitException(traitId)) return null;
+  return SKIN_TRAIT_EXCEPTIONS[traitId][`GEN${generation}`];
+};
+
+// =============================================
+// FUNCIÓN PRINCIPAL
+// =============================================
+
 export default async function handler(req, res) {
   try {
     // Extraer tokenId de la ruta, eliminando .png si existe
@@ -127,6 +162,15 @@ export default async function handler(req, res) {
       equippedTraits[category] = traitIds[index].toString();
     });
 
+    // Verificar si hay un trait de skin excepcional
+    let skinTraitPath = null;
+    if (equippedTraits['SKIN']) {
+      skinTraitPath = getSkinTraitPath(equippedTraits['SKIN'], gen);
+      if (skinTraitPath) {
+        console.log(`[render] Detectado trait de skin excepcional: ${skinTraitPath}`);
+      }
+    }
+
     // 1. PRIMERO: Renderizar BACKGROUND si existe
     if (equippedTraits['BACKGROUND']) {
       const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
@@ -139,19 +183,32 @@ export default async function handler(req, res) {
       }
     }
 
-    // 2. SEGUNDO: Renderizar el SKIN (Adrian base)
-    console.log('[render] PASO 2 - Iniciando carga del skin base');
-    const baseImage = await loadAndRenderSvg(baseImagePath);
-    if (baseImage) {
-      ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-      console.log('[render] PASO 2 - Skin base renderizado correctamente');
+    // 2. SEGUNDO: Renderizar el SKIN (Adrian base o excepción)
+    console.log('[render] PASO 2 - Iniciando carga del skin');
+    
+    // Si hay un trait de skin excepcional, usarlo en lugar del skin base
+    if (skinTraitPath) {
+      console.log(`[render] PASO 2 - Usando skin excepcional: ${skinTraitPath}`);
+      const skinImage = await loadAndRenderSvg(skinTraitPath);
+      if (skinImage) {
+        ctx.drawImage(skinImage, 0, 0, 1000, 1000);
+        console.log('[render] PASO 2 - Skin excepcional renderizado correctamente');
+      }
     } else {
-      console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
-      const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
-      const fallbackImage = await loadAndRenderSvg(fallbackPath);
-      if (fallbackImage) {
-        ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
-        console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+      // Usar skin base normal
+      console.log('[render] PASO 2 - Usando skin base normal');
+      const baseImage = await loadAndRenderSvg(baseImagePath);
+      if (baseImage) {
+        ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+        console.log('[render] PASO 2 - Skin base renderizado correctamente');
+      } else {
+        console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
+        const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
+        const fallbackImage = await loadAndRenderSvg(fallbackPath);
+        if (fallbackImage) {
+          ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+        }
       }
     }
 
