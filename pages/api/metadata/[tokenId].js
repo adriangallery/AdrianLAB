@@ -47,6 +47,13 @@ export default async function handler(req, res) {
         result: tokenData.map(v => v.toString())
       });
 
+      // Obtener skin del token
+      console.log('[metadata] Llamando a getTokenSkin...');
+      const skinId = await core.getTokenSkin(tokenId);
+      console.log('[metadata] Respuesta de getTokenSkin:', {
+        skinId: skinId.toString()
+      });
+
       // Obtener traits equipados
       console.log('[metadata] Llamando a getAllEquippedTraits...');
       const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
@@ -54,6 +61,36 @@ export default async function handler(req, res) {
         categories,
         traitIds: traitIds.map(id => id.toString())
       });
+
+      // Añadir atributos base
+      baseMetadata.attributes.push(
+        {
+          trait_type: "Generation",
+          value: tokenData[0].toString()
+        },
+        {
+          trait_type: "Skin",
+          value: `#${skinId.toString()}`
+        }
+      );
+
+      // Añadir atributos de mutación si está mutado
+      if (tokenData[2]) { // isMutated
+        baseMetadata.attributes.push(
+          {
+            trait_type: "Mutation Level",
+            value: tokenData[1].toString()
+          },
+          {
+            trait_type: "Mutation Type",
+            value: tokenData[3].toString()
+          },
+          {
+            trait_type: "Mutation Stage",
+            value: tokenData[4].toString()
+          }
+        );
+      }
 
       // Añadir traits como atributos
       if (categories && categories.length > 0) {
@@ -70,8 +107,16 @@ export default async function handler(req, res) {
         contracts: {
           core: {
             address: core.address,
-            functionCalled: 'getTokenData',
-            result: tokenData.map(v => v.toString())
+            functions: {
+              getTokenData: {
+                called: true,
+                result: tokenData.map(v => v.toString())
+              },
+              getTokenSkin: {
+                called: true,
+                result: skinId.toString()
+              }
+            }
           },
           traitsExtension: {
             address: traitsExtension.address,
