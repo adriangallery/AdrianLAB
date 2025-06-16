@@ -47,6 +47,10 @@ export default async function handler(req, res) {
       skinId: skinId.toString()
     });
 
+    // Extraer solo el número del skin ID (en caso de que venga como "0,Zero")
+    const skinIdStr = skinId.toString().split(',')[0];
+    console.log('[render] Skin ID procesado:', skinIdStr);
+
     // Obtener traits equipados
     console.log('[render] Llamando a getAllEquippedTraits...');
     const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
@@ -79,7 +83,6 @@ export default async function handler(req, res) {
 
     // Determinar la imagen base según generación y skin
     const generation = tokenData[0].toString();
-    const skinIdStr = skinId.toString();
     let baseImagePath;
 
     if (skinIdStr === "0") {
