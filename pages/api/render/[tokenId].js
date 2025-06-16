@@ -1,12 +1,7 @@
 // API endpoint for rendering tokens by tokenId
-import path from 'path';
-import fs from 'fs';
-import { createCanvas, loadImage, Image } from 'canvas';
-import { getRawTokenMetadata } from '../../../lib/blockchain.js';
-import { Resvg } from '@resvg/resvg-js';
+import { createCanvas, loadImage } from 'canvas';
 import { getContracts } from '../../../lib/contracts.js';
-import { getTokenTraits } from '../../../lib/blockchain.js';
-import { renderSvgBuffer } from '@resvg/resvg-js';
+import { Resvg } from '@resvg/resvg-js';
 
 export default async function handler(req, res) {
   try {
@@ -19,136 +14,158 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // Test de conexión a contratos
-    console.log('[render] Intentando conectar con los contratos...');
+    // Conectar con los contratos
+    console.log('[render] Conectando con los contratos...');
     const { core, traitsExtension } = await getContracts();
-    console.log('[render] Contratos conectados:', {
-      core: {
-        address: core.address,
-        functions: Object.keys(core.functions)
-      },
-      traitsExtension: {
-        address: traitsExtension.address,
-        functions: Object.keys(traitsExtension.functions)
-      }
-    });
 
     // Obtener datos del token
-    console.log('[render] Llamando a getTokenData...');
+    console.log('[render] Obteniendo datos del token...');
     const tokenData = await core.getTokenData(tokenId);
-    console.log('[render] Respuesta de getTokenData:', {
-      result: tokenData.map(v => v.toString())
+    const [generation, mutationLevel, canReplicate, replicationCount, lastReplication, hasBeenModified] = tokenData;
+    
+    console.log('[render] TokenData:', {
+      generation: generation.toString(),
+      mutationLevel: mutationLevel.toString(),
+      canReplicate,
+      hasBeenModified
     });
 
     // Obtener skin del token
-    console.log('[render] Llamando a getTokenSkin...');
-    const skinId = await core.getTokenSkin(tokenId);
-    console.log('[render] Respuesta de getTokenSkin:', {
-      skinId: skinId.toString()
+    console.log('[render] Obteniendo skin del token...');
+    const tokenSkinData = await core.getTokenSkin(tokenId);
+    const skinId = tokenSkinData[0].toString();
+    const skinName = tokenSkinData[1];
+    
+    console.log('[render] Skin info:', {
+      skinId,
+      skinName
     });
 
-    // Extraer solo el número del skin ID (en caso de que venga como "0,Zero")
-    const skinIdStr = skinId.toString();
-    console.log('[render] Skin ID procesado:', skinIdStr);
-
     // Obtener traits equipados
-    console.log('[render] Llamando a getAllEquippedTraits...');
+    console.log('[render] Obteniendo traits equipados...');
     const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
-    console.log('[render] Respuesta de getAllEquippedTraits:', {
+    console.log('[render] Traits equipados:', {
       categories,
       traitIds: traitIds.map(id => id.toString())
     });
 
-    // Crear canvas
+    // Crear canvas con fondo blanco
     const canvas = createCanvas(1000, 1000);
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 1000, 1000);
+    console.log('[render] Canvas creado con fondo blanco');
 
     // Función para cargar y renderizar SVG
     const loadAndRenderSvg = async (path) => {
       try {
-        // Construir la URL correcta para las imágenes
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
         const imageUrl = `${baseUrl}/traits/${path}`;
-        console.log(`[render] Intentando cargar imagen desde: ${imageUrl}`);
+        console.log(`[render] Cargando imagen: ${imageUrl}`);
 
-        const svgBuffer = await fetch(imageUrl)
-          .then(res => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.arrayBuffer();
-          });
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Usar Resvg directamente en lugar de renderSvgBuffer
+        const svgBuffer = await response.arrayBuffer();
+        
+        // Renderizar SVG a PNG
         const resvg = new Resvg(Buffer.from(svgBuffer), {
           fitTo: {
             mode: 'width',
             value: 1000
           }
         });
+        
         const pngBuffer = resvg.render().asPng();
         return loadImage(pngBuffer);
       } catch (error) {
-        console.error(`[render] Error cargando SVG ${path}:`, error);
+        console.error(`[render] Error cargando SVG ${path}:`, error.message);
         return null;
       }
     };
 
     // Determinar la imagen base según generación y skin
-    const generation = tokenData[0].toString();
+    const gen = generation.toString();
     let baseImagePath;
 
-    console.log('[render] Datos para selección de skin:', {
-      generation,
-      skinIdStr,
-      isMutated: tokenData[2],
-      mutationLevel: tokenData[1].toString(),
-      mutationType: tokenData[3].toString(),
-      mutationStage: tokenData[4].toString()
+    // Mapear skin para determinar la imagen a mostrar
+    let skinType;
+    
+    console.log('[render] Analizando skin:', {
+      skinId,
+      skinName,
+      generacion: gen
+    });
+    
+    if (skinName === "Zero" || skinId === "0" || skinId === "1") {
+      skinType = "Medium";
+      console.log('[render] Skin Zero detectado, usando Medium');
+    } else if (skinId === "2" || skinName === "Dark") {
+      skinType = "Dark";
+    } else if (skinId === "3" || skinName === "Alien") {
+      skinType = "Alien";
+    } else {
+      skinType = skinName || "Medium";
+    }
+
+    // Construir path del Adrian base
+    baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
+    console.log('[render] Path de imagen base:', baseImagePath);
+    console.log('[render] Mapeo aplicado:', {
+      skinId,
+      skinName,
+      skinTypeSeleccionado: skinType
     });
 
-    if (skinIdStr === "0,Zero") {
-      // Para skin 0,Zero usar GEN0-Medium
-      baseImagePath = `ADRIAN/GEN${generation}-Medium.svg`;
-      console.log('[render] Usando skin 0,Zero -> Medium');
-    } else if (skinIdStr === "0") {
-      // Sin skin, usar base según generación
-      baseImagePath = `SKIN/${generation}.svg`;
-      console.log('[render] Usando skin base según generación');
-    } else {
-      // Con skin, usar combinación de generación y skin
-      const skinType = skinIdStr === "1" ? "Dark" : 
-                      skinIdStr === "2" ? "Alien" : 
-                      skinIdStr === "3" ? "Light" :
-                      skinIdStr === "4" ? "Albino" :
-                      skinIdStr === "5" ? "Medium" : "Medium";
-      baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
-      console.log('[render] Usando skin personalizado:', { skinIdStr, skinType });
+    // Crear mapa de traits equipados
+    const equippedTraits = {};
+    categories.forEach((category, index) => {
+      equippedTraits[category] = traitIds[index].toString();
+    });
+
+    // 1. PRIMERO: Renderizar BACKGROUND si existe
+    if (equippedTraits['BACKGROUND']) {
+      const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
+      console.log(`[render] PASO 1 - Cargando background: ${bgPath}`);
+      
+      const bgImage = await loadAndRenderSvg(bgPath);
+      if (bgImage) {
+        ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+        console.log('[render] PASO 1 - Background renderizado correctamente');
+      }
     }
 
-    console.log('[render] Cargando imagen base:', baseImagePath);
+    // 2. SEGUNDO: Renderizar el SKIN (Adrian base)
+    console.log('[render] PASO 2 - Iniciando carga del skin base');
     const baseImage = await loadAndRenderSvg(baseImagePath);
     if (baseImage) {
-      console.log('[render] Imagen base cargada correctamente');
       ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+      console.log('[render] PASO 2 - Skin base renderizado correctamente');
     } else {
-      console.error('[render] Error al cargar la imagen base');
+      console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
+      const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
+      const fallbackImage = await loadAndRenderSvg(fallbackPath);
+      if (fallbackImage) {
+        ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+        console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+      }
     }
 
-    // Renderizar traits en orden
-    if (categories && categories.length > 0) {
-      for (let i = 0; i < categories.length; i++) {
-        const category = categories[i];
-        const traitId = traitIds[i].toString();
-        const traitPath = `${category}/${traitId}.svg`;
+    // 3. TERCERO: Renderizar resto de traits
+    console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
+    const traitOrder = ['BASE', 'BODY', 'EYES', 'MOUTH', 'HEAD', 'CLOTHING', 'ACCESSORIES'];
+    
+    for (const category of traitOrder) {
+      if (equippedTraits[category]) {
+        const traitPath = `${category}/${equippedTraits[category]}.svg`;
+        console.log(`[render] PASO 3 - Cargando trait: ${traitPath}`);
         
-        console.log(`[render] Cargando trait: ${traitPath}`);
         const traitImage = await loadAndRenderSvg(traitPath);
         if (traitImage) {
-          console.log(`[render] Trait ${traitPath} cargado correctamente`);
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-        } else {
-          console.error(`[render] Error al cargar el trait ${traitPath}`);
+          console.log(`[render] PASO 3 - Trait ${category} renderizado correctamente`);
         }
       }
     }
@@ -165,47 +182,32 @@ export default async function handler(req, res) {
     res.setHeader('Content-Length', buffer.length);
     res.send(buffer);
 
+    console.log('[render] Renderizado completado exitosamente');
+
   } catch (error) {
-    console.error('[render] Error:', error);
+    console.error('[render] Error general:', error);
     console.error('[render] Stack trace:', error.stack);
     
     // En caso de error, devolver una imagen de error
     const canvas = createCanvas(1000, 1000);
     const ctx = canvas.getContext('2d');
     
-    // Fondo rojo
-    ctx.fillStyle = '#ff0000';
+    // Fondo gris
+    ctx.fillStyle = '#cccccc';
     ctx.fillRect(0, 0, 1000, 1000);
     
     // Texto de error
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '48px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 48px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('Error Rendering Token', 500, 450);
+    ctx.fillText('Error Rendering', 500, 450);
     ctx.font = '24px Arial';
-    ctx.fillText(error.message, 500, 500);
+    ctx.fillText(`Token #${req.query.tokenId || 'Unknown'}`, 500, 500);
+    ctx.font = '18px Arial';
+    ctx.fillText(error.message.substring(0, 50), 500, 550);
     
     const buffer = canvas.toBuffer('image/png');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Content-Length', buffer.length);
     res.send(buffer);
   }
-}
-
-function renderFallbackSVG(res, tokenId) {
-  // Default or fallback, return SVG
-  const svg = `
-  <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#f0f0f0"/>
-    <text x="50%" y="50%" font-family="Arial" font-size="24" fill="black" text-anchor="middle">
-      BareAdrian #${tokenId}
-    </text>
-    <text x="50%" y="60%" font-family="Arial" font-size="16" fill="black" text-anchor="middle">
-      API in development
-    </text>
-  </svg>
-  `;
-  
-  res.setHeader('Content-Type', 'image/svg+xml');
-  return res.status(200).send(svg);
 }
