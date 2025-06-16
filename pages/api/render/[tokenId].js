@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     });
 
     // Extraer solo el número del skin ID (en caso de que venga como "0,Zero")
-    const skinIdStr = skinId.toString().split(',')[0];
+    const skinIdStr = skinId.toString();
     console.log('[render] Skin ID procesado:', skinIdStr);
 
     // Obtener traits equipados
@@ -68,12 +68,15 @@ export default async function handler(req, res) {
       try {
         const svgBuffer = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app'}/traits/${path}`)
           .then(res => res.arrayBuffer());
-        const pngBuffer = await renderSvgBuffer(Buffer.from(svgBuffer), {
+        
+        // Usar Resvg directamente en lugar de renderSvgBuffer
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
           fitTo: {
             mode: 'width',
             value: 1000
           }
         });
+        const pngBuffer = resvg.render().asPng();
         return loadImage(pngBuffer);
       } catch (error) {
         console.error(`[render] Error cargando SVG ${path}:`, error);
@@ -85,16 +88,19 @@ export default async function handler(req, res) {
     const generation = tokenData[0].toString();
     let baseImagePath;
 
-    if (skinIdStr === "0") {
+    if (skinIdStr === "0,Zero") {
+      // Para skin 0,Zero usar GEN0-Medium
+      baseImagePath = `ADRIAN/GEN${generation}-Medium.svg`;
+    } else if (skinIdStr === "0") {
       // Sin skin, usar base según generación
       baseImagePath = `SKIN/${generation}.svg`;
     } else {
       // Con skin, usar combinación de generación y skin
-      const skinType = skinIdStr === "1" ? "Medium" : 
-                      skinIdStr === "2" ? "Dark" : 
-                      skinIdStr === "3" ? "Alien" :
-                      skinIdStr === "4" ? "Light" :
-                      skinIdStr === "5" ? "Albino" : "Medium";
+      const skinType = skinIdStr === "1" ? "Dark" : 
+                      skinIdStr === "2" ? "Alien" : 
+                      skinIdStr === "3" ? "Light" :
+                      skinIdStr === "4" ? "Albino" :
+                      skinIdStr === "5" ? "Medium" : "Medium";
       baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
     }
 
