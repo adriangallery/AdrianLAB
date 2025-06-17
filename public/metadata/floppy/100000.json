@@ -1,5 +1,4 @@
 {
-  // Metadata para el FLOPPY DISK OG
   "name": "OG floppy",
   "description": "A FLOPPY DISK from the AdrianLAB collection",
   "image": "https://adrianlab.vercel.app/traits/FLOPPY/100000.gif",
@@ -14,4 +13,4 @@
       "value": "OG"
     }
   ]
-} 
+}
