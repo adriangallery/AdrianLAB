@@ -1,8 +1,9 @@
 {
+  // Metadata para el FLOPPY DISK OG
   "name": "OG floppy",
   "description": "A FLOPPY DISK from the AdrianLAB collection",
   "image": "https://adrianlab.vercel.app/traits/FLOPPY/100000.gif",
-  "external_url": "https://adrianlab.vercel.app/metadata/floppy/100000.json",
+  "external_url": "https://adrianlab.vercel.app/traits/FLOPPY/100000.gif",
   "attributes": [
     {
       "trait_type": "Type",
@@ -12,5 +13,6 @@
       "trait_type": "Rarity",
       "value": "OG"
     }
-  ]
+  ],
+  "version": "1.0"
 } 
