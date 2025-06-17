@@ -10,15 +10,15 @@ export default async function handler(req, res) {
     }
 
     // Build base URL for images
-    const baseUrl = 'https://adrianlab.vercel.app';
+    const baseUrl = 'https://adrianlab.vercel.app/api/metadata';
     const version = Date.now();
 
     // Metadata base para floppys
     const metadata = {
       name: `FLOPPY #${id}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
-      image: `${baseUrl}/traits/FLOPPY/${id}.gif?v=${version}`,
-      external_url: `${baseUrl}/traits/FLOPPY/${id}.gif?v=${version}`,
+      image: `${baseUrl}/floppy/${id}.gif?v=${version}`,
+      external_url: `${baseUrl}/floppy/${id}.gif?v=${version}`,
       attributes: [
         {
           trait_type: "Type",
