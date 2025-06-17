@@ -1,9 +1,24 @@
 import { getContracts } from '../../../lib/contracts.js';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req, res) {
   try {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
+    
+    // Caso especial para el token 100000
+    if (tokenId === '100000' || tokenId === '100000.json') {
+      const floppyPath = path.join(process.cwd(), 'public', 'metadata', 'floppy', '100000.json');
+      const floppyData = JSON.parse(fs.readFileSync(floppyPath, 'utf8'));
+      
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      
+      return res.status(200).json(floppyData);
+    }
     
     // Verify that tokenId is valid
     if (!tokenId || isNaN(parseInt(tokenId))) {
