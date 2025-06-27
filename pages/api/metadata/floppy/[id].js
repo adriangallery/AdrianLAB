@@ -9,16 +9,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid floppy ID' });
     }
 
-    // Build base URL for images
-    const baseUrl = 'https://adrianlab.vercel.app/api/metadata';
+    // Build base URL for images - MODIFICADO para usar labimages
+    const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // Metadata base para floppys
+    // Metadata base para floppys - MODIFICADO para usar imagen de labimages
     const metadata = {
       name: `FLOPPY #${id}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
-      image: `${baseUrl}/floppy/${id}.gif?v=${version}`,
-      external_url: `${baseUrl}/floppy/${id}.gif?v=${version}`,
+      image: `${baseUrl}/labimages/10000.gif`,
+      external_url: `${baseUrl}/labimages/10000.gif`,
       attributes: [
         {
           trait_type: "Type",
