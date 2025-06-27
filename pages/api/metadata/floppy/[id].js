@@ -30,15 +30,21 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // Metadata base para floppys - MODIFICADO con nueva estructura
+    // Metadata base para floppys - MODIFICADO con attributes estándar
     const metadata = {
       name: `Asset #${actualId}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
       image: `${baseUrl}/labimages/10000.png?v=${version}`,
-      properties: {
-        category: "FLOPPY",
-        assetType: "VISUAL_TRAIT"
-      }
+      attributes: [
+        {
+          trait_type: "Category",
+          value: "FLOPPY"
+        },
+        {
+          trait_type: "Asset Type",
+          value: "VISUAL_TRAIT"
+        }
+      ]
     };
 
     // Configurar headers para evitar cache
