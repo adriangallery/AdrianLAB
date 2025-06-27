@@ -16,22 +16,15 @@ export default async function handler(req, res) {
     // Mapear ID para el nombre específico del test - MODIFICADO para PNG
     const displayName = id === '10000' ? '10000.png' : id;
 
-    // Metadata base para floppys - MODIFICADO para usar PNG
+    // Metadata base para floppys - MODIFICADO con nueva estructura
     const metadata = {
-      name: `FLOPPY #${displayName}`,
+      name: `Asset #${id}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
       image: `${baseUrl}/labimages/10000.png?v=${version}`,
-      external_url: `${baseUrl}/labimages/10000.png?v=${version}`,
-      attributes: [
-        {
-          trait_type: "Type",
-          value: "FLOPPY DISK"
-        },
-        {
-          trait_type: "Rarity",
-          value: "OG"
-        }
-      ]
+      properties: {
+        category: "FLOPPY",
+        assetType: "VISUAL_TRAIT"
+      }
     };
 
     // Configurar headers para evitar cache
