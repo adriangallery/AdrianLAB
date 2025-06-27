@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 export default async function handler(req, res) {
   try {
     let { id } = req.query;
@@ -24,6 +27,24 @@ export default async function handler(req, res) {
     if (!actualId || isNaN(parseInt(actualId)) || parseInt(actualId) < 10000) {
       console.error(`[floppy-metadata] ID inválido: ${actualId} (original: ${req.query.id})`);
       return res.status(400).json({ error: 'Invalid floppy ID' });
+    }
+
+    // Caso especial para el token 10000 - usar JSON estático
+    if (actualId === '10000') {
+      try {
+        const metadataPath = path.join(process.cwd(), 'public', '10000.json');
+        const metadataData = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+        
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+        
+        return res.status(200).json(metadataData);
+      } catch (error) {
+        console.error(`[floppy-metadata] Error leyendo 10000.json:`, error);
+        // Continuar con metadata generado si falla la lectura del archivo
+      }
     }
 
     // Build base URL for images - MODIFICADO para usar labimages
