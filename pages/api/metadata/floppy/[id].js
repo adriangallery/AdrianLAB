@@ -13,15 +13,15 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // Mapear ID para el nombre específico del test - MODIFICADO para token 10000
-    const displayName = id === '10000' ? '10000.gif' : id;
+    // Mapear ID para el nombre específico del test - MODIFICADO para PNG
+    const displayName = id === '10000' ? '10000.png' : id;
 
-    // Metadata base para floppys - MODIFICADO para usar imagen de labimages con timestamp
+    // Metadata base para floppys - MODIFICADO para usar PNG
     const metadata = {
       name: `FLOPPY #${displayName}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
-      image: `${baseUrl}/labimages/10000.gif?v=${version}`,
-      external_url: `${baseUrl}/labimages/10000.gif?v=${version}`,
+      image: `${baseUrl}/labimages/10000.png?v=${version}`,
+      external_url: `${baseUrl}/labimages/10000.png?v=${version}`,
       attributes: [
         {
           trait_type: "Type",
