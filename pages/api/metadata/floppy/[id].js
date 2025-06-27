@@ -1,11 +1,28 @@
 export default async function handler(req, res) {
   try {
-    const { id } = req.query;
+    let { id } = req.query;
     console.log(`[floppy-metadata] Iniciando request para floppy ${id}`);
     
-    // Verificar que el id es válido - MODIFICADO para permitir 10000
-    if (!id || isNaN(parseInt(id)) || parseInt(id) < 10000) {
-      console.error(`[floppy-metadata] ID inválido: ${id}`);
+    // Manejar formato ERC1155 - convertir hex de 64 caracteres a decimal
+    let actualId = id;
+    
+    // Si el ID termina en .json, removerlo
+    if (id && id.endsWith('.json')) {
+      id = id.replace('.json', '');
+    }
+    
+    // Si el ID es un hex de 64 caracteres (patrón ERC1155)
+    if (id && id.length === 64 && /^[0-9a-f]+$/i.test(id)) {
+      // Convertir de hex a decimal
+      actualId = parseInt(id, 16).toString();
+      console.log(`[floppy-metadata] Convertido hex ${id} a decimal ${actualId}`);
+    } else {
+      actualId = id;
+    }
+    
+    // Verificar que el actualId es válido
+    if (!actualId || isNaN(parseInt(actualId)) || parseInt(actualId) < 10000) {
+      console.error(`[floppy-metadata] ID inválido: ${actualId} (original: ${req.query.id})`);
       return res.status(400).json({ error: 'Invalid floppy ID' });
     }
 
@@ -13,12 +30,9 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // Mapear ID para el nombre específico del test - MODIFICADO para PNG
-    const displayName = id === '10000' ? '10000.png' : id;
-
     // Metadata base para floppys - MODIFICADO con nueva estructura
     const metadata = {
-      name: `Asset #${id}`,
+      name: `Asset #${actualId}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
       image: `${baseUrl}/labimages/10000.png?v=${version}`,
       properties: {
