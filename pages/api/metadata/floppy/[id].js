@@ -16,12 +16,12 @@ export default async function handler(req, res) {
     // Mapear ID para el nombre específico del test
     const displayName = id === '100000' ? '10000.gif' : id;
 
-    // Metadata base para floppys - MODIFICADO para usar imagen de labimages
+    // Metadata base para floppys - MODIFICADO para usar imagen de labimages con timestamp
     const metadata = {
       name: `FLOPPY #${displayName}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
-      image: `${baseUrl}/labimages/10000.gif`,
-      external_url: `${baseUrl}/labimages/10000.gif`,
+      image: `${baseUrl}/labimages/10000.gif?v=${version}`,
+      external_url: `${baseUrl}/labimages/10000.gif?v=${version}`,
       attributes: [
         {
           trait_type: "Type",
