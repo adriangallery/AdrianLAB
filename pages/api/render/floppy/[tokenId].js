@@ -84,8 +84,8 @@ export default async function handler(req, res) {
     // DEBUG: Test de fuentes básico
     console.log(`[floppy-render] ===== TEST DE FUENTES =====`);
     
-    // Test 1: Fuente básica
-    ctx.font = '16px Arial';
+    // Test 1: Fuente básica - USAR FONTE DEL SISTEMA
+    ctx.font = '16px sans-serif';
     console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
     
     // Test 2: Medir texto
@@ -106,9 +106,8 @@ export default async function handler(req, res) {
     ctx.fillText(testText, 10, 50);
     console.log(`[floppy-render] Texto de prueba dibujado en (10, 50)`);
 
-    // Test 4: Diferentes fuentes
+    // Test 4: Diferentes fuentes - SOLO FUENTES DEL SISTEMA
     const fontsToTest = [
-      '16px Arial',
       '16px sans-serif',
       '16px monospace',
       '16px serif',
@@ -166,7 +165,7 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = '16px Arial';
+        ctx.font = '16px sans-serif'; // CAMBIADO A SANS-SERIF
         ctx.textAlign = 'center';
         console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
@@ -177,7 +176,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 120, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px Arial';
+        ctx.font = '48px sans-serif'; // CAMBIADO A SANS-SERIF
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
         console.log(`[floppy-render] Placeholder dibujado`);
@@ -187,7 +186,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 120, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Arial';
+      ctx.font = '48px sans-serif'; // CAMBIADO A SANS-SERIF
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
     }
@@ -198,7 +197,7 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 760, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = '48px Arial';
+    ctx.font = '48px sans-serif'; // CAMBIADO A SANS-SERIF
     ctx.textAlign = 'center';
     console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
     ctx.fillText(tokenData.name, 384, 810);
@@ -207,7 +206,7 @@ export default async function handler(req, res) {
     // Bloque inferior de datos
     console.log(`[floppy-render] Dibujando datos del trait...`);
     ctx.fillStyle = '#333333';
-    ctx.font = '24px Arial';
+    ctx.font = '24px sans-serif'; // CAMBIADO A SANS-SERIF
     ctx.textAlign = 'left';
     
     const dataY = 880;
@@ -231,7 +230,7 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
     
     // Logo AdrianLAB
-    ctx.font = '32px Arial';
+    ctx.font = '32px sans-serif'; // CAMBIADO A SANS-SERIF
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
