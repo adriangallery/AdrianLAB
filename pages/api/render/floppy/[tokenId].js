@@ -3,15 +3,6 @@ import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
 
-// Configurar canvas para evitar problemas de fuentes
-const { Canvas } = require('canvas');
-Canvas.prototype.getContext = function(type) {
-  const context = require('canvas').CanvasRenderingContext2D.prototype.constructor.call(this, this, type);
-  // Forzar uso de fuentes básicas
-  context.font = '12px monospace';
-  return context;
-};
-
 export default async function handler(req, res) {
   try {
     let { tokenId } = req.query;
@@ -118,8 +109,8 @@ export default async function handler(req, res) {
         ctx.fillRect(imageX, imageY, 160, 60);
         
         ctx.fillStyle = '#ffffff';
-        // Usar fuente monospace que siempre funciona
-        ctx.font = '16px monospace';
+        // Usar fuente básica sin especificar familia
+        ctx.font = '16px';
         ctx.textAlign = 'center';
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
         
@@ -129,7 +120,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 80, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px monospace';
+        ctx.font = '48px';
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
       }
@@ -139,7 +130,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 80, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px monospace';
+      ctx.font = '48px';
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
     }
@@ -149,15 +140,15 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 720, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    // Usar fuente monospace
-    ctx.font = '48px monospace';
+    // Usar fuente básica sin especificar familia
+    ctx.font = '48px';
     ctx.textAlign = 'center';
     ctx.fillText(tokenData.name, 384, 770);
 
     // Bloque inferior de datos
     ctx.fillStyle = '#333333';
-    // Usar fuente monospace
-    ctx.font = '24px monospace';
+    // Usar fuente básica sin especificar familia
+    ctx.font = '24px';
     ctx.textAlign = 'left';
     
     const dataY = 840;
@@ -173,7 +164,7 @@ export default async function handler(req, res) {
     ctx.fillText(`${tokenData.origin}`, 684, dataY + lineHeight * 4);
     
     // Logo AdrianLAB
-    ctx.font = '32px monospace';
+    ctx.font = '32px';
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
