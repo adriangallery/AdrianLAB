@@ -24,13 +24,17 @@ export default async function handler(req, res) {
     }
     
     // Verificar que el actualId es válido
-    if (!actualId || isNaN(parseInt(actualId)) || parseInt(actualId) < 10000) {
+    if (!actualId || isNaN(parseInt(actualId)) || parseInt(actualId) < 1) {
       console.error(`[floppy-metadata] ID inválido: ${actualId} (original: ${req.query.id})`);
       return res.status(400).json({ error: 'Invalid floppy ID' });
     }
 
+    const tokenIdNum = parseInt(actualId);
+    const baseUrl = 'https://adrianlab.vercel.app';
+    const version = Date.now();
+
     // Caso especial para el token 10000 - usar JSON estático
-    if (actualId === '10000') {
+    if (tokenIdNum === 10000) {
       try {
         const metadataPath = path.join(process.cwd(), 'public', '10000.json');
         const metadataData = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
@@ -47,11 +51,98 @@ export default async function handler(req, res) {
       }
     }
 
-    // Build base URL for images - MODIFICADO para usar labimages
-    const baseUrl = 'https://adrianlab.vercel.app';
-    const version = Date.now();
+    // Para tokens del 1 al 9999 - usar nuevo sistema de renderizado
+    if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
+      // Datos mockup para el test
+      const mockData = {
+        "1": {
+          "name": "BLUNT",
+          "trait": "UNISEX",
+          "series": "1",
+          "category": "MOUTH",
+          "required": "NONE",
+          "origin": "UNIVERSAL",
+          "maxSupply": 450
+        },
+        "2": {
+          "name": "CRAZY HAIR GREEN",
+          "trait": "FEMALE",
+          "series": "1",
+          "category": "HAIR",
+          "required": "HEAD",
+          "origin": "GENESIS",
+          "maxSupply": 85
+        }
+      };
 
-    // Metadata base para floppys - MODIFICADO con attributes estándar
+      // Obtener datos del token (usar mockup por ahora)
+      const tokenData = mockData[actualId] || {
+        name: `TRAIT #${actualId}`,
+        trait: "UNISEX",
+        series: "1",
+        category: "MOUTH",
+        required: "NONE",
+        origin: "UNIVERSAL",
+        maxSupply: 300
+      };
+
+      // Función para obtener tag y color según maxSupply
+      function getRarityTagAndColor(maxSupply) {
+        if (maxSupply <= 50) return { tag: 'LEGENDARY', bg: '#ffd700' };
+        if (maxSupply <= 150) return { tag: 'RARE', bg: '#da70d6' };
+        if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };
+        return { tag: 'COMMON', bg: '#a9a9a9' };
+      }
+
+      const rarity = getRarityTagAndColor(tokenData.maxSupply);
+
+      // Metadata para tokens del 1 al 9999
+      const metadata = {
+        name: tokenData.name,
+        description: `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
+        image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
+        attributes: [
+          {
+            trait_type: "Trait",
+            value: tokenData.trait
+          },
+          {
+            trait_type: "Series",
+            value: tokenData.series
+          },
+          {
+            trait_type: "Category",
+            value: tokenData.category
+          },
+          {
+            trait_type: "Required",
+            value: tokenData.required
+          },
+          {
+            trait_type: "Origin",
+            value: tokenData.origin
+          },
+          {
+            trait_type: "Rarity",
+            value: rarity.tag
+          },
+          {
+            trait_type: "Max Supply",
+            value: tokenData.maxSupply
+          }
+        ]
+      };
+
+      // Configurar headers para evitar cache
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      
+      return res.status(200).json(metadata);
+    }
+
+    // Para otros tokens - metadata base (mantener lógica existente)
     const metadata = {
       name: `Asset #${actualId}`,
       description: "A FLOPPY DISK from the AdrianLAB collection",
