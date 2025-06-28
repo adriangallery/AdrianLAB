@@ -1,15 +1,7 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
-
-// Registrar fuentes si están disponibles
-try {
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf'), { family: 'Roboto', weight: 'bold' });
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf'), { family: 'Roboto', weight: 'normal' });
-} catch (error) {
-  console.log('Fuentes no encontradas, usando fuentes del sistema');
-}
 
 export default async function handler(req, res) {
   try {
@@ -26,7 +18,7 @@ export default async function handler(req, res) {
 
     const tokenIdNum = parseInt(tokenId);
     
-    // Datos mockup para el test
+    // Datos mockup para el test - MOVIDO AQUÍ para evitar duplicación
     const mockData = {
       "1": {
         "name": "BLUNT",
@@ -59,6 +51,8 @@ export default async function handler(req, res) {
       maxSupply: 300
     };
 
+    console.log(`[floppy-render] Renderizando token ${tokenId} con datos:`, tokenData);
+
     // Función para obtener tag y color según maxSupply
     function getRarityTagAndColor(maxSupply) {
       if (maxSupply <= 50) return { tag: 'LEGENDARY', bg: '#ffd700' };
@@ -80,8 +74,10 @@ export default async function handler(req, res) {
     // Cargar y renderizar SVG del trait
     try {
       const svgPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.svg`);
+      console.log(`[floppy-render] Intentando cargar SVG: ${svgPath}`);
       
       if (fs.existsSync(svgPath)) {
+        console.log(`[floppy-render] SVG encontrado, procesando...`);
         const svgBuffer = fs.readFileSync(svgPath);
         
         // Renderizar SVG a PNG
@@ -106,32 +102,34 @@ export default async function handler(req, res) {
         
         // Dibujar imagen del trait
         ctx.drawImage(traitImage, imageX, imageY, imageSize, imageSize);
+        console.log(`[floppy-render] Imagen SVG renderizada correctamente`);
         
         // Tag de rareza (superior izquierda)
         ctx.fillStyle = rarity.bg;
         ctx.fillRect(imageX, imageY, 160, 60);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px Roboto, Arial';
+        ctx.font = 'bold 16px Arial'; // Usar Arial como fallback
         ctx.textAlign = 'center';
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
         
       } else {
+        console.log(`[floppy-render] SVG no encontrado, usando placeholder`);
         // Placeholder si no existe el SVG
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 80, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px Roboto, Arial';
+        ctx.font = '48px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
       }
     } catch (error) {
-      console.error('Error cargando SVG:', error);
+      console.error('[floppy-render] Error cargando SVG:', error);
       // Placeholder en caso de error
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 80, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Roboto, Arial';
+      ctx.font = '48px Arial';
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
     }
@@ -141,13 +139,13 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 720, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px Roboto, Arial';
+    ctx.font = 'bold 48px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(tokenData.name, 384, 770);
 
     // Bloque inferior de datos
     ctx.fillStyle = '#333333';
-    ctx.font = '24px Roboto, Arial';
+    ctx.font = '24px Arial';
     ctx.textAlign = 'left';
     
     const dataY = 840;
@@ -163,11 +161,13 @@ export default async function handler(req, res) {
     ctx.fillText(`${tokenData.origin}`, 684, dataY + lineHeight * 4);
     
     // Logo AdrianLAB
-    ctx.font = 'bold 32px Roboto, Arial';
+    ctx.font = 'bold 32px Arial';
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
     ctx.fillText('LAB', 684, dataY + lineHeight * 6);
+
+    console.log(`[floppy-render] Renderizado completado para token ${tokenId}`);
 
     // Configurar headers
     res.setHeader('Content-Type', 'image/png');
@@ -178,7 +178,7 @@ export default async function handler(req, res) {
     res.status(200).send(buffer);
     
   } catch (error) {
-    console.error('Error rendering floppy:', error);
-    res.status(500).json({ error: 'Error rendering floppy image' });
+    console.error('[floppy-render] Error:', error);
+    res.status(500).json({ error: 'Error rendering floppy image', details: error.message });
   }
 } 
