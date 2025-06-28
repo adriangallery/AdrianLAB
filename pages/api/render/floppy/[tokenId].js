@@ -109,7 +109,8 @@ export default async function handler(req, res) {
         ctx.fillRect(imageX, imageY, 160, 60);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px Arial'; // Usar Arial como fallback
+        // Usar fuente más básica para evitar problemas
+        ctx.font = '16px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
         
@@ -119,7 +120,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 80, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px Arial';
+        ctx.font = '48px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
       }
@@ -129,7 +130,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 80, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Arial';
+      ctx.font = '48px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 380);
     }
@@ -139,13 +140,15 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 720, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px Arial';
+    // Usar fuente más básica
+    ctx.font = '48px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(tokenData.name, 384, 770);
 
     // Bloque inferior de datos
     ctx.fillStyle = '#333333';
-    ctx.font = '24px Arial';
+    // Usar fuente más básica
+    ctx.font = '24px sans-serif';
     ctx.textAlign = 'left';
     
     const dataY = 840;
@@ -161,7 +164,7 @@ export default async function handler(req, res) {
     ctx.fillText(`${tokenData.origin}`, 684, dataY + lineHeight * 4);
     
     // Logo AdrianLAB
-    ctx.font = 'bold 32px Arial';
+    ctx.font = '32px sans-serif';
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
