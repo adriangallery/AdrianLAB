@@ -1,56 +1,10 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
 
 // Configurar runtime Node.js (necesario para canvas)
 export const config = { runtime: 'nodejs' };
-
-// Ruta absoluta dentro de la propia lambda
-const fontDir = path.join(__dirname, 'fonts');
-
-// REGISTRAR TIPOGRAFÍAS ROBOTO (solo para tokens 1-9999)
-try {
-  console.log('[floppy-render] Registrando fuentes Roboto...');
-  console.log('[floppy-render] Font directory:', fontDir);
-  
-  // Verificar que las fuentes existen
-  const robotoRegular = path.join(fontDir, 'Roboto-Regular.ttf');
-  const robotoBold = path.join(fontDir, 'Roboto-Bold.ttf');
-  const robotoMedium = path.join(fontDir, 'Roboto-Medium.ttf');
-  
-  console.log('[floppy-render] Roboto-Regular existe:', fs.existsSync(robotoRegular));
-  console.log('[floppy-render] Roboto-Bold existe:', fs.existsSync(robotoBold));
-  console.log('[floppy-render] Roboto-Medium existe:', fs.existsSync(robotoMedium));
-  
-  // Registrar fuentes principales de Roboto
-  if (fs.existsSync(robotoRegular)) {
-    registerFont(robotoRegular, {
-      family: 'Roboto'
-    });
-    console.log('[floppy-render] Roboto Regular registrada');
-  }
-  
-  if (fs.existsSync(robotoBold)) {
-    registerFont(robotoBold, {
-      family: 'Roboto',
-      weight: 'bold'
-    });
-    console.log('[floppy-render] Roboto Bold registrada');
-  }
-  
-  if (fs.existsSync(robotoMedium)) {
-    registerFont(robotoMedium, {
-      family: 'Roboto',
-      weight: '500'
-    });
-    console.log('[floppy-render] Roboto Medium registrada');
-  }
-  
-  console.log('[floppy-render] Fuentes Roboto registradas exitosamente');
-} catch (error) {
-  console.error('[floppy-render] Error registrando fuentes Roboto:', error);
-}
 
 export default async function handler(req, res) {
   try {
@@ -88,7 +42,7 @@ export default async function handler(req, res) {
   }
 }
 
-// FUNCIÓN PARA TOKENS 1-9999 (RENDERIZADO)
+// FUNCIÓN PARA TOKENS 1-9999 (RENDERIZADO HÍBRIDO: Resvg + Canvas)
 async function handleRenderToken(req, res, tokenId) {
   // Datos mockup para el test
   const mockData = {
@@ -135,34 +89,24 @@ async function handleRenderToken(req, res, tokenId) {
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
   console.log(`[floppy-render] Rarity calculada:`, rarity);
 
-  // Crear canvas 768x1024 (formato carta 3:4)
-  console.log(`[floppy-render] Creando canvas 768x1024...`);
-  const canvas = createCanvas(768, 1024);
-  const ctx = canvas.getContext('2d');
-  console.log(`[floppy-render] Canvas creado, contexto obtenido`);
-
-  // DEBUG: Información del canvas
-  console.log(`[floppy-render] Canvas width: ${canvas.width}, height: ${canvas.height}`);
-  console.log(`[floppy-render] Context type: ${ctx.constructor.name}`);
-
-  // Fondo principal blanco
-  console.log(`[floppy-render] Aplicando fondo blanco...`);
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 768, 1024);
-  console.log(`[floppy-render] Fondo blanco aplicado`);
-
-  // Cargar y renderizar SVG del trait
+  // ===== PASO 1: RENDERIZAR SVG CON RESVG =====
+  console.log(`[floppy-render] ===== PASO 1: RENDERIZANDO SVG CON RESVG =====`);
+  
+  let traitPngBuffer = null;
+  let svgExists = false;
+  
   try {
     const svgPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.svg`);
     console.log(`[floppy-render] Ruta SVG: ${svgPath}`);
     console.log(`[floppy-render] Existe SVG: ${fs.existsSync(svgPath)}`);
     
     if (fs.existsSync(svgPath)) {
-      console.log(`[floppy-render] SVG encontrado, procesando...`);
+      svgExists = true;
+      console.log(`[floppy-render] SVG encontrado, procesando con Resvg...`);
       const svgBuffer = fs.readFileSync(svgPath);
       console.log(`[floppy-render] SVG leído, tamaño: ${svgBuffer.length} bytes`);
       
-      // Renderizar SVG a PNG
+      // Renderizar SVG a PNG usando Resvg (especialidad)
       const resvg = new Resvg(Buffer.from(svgBuffer), {
         fitTo: {
           mode: 'width',
@@ -170,57 +114,83 @@ async function handleRenderToken(req, res, tokenId) {
         }
       });
       
-      const pngBuffer = resvg.render().asPng();
-      console.log(`[floppy-render] SVG renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
-      
-      const traitImage = await loadImage(pngBuffer);
-      console.log(`[floppy-render] Imagen cargada, dimensiones: ${traitImage.width}x${traitImage.height}`);
-      
-      // Dibujar contenedor de imagen con fondo dinámico
-      const imageX = 84;
-      const imageY = 120;
-      const imageSize = 600;
-      
-      // Fondo del contenedor con color dinámico
-      ctx.fillStyle = rarity.bg + '20';
-      ctx.fillRect(imageX, imageY, imageSize, imageSize);
-      console.log(`[floppy-render] Fondo del contenedor dibujado con color: ${rarity.bg}20`);
-      
-      // Dibujar imagen del trait
-      ctx.drawImage(traitImage, imageX, imageY, imageSize, imageSize);
-      console.log(`[floppy-render] Imagen SVG dibujada en (${imageX}, ${imageY})`);
-      
-      // Tag de rareza (superior izquierda)
-      ctx.fillStyle = rarity.bg;
-      ctx.fillRect(imageX, imageY, 160, 60);
-      console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
-      
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px "Roboto"'; // USAR ROBOTO
-      ctx.textAlign = 'center';
-      console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
-      ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
-      console.log(`[floppy-render] Tag de rareza "${rarity.tag}" dibujado en (${imageX + 80}, ${imageY + 35})`);
-      
+      traitPngBuffer = resvg.render().asPng();
+      console.log(`[floppy-render] SVG renderizado a PNG con Resvg, tamaño: ${traitPngBuffer.length} bytes`);
     } else {
-      console.log(`[floppy-render] SVG no encontrado, usando placeholder`);
-      ctx.fillStyle = '#f0f0f0';
-      ctx.fillRect(84, 120, 600, 600);
-      ctx.fillStyle = '#999999';
-      ctx.font = '48px "Roboto"'; // USAR ROBOTO
-      ctx.textAlign = 'center';
-      ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
-      console.log(`[floppy-render] Placeholder dibujado`);
+      console.log(`[floppy-render] SVG no encontrado, se usará placeholder`);
     }
   } catch (error) {
-    console.error('[floppy-render] Error cargando SVG:', error);
+    console.error('[floppy-render] Error renderizando SVG con Resvg:', error);
+    console.log(`[floppy-render] Continuando con placeholder...`);
+  }
+
+  // ===== PASO 2: CANVAS SOLO PARA TEXTO Y COMPOSICIÓN =====
+  console.log(`[floppy-render] ===== PASO 2: CANVAS PARA TEXTO Y COMPOSICIÓN =====`);
+  
+  // Crear canvas 768x1024 (formato carta 3:4)
+  console.log(`[floppy-render] Creando canvas 768x1024...`);
+  const canvas = createCanvas(768, 1024);
+  const ctx = canvas.getContext('2d');
+  console.log(`[floppy-render] Canvas creado, contexto obtenido`);
+
+  // Fondo principal blanco
+  console.log(`[floppy-render] Aplicando fondo blanco...`);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 768, 1024);
+  console.log(`[floppy-render] Fondo blanco aplicado`);
+
+  // Coordenadas de la imagen
+  const imageX = 84;
+  const imageY = 120;
+  const imageSize = 600;
+
+  // Dibujar contenedor de imagen con fondo dinámico
+  ctx.fillStyle = rarity.bg + '20';
+  ctx.fillRect(imageX, imageY, imageSize, imageSize);
+  console.log(`[floppy-render] Fondo del contenedor dibujado con color: ${rarity.bg}20`);
+
+  // Dibujar imagen del trait (si existe)
+  if (svgExists && traitPngBuffer) {
+    try {
+      const traitImage = await loadImage(traitPngBuffer);
+      console.log(`[floppy-render] Imagen cargada desde Resvg, dimensiones: ${traitImage.width}x${traitImage.height}`);
+      ctx.drawImage(traitImage, imageX, imageY, imageSize, imageSize);
+      console.log(`[floppy-render] Imagen SVG dibujada en (${imageX}, ${imageY})`);
+    } catch (error) {
+      console.error('[floppy-render] Error cargando imagen desde Resvg:', error);
+      // Fallback a placeholder
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(imageX, imageY, imageSize, imageSize);
+      ctx.fillStyle = '#999999';
+      ctx.font = '48px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
+    }
+  } else {
+    // Placeholder si no hay SVG
+    console.log(`[floppy-render] Dibujando placeholder`);
     ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(84, 120, 600, 600);
+    ctx.fillRect(imageX, imageY, imageSize, imageSize);
     ctx.fillStyle = '#999999';
-    ctx.font = '48px "Roboto"'; // USAR ROBOTO
+    ctx.font = '48px Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
   }
+
+  // ===== TEXTO CON FUENTES DEL SISTEMA =====
+  console.log(`[floppy-render] ===== RENDERIZANDO TEXTO CON FUENTES DEL SISTEMA =====`);
+
+  // Tag de rareza (superior izquierda)
+  ctx.fillStyle = rarity.bg;
+  ctx.fillRect(imageX, imageY, 160, 60);
+  console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
+  
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 16px Arial, sans-serif'; // Fuente del sistema
+  ctx.textAlign = 'center';
+  console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
+  ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
+  console.log(`[floppy-render] Tag de rareza "${rarity.tag}" dibujado en (${imageX + 80}, ${imageY + 35})`);
 
   // Nombre del trait (debajo de la imagen)
   console.log(`[floppy-render] Dibujando nombre del trait: "${tokenData.name}"`);
@@ -228,7 +198,7 @@ async function handleRenderToken(req, res, tokenId) {
   ctx.fillRect(84, 760, 600, 80);
   
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 48px "Roboto"'; // USAR ROBOTO
+  ctx.font = 'bold 48px Arial, sans-serif'; // Fuente del sistema
   ctx.textAlign = 'center';
   console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
   ctx.fillText(tokenData.name, 384, 810);
@@ -237,7 +207,7 @@ async function handleRenderToken(req, res, tokenId) {
   // Bloque inferior de datos
   console.log(`[floppy-render] Dibujando datos del trait...`);
   ctx.fillStyle = '#333333';
-  ctx.font = '24px "Roboto"'; // USAR ROBOTO
+  ctx.font = '24px Arial, sans-serif'; // Fuente del sistema
   ctx.textAlign = 'left';
   
   const dataY = 880;
@@ -261,18 +231,18 @@ async function handleRenderToken(req, res, tokenId) {
   console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
   
   // Logo AdrianLAB
-  ctx.font = 'bold 32px "Roboto"'; // USAR ROBOTO
+  ctx.font = 'bold 32px Arial, sans-serif'; // Fuente del sistema
   ctx.fillStyle = '#333333';
   ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
   ctx.fillStyle = '#ff69b4';
   ctx.fillText('LAB', 684, dataY + lineHeight * 6);
   console.log(`[floppy-render] Logo AdrianLAB dibujado`);
 
-  // ===== TEXTO DE PRUEBA AL FINAL (DESPUÉS DE TODO) =====
-  console.log(`[floppy-render] ===== TEST DE FUENTES ROBOTO AL FINAL =====`);
+  // ===== TEST DE FUENTES DEL SISTEMA =====
+  console.log(`[floppy-render] ===== TEST DE FUENTES DEL SISTEMA =====`);
   
-  // Test 1: Roboto Regular
-  ctx.font = '16px "Roboto"';
+  // Test 1: Arial Regular
+  ctx.font = '16px Arial, sans-serif';
   console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
   
   // Test 2: Medir texto
@@ -286,21 +256,14 @@ async function handleRenderToken(req, res, tokenId) {
     fontBoundingBoxDescent: textMetrics.fontBoundingBoxDescent
   });
 
-  // Test 3: Dibujar texto de prueba en la esquina superior derecha
-  console.log(`[floppy-render] Dibujando texto de prueba...`);
-  ctx.fillStyle = '#ff0000'; // ROJO para que sea muy visible
-  ctx.textAlign = 'left';
-  ctx.fillText(testText, 650, 50);
-  console.log(`[floppy-render] Texto de prueba dibujado en (650, 50)`);
-
-  // Test 4: Diferentes variantes de Roboto en diferentes colores
+  // Test 3: Diferentes variantes de Arial en diferentes colores
   const fontsToTest = [
-    { font: '16px "Roboto"', color: '#ff0000', y: 80, label: 'ROBOTO REG' },
-    { font: 'bold 16px "Roboto"', color: '#00ff00', y: 100, label: 'ROBOTO BOLD' },
-    { font: '500 24px "Roboto"', color: '#0000ff', y: 130, label: 'ROBOTO MEDIUM' },
-    { font: 'bold 24px "Roboto"', color: '#ff00ff', y: 160, label: 'ROBOTO BOLD 24' },
-    { font: '500 32px "Roboto"', color: '#ff6600', y: 190, label: 'ROBOTO MED 32' },
-    { font: '48px "Roboto"', color: '#800080', y: 240, label: 'ROBOTO LARGE' }
+    { font: '16px Arial, sans-serif', color: '#ff0000', y: 80, label: 'ARIAL REG' },
+    { font: 'bold 16px Arial, sans-serif', color: '#00ff00', y: 100, label: 'ARIAL BOLD' },
+    { font: '24px Arial, sans-serif', color: '#0000ff', y: 130, label: 'ARIAL 24' },
+    { font: 'bold 24px Arial, sans-serif', color: '#ff00ff', y: 160, label: 'ARIAL BOLD 24' },
+    { font: '32px Arial, sans-serif', color: '#ff6600', y: 190, label: 'ARIAL 32' },
+    { font: '48px Arial, sans-serif', color: '#800080', y: 240, label: 'ARIAL LARGE' }
   ];
 
   fontsToTest.forEach((test, index) => {
@@ -310,50 +273,32 @@ async function handleRenderToken(req, res, tokenId) {
     ctx.fillText(test.label, 650, test.y);
   });
 
-  // Test 5: Texto grande y visible en el centro con Roboto
-  ctx.font = 'bold 32px "Roboto"';
+  // Test 4: Texto grande y visible en el centro con Arial
+  ctx.font = 'bold 32px Arial, sans-serif';
   ctx.fillStyle = '#000000';
   ctx.textAlign = 'center';
-  ctx.fillText('AdrianLAB ROBOTO TEST', 384, 50);
-  console.log(`[floppy-render] Texto grande con Roboto dibujado en el centro`);
+  ctx.fillText('AdrianLAB ARIAL TEST', 384, 50);
+  console.log(`[floppy-render] Texto grande con Arial dibujado en el centro`);
 
-  // Test 6: Texto con Roboto Medium
-  ctx.font = '500 32px "Roboto"';
-  ctx.fillStyle = '#800080';
-  ctx.fillText('ROBOTO MEDIUM', 384, 300);
-  console.log(`[floppy-render] Texto con Roboto Medium dibujado`);
-
-  // Test 7: Texto con Roboto Bold grande
-  ctx.font = 'bold 48px "Roboto"';
-  ctx.fillStyle = '#ff6600';
-  ctx.fillText('ROBOTO BOLD LARGE', 384, 380);
-  console.log(`[floppy-render] Texto Roboto Bold grande dibujado`);
-
-  // Test 8: Texto con Roboto Regular pequeño
-  ctx.font = '12px "Roboto"';
-  ctx.fillStyle = '#000000';
-  ctx.fillText('ROBOTO SMALL', 384, 450);
-  console.log(`[floppy-render] Texto Roboto pequeño dibujado`);
-
-  // Test 9: Texto con stroke usando Roboto
-  ctx.font = '24px "Roboto"';
+  // Test 5: Texto con stroke usando Arial
+  ctx.font = '24px Arial, sans-serif';
   ctx.strokeStyle = '#00ff00';
   ctx.lineWidth = 2;
-  ctx.strokeText('ROBOTO STROKE', 384, 500);
-  console.log(`[floppy-render] Texto Roboto con stroke dibujado`);
+  ctx.strokeText('ARIAL STROKE', 384, 300);
+  console.log(`[floppy-render] Texto Arial con stroke dibujado`);
 
-  // Test 10: Texto con fill y stroke usando Roboto
+  // Test 6: Texto con fill y stroke usando Arial
   ctx.fillStyle = '#000000';
-  ctx.fillText('ROBOTO FILL+STROKE', 384, 550);
-  console.log(`[floppy-render] Texto Roboto fill+stroke dibujado`);
+  ctx.fillText('ARIAL FILL+STROKE', 384, 350);
+  console.log(`[floppy-render] Texto Arial fill+stroke dibujado`);
 
-  // Test 11: Fallback a fuentes genéricas si Roboto falla
+  // Test 7: Fallback a fuentes genéricas
   ctx.font = '24px sans-serif';
   ctx.fillStyle = '#ff0000';
-  ctx.fillText('FALLBACK SANS-SERIF', 384, 600);
+  ctx.fillText('FALLBACK SANS-SERIF', 384, 400);
   console.log(`[floppy-render] Texto fallback dibujado`);
 
-  console.log(`[floppy-render] ===== RENDERIZADO COMPLETADO =====`);
+  console.log(`[floppy-render] ===== RENDERIZADO HÍBRIDO COMPLETADO =====`);
 
   // Configurar headers
   res.setHeader('Content-Type', 'image/png');
