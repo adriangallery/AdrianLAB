@@ -3,34 +3,49 @@ import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
 
+// Configurar runtime Node.js (necesario para canvas)
+export const config = { runtime: 'nodejs' };
+
+// Ruta absoluta dentro de la propia lambda
+const fontDir = path.join(__dirname, 'fonts');
+
 // REGISTRAR TIPOGRAFÍAS ROBOTO
 try {
   console.log('[floppy-render] Registrando fuentes Roboto...');
+  console.log('[floppy-render] Font directory:', fontDir);
+  
+  // Verificar que las fuentes existen
+  const robotoRegular = path.join(fontDir, 'Roboto-Regular.ttf');
+  const robotoBold = path.join(fontDir, 'Roboto-Bold.ttf');
+  const robotoMedium = path.join(fontDir, 'Roboto-Medium.ttf');
+  
+  console.log('[floppy-render] Roboto-Regular existe:', fs.existsSync(robotoRegular));
+  console.log('[floppy-render] Roboto-Bold existe:', fs.existsSync(robotoBold));
+  console.log('[floppy-render] Roboto-Medium existe:', fs.existsSync(robotoMedium));
   
   // Registrar fuentes principales de Roboto
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf'), {
-    family: 'Roboto'
-  });
+  if (fs.existsSync(robotoRegular)) {
+    registerFont(robotoRegular, {
+      family: 'Roboto'
+    });
+    console.log('[floppy-render] Roboto Regular registrada');
+  }
   
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf'), {
-    family: 'Roboto',
-    weight: 'bold'
-  });
+  if (fs.existsSync(robotoBold)) {
+    registerFont(robotoBold, {
+      family: 'Roboto',
+      weight: 'bold'
+    });
+    console.log('[floppy-render] Roboto Bold registrada');
+  }
   
-  // Registrar fuentes de la carpeta static
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Regular.ttf'), {
-    family: 'Roboto Static'
-  });
-  
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Bold.ttf'), {
-    family: 'Roboto Static',
-    weight: 'bold'
-  });
-  
-  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Medium.ttf'), {
-    family: 'Roboto Static',
-    weight: '500'
-  });
+  if (fs.existsSync(robotoMedium)) {
+    registerFont(robotoMedium, {
+      family: 'Roboto',
+      weight: '500'
+    });
+    console.log('[floppy-render] Roboto Medium registrada');
+  }
   
   console.log('[floppy-render] Fuentes Roboto registradas exitosamente');
 } catch (error) {
@@ -261,9 +276,9 @@ export default async function handler(req, res) {
     const fontsToTest = [
       { font: '16px "Roboto"', color: '#ff0000', y: 80, label: 'ROBOTO REG' },
       { font: 'bold 16px "Roboto"', color: '#00ff00', y: 100, label: 'ROBOTO BOLD' },
-      { font: '24px "Roboto Static"', color: '#0000ff', y: 130, label: 'ROBOTO STATIC' },
-      { font: 'bold 24px "Roboto Static"', color: '#ff00ff', y: 160, label: 'ROBOTO STATIC BOLD' },
-      { font: '500 24px "Roboto Static"', color: '#ff6600', y: 190, label: 'ROBOTO MEDIUM' },
+      { font: '500 24px "Roboto"', color: '#0000ff', y: 130, label: 'ROBOTO MEDIUM' },
+      { font: 'bold 24px "Roboto"', color: '#ff00ff', y: 160, label: 'ROBOTO BOLD 24' },
+      { font: '500 32px "Roboto"', color: '#ff6600', y: 190, label: 'ROBOTO MED 32' },
       { font: '48px "Roboto"', color: '#800080', y: 240, label: 'ROBOTO LARGE' }
     ];
 
@@ -281,11 +296,11 @@ export default async function handler(req, res) {
     ctx.fillText('AdrianLAB ROBOTO TEST', 384, 50);
     console.log(`[floppy-render] Texto grande con Roboto dibujado en el centro`);
 
-    // Test 6: Texto con Roboto Static Medium
-    ctx.font = '500 32px "Roboto Static"';
+    // Test 6: Texto con Roboto Medium
+    ctx.font = '500 32px "Roboto"';
     ctx.fillStyle = '#800080';
-    ctx.fillText('ROBOTO STATIC MEDIUM', 384, 300);
-    console.log(`[floppy-render] Texto con Roboto Static Medium dibujado`);
+    ctx.fillText('ROBOTO MEDIUM', 384, 300);
+    console.log(`[floppy-render] Texto con Roboto Medium dibujado`);
 
     // Test 7: Texto con Roboto Bold grande
     ctx.font = 'bold 48px "Roboto"';

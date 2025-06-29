@@ -5,7 +5,7 @@
   "framework": "nextjs",
   "functions": {
     "pages/api/render/floppy/[tokenId].js": {
-      "includeFiles": "public/fonts/**"
+      "includeFiles": "fonts/**"
     }
   }
 } 
