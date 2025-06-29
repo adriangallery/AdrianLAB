@@ -15,44 +15,55 @@ export default async function handler(req, res) {
     console.log(`[debug-svg] ===== DEBUG SVG INICIADO =====`);
     console.log(`[debug-svg] Token ID: ${tokenId}`);
 
-    // Test simple: solo un elemento
-    const simpleElement = textToSVGElement('TEST', {
-      x: 100,
-      y: 100,
-      fontSize: 48,
+    // Path generado a partir de texto
+    const pathElement = textToSVGElement('PRUEBA', {
+      x: 200,
+      y: 120,
+      fontSize: 64,
       fill: '#ff0000'
     });
 
-    console.log(`[debug-svg] Simple element:`, simpleElement);
+    // Path generado a partir de texto más pequeño
+    const pathElementSmall = textToSVGElement('small', {
+      x: 200,
+      y: 200,
+      fontSize: 32,
+      fill: '#00aa00'
+    });
 
-    // Test simple: solo líneas
-    const simpleLines = linesToSVG([
-      {
-        text: 'LINE 1',
-        x: 100,
-        y: 200,
-        fontSize: 32,
-        fill: '#00ff00'
-      }
-    ]);
+    // Path generado a partir de texto más grande
+    const pathElementBig = textToSVGElement('BIG', {
+      x: 200,
+      y: 260,
+      fontSize: 80,
+      fill: '#0000ff'
+    });
 
-    console.log(`[debug-svg] Simple lines:`, simpleLines);
+    // Texto normal para comparar
+    const textElement = `<text x="200" y="120" font-family="Arial" font-size="64" text-anchor="middle" fill="#888888">PRUEBA</text>`;
+    const textElementSmall = `<text x="200" y="200" font-family="Arial" font-size="32" text-anchor="middle" fill="#888888">small</text>`;
+    const textElementBig = `<text x="200" y="260" font-family="Arial" font-size="80" text-anchor="middle" fill="#888888">BIG</text>`;
 
-    // SVG simple para debug
+    // SVG de prueba
     const debugSvg = `
-      <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="300" fill="#ffffff"/>
-        <text x="200" y="50" font-family="Arial" font-size="20" text-anchor="middle" fill="#333">Debug SVG</text>
-        ${simpleElement}
-        ${simpleLines}
+      <svg width="400" height="320" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="320" fill="#fff"/>
+        <text x="200" y="40" font-family="Arial" font-size="20" text-anchor="middle" fill="#333">Debug: Path vs Text</text>
+        <!-- Path generado -->
+        ${pathElement}
+        ${pathElementSmall}
+        ${pathElementBig}
+        <!-- Texto normal -->
+        ${textElement}
+        ${textElementSmall}
+        ${textElementBig}
       </svg>
     `;
 
     console.log(`[debug-svg] Debug SVG:`, debugSvg);
     console.log(`[debug-svg] Debug SVG length:`, debugSvg.length);
 
-    // Devolver el SVG como texto para inspeccionar
-    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'image/svg+xml');
     res.status(200).send(debugSvg);
     
   } catch (error) {
