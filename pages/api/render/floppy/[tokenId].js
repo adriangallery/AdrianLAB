@@ -1,6 +1,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
+import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
 
 export default async function handler(req, res) {
   try {
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
   }
 }
 
-// FUNCIÓN PARA TOKENS 1-9999 (SVG COMPLETO CON TEXTO EMBEBIDO)
+// FUNCIÓN PARA TOKENS 1-9999 (SVG COMPLETO CON TEXTO CONVERTIDO A PATHS)
 async function handleRenderToken(req, res, tokenId) {
   // Datos mockup para el test
   const mockData = {
@@ -82,8 +83,8 @@ async function handleRenderToken(req, res, tokenId) {
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
   console.log(`[floppy-render] Rarity calculada:`, rarity);
 
-  // ===== SOLUCIÓN DEFINITIVA: SVG COMPLETO CON TEXTO EMBEBIDO =====
-  console.log(`[floppy-render] ===== CREANDO SVG COMPLETO CON TEXTO EMBEBIDO =====`);
+  // ===== SOLUCIÓN DEFINITIVA: SVG COMPLETO CON TEXTO CONVERTIDO A PATHS =====
+  console.log(`[floppy-render] ===== CREANDO SVG COMPLETO CON TEXTO A PATHS =====`);
   
   // Leer el SVG original del trait
   let traitSvgContent = '';
@@ -106,7 +107,7 @@ async function handleRenderToken(req, res, tokenId) {
     `;
   }
 
-  // Crear SVG completo con texto embebido
+  // Crear SVG completo con texto convertido a paths
   const completeSvg = `
     <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
       <!-- Fondo principal -->
@@ -120,30 +121,81 @@ async function handleRenderToken(req, res, tokenId) {
         ${traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
       </g>
       
-      <!-- Tag de rareza (superior izquierda) -->
+      <!-- Tag de rareza (superior izquierda) - convertido a path -->
       <rect x="84" y="120" width="160" height="60" fill="${rarity.bg}"/>
-      <text x="164" y="155" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#ffffff">${rarity.tag}</text>
+      ${textToSVGElement(rarity.tag, {
+        x: 164,
+        y: 155,
+        fontSize: 16,
+        fill: '#ffffff'
+      })}
       
-      <!-- Nombre del trait (debajo de la imagen) -->
+      <!-- Nombre del trait (debajo de la imagen) - convertido a path -->
       <rect x="84" y="760" width="600" height="80" fill="#0f4e6d"/>
-      <text x="384" y="810" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#ffffff">${tokenData.name}</text>
+      ${textToSVGElement(tokenData.name, {
+        x: 384,
+        y: 810,
+        fontSize: 48,
+        fill: '#ffffff'
+      })}
       
-      <!-- Bloque inferior de datos -->
-      <text x="84" y="880" font-family="Arial, sans-serif" font-size="24" fill="#333333">TRAIT: ${tokenData.trait}</text>
-      <text x="84" y="915" font-family="Arial, sans-serif" font-size="24" fill="#333333">SERIES: ${tokenData.series}</text>
-      <text x="84" y="950" font-family="Arial, sans-serif" font-size="24" fill="#333333">CATEGORY: ${tokenData.category}</text>
-      <text x="84" y="985" font-family="Arial, sans-serif" font-size="24" fill="#333333">REQUIRED: ${tokenData.required}</text>
+      <!-- Bloque inferior de datos - convertido a paths -->
+      ${linesToSVG([
+        {
+          text: `TRAIT: ${tokenData.trait}`,
+          x: 84,
+          y: 880,
+          fontSize: 24,
+          fill: '#333333'
+        },
+        {
+          text: `SERIES: ${tokenData.series}`,
+          x: 84,
+          y: 915,
+          fontSize: 24,
+          fill: '#333333'
+        },
+        {
+          text: `CATEGORY: ${tokenData.category}`,
+          x: 84,
+          y: 950,
+          fontSize: 24,
+          fill: '#333333'
+        },
+        {
+          text: `REQUIRED: ${tokenData.required}`,
+          x: 84,
+          y: 985,
+          fontSize: 24,
+          fill: '#333333'
+        }
+      ])}
       
-      <!-- Origin (alineado a la derecha) -->
-      <text x="684" y="985" font-family="Arial, sans-serif" font-size="24" text-anchor="end" fill="#333333">${tokenData.origin}</text>
+      <!-- Origin (alineado a la derecha) - convertido a path -->
+      ${textToSVGElement(tokenData.origin, {
+        x: 684,
+        y: 985,
+        fontSize: 24,
+        fill: '#333333'
+      })}
       
-      <!-- Logo AdrianLAB (alineado a la derecha) -->
-      <text x="684" y="1020" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="end" fill="#333333">Adrian</text>
-      <text x="684" y="1055" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="end" fill="#ff69b4">LAB</text>
+      <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
+      ${textToSVGElement('Adrian', {
+        x: 684,
+        y: 1020,
+        fontSize: 32,
+        fill: '#333333'
+      })}
+      ${textToSVGElement('LAB', {
+        x: 684,
+        y: 1055,
+        fontSize: 32,
+        fill: '#ff69b4'
+      })}
     </svg>
   `;
 
-  console.log(`[floppy-render] SVG completo generado con texto embebido`);
+  console.log(`[floppy-render] SVG completo generado con texto convertido a paths`);
 
   try {
     // Renderizar SVG completo a PNG usando Resvg
