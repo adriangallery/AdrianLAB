@@ -126,7 +126,7 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px Arial'; // USAR ARIAL BOLD
+        ctx.font = 'bold 16px sans-serif'; // USAR SANS-SERIF
         ctx.textAlign = 'center';
         console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 120, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px Arial'; // USAR ARIAL
+        ctx.font = '48px sans-serif'; // USAR SANS-SERIF
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
         console.log(`[floppy-render] Placeholder dibujado`);
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 120, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Arial'; // USAR ARIAL
+      ctx.font = '48px sans-serif'; // USAR SANS-SERIF
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
     }
@@ -158,7 +158,7 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 760, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px Arial'; // USAR ARIAL BOLD
+    ctx.font = 'bold 48px sans-serif'; // USAR SANS-SERIF
     ctx.textAlign = 'center';
     console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
     ctx.fillText(tokenData.name, 384, 810);
@@ -167,7 +167,7 @@ export default async function handler(req, res) {
     // Bloque inferior de datos
     console.log(`[floppy-render] Dibujando datos del trait...`);
     ctx.fillStyle = '#333333';
-    ctx.font = '24px Arial'; // USAR ARIAL
+    ctx.font = '24px sans-serif'; // USAR SANS-SERIF
     ctx.textAlign = 'left';
     
     const dataY = 880;
@@ -191,7 +191,7 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
     
     // Logo AdrianLAB
-    ctx.font = 'bold 32px Arial'; // USAR ARIAL BOLD
+    ctx.font = 'bold 32px sans-serif'; // USAR SANS-SERIF
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
@@ -199,10 +199,10 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Logo AdrianLAB dibujado`);
 
     // ===== TEXTO DE PRUEBA AL FINAL (DESPUÉS DE TODO) =====
-    console.log(`[floppy-render] ===== TEST DE FUENTES CON ARIAL AL FINAL =====`);
+    console.log(`[floppy-render] ===== TEST DE FUENTES GENÉRICAS AL FINAL =====`);
     
-    // Test 1: Fuente Arial (como en generate-test-images.js)
-    ctx.font = '16px Arial';
+    // Test 1: Fuente sans-serif (más básica)
+    ctx.font = '16px sans-serif';
     console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
     
     // Test 2: Medir texto
@@ -223,12 +223,12 @@ export default async function handler(req, res) {
     ctx.fillText(testText, 650, 50);
     console.log(`[floppy-render] Texto de prueba dibujado en (650, 50)`);
 
-    // Test 4: Diferentes tamaños de Arial en diferentes colores
+    // Test 4: Diferentes fuentes genéricas en diferentes colores
     const fontsToTest = [
-      { font: '16px Arial', color: '#ff0000', y: 80 },
-      { font: 'bold 16px Arial', color: '#00ff00', y: 100 },
-      { font: '24px Arial', color: '#0000ff', y: 130 },
-      { font: '48px Arial', color: '#ff00ff', y: 180 }
+      { font: '16px sans-serif', color: '#ff0000', y: 80 },
+      { font: 'bold 16px sans-serif', color: '#00ff00', y: 100 },
+      { font: '24px monospace', color: '#0000ff', y: 130 },
+      { font: '48px serif', color: '#ff00ff', y: 180 }
     ];
 
     fontsToTest.forEach((test, index) => {
@@ -239,11 +239,17 @@ export default async function handler(req, res) {
     });
 
     // Test 5: Texto grande y visible en el centro
-    ctx.font = 'bold 32px Arial';
+    ctx.font = 'bold 32px sans-serif';
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
     ctx.fillText('AdrianLAB TEST', 384, 50);
     console.log(`[floppy-render] Texto grande dibujado en el centro`);
+
+    // Test 6: Texto con fuente genérica sin especificar
+    ctx.font = '32px';
+    ctx.fillStyle = '#800080';
+    ctx.fillText('GENERIC FONT', 384, 200);
+    console.log(`[floppy-render] Texto con fuente genérica dibujado`);
 
     console.log(`[floppy-render] ===== RENDERIZADO COMPLETADO =====`);
 
