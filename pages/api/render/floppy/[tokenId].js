@@ -145,7 +145,7 @@ async function handleRenderToken(req, res, tokenId) {
       ${linesToSVG([
         {
           text: `TRAIT: ${tokenData.trait}`,
-          x: 84,
+          x: 84 + 10,  // Margen izquierdo de 10px
           y: 880,
           fontSize: 24,
           fill: '#333333',
@@ -153,7 +153,7 @@ async function handleRenderToken(req, res, tokenId) {
         },
         {
           text: `SERIES: ${tokenData.series}`,
-          x: 84,
+          x: 84 + 10,  // Margen izquierdo de 10px
           y: 915,
           fontSize: 24,
           fill: '#333333',
@@ -161,7 +161,7 @@ async function handleRenderToken(req, res, tokenId) {
         },
         {
           text: `CATEGORY: ${tokenData.category}`,
-          x: 84,
+          x: 84 + 10,  // Margen izquierdo de 10px
           y: 950,
           fontSize: 24,
           fill: '#333333',
@@ -169,7 +169,7 @@ async function handleRenderToken(req, res, tokenId) {
         },
         {
           text: `REQUIRED: ${tokenData.required}`,
-          x: 84,
+          x: 84 + 10,  // Margen izquierdo de 10px
           y: 985,
           fontSize: 24,
           fill: '#333333',
@@ -179,7 +179,7 @@ async function handleRenderToken(req, res, tokenId) {
       
       <!-- Origin (alineado a la derecha) - convertido a path -->
       ${textToSVGElement(tokenData.origin, {
-        x: 684,
+        x: 684 - 10,  // Margen derecho de 10px
         y: 985,
         fontSize: 24,
         fill: '#333333',
@@ -188,14 +188,14 @@ async function handleRenderToken(req, res, tokenId) {
       
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
-        x: 684,
+        x: 684 - 10,  // Margen derecho de 10px
         y: 1020,
         fontSize: 32,
         fill: '#333333',
         anchor: 'end'
       })}
       ${textToSVGElement('LAB', {
-        x: 684,
+        x: 684 - 10,  // Margen derecho de 10px
         y: 1055,
         fontSize: 32,
         fill: '#ff69b4',
