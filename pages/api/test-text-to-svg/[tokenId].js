@@ -25,6 +25,7 @@ export default async function handler(req, res) {
     });
     
     console.log(`[test-text-to-svg] Test element result:`, testElement);
+    console.log(`[test-text-to-svg] Test element length:`, testElement.length);
 
     // Test 2: Múltiples líneas
     const testLines = linesToSVG([
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
     ]);
     
     console.log(`[test-text-to-svg] Test lines result:`, testLines);
+    console.log(`[test-text-to-svg] Test lines length:`, testLines.length);
 
     // Test 3: SVG completo con paths
     const completeSvg = createSVGWithPaths({
@@ -147,6 +149,10 @@ export default async function handler(req, res) {
         </g>
       </svg>
     `;
+
+    console.log(`[test-text-to-svg] Combined SVG length:`, combinedSvg.length);
+    console.log(`[test-text-to-svg] Combined SVG preview (first 500 chars):`, combinedSvg.substring(0, 500));
+    console.log(`[test-text-to-svg] Combined SVG preview (chars 500-1000):`, combinedSvg.substring(500, 1000));
 
     try {
       const resvg = new Resvg(Buffer.from(combinedSvg), {
