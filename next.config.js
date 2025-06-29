@@ -11,6 +11,13 @@ const nextConfig = {
         destination: '/metadata/:path*.json'
       }
     ]
+  },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.(ttf|otf|woff|woff2)$/,
+      type: 'asset/resource'
+    });
+    return config;
   }
 }
 

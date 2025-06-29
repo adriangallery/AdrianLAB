@@ -1,7 +1,41 @@
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
+
+// REGISTRAR TIPOGRAFÍAS ROBOTO
+try {
+  console.log('[floppy-render] Registrando fuentes Roboto...');
+  
+  // Registrar fuentes principales de Roboto
+  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf'), {
+    family: 'Roboto'
+  });
+  
+  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf'), {
+    family: 'Roboto',
+    weight: 'bold'
+  });
+  
+  // Registrar fuentes de la carpeta static
+  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Regular.ttf'), {
+    family: 'Roboto Static'
+  });
+  
+  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Bold.ttf'), {
+    family: 'Roboto Static',
+    weight: 'bold'
+  });
+  
+  registerFont(path.join(process.cwd(), 'public', 'fonts', 'Roboto', 'static', 'Roboto-Medium.ttf'), {
+    family: 'Roboto Static',
+    weight: '500'
+  });
+  
+  console.log('[floppy-render] Fuentes Roboto registradas exitosamente');
+} catch (error) {
+  console.error('[floppy-render] Error registrando fuentes Roboto:', error);
+}
 
 export default async function handler(req, res) {
   try {
@@ -126,7 +160,7 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px sans-serif'; // USAR SANS-SERIF
+        ctx.font = 'bold 16px "Roboto"'; // USAR ROBOTO
         ctx.textAlign = 'center';
         console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
@@ -137,7 +171,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 120, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px sans-serif'; // USAR SANS-SERIF
+        ctx.font = '48px "Roboto"'; // USAR ROBOTO
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
         console.log(`[floppy-render] Placeholder dibujado`);
@@ -147,7 +181,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 120, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px sans-serif'; // USAR SANS-SERIF
+      ctx.font = '48px "Roboto"'; // USAR ROBOTO
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
     }
@@ -158,7 +192,7 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 760, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px sans-serif'; // USAR SANS-SERIF
+    ctx.font = 'bold 48px "Roboto"'; // USAR ROBOTO
     ctx.textAlign = 'center';
     console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
     ctx.fillText(tokenData.name, 384, 810);
@@ -167,7 +201,7 @@ export default async function handler(req, res) {
     // Bloque inferior de datos
     console.log(`[floppy-render] Dibujando datos del trait...`);
     ctx.fillStyle = '#333333';
-    ctx.font = '24px sans-serif'; // USAR SANS-SERIF
+    ctx.font = '24px "Roboto"'; // USAR ROBOTO
     ctx.textAlign = 'left';
     
     const dataY = 880;
@@ -191,7 +225,7 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
     
     // Logo AdrianLAB
-    ctx.font = 'bold 32px sans-serif'; // USAR SANS-SERIF
+    ctx.font = 'bold 32px "Roboto"'; // USAR ROBOTO
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
@@ -199,10 +233,10 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Logo AdrianLAB dibujado`);
 
     // ===== TEXTO DE PRUEBA AL FINAL (DESPUÉS DE TODO) =====
-    console.log(`[floppy-render] ===== TEST DE FUENTES GENÉRICAS AL FINAL =====`);
+    console.log(`[floppy-render] ===== TEST DE FUENTES ROBOTO AL FINAL =====`);
     
-    // Test 1: Fuente sans-serif (más básica)
-    ctx.font = '16px sans-serif';
+    // Test 1: Roboto Regular
+    ctx.font = '16px "Roboto"';
     console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
     
     // Test 2: Medir texto
@@ -223,68 +257,65 @@ export default async function handler(req, res) {
     ctx.fillText(testText, 650, 50);
     console.log(`[floppy-render] Texto de prueba dibujado en (650, 50)`);
 
-    // Test 4: Diferentes fuentes genéricas en diferentes colores
+    // Test 4: Diferentes variantes de Roboto en diferentes colores
     const fontsToTest = [
-      { font: '16px sans-serif', color: '#ff0000', y: 80 },
-      { font: 'bold 16px sans-serif', color: '#00ff00', y: 100 },
-      { font: '24px monospace', color: '#0000ff', y: 130 },
-      { font: '48px serif', color: '#ff00ff', y: 180 }
+      { font: '16px "Roboto"', color: '#ff0000', y: 80, label: 'ROBOTO REG' },
+      { font: 'bold 16px "Roboto"', color: '#00ff00', y: 100, label: 'ROBOTO BOLD' },
+      { font: '24px "Roboto Static"', color: '#0000ff', y: 130, label: 'ROBOTO STATIC' },
+      { font: 'bold 24px "Roboto Static"', color: '#ff00ff', y: 160, label: 'ROBOTO STATIC BOLD' },
+      { font: '500 24px "Roboto Static"', color: '#ff6600', y: 190, label: 'ROBOTO MEDIUM' },
+      { font: '48px "Roboto"', color: '#800080', y: 240, label: 'ROBOTO LARGE' }
     ];
 
     fontsToTest.forEach((test, index) => {
       ctx.font = test.font;
       ctx.fillStyle = test.color;
       console.log(`[floppy-render] Test ${index + 1}: "${test.font}" -> "${ctx.font}"`);
-      ctx.fillText(`TEST${index + 1}`, 650, test.y);
+      ctx.fillText(test.label, 650, test.y);
     });
 
-    // Test 5: Texto grande y visible en el centro
-    ctx.font = 'bold 32px sans-serif';
+    // Test 5: Texto grande y visible en el centro con Roboto
+    ctx.font = 'bold 32px "Roboto"';
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
-    ctx.fillText('AdrianLAB TEST', 384, 50);
-    console.log(`[floppy-render] Texto grande dibujado en el centro`);
+    ctx.fillText('AdrianLAB ROBOTO TEST', 384, 50);
+    console.log(`[floppy-render] Texto grande con Roboto dibujado en el centro`);
 
-    // Test 6: Texto con fuente genérica sin especificar
-    ctx.font = '32px';
+    // Test 6: Texto con Roboto Static Medium
+    ctx.font = '500 32px "Roboto Static"';
     ctx.fillStyle = '#800080';
-    ctx.fillText('GENERIC FONT', 384, 200);
-    console.log(`[floppy-render] Texto con fuente genérica dibujado`);
+    ctx.fillText('ROBOTO STATIC MEDIUM', 384, 300);
+    console.log(`[floppy-render] Texto con Roboto Static Medium dibujado`);
 
-    // Test 7: Texto SIN FORMATO ALGUNO (solo tamaño)
-    ctx.font = '32px';
+    // Test 7: Texto con Roboto Bold grande
+    ctx.font = 'bold 48px "Roboto"';
     ctx.fillStyle = '#ff6600';
-    ctx.fillText('SIN FORMATO', 384, 250);
-    console.log(`[floppy-render] Texto sin formato dibujado`);
+    ctx.fillText('ROBOTO BOLD LARGE', 384, 380);
+    console.log(`[floppy-render] Texto Roboto Bold grande dibujado`);
 
-    // Test 8: Texto con solo tamaño básico
-    ctx.font = '24px';
-    ctx.fillStyle = '#0066ff';
-    ctx.fillText('BASIC TEXT', 384, 300);
-    console.log(`[floppy-render] Texto básico dibujado`);
-
-    // Test 9: Texto con tamaño mínimo
-    ctx.font = '12px';
+    // Test 8: Texto con Roboto Regular pequeño
+    ctx.font = '12px "Roboto"';
     ctx.fillStyle = '#000000';
-    ctx.fillText('MINI TEXT', 384, 350);
-    console.log(`[floppy-render] Texto mínimo dibujado`);
+    ctx.fillText('ROBOTO SMALL', 384, 450);
+    console.log(`[floppy-render] Texto Roboto pequeño dibujado`);
 
-    // Test 10: Texto con solo color (sin especificar fuente)
-    ctx.fillStyle = '#ff0000';
-    ctx.fillText('COLOR ONLY', 384, 400);
-    console.log(`[floppy-render] Texto solo color dibujado`);
-
-    // Test 11: Texto con stroke (contorno) en lugar de fill
-    ctx.font = '24px sans-serif';
+    // Test 9: Texto con stroke usando Roboto
+    ctx.font = '24px "Roboto"';
     ctx.strokeStyle = '#00ff00';
     ctx.lineWidth = 2;
-    ctx.strokeText('STROKE TEXT', 384, 450);
-    console.log(`[floppy-render] Texto con stroke dibujado`);
+    ctx.strokeText('ROBOTO STROKE', 384, 500);
+    console.log(`[floppy-render] Texto Roboto con stroke dibujado`);
 
-    // Test 12: Texto con fill y stroke
+    // Test 10: Texto con fill y stroke usando Roboto
     ctx.fillStyle = '#000000';
-    ctx.fillText('FILL+STROKE', 384, 500);
-    console.log(`[floppy-render] Texto fill+stroke dibujado`);
+    ctx.fillText('ROBOTO FILL+STROKE', 384, 550);
+    console.log(`[floppy-render] Texto Roboto fill+stroke dibujado`);
+
+    // Test 11: Fallback a fuentes genéricas si Roboto falla
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = '#ff0000';
+    ctx.fillText('FALLBACK SANS-SERIF', 384, 600);
+    console.log(`[floppy-render] Texto fallback dibujado`);
 
     console.log(`[floppy-render] ===== RENDERIZADO COMPLETADO =====`);
 
