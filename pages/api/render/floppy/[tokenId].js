@@ -251,6 +251,41 @@ export default async function handler(req, res) {
     ctx.fillText('GENERIC FONT', 384, 200);
     console.log(`[floppy-render] Texto con fuente genérica dibujado`);
 
+    // Test 7: Texto SIN FORMATO ALGUNO (solo tamaño)
+    ctx.font = '32px';
+    ctx.fillStyle = '#ff6600';
+    ctx.fillText('SIN FORMATO', 384, 250);
+    console.log(`[floppy-render] Texto sin formato dibujado`);
+
+    // Test 8: Texto con solo tamaño básico
+    ctx.font = '24px';
+    ctx.fillStyle = '#0066ff';
+    ctx.fillText('BASIC TEXT', 384, 300);
+    console.log(`[floppy-render] Texto básico dibujado`);
+
+    // Test 9: Texto con tamaño mínimo
+    ctx.font = '12px';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('MINI TEXT', 384, 350);
+    console.log(`[floppy-render] Texto mínimo dibujado`);
+
+    // Test 10: Texto con solo color (sin especificar fuente)
+    ctx.fillStyle = '#ff0000';
+    ctx.fillText('COLOR ONLY', 384, 400);
+    console.log(`[floppy-render] Texto solo color dibujado`);
+
+    // Test 11: Texto con stroke (contorno) en lugar de fill
+    ctx.font = '24px sans-serif';
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 2;
+    ctx.strokeText('STROKE TEXT', 384, 450);
+    console.log(`[floppy-render] Texto con stroke dibujado`);
+
+    // Test 12: Texto con fill y stroke
+    ctx.fillStyle = '#000000';
+    ctx.fillText('FILL+STROKE', 384, 500);
+    console.log(`[floppy-render] Texto fill+stroke dibujado`);
+
     console.log(`[floppy-render] ===== RENDERIZADO COMPLETADO =====`);
 
     // Configurar headers
