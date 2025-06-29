@@ -190,7 +190,7 @@ export default async function handler(req, res) {
       const metadata = {
         name: tokenData.name,
         description: tokenData.description,
-        image: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif` : null,
+        image: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}` : null,
         external_url: `${baseUrl}/api/metadata/floppy/${tokenIdNum}`,
         attributes: [
           {
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif` : null,
+              uri: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}` : null,
               type: "image/gif"
             }
           ],
