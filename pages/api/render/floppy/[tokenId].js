@@ -1,76 +1,7 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
-import https from 'https';
-
-// Función para descargar fuente si no existe
-async function downloadFont(fontUrl, fontPath) {
-  return new Promise((resolve, reject) => {
-    if (fs.existsSync(fontPath)) {
-      console.log(`[floppy-render] Fuente ya existe: ${fontPath}`);
-      resolve();
-      return;
-    }
-
-    console.log(`[floppy-render] Descargando fuente: ${fontUrl}`);
-    
-    // Crear directorio si no existe
-    const fontDir = path.dirname(fontPath);
-    if (!fs.existsSync(fontDir)) {
-      fs.mkdirSync(fontDir, { recursive: true });
-    }
-
-    const file = fs.createWriteStream(fontPath);
-    https.get(fontUrl, (response) => {
-      response.pipe(file);
-      file.on('finish', () => {
-        file.close();
-        console.log(`[floppy-render] Fuente descargada: ${fontPath}`);
-        resolve();
-      });
-    }).on('error', (err) => {
-      fs.unlink(fontPath, () => {}); // Eliminar archivo parcial
-      console.log(`[floppy-render] Error descargando fuente: ${err.message}`);
-      reject(err);
-    });
-  });
-}
-
-// Función para registrar fuentes
-async function setupFonts() {
-  try {
-    const fontsDir = path.join(process.cwd(), 'public', 'fonts');
-    
-    // URLs de fuentes Roboto de Google Fonts
-    const fontUrls = {
-      'Roboto-Regular.ttf': 'https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf',
-      'Roboto-Bold.ttf': 'https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Bold.ttf'
-    };
-
-    // Descargar y registrar fuentes
-    for (const [fontName, fontUrl] of Object.entries(fontUrls)) {
-      const fontPath = path.join(fontsDir, fontName);
-      
-      try {
-        await downloadFont(fontUrl, fontPath);
-        
-        // Registrar la fuente
-        if (fontName.includes('Bold')) {
-          registerFont(fontPath, { family: 'Roboto', weight: 'bold' });
-        } else {
-          registerFont(fontPath, { family: 'Roboto', weight: 'normal' });
-        }
-        
-        console.log(`[floppy-render] Fuente registrada: ${fontName}`);
-      } catch (error) {
-        console.log(`[floppy-render] No se pudo cargar ${fontName}: ${error.message}`);
-      }
-    }
-  } catch (error) {
-    console.log(`[floppy-render] Error configurando fuentes: ${error.message}`);
-  }
-}
 
 export default async function handler(req, res) {
   try {
@@ -123,10 +54,6 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Token ID: ${tokenId}`);
     console.log(`[floppy-render] Datos del token:`, JSON.stringify(tokenData, null, 2));
 
-    // Configurar fuentes
-    console.log(`[floppy-render] Configurando fuentes...`);
-    await setupFonts();
-
     // Función para obtener tag y color según maxSupply
     function getRarityTagAndColor(maxSupply) {
       if (maxSupply <= 50) return { tag: 'LEGENDARY', bg: '#ffd700' };
@@ -154,11 +81,11 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 768, 1024);
     console.log(`[floppy-render] Fondo blanco aplicado`);
 
-    // DEBUG: Test de fuentes básico
-    console.log(`[floppy-render] ===== TEST DE FUENTES =====`);
+    // DEBUG: Test de fuentes con Arial (que sabemos que funciona)
+    console.log(`[floppy-render] ===== TEST DE FUENTES CON ARIAL =====`);
     
-    // Test 1: Fuente Roboto
-    ctx.font = '16px Roboto';
+    // Test 1: Fuente Arial (como en generate-test-images.js)
+    ctx.font = '16px Arial';
     console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
     
     // Test 2: Medir texto
@@ -179,12 +106,12 @@ export default async function handler(req, res) {
     ctx.fillText(testText, 10, 50);
     console.log(`[floppy-render] Texto de prueba dibujado en (10, 50)`);
 
-    // Test 4: Diferentes fuentes
+    // Test 4: Diferentes tamaños de Arial
     const fontsToTest = [
-      '16px Roboto',
-      'bold 16px Roboto',
-      '16px sans-serif',
-      '16px monospace'
+      '16px Arial',
+      'bold 16px Arial',
+      '24px Arial',
+      '48px Arial'
     ];
 
     fontsToTest.forEach((font, index) => {
@@ -238,7 +165,7 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
         
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px Roboto'; // USAR ROBOTO BOLD
+        ctx.font = 'bold 16px Arial'; // USAR ARIAL BOLD
         ctx.textAlign = 'center';
         console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
         ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
@@ -249,7 +176,7 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#f0f0f0';
         ctx.fillRect(84, 120, 600, 600);
         ctx.fillStyle = '#999999';
-        ctx.font = '48px Roboto'; // USAR ROBOTO
+        ctx.font = '48px Arial'; // USAR ARIAL
         ctx.textAlign = 'center';
         ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
         console.log(`[floppy-render] Placeholder dibujado`);
@@ -259,7 +186,7 @@ export default async function handler(req, res) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(84, 120, 600, 600);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Roboto'; // USAR ROBOTO
+      ctx.font = '48px Arial'; // USAR ARIAL
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
     }
@@ -270,7 +197,7 @@ export default async function handler(req, res) {
     ctx.fillRect(84, 760, 600, 80);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px Roboto'; // USAR ROBOTO BOLD
+    ctx.font = 'bold 48px Arial'; // USAR ARIAL BOLD
     ctx.textAlign = 'center';
     console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
     ctx.fillText(tokenData.name, 384, 810);
@@ -279,7 +206,7 @@ export default async function handler(req, res) {
     // Bloque inferior de datos
     console.log(`[floppy-render] Dibujando datos del trait...`);
     ctx.fillStyle = '#333333';
-    ctx.font = '24px Roboto'; // USAR ROBOTO
+    ctx.font = '24px Arial'; // USAR ARIAL
     ctx.textAlign = 'left';
     
     const dataY = 880;
@@ -303,7 +230,7 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
     
     // Logo AdrianLAB
-    ctx.font = 'bold 32px Roboto'; // USAR ROBOTO BOLD
+    ctx.font = 'bold 32px Arial'; // USAR ARIAL BOLD
     ctx.fillStyle = '#333333';
     ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
     ctx.fillStyle = '#ff69b4';
