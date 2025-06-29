@@ -81,45 +81,6 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 768, 1024);
     console.log(`[floppy-render] Fondo blanco aplicado`);
 
-    // DEBUG: Test de fuentes con Arial (que sabemos que funciona)
-    console.log(`[floppy-render] ===== TEST DE FUENTES CON ARIAL =====`);
-    
-    // Test 1: Fuente Arial (como en generate-test-images.js)
-    ctx.font = '16px Arial';
-    console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
-    
-    // Test 2: Medir texto
-    const testText = 'TEST';
-    const textMetrics = ctx.measureText(testText);
-    console.log(`[floppy-render] Métricas del texto "${testText}":`, {
-      width: textMetrics.width,
-      actualBoundingBoxAscent: textMetrics.actualBoundingBoxAscent,
-      actualBoundingBoxDescent: textMetrics.actualBoundingBoxDescent,
-      fontBoundingBoxAscent: textMetrics.fontBoundingBoxAscent,
-      fontBoundingBoxDescent: textMetrics.fontBoundingBoxDescent
-    });
-
-    // Test 3: Dibujar texto de prueba
-    console.log(`[floppy-render] Dibujando texto de prueba...`);
-    ctx.fillStyle = '#000000';
-    ctx.textAlign = 'left';
-    ctx.fillText(testText, 10, 50);
-    console.log(`[floppy-render] Texto de prueba dibujado en (10, 50)`);
-
-    // Test 4: Diferentes tamaños de Arial
-    const fontsToTest = [
-      '16px Arial',
-      'bold 16px Arial',
-      '24px Arial',
-      '48px Arial'
-    ];
-
-    fontsToTest.forEach((font, index) => {
-      ctx.font = font;
-      console.log(`[floppy-render] Test ${index + 1}: "${font}" -> "${ctx.font}"`);
-      ctx.fillText(`TEST${index + 1}`, 10, 80 + (index * 20));
-    });
-
     // Cargar y renderizar SVG del trait
     try {
       const svgPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.svg`);
@@ -147,7 +108,7 @@ export default async function handler(req, res) {
         
         // Dibujar contenedor de imagen con fondo dinámico
         const imageX = 84;
-        const imageY = 120; // Movido abajo para dejar espacio a los tests
+        const imageY = 120;
         const imageSize = 600;
         
         // Fondo del contenedor con color dinámico
@@ -236,6 +197,53 @@ export default async function handler(req, res) {
     ctx.fillStyle = '#ff69b4';
     ctx.fillText('LAB', 684, dataY + lineHeight * 6);
     console.log(`[floppy-render] Logo AdrianLAB dibujado`);
+
+    // ===== TEXTO DE PRUEBA AL FINAL (DESPUÉS DE TODO) =====
+    console.log(`[floppy-render] ===== TEST DE FUENTES CON ARIAL AL FINAL =====`);
+    
+    // Test 1: Fuente Arial (como en generate-test-images.js)
+    ctx.font = '16px Arial';
+    console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
+    
+    // Test 2: Medir texto
+    const testText = 'TEST';
+    const textMetrics = ctx.measureText(testText);
+    console.log(`[floppy-render] Métricas del texto "${testText}":`, {
+      width: textMetrics.width,
+      actualBoundingBoxAscent: textMetrics.actualBoundingBoxAscent,
+      actualBoundingBoxDescent: textMetrics.actualBoundingBoxDescent,
+      fontBoundingBoxAscent: textMetrics.fontBoundingBoxAscent,
+      fontBoundingBoxDescent: textMetrics.fontBoundingBoxDescent
+    });
+
+    // Test 3: Dibujar texto de prueba en la esquina superior derecha
+    console.log(`[floppy-render] Dibujando texto de prueba...`);
+    ctx.fillStyle = '#ff0000'; // ROJO para que sea muy visible
+    ctx.textAlign = 'left';
+    ctx.fillText(testText, 650, 50);
+    console.log(`[floppy-render] Texto de prueba dibujado en (650, 50)`);
+
+    // Test 4: Diferentes tamaños de Arial en diferentes colores
+    const fontsToTest = [
+      { font: '16px Arial', color: '#ff0000', y: 80 },
+      { font: 'bold 16px Arial', color: '#00ff00', y: 100 },
+      { font: '24px Arial', color: '#0000ff', y: 130 },
+      { font: '48px Arial', color: '#ff00ff', y: 180 }
+    ];
+
+    fontsToTest.forEach((test, index) => {
+      ctx.font = test.font;
+      ctx.fillStyle = test.color;
+      console.log(`[floppy-render] Test ${index + 1}: "${test.font}" -> "${ctx.font}"`);
+      ctx.fillText(`TEST${index + 1}`, 650, test.y);
+    });
+
+    // Test 5: Texto grande y visible en el centro
+    ctx.font = 'bold 32px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.fillText('AdrianLAB TEST', 384, 50);
+    console.log(`[floppy-render] Texto grande dibujado en el centro`);
 
     console.log(`[floppy-render] ===== RENDERIZADO COMPLETADO =====`);
 
