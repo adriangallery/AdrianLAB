@@ -124,19 +124,21 @@ async function handleRenderToken(req, res, tokenId) {
       <!-- Tag de rareza (superior izquierda) - convertido a path -->
       <rect x="84" y="120" width="160" height="60" fill="${rarity.bg}"/>
       ${textToSVGElement(rarity.tag, {
-        x: 164,
-        y: 155,
+        x: 84 + 160 / 2,  // Centro horizontal del rectángulo
+        y: 120 + 60 / 2,  // Centro vertical del rectángulo
         fontSize: 16,
-        fill: '#ffffff'
+        fill: '#ffffff',
+        anchor: 'center middle'
       })}
       
       <!-- Nombre del trait (debajo de la imagen) - convertido a path -->
       <rect x="84" y="760" width="600" height="80" fill="#0f4e6d"/>
       ${textToSVGElement(tokenData.name, {
-        x: 384,
-        y: 810,
+        x: 84 + 600 / 2,  // Centro horizontal del rectángulo
+        y: 760 + 80 / 2,  // Centro vertical del rectángulo
         fontSize: 48,
-        fill: '#ffffff'
+        fill: '#ffffff',
+        anchor: 'center middle'
       })}
       
       <!-- Bloque inferior de datos - convertido a paths -->
@@ -146,28 +148,32 @@ async function handleRenderToken(req, res, tokenId) {
           x: 84,
           y: 880,
           fontSize: 24,
-          fill: '#333333'
+          fill: '#333333',
+          anchor: 'left middle'
         },
         {
           text: `SERIES: ${tokenData.series}`,
           x: 84,
           y: 915,
           fontSize: 24,
-          fill: '#333333'
+          fill: '#333333',
+          anchor: 'left middle'
         },
         {
           text: `CATEGORY: ${tokenData.category}`,
           x: 84,
           y: 950,
           fontSize: 24,
-          fill: '#333333'
+          fill: '#333333',
+          anchor: 'left middle'
         },
         {
           text: `REQUIRED: ${tokenData.required}`,
           x: 84,
           y: 985,
           fontSize: 24,
-          fill: '#333333'
+          fill: '#333333',
+          anchor: 'left middle'
         }
       ])}
       
@@ -176,7 +182,8 @@ async function handleRenderToken(req, res, tokenId) {
         x: 684,
         y: 985,
         fontSize: 24,
-        fill: '#333333'
+        fill: '#333333',
+        anchor: 'right middle'
       })}
       
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
@@ -184,13 +191,15 @@ async function handleRenderToken(req, res, tokenId) {
         x: 684,
         y: 1020,
         fontSize: 32,
-        fill: '#333333'
+        fill: '#333333',
+        anchor: 'right middle'
       })}
       ${textToSVGElement('LAB', {
         x: 684,
         y: 1055,
         fontSize: 32,
-        fill: '#ff69b4'
+        fill: '#ff69b4',
+        anchor: 'right middle'
       })}
     </svg>
   `;
