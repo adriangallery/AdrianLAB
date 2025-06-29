@@ -128,7 +128,7 @@ async function handleRenderToken(req, res, tokenId) {
         y: 120 + 60 / 2,  // Centro vertical del rectángulo
         fontSize: 16,
         fill: '#ffffff',
-        anchor: 'middle'
+        anchor: 'center middle'
       })}
       
       <!-- Nombre del trait (debajo de la imagen) - convertido a path -->
@@ -138,7 +138,7 @@ async function handleRenderToken(req, res, tokenId) {
         y: 760 + 80 / 2,  // Centro vertical del rectángulo
         fontSize: 48,
         fill: '#ffffff',
-        anchor: 'middle'
+        anchor: 'center middle'
       })}
       
       <!-- Bloque inferior de datos - convertido a paths -->
@@ -149,7 +149,7 @@ async function handleRenderToken(req, res, tokenId) {
           y: 880,
           fontSize: 24,
           fill: '#333333',
-          anchor: 'start'
+          anchor: 'start middle'
         },
         {
           text: `SERIES: ${tokenData.series}`,
@@ -157,7 +157,7 @@ async function handleRenderToken(req, res, tokenId) {
           y: 915,
           fontSize: 24,
           fill: '#333333',
-          anchor: 'start'
+          anchor: 'start middle'
         },
         {
           text: `CATEGORY: ${tokenData.category}`,
@@ -165,7 +165,7 @@ async function handleRenderToken(req, res, tokenId) {
           y: 950,
           fontSize: 24,
           fill: '#333333',
-          anchor: 'start'
+          anchor: 'start middle'
         },
         {
           text: `REQUIRED: ${tokenData.required}`,
@@ -173,7 +173,7 @@ async function handleRenderToken(req, res, tokenId) {
           y: 985,
           fontSize: 24,
           fill: '#333333',
-          anchor: 'start'
+          anchor: 'start middle'
         }
       ])}
       
@@ -183,7 +183,7 @@ async function handleRenderToken(req, res, tokenId) {
         y: 985,
         fontSize: 24,
         fill: '#333333',
-        anchor: 'end'
+        anchor: 'end middle'
       })}
       
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
@@ -192,14 +192,14 @@ async function handleRenderToken(req, res, tokenId) {
         y: 1020,
         fontSize: 32,
         fill: '#333333',
-        anchor: 'end'
+        anchor: 'end middle'
       })}
       ${textToSVGElement('LAB', {
         x: 684 - 10,  // Margen derecho de 10px
         y: 1055,
         fontSize: 32,
         fill: '#ff69b4',
-        anchor: 'end'
+        anchor: 'end middle'
       })}
     </svg>
   `;
