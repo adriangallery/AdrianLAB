@@ -116,7 +116,7 @@ async function handleRenderToken(req, res, tokenId) {
       <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
       
       <!-- Imagen del trait (centrada en el contenedor) -->
-      <g transform="translate(84, 120)">
+      <g transform="translate(84, 120) scale(16.22)">
         ${traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
       </g>
       
