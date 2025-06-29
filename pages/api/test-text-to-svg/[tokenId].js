@@ -23,6 +23,8 @@ export default async function handler(req, res) {
       fontSize: 48,
       fill: '#ff0000'
     });
+    
+    console.log(`[test-text-to-svg] Test element result:`, testElement);
 
     // Test 2: Múltiples líneas
     const testLines = linesToSVG([
@@ -48,6 +50,8 @@ export default async function handler(req, res) {
         fill: '#ff6600'
       }
     ]);
+    
+    console.log(`[test-text-to-svg] Test lines result:`, testLines);
 
     // Test 3: SVG completo con paths
     const completeSvg = createSVGWithPaths({
