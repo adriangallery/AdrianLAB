@@ -162,7 +162,7 @@ async function handleRenderToken(req, res, tokenId) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(imageX, imageY, imageSize, imageSize);
       ctx.fillStyle = '#999999';
-      ctx.font = '48px Arial, sans-serif';
+      ctx.font = '48px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
     }
@@ -172,7 +172,7 @@ async function handleRenderToken(req, res, tokenId) {
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(imageX, imageY, imageSize, imageSize);
     ctx.fillStyle = '#999999';
-    ctx.font = '48px Arial, sans-serif';
+    ctx.font = '48px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`TRAIT ${tokenId}`, 384, 420);
   }
@@ -186,7 +186,7 @@ async function handleRenderToken(req, res, tokenId) {
   console.log(`[floppy-render] Tag de rareza dibujado con color: ${rarity.bg}`);
   
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 16px Arial, sans-serif'; // Fuente del sistema
+  ctx.font = 'bold 16px sans-serif'; // Solo fuente genérica
   ctx.textAlign = 'center';
   console.log(`[floppy-render] Configurando texto del tag: fuente="${ctx.font}", color=#ffffff`);
   ctx.fillText(rarity.tag, imageX + 80, imageY + 35);
@@ -198,7 +198,7 @@ async function handleRenderToken(req, res, tokenId) {
   ctx.fillRect(84, 760, 600, 80);
   
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 48px Arial, sans-serif'; // Fuente del sistema
+  ctx.font = 'bold 48px sans-serif'; // Solo fuente genérica
   ctx.textAlign = 'center';
   console.log(`[floppy-render] Configurando nombre: fuente="${ctx.font}", color=#ffffff`);
   ctx.fillText(tokenData.name, 384, 810);
@@ -207,7 +207,7 @@ async function handleRenderToken(req, res, tokenId) {
   // Bloque inferior de datos
   console.log(`[floppy-render] Dibujando datos del trait...`);
   ctx.fillStyle = '#333333';
-  ctx.font = '24px Arial, sans-serif'; // Fuente del sistema
+  ctx.font = '24px sans-serif'; // Solo fuente genérica
   ctx.textAlign = 'left';
   
   const dataY = 880;
@@ -231,18 +231,18 @@ async function handleRenderToken(req, res, tokenId) {
   console.log(`[floppy-render] Origin dibujado: "${tokenData.origin}"`);
   
   // Logo AdrianLAB
-  ctx.font = 'bold 32px Arial, sans-serif'; // Fuente del sistema
+  ctx.font = 'bold 32px sans-serif'; // Solo fuente genérica
   ctx.fillStyle = '#333333';
   ctx.fillText('Adrian', 684, dataY + lineHeight * 5);
   ctx.fillStyle = '#ff69b4';
   ctx.fillText('LAB', 684, dataY + lineHeight * 6);
   console.log(`[floppy-render] Logo AdrianLAB dibujado`);
 
-  // ===== TEST DE FUENTES DEL SISTEMA =====
-  console.log(`[floppy-render] ===== TEST DE FUENTES DEL SISTEMA =====`);
+  // ===== TEST DE FUENTES GENÉRICAS =====
+  console.log(`[floppy-render] ===== TEST DE FUENTES GENÉRICAS =====`);
   
-  // Test 1: Arial Regular
-  ctx.font = '16px Arial, sans-serif';
+  // Test 1: Sans-serif Regular
+  ctx.font = '16px sans-serif';
   console.log(`[floppy-render] Fuente 1 configurada: "${ctx.font}"`);
   
   // Test 2: Medir texto
@@ -256,14 +256,14 @@ async function handleRenderToken(req, res, tokenId) {
     fontBoundingBoxDescent: textMetrics.fontBoundingBoxDescent
   });
 
-  // Test 3: Diferentes variantes de Arial en diferentes colores
+  // Test 3: Diferentes variantes de sans-serif en diferentes colores
   const fontsToTest = [
-    { font: '16px Arial, sans-serif', color: '#ff0000', y: 80, label: 'ARIAL REG' },
-    { font: 'bold 16px Arial, sans-serif', color: '#00ff00', y: 100, label: 'ARIAL BOLD' },
-    { font: '24px Arial, sans-serif', color: '#0000ff', y: 130, label: 'ARIAL 24' },
-    { font: 'bold 24px Arial, sans-serif', color: '#ff00ff', y: 160, label: 'ARIAL BOLD 24' },
-    { font: '32px Arial, sans-serif', color: '#ff6600', y: 190, label: 'ARIAL 32' },
-    { font: '48px Arial, sans-serif', color: '#800080', y: 240, label: 'ARIAL LARGE' }
+    { font: '16px sans-serif', color: '#ff0000', y: 80, label: 'SANS-REG' },
+    { font: 'bold 16px sans-serif', color: '#00ff00', y: 100, label: 'SANS-BOLD' },
+    { font: '24px sans-serif', color: '#0000ff', y: 130, label: 'SANS-24' },
+    { font: 'bold 24px sans-serif', color: '#ff00ff', y: 160, label: 'SANS-BOLD-24' },
+    { font: '32px sans-serif', color: '#ff6600', y: 190, label: 'SANS-32' },
+    { font: '48px sans-serif', color: '#800080', y: 240, label: 'SANS-LARGE' }
   ];
 
   fontsToTest.forEach((test, index) => {
@@ -273,30 +273,30 @@ async function handleRenderToken(req, res, tokenId) {
     ctx.fillText(test.label, 650, test.y);
   });
 
-  // Test 4: Texto grande y visible en el centro con Arial
-  ctx.font = 'bold 32px Arial, sans-serif';
+  // Test 4: Texto grande y visible en el centro con sans-serif
+  ctx.font = 'bold 32px sans-serif';
   ctx.fillStyle = '#000000';
   ctx.textAlign = 'center';
-  ctx.fillText('AdrianLAB ARIAL TEST', 384, 50);
-  console.log(`[floppy-render] Texto grande con Arial dibujado en el centro`);
+  ctx.fillText('AdrianLAB SANS-SERIF TEST', 384, 50);
+  console.log(`[floppy-render] Texto grande con sans-serif dibujado en el centro`);
 
-  // Test 5: Texto con stroke usando Arial
-  ctx.font = '24px Arial, sans-serif';
+  // Test 5: Texto con stroke usando sans-serif
+  ctx.font = '24px sans-serif';
   ctx.strokeStyle = '#00ff00';
   ctx.lineWidth = 2;
-  ctx.strokeText('ARIAL STROKE', 384, 300);
-  console.log(`[floppy-render] Texto Arial con stroke dibujado`);
+  ctx.strokeText('SANS-SERIF STROKE', 384, 300);
+  console.log(`[floppy-render] Texto sans-serif con stroke dibujado`);
 
-  // Test 6: Texto con fill y stroke usando Arial
+  // Test 6: Texto con fill y stroke usando sans-serif
   ctx.fillStyle = '#000000';
-  ctx.fillText('ARIAL FILL+STROKE', 384, 350);
-  console.log(`[floppy-render] Texto Arial fill+stroke dibujado`);
+  ctx.fillText('SANS-SERIF FILL+STROKE', 384, 350);
+  console.log(`[floppy-render] Texto sans-serif fill+stroke dibujado`);
 
-  // Test 7: Fallback a fuentes genéricas
-  ctx.font = '24px sans-serif';
+  // Test 7: Texto con monospace como alternativa
+  ctx.font = '24px monospace';
   ctx.fillStyle = '#ff0000';
-  ctx.fillText('FALLBACK SANS-SERIF', 384, 400);
-  console.log(`[floppy-render] Texto fallback dibujado`);
+  ctx.fillText('MONOSPACE ALTERNATIVE', 384, 400);
+  console.log(`[floppy-render] Texto monospace dibujado`);
 
   console.log(`[floppy-render] ===== RENDERIZADO HÍBRIDO COMPLETADO =====`);
 
