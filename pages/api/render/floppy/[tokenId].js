@@ -180,7 +180,7 @@ async function handleRenderToken(req, res, tokenId) {
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
         x: 684 - 10,  // Margen derecho de 10px
-        y: 985,
+        y: 950,       // Mover hacia arriba para alinear con FLOPPY
         fontSize: 32,
         fill: '#333333',
         anchor: 'end middle'
@@ -188,7 +188,7 @@ async function handleRenderToken(req, res, tokenId) {
       
       ${textToSVGElement('LAB', {
         x: 684 - 10,  // Margen derecho de 10px
-        y: 1020,
+        y: 985,       // Alinear con la línea inferior de FLOPPY
         fontSize: 32,
         fill: '#ff69b4',
         anchor: 'end middle'
