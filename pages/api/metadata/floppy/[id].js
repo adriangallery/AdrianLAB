@@ -114,48 +114,51 @@ export default async function handler(req, res) {
     } else if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para JSON + GIF`);
       
+      // Cargar datos de labmetadata
+      const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+      let labmetadata;
+      
+      try {
+        const labmetadataBuffer = fs.readFileSync(labmetadataPath);
+        labmetadata = JSON.parse(labmetadataBuffer.toString());
+        console.log(`[floppy-metadata] Labmetadata cargado para token ${tokenIdNum}, ${labmetadata.traits.length} traits encontrados`);
+      } catch (error) {
+        console.error('[floppy-metadata] Error cargando labmetadata:', error);
+        return res.status(500).json({ error: 'Error cargando datos de traits' });
+      }
+
+      // Buscar el trait correspondiente al tokenId
+      const traitData = labmetadata.traits.find(trait => trait.tokenId === tokenIdNum);
+      
+      if (!traitData) {
+        console.log(`[floppy-metadata] Trait no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
+        // Datos genéricos si no se encuentra el trait
+        const tokenData = {
+          name: `ANIMATED TRAIT #${tokenIdNum}`,
+          description: `Un trait animado especial del token ${tokenIdNum}`,
+          category: "SPECIAL",
+          maxSupply: 200,
+          floppy: "OG",
+          external_url: "https://adrianpunks.com/"
+        };
+      } else {
+        console.log(`[floppy-metadata] Trait encontrado:`, JSON.stringify(traitData, null, 2));
+      }
+
+      // Usar los datos del trait encontrado o datos genéricos
+      const tokenData = traitData || {
+        name: `ANIMATED TRAIT #${tokenIdNum}`,
+        description: `Un trait animado especial del token ${tokenIdNum}`,
+        category: "SPECIAL",
+        maxSupply: 200,
+        floppy: "OG",
+        external_url: "https://adrianpunks.com/"
+      };
+
       // Verificar si existe el GIF correspondiente
       const gifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.gif`);
       const gifExists = fs.existsSync(gifPath);
       console.log(`[floppy-metadata] GIF existe: ${gifExists}, ruta: ${gifPath}`);
-      
-      // Datos mockup para tokens 10000-15000
-      const mockData = {
-        "10000": {
-          "name": "ANIMATED TRAIT #10000",
-          "description": "Un trait animado especial de la serie premium",
-          "trait": "ANIMATED",
-          "series": "2",
-          "category": "SPECIAL",
-          "required": "NONE",
-          "origin": "PREMIUM",
-          "maxSupply": 100,
-          "rarity": "LEGENDARY"
-        },
-        "10001": {
-          "name": "FLYING FLOPPY #10001",
-          "description": "Un floppy que vuela con animación",
-          "trait": "FLYING",
-          "series": "2",
-          "category": "MOVEMENT",
-          "required": "BODY",
-          "origin": "PREMIUM",
-          "maxSupply": 150,
-          "rarity": "RARE"
-        }
-      };
-
-      const tokenData = mockData[tokenIdNum] || {
-        name: `ANIMATED TRAIT #${tokenIdNum}`,
-        description: `Un trait animado especial del token ${tokenIdNum}`,
-        trait: "ANIMATED",
-        series: "2",
-        category: "SPECIAL",
-        required: "NONE",
-        origin: "PREMIUM",
-        maxSupply: 200,
-        rarity: "UNCOMMON"
-      };
 
       // Función para obtener tag y color según maxSupply (niveles actualizados)
       function getRarityTagAndColor(maxSupply) {
@@ -167,36 +170,24 @@ export default async function handler(req, res) {
 
       const rarity = getRarityTagAndColor(tokenData.maxSupply);
       
-      // Construir JSON de metadata
+      // Construir JSON de metadata usando solo datos del traits.json
       const metadata = {
         name: tokenData.name,
         description: tokenData.description,
         image: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}` : null,
-        external_url: `${baseUrl}/api/metadata/floppy/${tokenIdNum}`,
+        external_url: tokenData.external_url,
         attributes: [
-          {
-            trait_type: "Trait",
-            value: tokenData.trait
-          },
-          {
-            trait_type: "Series",
-            value: tokenData.series
-          },
           {
             trait_type: "Category",
             value: tokenData.category
           },
           {
-            trait_type: "Required",
-            value: tokenData.required
-          },
-          {
-            trait_type: "Origin",
-            value: tokenData.origin
-          },
-          {
             trait_type: "Max Supply",
             value: tokenData.maxSupply
+          },
+          {
+            trait_type: "Floppy",
+            value: tokenData.floppy
           },
           {
             trait_type: "Rarity",
