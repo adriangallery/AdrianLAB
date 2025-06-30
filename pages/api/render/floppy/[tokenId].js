@@ -38,46 +38,49 @@ export default async function handler(req, res) {
 
 // FUNCIÓN PARA TOKENS 1-9999 (SVG COMPLETO CON TEXTO CONVERTIDO A PATHS)
 async function handleRenderToken(req, res, tokenId) {
-  // Datos mockup para el test
-  const mockData = {
-    "1": {
-      "name": "BLUNT",
-      "trait": "UNISEX",
-      "series": "1",
-      "category": "MOUTH",
-      "required": "NONE",
-      "origin": "UNIVERSAL",
-      "maxSupply": 450
-    },
-    "2": {
-      "name": "CRAZY HAIR GREEN",
-      "trait": "FEMALE",
-      "series": "1",
-      "category": "HAIR",
-      "required": "HEAD",
-      "origin": "GENESIS",
-      "maxSupply": 85
-    }
-  };
+  // Cargar datos de labmetadata
+  const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+  let labmetadata;
+  
+  try {
+    const labmetadataBuffer = fs.readFileSync(labmetadataPath);
+    labmetadata = JSON.parse(labmetadataBuffer.toString());
+    console.log(`[floppy-render] Labmetadata cargado, ${labmetadata.traits.length} traits encontrados`);
+  } catch (error) {
+    console.error('[floppy-render] Error cargando labmetadata:', error);
+    return res.status(500).json({ error: 'Error cargando datos de traits' });
+  }
 
-  const tokenData = mockData[tokenId] || {
+  // Buscar el trait correspondiente al tokenId
+  const traitData = labmetadata.traits.find(trait => trait.tokenId === parseInt(tokenId));
+  
+  if (!traitData) {
+    console.log(`[floppy-render] Trait no encontrado para tokenId ${tokenId}, usando datos genéricos`);
+    // Datos genéricos si no se encuentra el trait
+    const tokenData = {
+      name: `TRAIT #${tokenId}`,
+      category: "UNKNOWN",
+      maxSupply: 300
+    };
+  } else {
+    console.log(`[floppy-render] Trait encontrado:`, JSON.stringify(traitData, null, 2));
+  }
+
+  // Usar los datos del trait encontrado o datos genéricos
+  const tokenData = traitData || {
     name: `TRAIT #${tokenId}`,
-    trait: "UNISEX",
-    series: "1",
-    category: "MOUTH",
-    required: "NONE",
-    origin: "UNIVERSAL",
+    category: "UNKNOWN",
     maxSupply: 300
   };
 
   console.log(`[floppy-render] Datos del token:`, JSON.stringify(tokenData, null, 2));
 
-  // Función para obtener tag y color según maxSupply
+  // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
-    if (maxSupply <= 50) return { tag: 'LEGENDARY', bg: '#ffd700' };
-    if (maxSupply <= 150) return { tag: 'RARE', bg: '#da70d6' };
-    if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };
-    return { tag: 'COMMON', bg: '#a9a9a9' };
+    if (maxSupply <= 30) return { tag: 'LEGENDARY', bg: '#ffd700' };    // Dorado
+    if (maxSupply <= 100) return { tag: 'RARE', bg: '#da70d6' };       // Púrpura
+    if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };   // Azul
+    return { tag: 'COMMON', bg: '#a9a9a9' };                          // Gris
   }
 
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
@@ -149,7 +152,7 @@ async function handleRenderToken(req, res, tokenId) {
       <!-- Bloque inferior de datos - convertido a paths -->
       ${linesToSVG([
         {
-          text: `TRAIT: ${tokenData.trait}`,
+          text: `CATEGORY: ${tokenData.category}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 880,
           fontSize: 24,
@@ -157,7 +160,7 @@ async function handleRenderToken(req, res, tokenId) {
           anchor: 'start middle'
         },
         {
-          text: `SERIES: ${tokenData.series}`,
+          text: `MAX SUPPLY: ${tokenData.maxSupply}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 915,
           fontSize: 24,
@@ -165,43 +168,27 @@ async function handleRenderToken(req, res, tokenId) {
           anchor: 'start middle'
         },
         {
-          text: `CATEGORY: ${tokenData.category}`,
+          text: `FLOPPY: ${tokenData.floppy || 'OG'}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 950,
-          fontSize: 24,
-          fill: '#333333',
-          anchor: 'start middle'
-        },
-        {
-          text: `REQUIRED: ${tokenData.required}`,
-          x: 84 + 10,  // Margen izquierdo de 10px
-          y: 985,
           fontSize: 24,
           fill: '#333333',
           anchor: 'start middle'
         }
       ])}
       
-      <!-- Origin (alineado a la derecha) - convertido a path -->
-      ${textToSVGElement(tokenData.origin, {
-        x: 684 - 10,  // Margen derecho de 10px
-        y: 985,
-        fontSize: 24,
-        fill: '#333333',
-        anchor: 'end middle'
-      })}
-      
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
         x: 684 - 10,  // Margen derecho de 10px
-        y: 1020,
+        y: 985,
         fontSize: 32,
         fill: '#333333',
         anchor: 'end middle'
       })}
+      
       ${textToSVGElement('LAB', {
         x: 684 - 10,  // Margen derecho de 10px
-        y: 1055,
+        y: 1020,
         fontSize: 32,
         fill: '#ff69b4',
         anchor: 'end middle'
@@ -285,10 +272,10 @@ async function handleJsonToken(req, res, tokenId) {
     rarity: "UNCOMMON"
   };
 
-  // Función para obtener tag y color según maxSupply
+  // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
-    if (maxSupply <= 50) return { tag: 'LEGENDARY', bg: '#ffd700' };
-    if (maxSupply <= 150) return { tag: 'RARE', bg: '#da70d6' };
+    if (maxSupply <= 30) return { tag: 'LEGENDARY', bg: '#ffd700' };
+    if (maxSupply <= 100) return { tag: 'RARE', bg: '#da70d6' };
     if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };
     return { tag: 'COMMON', bg: '#a9a9a9' };
   }
