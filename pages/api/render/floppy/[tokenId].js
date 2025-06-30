@@ -183,7 +183,7 @@ async function handleRenderToken(req, res, tokenId) {
         y: 950,       // Mover hacia arriba para alinear con FLOPPY
         fontSize: 32,
         fill: '#333333',
-        anchor: 'end middle'
+        anchor: 'end'
       })}
       
       ${textToSVGElement('LAB', {
@@ -191,7 +191,7 @@ async function handleRenderToken(req, res, tokenId) {
         y: 985,       // Alinear con la línea inferior de FLOPPY
         fontSize: 32,
         fill: '#ff69b4',
-        anchor: 'end middle'
+        anchor: 'end'
       })}
     </svg>
   `;
