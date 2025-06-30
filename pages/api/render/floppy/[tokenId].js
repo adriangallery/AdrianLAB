@@ -16,19 +16,15 @@ export default async function handler(req, res) {
     }
 
     const tokenIdNum = parseInt(tokenId);
-    console.log(`[floppy-render] ===== DEBUG INICIADO =====`);
+    console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
     console.log(`[floppy-render] Token ID: ${tokenId}`);
-    console.log(`[floppy-render] Token ID numérico: ${tokenIdNum}`);
 
-    // Determinar el rango del token
+    // Solo procesar tokens 1-9999 (traits)
     if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
-      console.log(`[floppy-render] Procesando token ${tokenId} como RENDERIZADO (1-9999)`);
+      console.log(`[floppy-render] Procesando trait ${tokenId} (renderizado PNG)`);
       await handleRenderToken(req, res, tokenId);
-    } else if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
-      console.log(`[floppy-render] Procesando token ${tokenId} como JSON (10000-15000)`);
-      await handleJsonToken(req, res, tokenId);
     } else {
-      res.status(400).json({ error: 'Token ID fuera de rango válido' });
+      res.status(400).json({ error: 'Este endpoint solo maneja tokens 1-9999 (traits). Para tokens 10000+ usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
     console.error('[floppy-render] Error:', error);
@@ -223,101 +219,4 @@ async function handleRenderToken(req, res, tokenId) {
     console.error('[floppy-render] Error renderizando SVG completo:', error);
     res.status(500).json({ error: 'Error renderizando imagen' });
   }
-}
-
-// FUNCIÓN PARA TOKENS 10000-15000 (JSON + GIF)
-async function handleJsonToken(req, res, tokenId) {
-  console.log(`[floppy-render] Generando JSON para token ${tokenId}`);
-  
-  // Cargar datos de labmetadata
-  const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-  let labmetadata;
-  
-  try {
-    const labmetadataBuffer = fs.readFileSync(labmetadataPath);
-    labmetadata = JSON.parse(labmetadataBuffer.toString());
-    console.log(`[floppy-render] Labmetadata cargado para token ${tokenId}, ${labmetadata.traits.length} traits encontrados`);
-  } catch (error) {
-    console.error('[floppy-render] Error cargando labmetadata:', error);
-    return res.status(500).json({ error: 'Error cargando datos de traits' });
-  }
-
-  // Buscar el trait correspondiente al tokenId
-  const traitData = labmetadata.traits.find(trait => trait.tokenId === parseInt(tokenId));
-  
-  if (!traitData) {
-    console.log(`[floppy-render] Trait no encontrado para tokenId ${tokenId}, usando datos genéricos`);
-    // Datos genéricos si no se encuentra el trait
-    const tokenData = {
-      name: `ANIMATED TRAIT #${tokenId}`,
-      description: `Un trait animado especial del token ${tokenId}`,
-      category: "SPECIAL",
-      maxSupply: 200,
-      floppy: "OG",
-      external_url: "https://adrianpunks.com/"
-    };
-  } else {
-    console.log(`[floppy-render] Trait encontrado:`, JSON.stringify(traitData, null, 2));
-  }
-
-  // Usar los datos del trait encontrado o datos genéricos
-  const tokenData = traitData || {
-    name: `ANIMATED TRAIT #${tokenId}`,
-    description: `Un trait animado especial del token ${tokenId}`,
-    category: "SPECIAL",
-    maxSupply: 200,
-    floppy: "OG",
-    external_url: "https://adrianpunks.com/"
-  };
-
-  // Verificar si existe el GIF correspondiente
-  const gifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.gif`);
-  const gifExists = fs.existsSync(gifPath);
-  console.log(`[floppy-render] GIF existe: ${gifExists}, ruta: ${gifPath}`);
-  
-  // Función para obtener tag y color según maxSupply (niveles actualizados)
-  function getRarityTagAndColor(maxSupply) {
-    if (maxSupply <= 30) return { tag: 'LEGENDARY', bg: '#ffd700' };
-    if (maxSupply <= 100) return { tag: 'RARE', bg: '#da70d6' };
-    if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };
-    return { tag: 'COMMON', bg: '#a9a9a9' };
-  }
-
-  const rarity = getRarityTagAndColor(tokenData.maxSupply);
-  
-  // Generar timestamp para la URL de la imagen con dominio correcto
-  const timestamp = Date.now();
-  const imageUrl = gifExists ? `https://adrianlab.vercel.app/labimages/${tokenId}.gif?v=${timestamp}` : null;
-  
-  // Construir JSON de metadata usando solo datos del traits.json
-  const metadata = {
-    name: tokenData.name,
-    description: tokenData.description,
-    image: imageUrl,
-    external_url: tokenData.external_url,
-    attributes: [
-      {
-        trait_type: "Category",
-        value: tokenData.category
-      },
-      {
-        trait_type: "Max Supply",
-        value: tokenData.maxSupply
-      },
-      {
-        trait_type: "Floppy",
-        value: tokenData.floppy
-      },
-      {
-        trait_type: "Rarity",
-        value: rarity.tag
-      }
-    ]
-  };
-
-  console.log(`[floppy-render] JSON generado para token ${tokenId}`);
-  
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  res.status(200).json(metadata);
 } 

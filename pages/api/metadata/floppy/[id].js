@@ -17,102 +17,17 @@ export default async function handler(req, res) {
     const actualId = id;
     const version = Date.now();
 
-    console.log(`[floppy-metadata] ===== METADATA REQUEST =====`);
+    console.log(`[floppy-metadata] ===== METADATA FLOPPY DISCS (10000+) =====`);
     console.log(`[floppy-metadata] Token ID: ${tokenIdNum}`);
-    console.log(`[floppy-metadata] Actual ID: ${actualId}`);
 
     // Configurar URL base
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
       : 'https://adrianlab.vercel.app';
 
-    // DETERMINAR TIPO DE TOKEN
-    if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para renderizado`);
-      
-      // Cargar datos de labmetadata
-      const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-      let labmetadata;
-      
-      try {
-        const labmetadataBuffer = fs.readFileSync(labmetadataPath);
-        labmetadata = JSON.parse(labmetadataBuffer.toString());
-        console.log(`[floppy-metadata] Labmetadata cargado, ${labmetadata.traits.length} traits encontrados`);
-      } catch (error) {
-        console.error('[floppy-metadata] Error cargando labmetadata:', error);
-        return res.status(500).json({ error: 'Error cargando datos de traits' });
-      }
-
-      // Buscar el trait correspondiente al tokenId
-      const traitData = labmetadata.traits.find(trait => trait.tokenId === tokenIdNum);
-      
-      if (!traitData) {
-        console.log(`[floppy-metadata] Trait no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
-        // Datos genéricos si no se encuentra el trait
-        const tokenData = {
-          name: `TRAIT #${tokenIdNum}`,
-          category: "UNKNOWN",
-          maxSupply: 300
-        };
-      } else {
-        console.log(`[floppy-metadata] Trait encontrado:`, JSON.stringify(traitData, null, 2));
-      }
-
-      // Usar los datos del trait encontrado o datos genéricos
-      const tokenData = traitData || {
-        name: `TRAIT #${tokenIdNum}`,
-        category: "UNKNOWN",
-        maxSupply: 300
-      };
-
-      // Función para obtener tag y color según maxSupply (niveles actualizados)
-      function getRarityTagAndColor(maxSupply) {
-        if (maxSupply <= 30) return { tag: 'LEGENDARY', bg: '#ffd700' };
-        if (maxSupply <= 100) return { tag: 'RARE', bg: '#da70d6' };
-        if (maxSupply <= 300) return { tag: 'UNCOMMON', bg: '#5dade2' };
-        return { tag: 'COMMON', bg: '#a9a9a9' };
-      }
-
-      const rarity = getRarityTagAndColor(tokenData.maxSupply);
-
-      // Metadata para tokens del 1 al 9999 (renderizado dinámico)
-      const metadata = {
-        name: tokenData.name,
-        description: `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
-        image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-        external_url: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-        attributes: [
-          {
-            trait_type: "Category",
-            value: tokenData.category
-          },
-          {
-            trait_type: "Max Supply",
-            value: tokenData.maxSupply
-          },
-          {
-            trait_type: "Floppy",
-            value: tokenData.floppy || "OG"
-          },
-          {
-            trait_type: "Rarity",
-            value: rarity.tag
-          }
-        ]
-      };
-
-      console.log(`[floppy-metadata] Metadata generada para token ${tokenIdNum}:`, metadata);
-
-      // Configurar headers para evitar cache
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('Surrogate-Control', 'no-store');
-      
-      return res.status(200).json(metadata);
-      
-    } else if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para JSON + GIF`);
+    // Solo procesar tokens 10000+ (floppy discs)
+    if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
+      console.log(`[floppy-metadata] Procesando floppy disc ${tokenIdNum} (metadata JSON)`);
       
       // Cargar datos de labmetadata
       const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
@@ -205,7 +120,7 @@ export default async function handler(req, res) {
         }
       };
 
-      console.log(`[floppy-metadata] Metadata generada para token ${tokenIdNum}:`, metadata);
+      console.log(`[floppy-metadata] Metadata generada para floppy disc ${tokenIdNum}:`, metadata);
 
       // Configurar headers para JSON
       res.setHeader('Content-Type', 'application/json');
@@ -214,7 +129,7 @@ export default async function handler(req, res) {
       return res.status(200).json(metadata);
       
     } else {
-      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-15000)' });
+      return res.status(400).json({ error: 'Este endpoint solo maneja tokens 10000-15000 (floppy discs). Para tokens 1-9999 usa /api/render/floppy/[tokenId]' });
     }
     
   } catch (error) {
