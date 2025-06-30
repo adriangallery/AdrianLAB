@@ -395,10 +395,21 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10000,
+      "name": "OG Floppy",
+      "category": "Floppy discs",
+      "fileName": "OG-Floppy",
+      "maxSupply": 100,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 36,
+    "totalTraits": 37,
     "categories": [
       "Background",
       "Ear", 
@@ -408,7 +419,8 @@
       "Neck",
       "Nose",
       "Skin",
-      "Swag"
+      "Swag",
+      "Floppy discs"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"

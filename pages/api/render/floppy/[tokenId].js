@@ -229,49 +229,50 @@ async function handleRenderToken(req, res, tokenId) {
 async function handleJsonToken(req, res, tokenId) {
   console.log(`[floppy-render] Generando JSON para token ${tokenId}`);
   
+  // Cargar datos de labmetadata
+  const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+  let labmetadata;
+  
+  try {
+    const labmetadataBuffer = fs.readFileSync(labmetadataPath);
+    labmetadata = JSON.parse(labmetadataBuffer.toString());
+    console.log(`[floppy-render] Labmetadata cargado para token ${tokenId}, ${labmetadata.traits.length} traits encontrados`);
+  } catch (error) {
+    console.error('[floppy-render] Error cargando labmetadata:', error);
+    return res.status(500).json({ error: 'Error cargando datos de traits' });
+  }
+
+  // Buscar el trait correspondiente al tokenId
+  const traitData = labmetadata.traits.find(trait => trait.tokenId === parseInt(tokenId));
+  
+  if (!traitData) {
+    console.log(`[floppy-render] Trait no encontrado para tokenId ${tokenId}, usando datos genéricos`);
+    // Datos genéricos si no se encuentra el trait
+    const tokenData = {
+      name: `ANIMATED TRAIT #${tokenId}`,
+      description: `Un trait animado especial del token ${tokenId}`,
+      category: "SPECIAL",
+      maxSupply: 200,
+      floppy: "OG"
+    };
+  } else {
+    console.log(`[floppy-render] Trait encontrado:`, JSON.stringify(traitData, null, 2));
+  }
+
+  // Usar los datos del trait encontrado o datos genéricos
+  const tokenData = traitData || {
+    name: `ANIMATED TRAIT #${tokenId}`,
+    description: `Un trait animado especial del token ${tokenId}`,
+    category: "SPECIAL",
+    maxSupply: 200,
+    floppy: "OG"
+  };
+
   // Verificar si existe el GIF correspondiente
   const gifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.gif`);
   const gifExists = fs.existsSync(gifPath);
   console.log(`[floppy-render] GIF existe: ${gifExists}, ruta: ${gifPath}`);
   
-  // Datos mockup para tokens 10000-15000
-  const mockData = {
-    "10000": {
-      "name": "ANIMATED TRAIT #10000",
-      "description": "Un trait animado especial de la serie premium",
-      "trait": "ANIMATED",
-      "series": "2",
-      "category": "SPECIAL",
-      "required": "NONE",
-      "origin": "PREMIUM",
-      "maxSupply": 100,
-      "rarity": "LEGENDARY"
-    },
-    "10001": {
-      "name": "FLYING FLOPPY #10001",
-      "description": "Un floppy que vuela con animación",
-      "trait": "FLYING",
-      "series": "2",
-      "category": "MOVEMENT",
-      "required": "BODY",
-      "origin": "PREMIUM",
-      "maxSupply": 150,
-      "rarity": "RARE"
-    }
-  };
-
-  const tokenData = mockData[tokenId] || {
-    name: `ANIMATED TRAIT #${tokenId}`,
-    description: `Un trait animado especial del token ${tokenId}`,
-    trait: "ANIMATED",
-    series: "2",
-    category: "SPECIAL",
-    required: "NONE",
-    origin: "PREMIUM",
-    maxSupply: 200,
-    rarity: "UNCOMMON"
-  };
-
   // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
     if (maxSupply <= 30) return { tag: 'LEGENDARY', bg: '#ffd700' };
@@ -282,32 +283,28 @@ async function handleJsonToken(req, res, tokenId) {
 
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
   
+  // Generar timestamp para la URL de la imagen
+  const timestamp = Date.now();
+  const imageUrl = gifExists ? `/labimages/${tokenId}.gif?t=${timestamp}` : null;
+  
   // Construir JSON de metadata
   const metadata = {
     name: tokenData.name,
     description: tokenData.description,
-    image: gifExists ? `/labimages/${tokenId}.gif` : null,
-    external_url: `https://adrianlab.com/token/${tokenId}`,
+    image: imageUrl,
+    external_url: tokenData.external_url || `https://adrianlab.com/token/${tokenId}`,
     attributes: [
-      {
-        trait_type: "Trait",
-        value: tokenData.trait
-      },
-      {
-        trait_type: "Series",
-        value: tokenData.series
-      },
       {
         trait_type: "Category",
         value: tokenData.category
       },
       {
-        trait_type: "Required",
-        value: tokenData.required
+        trait_type: "Max Supply",
+        value: tokenData.maxSupply
       },
       {
-        trait_type: "Origin",
-        value: tokenData.origin
+        trait_type: "Floppy",
+        value: tokenData.floppy || "OG"
       },
       {
         trait_type: "Rarity",
