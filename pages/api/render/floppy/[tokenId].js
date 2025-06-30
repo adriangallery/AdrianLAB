@@ -253,7 +253,8 @@ async function handleJsonToken(req, res, tokenId) {
       description: `Un trait animado especial del token ${tokenId}`,
       category: "SPECIAL",
       maxSupply: 200,
-      floppy: "OG"
+      floppy: "OG",
+      external_url: "https://adrianpunks.com/"
     };
   } else {
     console.log(`[floppy-render] Trait encontrado:`, JSON.stringify(traitData, null, 2));
@@ -265,7 +266,8 @@ async function handleJsonToken(req, res, tokenId) {
     description: `Un trait animado especial del token ${tokenId}`,
     category: "SPECIAL",
     maxSupply: 200,
-    floppy: "OG"
+    floppy: "OG",
+    external_url: "https://adrianpunks.com/"
   };
 
   // Verificar si existe el GIF correspondiente
@@ -283,16 +285,16 @@ async function handleJsonToken(req, res, tokenId) {
 
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
   
-  // Generar timestamp para la URL de la imagen
+  // Generar timestamp para la URL de la imagen con dominio correcto
   const timestamp = Date.now();
-  const imageUrl = gifExists ? `/labimages/${tokenId}.gif?t=${timestamp}` : null;
+  const imageUrl = gifExists ? `https://adrianlab.vercel.app/labimages/${tokenId}.gif?v=${timestamp}` : null;
   
-  // Construir JSON de metadata
+  // Construir JSON de metadata usando solo datos del traits.json
   const metadata = {
     name: tokenData.name,
     description: tokenData.description,
     image: imageUrl,
-    external_url: tokenData.external_url || `https://adrianlab.com/token/${tokenId}`,
+    external_url: tokenData.external_url,
     attributes: [
       {
         trait_type: "Category",
@@ -304,7 +306,7 @@ async function handleJsonToken(req, res, tokenId) {
       },
       {
         trait_type: "Floppy",
-        value: tokenData.floppy || "OG"
+        value: tokenData.floppy
       },
       {
         trait_type: "Rarity",
