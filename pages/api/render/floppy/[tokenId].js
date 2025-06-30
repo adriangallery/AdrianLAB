@@ -155,7 +155,7 @@ async function handleRenderToken(req, res, tokenId) {
           text: `CATEGORY: ${tokenData.category}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 880,
-          fontSize: 24,
+          fontSize: 32,  // Aumentado de 24 a 32
           fill: '#333333',
           anchor: 'start middle'
         },
@@ -163,7 +163,7 @@ async function handleRenderToken(req, res, tokenId) {
           text: `MAX SUPPLY: ${tokenData.maxSupply}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 915,
-          fontSize: 24,
+          fontSize: 32,  // Aumentado de 24 a 32
           fill: '#333333',
           anchor: 'start middle'
         },
@@ -171,7 +171,7 @@ async function handleRenderToken(req, res, tokenId) {
           text: `FLOPPY: ${tokenData.floppy || 'OG'}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 950,
-          fontSize: 24,
+          fontSize: 32,  // Aumentado de 24 a 32
           fill: '#333333',
           anchor: 'start middle'
         }
@@ -179,16 +179,16 @@ async function handleRenderToken(req, res, tokenId) {
       
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
-        x: 684 - 10,  // Margen derecho de 10px
-        y: 950,       // Mover hacia arriba para alinear con FLOPPY
+        x: 684 - 25,  // Movido 15px a la izquierda (de -10 a -25)
+        y: 935,       // Subido 15px (de 950 a 935)
         fontSize: 32,
         fill: '#333333',
         anchor: 'end'
       })}
       
       ${textToSVGElement('LAB', {
-        x: 684 - 10,  // Margen derecho de 10px
-        y: 985,       // Alinear con la línea inferior de FLOPPY
+        x: 684 - 25,  // Movido 15px a la izquierda (de -10 a -25)
+        y: 970,       // Subido 15px (de 985 a 970)
         fontSize: 32,
         fill: '#ff69b4',
         anchor: 'end'
