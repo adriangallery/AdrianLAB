@@ -134,7 +134,7 @@ async function handleRenderToken(req, res, tokenId) {
       ${textToSVGElement(rarity.tag, {
         x: 84 + 160 / 2,  // Centro horizontal del rectángulo
         y: 120 + 60 / 2,  // Centro vertical del rectángulo
-        fontSize: 64,     // Aumentado a 64 para que sea muy visible
+        fontSize: 32,     // Tamaño equilibrado
         fill: '#ffffff',
         anchor: 'center middle'
       })}
