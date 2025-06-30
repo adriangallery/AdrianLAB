@@ -1,0 +1,308 @@
+{
+  "traits": [
+    {
+      "tokenId": 1,
+      "name": "Dark Mode",
+      "category": "Background",
+      "fileName": "Dark-Mode",
+      "maxSupply": 15,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 2,
+      "name": "Light Mode",
+      "category": "Background",
+      "fileName": "Light-Mode",
+      "maxSupply": 30,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 3,
+      "name": "White",
+      "category": "Background",
+      "fileName": "White",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 4,
+      "name": "Diamond Earring",
+      "category": "Ear",
+      "fileName": "Diamond-Earring",
+      "maxSupply": 15,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 5,
+      "name": "Gold Earring",
+      "category": "Ear",
+      "fileName": "Gold-Earring",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 6,
+      "name": "3D Glasses Big",
+      "category": "Eyes",
+      "fileName": "3D-Glasses-Big",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 7,
+      "name": "3D Glasses",
+      "category": "Eyes",
+      "fileName": "3D-Glasses",
+      "maxSupply": 15,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 8,
+      "name": "3D Laser Eyes",
+      "category": "Eyes",
+      "fileName": "3D-Laser-Eyes",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 9,
+      "name": "Regular Shades",
+      "category": "Eyes",
+      "fileName": "Regular-Shades",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 13,
+      "name": "Black Fedora",
+      "category": "Head",
+      "fileName": "Black-Fedora",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 14,
+      "name": "Buzz",
+      "category": "Head",
+      "fileName": "Buzz",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 15,
+      "name": "Cap Backward",
+      "category": "Head",
+      "fileName": "Cap-Backward",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 16,
+      "name": "Cap Forward",
+      "category": "Head",
+      "fileName": "Cap-Forward",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 17,
+      "name": "Crazy Hair 3D",
+      "category": "Head",
+      "fileName": "Crazy-Hair-3D",
+      "maxSupply": 8,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 18,
+      "name": "Crazy Hair",
+      "category": "Head",
+      "fileName": "Crazy-Hair",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 19,
+      "name": "Short",
+      "category": "Head",
+      "fileName": "Short",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 20,
+      "name": "Tiara Tonsure",
+      "category": "Head",
+      "fileName": "Tiara-Tonsure",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 21,
+      "name": "Wild",
+      "category": "Head",
+      "fileName": "Wild",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 22,
+      "name": "Cigarett",
+      "category": "Mouth",
+      "fileName": "Cigarett",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 23,
+      "name": "Drool",
+      "category": "Mouth",
+      "fileName": "Drool",
+      "maxSupply": 13,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 24,
+      "name": "Joint",
+      "category": "Mouth",
+      "fileName": "Joint",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 25,
+      "name": "Pipe",
+      "category": "Mouth",
+      "fileName": "Pipe",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 26,
+      "name": "Sad",
+      "category": "Mouth",
+      "fileName": "Sad",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 27,
+      "name": "Smirk",
+      "category": "Mouth",
+      "fileName": "Smirk",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 28,
+      "name": "Vape",
+      "category": "Mouth",
+      "fileName": "Vape",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 29,
+      "name": "Gold Chain",
+      "category": "Neck",
+      "fileName": "Gold-Chain",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 30,
+      "name": "Neck Tattoo",
+      "category": "Neck",
+      "fileName": "Neck-Tattoo",
+      "maxSupply": 12,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 31,
+      "name": "Tiger Tattoo",
+      "category": "Neck",
+      "fileName": "Tiger-Tattoo",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 32,
+      "name": "Nose Bleed",
+      "category": "Nose",
+      "fileName": "Nose-Bleed",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 33,
+      "name": "Snot",
+      "category": "Nose",
+      "fileName": "Snot",
+      "maxSupply": 20,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 37,
+      "name": "OG GEN0 3D",
+      "category": "Skin",
+      "fileName": "OG_GEN0_3D",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 38,
+      "name": "OG GEN0",
+      "category": "Skin",
+      "fileName": "OG_GEN0",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 43,
+      "name": "Basic 3D Black T",
+      "category": "Swag",
+      "fileName": "Basic_3D_Black_T",
+      "maxSupply": 15,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 44,
+      "name": "Basic 3D White T",
+      "category": "Swag",
+      "fileName": "Basic_3D_White_T",
+      "maxSupply": 5,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 45,
+      "name": "Basic White T",
+      "category": "Swag",
+      "fileName": "Basic_White_T",
+      "maxSupply": 10,
+      "floppy": "OG"
+    },
+    {
+      "tokenId": 46,
+      "name": "Black T",
+      "category": "Swag",
+      "fileName": "Black-T",
+      "maxSupply": 10,
+      "floppy": "OG"
+    }
+  ],
+  "metadata": {
+    "totalTraits": 36,
+    "categories": [
+      "Background",
+      "Ear", 
+      "Eyes",
+      "Head",
+      "Mouth",
+      "Neck",
+      "Nose",
+      "Skin",
+      "Swag"
+    ],
+    "floppy": "OG",
+    "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
+  }
+}
