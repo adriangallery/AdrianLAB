@@ -115,9 +115,9 @@ async function handleRenderToken(req, res, tokenId) {
       <!-- Contenedor de imagen con fondo dinámico -->
       <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
       
-      <!-- Mannequin (base del personaje) -->
+      <!-- Blank (base del personaje) -->
       <g transform="translate(84, 120) scale(16.22)">
-        ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
+        ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'Blank.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
       </g>
       
       <!-- Imagen del trait (centrada en el contenedor) -->
