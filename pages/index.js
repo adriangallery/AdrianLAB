@@ -20,23 +20,33 @@ export default function Home() {
         </p>
 
         <div className={styles.grid}>
-          <a href="https://adrianlab.vercel.app/api/metadata/floppy/18.json" className={styles.card}>
-            <h2>MetadataZERO &rarr;</h2>
-            <p>Trait metadata API. Example: /api/metadata/floppy/18.json</p>
+          <a href="/api/render/1" className={styles.card}>
+            <h2>AdrianZERO &rarr;</h2>
+            <p>API for token rendering. Example: /api/render/1</p>
           </a>
 
+          <a href="/api/metadata/1" className={styles.card}>
+            <h2>MetadataZERO &rarr;</h2>
+            <p>API for token metadata. Example: /api/metadata/1</p>
+          </a>
+          
           <a href="https://adrianlab.vercel.app/api/render/floppy/18.png?v=1751144253455" className={styles.card}>
-            <h2>AdrianZERO &rarr;</h2>
+            <h2>Traits &rarr;</h2>
             <p>Trait images API. Example: /api/render/floppy/18.png</p>
           </a>
           
+          <a href="https://adrianlab.vercel.app/api/metadata/floppy/18.json" className={styles.card}>
+            <h2>Metadata Traits &rarr;</h2>
+            <p>Trait metadata API. Example: /api/metadata/floppy/18.json</p>
+          </a>
+          
           <a href="https://adrianlab.vercel.app/api/metadata/floppy/10000" className={styles.card}>
-            <h2>Pack Metadata &rarr;</h2>
+            <h2>Floppy &rarr;</h2>
             <p>Pack metadata API. Example: /api/metadata/floppy/10000</p>
           </a>
           
           <a href="https://adrianlab.vercel.app/labimages/10000.gif?v=1751282595734" className={styles.card}>
-            <h2>Pack Images &rarr;</h2>
+            <h2>Floppy Images &rarr;</h2>
             <p>Pack images API. Example: /labimages/10000.gif</p>
           </a>
         </div>
