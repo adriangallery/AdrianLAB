@@ -6,7 +6,10 @@
       "category": "Background",
       "fileName": "Dark-Mode",
       "maxSupply": 15,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 2,
@@ -14,7 +17,10 @@
       "category": "Background",
       "fileName": "Light-Mode",
       "maxSupply": 30,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 3,
@@ -22,7 +28,10 @@
       "category": "Background",
       "fileName": "White",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 4,
@@ -30,7 +39,10 @@
       "category": "Ear",
       "fileName": "Diamond-Earring",
       "maxSupply": 15,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 5,
@@ -38,7 +50,10 @@
       "category": "Ear",
       "fileName": "Gold-Earring",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 6,
@@ -46,7 +61,10 @@
       "category": "Eyes",
       "fileName": "3D-Glasses-Big",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 7,
@@ -54,7 +72,10 @@
       "category": "Eyes",
       "fileName": "3D-Glasses",
       "maxSupply": 15,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 8,
@@ -62,7 +83,10 @@
       "category": "Eyes",
       "fileName": "3D-Laser-Eyes",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 9,
@@ -70,7 +94,10 @@
       "category": "Eyes",
       "fileName": "Regular-Shades",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 13,
@@ -78,7 +105,10 @@
       "category": "Head",
       "fileName": "Black-Fedora",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 14,
@@ -86,7 +116,10 @@
       "category": "Head",
       "fileName": "Buzz",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 15,
@@ -94,7 +127,10 @@
       "category": "Head",
       "fileName": "Cap-Backward",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 16,
@@ -102,7 +138,10 @@
       "category": "Head",
       "fileName": "Cap-Forward",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 17,
@@ -110,7 +149,10 @@
       "category": "Head",
       "fileName": "Crazy-Hair-3D",
       "maxSupply": 8,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 18,
@@ -118,7 +160,10 @@
       "category": "Head",
       "fileName": "Crazy-Hair",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 19,
@@ -126,7 +171,10 @@
       "category": "Head",
       "fileName": "Short",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 20,
@@ -134,7 +182,10 @@
       "category": "Head",
       "fileName": "Tiara-Tonsure",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 21,
@@ -142,7 +193,10 @@
       "category": "Head",
       "fileName": "Wild",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 22,
@@ -150,7 +204,10 @@
       "category": "Mouth",
       "fileName": "Cigarett",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 23,
@@ -158,7 +215,10 @@
       "category": "Mouth",
       "fileName": "Drool",
       "maxSupply": 13,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 24,
@@ -166,7 +226,10 @@
       "category": "Mouth",
       "fileName": "Joint",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 25,
@@ -174,7 +237,10 @@
       "category": "Mouth",
       "fileName": "Pipe",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 26,
@@ -182,7 +248,10 @@
       "category": "Mouth",
       "fileName": "Sad",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 27,
@@ -190,7 +259,10 @@
       "category": "Mouth",
       "fileName": "Smirk",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 28,
@@ -198,7 +270,10 @@
       "category": "Mouth",
       "fileName": "Vape",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 29,
@@ -206,7 +281,10 @@
       "category": "Neck",
       "fileName": "Gold-Chain",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 30,
@@ -214,7 +292,10 @@
       "category": "Neck",
       "fileName": "Neck-Tattoo",
       "maxSupply": 12,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 31,
@@ -222,7 +303,10 @@
       "category": "Neck",
       "fileName": "Tiger-Tattoo",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 32,
@@ -230,7 +314,10 @@
       "category": "Nose",
       "fileName": "Nose-Bleed",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 33,
@@ -238,7 +325,10 @@
       "category": "Nose",
       "fileName": "Snot",
       "maxSupply": 20,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 37,
@@ -246,7 +336,10 @@
       "category": "Skin",
       "fileName": "OG_GEN0_3D",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 38,
@@ -254,7 +347,10 @@
       "category": "Skin",
       "fileName": "OG_GEN0",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 43,
@@ -262,7 +358,10 @@
       "category": "Swag",
       "fileName": "Basic_3D_Black_T",
       "maxSupply": 15,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 44,
@@ -270,7 +369,10 @@
       "category": "Swag",
       "fileName": "Basic_3D_White_T",
       "maxSupply": 5,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 45,
@@ -278,7 +380,10 @@
       "category": "Swag",
       "fileName": "Basic_White_T",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     },
     {
       "tokenId": 46,
@@ -286,7 +391,10 @@
       "category": "Swag",
       "fileName": "Black-T",
       "maxSupply": 10,
-      "floppy": "OG"
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
