@@ -1,7 +1,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
-import { textToSVGElement } from '../../../../lib/text-to-svg.js';
+import { textToSVGElement } from '../../../lib/text-to-svg.js';
 
 export default async function handler(req, res) {
   try {
