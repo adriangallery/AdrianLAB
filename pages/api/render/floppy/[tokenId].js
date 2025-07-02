@@ -134,9 +134,6 @@ async function handleRenderToken(req, res, tokenId) {
         </g>
       </g>
       
-      <!-- Fondo principal -->
-      <rect width="768" height="1024" fill="#ffffff"/>
-      
       <!-- Contenedor de imagen con fondo dinámico -->
       <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
       
