@@ -4,6 +4,16 @@ import fs from 'fs';
 import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
 
 export default async function handler(req, res) {
+  // Configurar CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     let { tokenId } = req.query;
     
