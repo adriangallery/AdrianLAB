@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 1024">
+  <!-- Frame principal -->
+  <defs>
+    <style>
+      .frame-fill { fill: #ffffff; }
+      .frame-border { fill: #333333; }
+    </style>
+  </defs>
+  
+  <!-- Fondo del frame -->
+  <rect x="0" y="0" width="768" height="1024" class="frame-fill"/>
+  
+  <!-- Bordes del frame -->
+  <rect x="0" y="0" width="768" height="4" class="frame-border"/>
+  <rect x="0" y="1020" width="768" height="4" class="frame-border"/>
+  <rect x="0" y="0" width="4" height="1024" class="frame-border"/>
+  <rect x="764" y="0" width="4" height="1024" class="frame-border"/>
+  
+  <!-- Esquinas decorativas -->
+  <rect x="20" y="20" width="40" height="40" class="frame-border"/>
+  <rect x="708" y="20" width="40" height="40" class="frame-border"/>
+  <rect x="20" y="964" width="40" height="40" class="frame-border"/>
+  <rect x="708" y="964" width="40" height="40" class="frame-border"/>
+  
+  <!-- Líneas decorativas horizontales -->
+  <rect x="40" y="80" width="688" height="2" class="frame-border"/>
+  <rect x="40" y="944" width="688" height="2" class="frame-border"/>
+  
+  <!-- Líneas decorativas verticales -->
+  <rect x="80" y="40" width="2" height="944" class="frame-border"/>
+  <rect x="686" y="40" width="2" height="944" class="frame-border"/>
+</svg> 
