@@ -208,7 +208,7 @@ async function handleRenderToken(req, res, tokenId) {
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
         x: 684 - 95,  // Movido 10px a la izquierda (de -85 a -95)
-        y: 922,       // Subido 3px (de 925 a 922)
+        y: 840,       // Alineado con el final del box del trait name (760 + 80 = 840)
         fontSize: 56,
         fill: '#333333',
         anchor: 'end'
@@ -216,7 +216,7 @@ async function handleRenderToken(req, res, tokenId) {
       
       ${textToSVGElement('LAB', {
         x: 684 - 95,  // Movido 10px a la izquierda (de -85 a -95)
-        y: 957,       // Subido 3px (de 960 a 957)
+        y: 875,       // Movido en consonancia con Adrian (840 + 35 = 875)
         fontSize: 56,
         fill: '#ff69b4',
         anchor: 'end'
