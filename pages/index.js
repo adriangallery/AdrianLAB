@@ -49,6 +49,11 @@ export default function Home() {
             <h2>Floppy Images &rarr;</h2>
             <p>Pack images API. Example: /labimages/10000.gif</p>
           </a>
+          
+          <a href="https://adrianlab.vercel.app/api/render/custom/1?eyes=7&mouth=22" className={styles.card}>
+            <h2>Custom Render Tool &rarr;</h2>
+            <p>Preview tokens with modified traits. Example: /api/render/custom/1?eyes=7&mouth=22</p>
+          </a>
         </div>
       </main>
 
