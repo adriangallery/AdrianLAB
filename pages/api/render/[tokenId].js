@@ -80,8 +80,10 @@ export default async function handler(req, res) {
 
     // Obtener traits equipados
     console.log('[render] Obteniendo traits equipados...');
-    const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(cleanTokenId);
-    console.log('[render] Traits equipados:', {
+    const nested = await traitsExtension.getAllEquippedTraits(cleanTokenId);
+    const categories = nested[0];
+    const traitIds = nested[1];
+    console.log('[render] Traits equipados (anidado):', {
       categories,
       traitIds: traitIds.map(id => id.toString())
     });
