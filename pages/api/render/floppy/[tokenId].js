@@ -207,7 +207,7 @@ async function handleRenderToken(req, res, tokenId) {
       
       <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
       ${textToSVGElement('Adrian', {
-        x: 684 - 155, // Movido otros 25px a la derecha (de -180 a -155)
+        x: 684 - 143, // Movido otros 12px a la derecha (de -155 a -143)
         y: 922,       // Subido 3px (de 925 a 922)
         fontSize: 56,
         fill: '#333333',
@@ -215,7 +215,7 @@ async function handleRenderToken(req, res, tokenId) {
       })}
       
       ${textToSVGElement('LAB', {
-        x: 684 - 155, // Movido otros 25px a la derecha (de -180 a -155)
+        x: 684 - 143, // Movido otros 12px a la derecha (de -155 a -143)
         y: 957,       // Subido 3px (de 960 a 957)
         fontSize: 56,
         fill: '#ff69b4',
