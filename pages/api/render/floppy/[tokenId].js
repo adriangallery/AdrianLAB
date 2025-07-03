@@ -119,6 +119,9 @@ async function handleRenderToken(req, res, tokenId) {
   // Crear SVG completo con texto convertido a paths
   const completeSvg = `
     <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
+      <!-- Capa base en gris claro (bajo todos los elementos) -->
+      <rect width="768" height="1024" fill="#f5f5f5"/>
+      
       <!-- Frame SVG (fondo de todas las capas) -->
       <defs>
         <style>
