@@ -209,7 +209,7 @@ async function handleRenderToken(req, res, tokenId) {
       ${textToSVGElement('Adrian', {
         x: 684 - 85,
         y: 922,       // Subido 3px (de 925 a 922)
-        fontSize: 32,
+        fontSize: 56,
         fill: '#333333',
         anchor: 'end'
       })}
@@ -217,7 +217,7 @@ async function handleRenderToken(req, res, tokenId) {
       ${textToSVGElement('LAB', {
         x: 684 - 85,
         y: 957,       // Subido 3px (de 960 a 957)
-        fontSize: 32,
+        fontSize: 56,
         fill: '#ff69b4',
         anchor: 'end'
       })}
