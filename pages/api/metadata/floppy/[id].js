@@ -75,13 +75,13 @@ export default async function handler(req, res) {
       const rarity = getRarityTagAndColor(tokenData.maxSupply);
 
       // Metadata para tokens del 1 al 9999 (traits con renderizado dinámico)
-      const metadata = {
+    const metadata = {
         name: tokenData.name,
         description: `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
         image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
         external_url: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-        attributes: [
-          {
+      attributes: [
+        {
             trait_type: "Category",
             value: tokenData.category
           },
@@ -92,23 +92,23 @@ export default async function handler(req, res) {
           {
             trait_type: "Floppy",
             value: tokenData.floppy || "OG"
-          },
-          {
-            trait_type: "Rarity",
+        },
+        {
+          trait_type: "Rarity",
             value: rarity.tag
-          }
-        ]
-      };
+        }
+      ]
+    };
 
       console.log(`[floppy-metadata] Metadata generada para trait ${tokenIdNum}:`, metadata);
 
-      // Configurar headers para evitar cache
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('Surrogate-Control', 'no-store');
-      
-      return res.status(200).json(metadata);
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
+    return res.status(200).json(metadata);
       
     } else if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS (10000+)`);

@@ -8,10 +8,12 @@ La Custom Render API permite generar previews de tokens AdrianZERO con traits mo
 
 ```
 GET /api/render/custom/{tokenId}?{categoria}={traitId}
+GET /api/render/custom/{tokenId}?trait={traitId}
 ```
 
 ## 📋 Parámetros
 
+### Formato 1: Por Categorías (Recomendado)
 | Parámetro | Tipo | Descripción | Ejemplo |
 |-----------|------|-------------|---------|
 | `tokenId` | number | ID del token AdrianZERO a modificar | `1`, `2`, `3` |
@@ -24,27 +26,58 @@ GET /api/render/custom/{tokenId}?{categoria}={traitId}
 | `accessories` | number | ID del trait de accesorios | `50`, `51`, `52` |
 | `skin` | number | ID del trait de skin | `37`, `38` |
 
+### Formato 2: Por IDs Directos (Nuevo)
+| Parámetro | Tipo | Descripción | Ejemplo |
+|-----------|------|-------------|---------|
+| `tokenId` | number | ID del token AdrianZERO a modificar | `1`, `2`, `3` |
+| `trait` | number | ID directo del trait (se mapea automáticamente a categoría) | `7`, `18`, `22` |
+
 ## 🎯 Ejemplos de Uso
 
-### Ejemplo 1: Cambiar solo los ojos
+### Formato 1: Por Categorías
+
+#### Ejemplo 1: Cambiar solo los ojos
 ```
 GET /api/render/custom/1?eyes=7
 ```
 - Token 1 con ojos tipo 7
 - Mantiene todos los otros traits originales
 
-### Ejemplo 2: Cambiar múltiples traits
+#### Ejemplo 2: Cambiar múltiples traits
 ```
 GET /api/render/custom/3?eyes=8&mouth=22&head=13
 ```
 - Token 3 con ojos tipo 8, boca tipo 22, y cabeza tipo 13
 - Mantiene todos los otros traits originales
 
-### Ejemplo 3: Cambiar fondo y skin
+#### Ejemplo 3: Cambiar fondo y skin
 ```
 GET /api/render/custom/5?background=2&skin=37
 ```
 - Token 5 con fondo tipo 2 y skin tipo 37
+- Mantiene todos los otros traits originales
+
+### Formato 2: Por IDs Directos
+
+#### Ejemplo 1: Cambiar un trait por ID
+```
+GET /api/render/custom/1?trait=18
+```
+- Token 1 con trait ID 18 (Crazy Hair - categoría HEAD)
+- Mantiene todos los otros traits originales
+
+#### Ejemplo 2: Cambiar múltiples traits por IDs
+```
+GET /api/render/custom/3?trait=8&trait=22&trait=13
+```
+- Token 3 con traits IDs 8 (3D Laser Eyes), 22 (Cigarett), y 13 (Black Fedora)
+- Mantiene todos los otros traits originales
+
+#### Ejemplo 3: Combinar ambos formatos
+```
+GET /api/render/custom/5?trait=18&eyes=7&background=2
+```
+- Token 5 con trait ID 18 (Crazy Hair), ojos tipo 7, y fondo tipo 2
 - Mantiene todos los otros traits originales
 
 ## 🔧 Implementación en dApps
@@ -53,21 +86,29 @@ GET /api/render/custom/5?background=2&skin=37
 
 ```javascript
 // Componente React para preview de traits
-function TraitPreview({ tokenId, selectedTraits }) {
+function TraitPreview({ tokenId, selectedTraits, useDirectIds = false }) {
   const [previewUrl, setPreviewUrl] = useState('');
   
   useEffect(() => {
-    // Construir URL con traits seleccionados
     const params = new URLSearchParams();
-    Object.entries(selectedTraits).forEach(([category, traitId]) => {
-      if (traitId) {
-        params.append(category.toLowerCase(), traitId);
-      }
-    });
+    
+    if (useDirectIds) {
+      // Usar formato de IDs directos
+      selectedTraits.forEach(traitId => {
+        params.append('trait', traitId);
+      });
+    } else {
+      // Usar formato de categorías
+      Object.entries(selectedTraits).forEach(([category, traitId]) => {
+        if (traitId) {
+          params.append(category.toLowerCase(), traitId);
+        }
+      });
+    }
     
     const url = `/api/render/custom/${tokenId}?${params.toString()}`;
     setPreviewUrl(url);
-  }, [tokenId, selectedTraits]);
+  }, [tokenId, selectedTraits, useDirectIds]);
   
   return (
     <div>
@@ -77,7 +118,7 @@ function TraitPreview({ tokenId, selectedTraits }) {
   );
 }
 
-// Uso del componente
+// Uso del componente con categorías
 <TraitPreview 
   tokenId={1} 
   selectedTraits={{
@@ -86,12 +127,19 @@ function TraitPreview({ tokenId, selectedTraits }) {
     head: 13
   }} 
 />
+
+// Uso del componente con IDs directos
+<TraitPreview 
+  tokenId={1} 
+  selectedTraits={[7, 22, 13]}
+  useDirectIds={true}
+/>
 ```
 
 ### Vanilla JavaScript
 
 ```javascript
-// Función para generar preview URL
+// Función para generar preview URL con categorías
 function generatePreviewUrl(tokenId, traits) {
   const baseUrl = 'https://adrianlab.vercel.app/api/render/custom';
   const params = new URLSearchParams();
@@ -105,22 +153,38 @@ function generatePreviewUrl(tokenId, traits) {
   return `${baseUrl}/${tokenId}?${params.toString()}`;
 }
 
-// Ejemplo de uso
-const previewUrl = generatePreviewUrl(1, {
-  eyes: 7,
-  mouth: 22
-});
+// Función para generar preview URL con IDs directos
+function generatePreviewUrlDirect(tokenId, traitIds) {
+  const baseUrl = 'https://adrianlab.vercel.app/api/render/custom';
+  const params = new URLSearchParams();
+  
+  traitIds.forEach(traitId => {
+    params.append('trait', traitId);
+  });
+  
+  return `${baseUrl}/${tokenId}?${params.toString()}`;
+}
 
-console.log(previewUrl);
+// Ejemplos de uso
+const previewUrl1 = generatePreviewUrl(1, { eyes: 7, mouth: 22 });
+console.log(previewUrl1);
 // Output: https://adrianlab.vercel.app/api/render/custom/1?eyes=7&mouth=22
+
+const previewUrl2 = generatePreviewUrlDirect(1, [7, 22]);
+console.log(previewUrl2);
+// Output: https://adrianlab.vercel.app/api/render/custom/1?trait=7&trait=22
 ```
 
 ### HTML Directo
 
 ```html
-<!-- Preview estático -->
+<!-- Preview con categorías -->
 <img src="https://adrianlab.vercel.app/api/render/custom/1?eyes=7&mouth=22" 
      alt="Token 1 con ojos 7 y boca 22" />
+
+<!-- Preview con IDs directos -->
+<img src="https://adrianlab.vercel.app/api/render/custom/1?trait=7&trait=22" 
+     alt="Token 1 con traits 7 y 22" />
 
 <!-- Preview dinámico con JavaScript -->
 <div id="preview-container">
@@ -128,26 +192,34 @@ console.log(previewUrl);
 </div>
 
 <script>
-function updatePreview(tokenId, traits) {
+function updatePreview(tokenId, traits, useDirectIds = false) {
   const params = new URLSearchParams();
-  Object.entries(traits).forEach(([category, traitId]) => {
-    if (traitId) {
-      params.append(category.toLowerCase(), traitId);
-    }
-  });
+  
+  if (useDirectIds) {
+    traits.forEach(traitId => {
+      params.append('trait', traitId);
+    });
+  } else {
+    Object.entries(traits).forEach(([category, traitId]) => {
+      if (traitId) {
+        params.append(category.toLowerCase(), traitId);
+      }
+    });
+  }
   
   const url = `https://adrianlab.vercel.app/api/render/custom/${tokenId}?${params.toString()}`;
   document.getElementById('preview-image').src = url;
 }
 
-// Ejemplo de uso
-updatePreview(1, { eyes: 7, mouth: 22 });
+// Ejemplos de uso
+updatePreview(1, { eyes: 7, mouth: 22 }); // Con categorías
+updatePreview(1, [7, 22], true); // Con IDs directos
 </script>
 ```
 
 ## 🎨 Interfaz de Usuario Sugerida
 
-### Selector de Traits
+### Selector de Traits por Categorías
 ```javascript
 const traitCategories = {
   eyes: [
@@ -179,6 +251,39 @@ const traitCategories = {
 };
 ```
 
+### Selector de Traits por IDs Directos
+```javascript
+// Lista completa de traits con sus IDs
+const allTraits = [
+  { id: 1, name: 'Dark Mode', category: 'Background' },
+  { id: 2, name: 'Light Mode', category: 'Background' },
+  { id: 3, name: 'White', category: 'Background' },
+  { id: 4, name: 'Diamond Earring', category: 'Ear' },
+  { id: 5, name: 'Gold Earring', category: 'Ear' },
+  { id: 6, name: '3D Glasses Big', category: 'Eyes' },
+  { id: 7, name: '3D Glasses', category: 'Eyes' },
+  { id: 8, name: '3D Laser Eyes', category: 'Eyes' },
+  { id: 9, name: 'Regular Shades', category: 'Eyes' },
+  { id: 13, name: 'Black Fedora', category: 'Head' },
+  { id: 14, name: 'Buzz', category: 'Head' },
+  { id: 15, name: 'Cap Backward', category: 'Head' },
+  { id: 16, name: 'Cap Forward', category: 'Head' },
+  { id: 17, name: 'Crazy Hair 3D', category: 'Head' },
+  { id: 18, name: 'Crazy Hair', category: 'Head' },
+  { id: 19, name: 'Short', category: 'Head' },
+  { id: 20, name: 'Tiara Tonsure', category: 'Head' },
+  { id: 21, name: 'Wild', category: 'Head' },
+  { id: 22, name: 'Cigarett', category: 'Mouth' },
+  { id: 23, name: 'Drool', category: 'Mouth' },
+  { id: 24, name: 'Joint', category: 'Mouth' },
+  { id: 25, name: 'Pipe', category: 'Mouth' },
+  { id: 26, name: 'Sad', category: 'Mouth' },
+  { id: 27, name: 'Smirk', category: 'Mouth' },
+  { id: 28, name: 'Vape', category: 'Mouth' }
+  // ... más traits
+];
+```
+
 ## 🔒 Características de Seguridad
 
 - ✅ **No modifica tokens reales** - Solo genera previews
@@ -186,6 +291,7 @@ const traitCategories = {
 - ✅ **Validación de parámetros** - Solo acepta trait IDs válidos
 - ✅ **Rate limiting** - Protección contra abuso
 - ✅ **CORS habilitado** - Acceso desde dApps externas
+- ✅ **Mapeo automático** - Los IDs se mapean automáticamente a categorías
 
 ## 📊 Categorías de Traits Disponibles
 
@@ -198,7 +304,41 @@ const traitCategories = {
 | `body` | Tipos de cuerpo | 10, 11, 12 |
 | `clothing` | Ropa y vestimenta | 40, 41, 42 |
 | `accessories` | Accesorios | 50, 51, 52 |
-| `skin` | Tipos de skin especiales | 37, 38 |
+
+## 🎯 Ventajas de Cada Formato
+
+### Formato por Categorías
+- ✅ **Más intuitivo** - Sabes exactamente qué categoría estás modificando
+- ✅ **Mejor para UIs** - Fácil de organizar por secciones
+- ✅ **Validación clara** - Evitas mezclar categorías
+
+### Formato por IDs Directos
+- ✅ **Más simple** - Solo necesitas el ID del trait
+- ✅ **Menos parámetros** - Una sola URL para múltiples traits
+- ✅ **Flexible** - Puedes mezclar traits de diferentes categorías fácilmente
+- ✅ **Ideal para listas** - Perfecto cuando tienes una lista de traits favoritos
+
+## 🔗 URLs de Ejemplo
+
+### Formato por Categorías
+```
+https://adrianlab.vercel.app/api/render/custom/1?eyes=7&mouth=22&head=18
+https://adrianlab.vercel.app/api/render/custom/5?background=2&skin=37
+https://adrianlab.vercel.app/api/render/custom/10?eyes=8&head=13
+```
+
+### Formato por IDs Directos
+```
+https://adrianlab.vercel.app/api/render/custom/1?trait=7&trait=22&trait=18
+https://adrianlab.vercel.app/api/render/custom/5?trait=2&trait=37
+https://adrianlab.vercel.app/api/render/custom/10?trait=8&trait=13
+```
+
+### Combinación de Ambos Formatos
+```
+https://adrianlab.vercel.app/api/render/custom/1?trait=18&eyes=7&mouth=22
+https://adrianlab.vercel.app/api/render/custom/5?trait=37&background=2&skin=38
+```
 
 ## 🚀 Casos de Uso
 

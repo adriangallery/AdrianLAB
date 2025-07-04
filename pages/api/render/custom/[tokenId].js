@@ -2,6 +2,34 @@
 import { createCanvas, loadImage } from 'canvas';
 import { getContracts } from '../../../../lib/contracts.js';
 import { Resvg } from '@resvg/resvg-js';
+import fs from 'fs';
+import path from 'path';
+
+// =============================================
+// SECCIÓN DE MAPEO DE TRAITS
+// =============================================
+
+// Función para cargar el mapeo de traits desde el JSON
+const loadTraitsMapping = () => {
+  try {
+    const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+    const traitsData = JSON.parse(fs.readFileSync(traitsPath, 'utf8'));
+    
+    const mapping = {};
+    traitsData.traits.forEach(trait => {
+      mapping[trait.tokenId] = {
+        category: trait.category.toUpperCase(),
+        name: trait.name,
+        fileName: trait.fileName
+      };
+    });
+    
+    return mapping;
+  } catch (error) {
+    console.error('[custom-render] Error cargando mapeo de traits:', error);
+    return {};
+  }
+};
 
 // =============================================
 // SECCIÓN DE EXCEPCIONES ESPECIALES
@@ -51,13 +79,34 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
+    // Cargar mapeo de traits
+    const traitsMapping = loadTraitsMapping();
+    console.log(`[custom-render] Mapeo de traits cargado con ${Object.keys(traitsMapping).length} entries`);
+
     // Obtener parámetros de query para traits personalizados
     const customTraits = {};
     Object.keys(req.query).forEach(key => {
       if (key !== 'tokenId' && key !== 'png') {
-        const traitId = parseInt(req.query[key]);
-        if (!isNaN(traitId)) {
-          customTraits[key.toUpperCase()] = traitId.toString();
+        const traitValue = req.query[key];
+        
+        // Si es un parámetro "trait" con ID directo
+        if (key === 'trait') {
+          const traitId = parseInt(traitValue);
+          if (!isNaN(traitId) && traitsMapping[traitId]) {
+            const category = traitsMapping[traitId].category;
+            customTraits[category] = traitId.toString();
+            console.log(`[custom-render] Trait ID ${traitId} mapeado a categoría ${category}`);
+          } else {
+            console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo`);
+          }
+        }
+        // Si es una categoría directa (como head=18)
+        else {
+          const traitId = parseInt(traitValue);
+          if (!isNaN(traitId)) {
+            customTraits[key.toUpperCase()] = traitId.toString();
+            console.log(`[custom-render] Categoría ${key.toUpperCase()} = ${traitId}`);
+          }
         }
       }
     });
