@@ -85,31 +85,35 @@ export default async function handler(req, res) {
 
     // Obtener parámetros de query para traits personalizados
     const customTraits = {};
+    
+    // Procesar parámetros de categorías directas primero
     Object.keys(req.query).forEach(key => {
-      if (key !== 'tokenId' && key !== 'png') {
+      if (key !== 'tokenId' && key !== 'png' && key !== 'trait') {
         const traitValue = req.query[key];
-        
-        // Si es un parámetro "trait" con ID directo
-        if (key === 'trait') {
-          const traitId = parseInt(traitValue);
-          if (!isNaN(traitId) && traitsMapping[traitId]) {
-            const category = traitsMapping[traitId].category;
-            customTraits[category] = traitId.toString();
-            console.log(`[custom-render] Trait ID ${traitId} mapeado a categoría ${category}`);
-          } else {
-            console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo`);
-          }
-        }
-        // Si es una categoría directa (como head=18)
-        else {
-          const traitId = parseInt(traitValue);
-          if (!isNaN(traitId)) {
-            customTraits[key.toUpperCase()] = traitId.toString();
-            console.log(`[custom-render] Categoría ${key.toUpperCase()} = ${traitId}`);
-          }
+        const traitId = parseInt(traitValue);
+        if (!isNaN(traitId)) {
+          customTraits[key.toUpperCase()] = traitId.toString();
+          console.log(`[custom-render] Categoría ${key.toUpperCase()} = ${traitId}`);
         }
       }
     });
+    
+    // Procesar parámetros "trait" (pueden ser múltiples)
+    if (req.query.trait) {
+      // Manejar tanto arrays como valores únicos
+      const traitValues = Array.isArray(req.query.trait) ? req.query.trait : [req.query.trait];
+      
+      traitValues.forEach(traitValue => {
+        const traitId = parseInt(traitValue);
+        if (!isNaN(traitId) && traitsMapping[traitId]) {
+          const category = traitsMapping[traitId].category;
+          customTraits[category] = traitId.toString();
+          console.log(`[custom-render] Trait ID ${traitId} mapeado a categoría ${category}`);
+        } else {
+          console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo`);
+        }
+      });
+    }
 
     console.log(`[custom-render] Traits personalizados:`, customTraits);
 
