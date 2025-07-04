@@ -406,10 +406,21 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10001,
+      "name": "STARTER Floppy",
+      "category": "Floppy discs",
+      "fileName": "STARTER-Floppy",
+      "maxSupply": 0,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 37,
+    "totalTraits": 38,
     "categories": [
       "Background",
       "Ear", 
