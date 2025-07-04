@@ -219,8 +219,7 @@ export default async function handler(req, res) {
           fitTo: {
             mode: 'width',
             value: 1000
-          },
-          background: 'none'
+          }
         });
         
         const pngBuffer = resvg.render().asPng();
