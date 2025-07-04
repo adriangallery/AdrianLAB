@@ -103,15 +103,46 @@ export default async function handler(req, res) {
       // Manejar tanto arrays como valores únicos
       const traitValues = Array.isArray(req.query.trait) ? req.query.trait : [req.query.trait];
       
+      // Crear un mapa temporal para detectar conflictos de categoría
+      const categoryConflicts = {};
+      
       traitValues.forEach(traitValue => {
         const traitId = parseInt(traitValue);
         if (!isNaN(traitId) && traitsMapping[traitId]) {
           const category = traitsMapping[traitId].category;
-          customTraits[category] = traitId.toString();
-          console.log(`[custom-render] Trait ID ${traitId} mapeado a categoría ${category}`);
+          const traitInfo = traitsMapping[traitId];
+          
+          // Registrar el trait para esta categoría
+          if (!categoryConflicts[category]) {
+            categoryConflicts[category] = [];
+          }
+          categoryConflicts[category].push({
+            id: traitId,
+            name: traitInfo.name,
+            fileName: traitInfo.fileName
+          });
+          
+          console.log(`[custom-render] Trait ID ${traitId} (${traitInfo.name}) mapeado a categoría ${category}`);
         } else {
           console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo`);
         }
+      });
+      
+      // Resolver conflictos: usar solo el último trait de cada categoría
+      Object.keys(categoryConflicts).forEach(category => {
+        const traits = categoryConflicts[category];
+        if (traits.length > 1) {
+          console.log(`[custom-render] ⚠️  Conflicto detectado en categoría ${category}:`);
+          traits.forEach((trait, index) => {
+            const status = index === traits.length - 1 ? '✅ SELECCIONADO' : '❌ DESCARTADO';
+            console.log(`[custom-render]   ${status} - Trait ${trait.id} (${trait.name})`);
+          });
+        }
+        
+        // Usar solo el último trait de la categoría
+        const lastTrait = traits[traits.length - 1];
+        customTraits[category] = lastTrait.id.toString();
+        console.log(`[custom-render] Final: Categoría ${category} = Trait ${lastTrait.id} (${lastTrait.name})`);
       });
     }
 

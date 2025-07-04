@@ -73,7 +73,15 @@ GET /api/render/custom/3?trait=8&trait=22&trait=13
 - Token 3 con traits IDs 8 (3D Laser Eyes), 22 (Cigarett), y 13 (Black Fedora)
 - Mantiene todos los otros traits originales
 
-#### Ejemplo 3: Combinar ambos formatos
+#### Ejemplo 3: Resolver conflictos automáticamente
+```
+GET /api/render/custom/1?trait=7&trait=8&trait=9&trait=22&trait=23
+```
+- **Traits 7, 8, 9** son todos de categoría EYES → Solo se usa el último (9 - Regular Shades)
+- **Traits 22, 23** son ambos de categoría MOUTH → Solo se usa el último (23 - Drool)
+- Resultado: Token con ojos tipo 9 y boca tipo 23
+
+#### Ejemplo 4: Combinar ambos formatos
 ```
 GET /api/render/custom/5?trait=18&eyes=7&background=2
 ```
@@ -292,6 +300,34 @@ const allTraits = [
 - ✅ **Rate limiting** - Protección contra abuso
 - ✅ **CORS habilitado** - Acceso desde dApps externas
 - ✅ **Mapeo automático** - Los IDs se mapean automáticamente a categorías
+- ✅ **Resolución de conflictos** - Detecta y resuelve automáticamente traits de la misma categoría
+
+## ⚠️ Resolución de Conflictos de Categoría
+
+Cuando se especifican múltiples traits de la misma categoría, el sistema automáticamente:
+
+1. **Detecta el conflicto** - Identifica traits que pertenecen a la misma categoría
+2. **Selecciona el último** - Usa solo el trait especificado más recientemente
+3. **Registra la decisión** - Muestra logs detallados de qué traits fueron seleccionados/descartados
+
+### Ejemplo de Conflicto:
+```
+GET /api/render/custom/1?trait=7&trait=8&trait=9
+```
+
+**Logs del sistema:**
+```
+[custom-render] Trait ID 7 (3D Glasses) mapeado a categoría EYES
+[custom-render] Trait ID 8 (3D Laser Eyes) mapeado a categoría EYES  
+[custom-render] Trait ID 9 (Regular Shades) mapeado a categoría EYES
+[custom-render] ⚠️  Conflicto detectado en categoría EYES:
+[custom-render]   ❌ DESCARTADO - Trait 7 (3D Glasses)
+[custom-render]   ❌ DESCARTADO - Trait 8 (3D Laser Eyes)
+[custom-render]   ✅ SELECCIONADO - Trait 9 (Regular Shades)
+[custom-render] Final: Categoría EYES = Trait 9 (Regular Shades)
+```
+
+**Resultado:** Solo se renderiza el trait 9 (Regular Shades) para la categoría EYES.
 
 ## 📊 Categorías de Traits Disponibles
 
