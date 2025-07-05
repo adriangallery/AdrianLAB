@@ -67,6 +67,17 @@ const getSkinTraitPath = (traitId, generation) => {
 // =============================================
 
 export default async function handler(req, res) {
+  // Configurar CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://adrianpunks.com');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Manejar preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     // Extraer tokenId de la ruta, eliminando .png si existe
     const { tokenId } = req.query;

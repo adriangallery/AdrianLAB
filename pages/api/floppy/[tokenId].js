@@ -4,6 +4,17 @@ import { createCanvas, loadImage } from 'canvas';
 import { getFloppyData } from '../../../lib/floppy.js';
 
 export default async function handler(req, res) {
+  // Configurar CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://adrianpunks.com');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Manejar preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     // Extraer tokenId, eliminando la extensión .png si está presente
     let { tokenId } = req.query;
