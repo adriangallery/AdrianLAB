@@ -39,8 +39,34 @@ const getSkinTraitPath = (traitId, generation) => {
 // =============================================
 
 export default async function handler(req, res) {
-  // Configurar CORS
-  res.setHeader('Access-Control-Allow-Origin', 'https://adrianpunks.com');
+  // Configurar CORS - Permitir múltiples orígenes
+  const allowedOrigins = [
+    'https://adrianpunks.com',
+    'https://opensea.io',
+    'https://testnets.opensea.io',
+    'https://rarible.com',
+    'https://looksrare.org',
+    'https://x2y2.io',
+    'https://blur.io',
+    'https://magiceden.io',
+    'https://sudoswap.xyz',
+    'https://reservoir.tools',
+    'https://nftx.io',
+    'https://element.market',
+    'https://tensor.trade',
+    'https://okx.com',
+    'https://binance.com',
+    'https://coinbase.com'
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    // Para requests sin origin (como imágenes directas) o orígenes no listados
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
