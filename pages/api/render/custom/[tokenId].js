@@ -347,13 +347,14 @@ export default async function handler(req, res) {
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
-    const traitOrder = ['BASE', 'BODY', 'EYES', 'MOUTH', 'HEAD', 'CLOTHING', 'ACCESSORIES'];
-    
+    // Nuevo orden de renderizado incluyendo todas las categorías relevantes
+    const traitOrder = ['EAR', 'EYES', 'HEAD', 'MOUTH', 'NECK', 'NOSE', 'SWAG'];
+
     for (const category of traitOrder) {
       if (finalTraits[category]) {
         const traitPath = `${category}/${finalTraits[category]}.svg`;
         console.log(`[custom-render] PASO 3 - Cargando trait: ${traitPath}`);
-        
+
         const traitImage = await loadAndRenderSvg(traitPath);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
