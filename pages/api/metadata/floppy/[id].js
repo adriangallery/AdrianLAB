@@ -189,6 +189,10 @@ export default async function handler(req, res) {
             value: tokenData.floppy
           },
           {
+            trait_type: "Traits Inside",
+            value: tokenData.traitsInside || 0
+          },
+          {
             trait_type: "Rarity",
             value: rarity.tag
           }
