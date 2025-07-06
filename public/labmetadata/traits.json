@@ -403,6 +403,7 @@
       "fileName": "OG-Floppy",
       "maxSupply": 100,
       "floppy": "OG",
+      "traitsInside": 3,
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -412,8 +413,21 @@
       "name": "STARTER Floppy",
       "category": "Floppy discs",
       "fileName": "STARTER-Floppy",
-      "maxSupply": 0,
+      "maxSupply": 1000,
       "floppy": "STARTER",
+      "traitsInside": 2,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10002,
+      "name": "STARTER Floppy",
+      "category": "Floppy discs",
+      "fileName": "STARTER-Floppy",
+      "maxSupply": 1000,
+      "floppy": "STARTER",
+      "traitsInside": 4,
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
