@@ -435,9 +435,10 @@
     {
       "tokenId": 15000,
       "name": "Professor_X",
-      "category": "pagers",
+      "category": "Pagers",
       "fileName": "Professor_X",
       "maxSupply": 1,
+      "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -445,9 +446,10 @@
     {
       "tokenId": 15001,
       "name": "Gooost",
-      "category": "pagers",
+      "category": "Pagers",
       "fileName": "Gooost",
       "maxSupply": 1,
+      "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -455,9 +457,10 @@
     {
       "tokenId": 15002,
       "name": "Cor727",
-      "category": "pagers",
+      "category": "Pagers",
       "fileName": "Cor727",
       "maxSupply": 1,
+      "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -465,9 +468,10 @@
     {
       "tokenId": 15003,
       "name": "Filthy",
-      "category": "pagers",
+      "category": "Pagers",
       "fileName": "Filthy",
       "maxSupply": 1,
+      "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -475,9 +479,10 @@
     {
       "tokenId": 15004,
       "name": "WasSa",
-      "category": "pagers",
+      "category": "Pagers",
       "fileName": "WasSa",
       "maxSupply": 1,
+      "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -496,7 +501,7 @@
       "Skin",
       "Swag",
       "Floppy discs",
-      "pagers"
+      "Pagers"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
