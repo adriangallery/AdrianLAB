@@ -110,7 +110,7 @@ export default async function handler(req, res) {
     
     return res.status(200).json(metadata);
       
-    } else if (tokenIdNum >= 10000 && tokenIdNum <= 15000) {
+    } else if (tokenIdNum >= 10000 && tokenIdNum <= 15500) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS (10000+)`);
       
       // Cargar datos de labmetadata
@@ -217,7 +217,7 @@ export default async function handler(req, res) {
       return res.status(200).json(metadata);
       
     } else {
-      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-9999 para traits, 10000-15000 para floppy discs)' });
+      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-9999 para traits, 10000-15500 para floppy discs)' });
     }
     
   } catch (error) {
