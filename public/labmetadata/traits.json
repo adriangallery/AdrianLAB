@@ -431,10 +431,65 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15000,
+      "name": "Professor_X",
+      "category": "pagers",
+      "fileName": "Professor_X",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15001,
+      "name": "Gooost",
+      "category": "pagers",
+      "fileName": "Gooost",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15002,
+      "name": "Cor727",
+      "category": "pagers",
+      "fileName": "Cor727",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15003,
+      "name": "Filthy",
+      "category": "pagers",
+      "fileName": "Filthy",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15004,
+      "name": "WasSa",
+      "category": "pagers",
+      "fileName": "WasSa",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 38,
+    "totalTraits": 43,
     "categories": [
       "Background",
       "Ear", 
@@ -445,7 +500,8 @@
       "Nose",
       "Skin",
       "Swag",
-      "Floppy discs"
+      "Floppy discs",
+      "pagers"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
