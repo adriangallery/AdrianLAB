@@ -234,22 +234,10 @@ async function handleRenderToken(req, res, tokenId) {
         }
       ])}
       
-      <!-- Logo AdrianLAB (alineado a la derecha) - convertido a paths -->
-      ${textToSVGElement('Adrian', {
-        x: 684 - 143, // Movido otros 12px a la derecha (de -155 a -143)
-        y: 922,       // Subido 3px (de 925 a 922)
-        fontSize: 56,
-        fill: '#333333',
-        anchor: 'end'
-      })}
-      
-      ${textToSVGElement('LAB', {
-        x: 684 - 143, // Movido otros 12px a la derecha (de -155 a -143)
-        y: 957,       // Subido 3px (de 960 a 957)
-        fontSize: 56,
-        fill: '#ff69b4',
-        anchor: 'end'
-      })}
+      <!-- Logo AdrianLAB SVG (nueva implementación) -->
+      <g transform="translate(541, 922) scale(0.1167)">
+        ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'adrianlablogo1.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
+      </g>
     </svg>
   `;
 
