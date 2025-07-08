@@ -1541,6 +1541,116 @@
       "external_url": "https://adrianpunks.com/"
     },
     {
+      "tokenId": 151,
+      "name": "Gas-Mask-Full",
+      "category": "Eyes",
+      "fileName": "Gas-Mask-Full",
+      "maxSupply": 15,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 152,
+      "name": "Golden_Shades",
+      "category": "Eyes",
+      "fileName": "Golden_Shades",
+      "maxSupply": 11,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 153,
+      "name": "Googly-Eyes",
+      "category": "Eyes",
+      "fileName": "Googly-Eyes",
+      "maxSupply": 16,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 154,
+      "name": "Graucho",
+      "category": "Eyes",
+      "fileName": "Graucho",
+      "maxSupply": 12,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 155,
+      "name": "Horned-Rimmed-Glasses",
+      "category": "Eyes",
+      "fileName": "Horned-Rimmed-Glasses",
+      "maxSupply": 14,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 156,
+      "name": "Nerd-Glasses-Big",
+      "category": "Eyes",
+      "fileName": "Nerd-Glasses-Big",
+      "maxSupply": 12,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 157,
+      "name": "Pink-Visor",
+      "category": "Eyes",
+      "fileName": "Pink-Visor",
+      "maxSupply": 9,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 158,
+      "name": "S.W.A.T.-Goggles",
+      "category": "Eyes",
+      "fileName": "S.W.A.T.-Goggles",
+      "maxSupply": 14,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 159,
+      "name": "Ski-Goggles",
+      "category": "Eyes",
+      "fileName": "Ski-Goggles",
+      "maxSupply": 10,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 160,
+      "name": "Small-Shades",
+      "category": "Eyes",
+      "fileName": "Small-Shades",
+      "maxSupply": 14,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
       "tokenId": 10000,
       "name": "OG Floppy",
       "category": "Floppy discs",
