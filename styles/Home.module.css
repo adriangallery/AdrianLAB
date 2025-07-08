@@ -167,6 +167,17 @@
   font-size: 0.9rem;
 }
 
+.traitType {
+  background: #0070f3;
+  color: white !important;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem !important;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 0.5rem !important;
+}
+
 .pagination {
   display: flex;
   justify-content: center;

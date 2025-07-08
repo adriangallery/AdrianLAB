@@ -15,19 +15,40 @@ export default function Home() {
   const loadTraits = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/metadata/floppy/1');
-      if (response.ok) {
-        // Cargar traits del 1 al 50 para la demo
-        const traitsData = [];
-        for (let i = 1; i <= 50; i++) {
-          traitsData.push({
-            id: i,
-            name: `Trait #${i}`,
-            imageUrl: `/api/render/floppy/${i}.png?v=${Date.now()}`
-          });
-        }
-        setTraits(traitsData);
+      // Cargar traits del 1 al 9999 (traits normales)
+      const traitsData = [];
+      
+      // Traits normales (1-9999)
+      for (let i = 1; i <= 9999; i++) {
+        traitsData.push({
+          id: i,
+          name: `Trait #${i}`,
+          imageUrl: `/api/render/floppy/${i}.png?v=${Date.now()}`,
+          type: 'trait'
+        });
       }
+      
+      // Floppy discs (10000-10002)
+      for (let i = 10000; i <= 10002; i++) {
+        traitsData.push({
+          id: i,
+          name: `Floppy #${i}`,
+          imageUrl: `/labimages/${i}.gif?v=${Date.now()}`,
+          type: 'floppy'
+        });
+      }
+      
+      // Pagers (15000-15004)
+      for (let i = 15000; i <= 15004; i++) {
+        traitsData.push({
+          id: i,
+          name: `Pager #${i}`,
+          imageUrl: `/labimages/${i}.gif?v=${Date.now()}`,
+          type: 'pager'
+        });
+      }
+      
+      setTraits(traitsData);
     } catch (error) {
       console.error('Error loading traits:', error);
     }
@@ -132,6 +153,7 @@ export default function Home() {
                     </div>
                     <h3>{trait.name}</h3>
                     <p>ID: {trait.id}</p>
+                    <p className={styles.traitType}>{trait.type.toUpperCase()}</p>
                   </div>
                 ))}
               </div>
