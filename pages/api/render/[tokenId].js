@@ -254,7 +254,7 @@ export default async function handler(req, res) {
     // 3. TERCERO: Renderizar resto de traits
     console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
     // Nuevo orden de renderizado incluyendo todas las categorías relevantes
-    const traitOrder = ['EAR', 'EYES', 'HEAD', 'MOUTH', 'NECK', 'NOSE', 'SWAG'];
+    const traitOrder = ['BEARD', 'EAR', 'EYES', 'GEAR', 'HEAD', 'MOUTH', 'NECK', 'NOSE', 'RANDOMSHIT', 'SWAG', 'FLOPPY DISCS', 'PAGERS'];
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
