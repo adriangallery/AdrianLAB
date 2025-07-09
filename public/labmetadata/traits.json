@@ -3174,10 +3174,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15005,
+      "name": "ActionPACK",
+      "category": "Action Packs",
+      "fileName": "ActionPACK",
+      "maxSupply": 1,
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 244,
+    "totalTraits": 245,
     "categories": [
       "Background",
       "Ear",
@@ -3192,7 +3205,8 @@
       "BEARD",
       "Randomshit",
       "Floppy discs",
-      "Pagers"
+      "Pagers",
+      "Action Packs"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"

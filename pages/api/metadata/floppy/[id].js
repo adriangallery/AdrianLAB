@@ -159,6 +159,25 @@ export default async function handler(req, res) {
       const gifExists = fs.existsSync(gifPath);
       console.log(`[floppy-metadata] GIF existe: ${gifExists}, ruta: ${gifPath}`);
 
+      // Verificar si existe el PNG correspondiente (para Action Packs)
+      const pngPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.png`);
+      const pngExists = fs.existsSync(pngPath);
+      console.log(`[floppy-metadata] PNG existe: ${pngExists}, ruta: ${pngPath}`);
+
+      // Determinar el tipo de imagen según la categoría
+      let imageUrl = null;
+      let imageType = null;
+      
+      if (tokenData.category === "Action Packs" && pngExists) {
+        imageUrl = `${baseUrl}/labimages/${tokenIdNum}.png?v=${version}`;
+        imageType = "image/png";
+        console.log(`[floppy-metadata] Usando PNG para Action Pack ${tokenIdNum}`);
+      } else if (gifExists) {
+        imageUrl = `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}`;
+        imageType = "image/gif";
+        console.log(`[floppy-metadata] Usando GIF para ${tokenData.category} ${tokenIdNum}`);
+      }
+
         // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
     if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };    // Dorado
@@ -173,7 +192,7 @@ export default async function handler(req, res) {
       const metadata = {
         name: tokenData.name,
         description: tokenData.description,
-        image: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}` : null,
+        image: imageUrl,
         external_url: tokenData.external_url,
         attributes: [
           {
@@ -200,8 +219,8 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: gifExists ? `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}` : null,
-              type: "image/gif"
+              uri: imageUrl,
+              type: imageType
             }
           ],
           category: "image"
