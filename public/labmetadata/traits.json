@@ -3134,6 +3134,20 @@
       "external_url": "https://adrianpunks.com/"
     },
     {
+      "tokenId": 300,
+      "name": "Flickering Eyes",
+      "category": "EYES",
+      "fileName": "Flickering Eyes",
+      "maxSupply": 50,
+      "animated": true,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
       "tokenId": 10000,
       "name": "OG Floppy",
       "category": "Floppy discs",
@@ -3255,7 +3269,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 250,
+    "totalTraits": 251,
     "categories": [
       "Background",
       "Ear",

@@ -5,6 +5,86 @@ import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
 
+// Cache para traits animados
+const animatedTraitsCache = new Map();
+
+// Función para detectar si un SVG es animado
+const detectSvgAnimation = (svgContent) => {
+  const animationPatterns = [
+    '<animate', '<animateTransform', '<animateMotion',
+    '@keyframes', 'animation:', 'transition:', 'dur=', 'repeatCount='
+  ];
+  
+  return animationPatterns.some(pattern => svgContent.includes(pattern));
+};
+
+// Función para cargar SVG y detectar animación
+const loadAndDetectAnimation = async (path) => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/traits/${path}`;
+    
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    const svgContent = await response.text();
+    const isAnimated = detectSvgAnimation(svgContent);
+    
+    return {
+      content: svgContent,
+      isAnimated: isAnimated
+    };
+  } catch (error) {
+    console.error(`Error cargando SVG ${path}:`, error.message);
+    return { content: null, isAnimated: false };
+  }
+};
+
+// Función principal de detección híbrida
+const isTraitAnimated = async (traitData, traitPath) => {
+  // Prioridad 1: Metadata en traits.json
+  if (traitData && traitData.animated !== undefined) {
+    return traitData.animated;
+  }
+  
+  // Prioridad 2: Cache
+  if (animatedTraitsCache.has(traitPath)) {
+    return animatedTraitsCache.get(traitPath);
+  }
+  
+  // Prioridad 3: Detección dinámica
+  try {
+    const svgData = await loadAndDetectAnimation(traitPath);
+    animatedTraitsCache.set(traitPath, svgData.isAnimated);
+    return svgData.isAnimated;
+  } catch (error) {
+    console.warn(`No se pudo detectar animación para ${traitPath}:`, error);
+    return false;
+  }
+};
+
+// Función para generar GIF animado (placeholder)
+const generateAnimatedGif = async (finalTraits, baseImagePath, skinTraitPath) => {
+  // Por ahora, generamos un PNG con indicador de animación
+  // En el futuro, aquí iría la lógica de generación de GIF
+  console.log('[custom-render] Generando GIF animado para traits animados');
+  
+  // Crear canvas con fondo blanco
+  const canvas = createCanvas(1000, 1000);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 1000, 1000);
+  
+  // Añadir indicador de animación
+  ctx.fillStyle = '#ff0000';
+  ctx.font = 'bold 48px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('ANIMATED TRAIT DETECTED', 500, 500);
+  ctx.fillText('GIF generation coming soon', 500, 550);
+  
+  return canvas.toBuffer('image/png');
+};
+
 // =============================================
 // SECCIÓN DE MAPEO DE TRAITS
 // =============================================
@@ -229,6 +309,60 @@ export default async function handler(req, res) {
     // Aplicar traits personalizados (sustituir los especificados)
     const finalTraits = { ...currentTraits, ...customTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
+
+    // DETECCIÓN DE ANIMACIONES
+    console.log('[custom-render] Iniciando detección de animaciones...');
+    
+    // Cargar datos de traits.json para verificar metadata
+    const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+    let labmetadata;
+    try {
+      const labmetadataBuffer = fs.readFileSync(labmetadataPath);
+      labmetadata = JSON.parse(labmetadataBuffer.toString());
+    } catch (error) {
+      console.warn('[custom-render] No se pudo cargar traits.json para detección de animaciones');
+      labmetadata = { traits: [] };
+    }
+
+    // Detectar si hay traits animados
+    const hasAnyAnimation = await Promise.all(
+      Object.entries(finalTraits).map(async ([category, traitId]) => {
+        const traitPath = `${category}/${traitId}.svg`;
+        const traitData = labmetadata.traits.find(t => t.tokenId === parseInt(traitId));
+        const isAnimated = await isTraitAnimated(traitData, traitPath);
+        
+        if (isAnimated) {
+          console.log(`[custom-render] Trait animado detectado: ${category}/${traitId}`);
+        }
+        
+        return isAnimated;
+      })
+    ).then(results => results.some(Boolean));
+
+    console.log(`[custom-render] Animaciones detectadas: ${hasAnyAnimation}`);
+
+    // Si hay animaciones, generar GIF (por ahora PNG con indicador)
+    if (hasAnyAnimation) {
+      console.log('[custom-render] Generando formato animado...');
+      const animatedBuffer = await generateAnimatedGif(finalTraits, baseImagePath, skinTraitPath);
+      
+      // Configurar headers para evitar cache
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      
+      // Enviar imagen animada
+      res.setHeader('Content-Type', 'image/png'); // Por ahora PNG, en el futuro GIF
+      res.setHeader('Content-Length', animatedBuffer.length);
+      res.send(animatedBuffer);
+      
+      console.log('[custom-render] Renderizado animado completado exitosamente');
+      return;
+    }
+
+    // Si no hay animaciones, continuar con renderizado PNG normal
+    console.log('[custom-render] Generando PNG estático...');
 
     // Crear canvas con fondo blanco
     const canvas = createCanvas(1000, 1000);
