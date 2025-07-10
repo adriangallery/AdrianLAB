@@ -90,6 +90,7 @@ const normalizeCategory = (category) => {
   const categoryMap = {
     'Head': 'HEAD',
     'Swag': 'SWAG',
+    'PACKS': 'SWAG',  // Mapear PACKS a SWAG
     'Background': 'BACKGROUND',
     'Ear': 'EAR',
     'Eyes': 'EYES',
