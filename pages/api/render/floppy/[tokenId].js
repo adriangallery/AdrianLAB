@@ -3,6 +3,87 @@ import path from 'path';
 import fs from 'fs';
 import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
 
+// Cache para traits animados
+const animatedTraitsCache = new Map();
+
+// Función para detectar si un SVG es animado
+const detectSvgAnimation = (svgContent) => {
+  const animationPatterns = [
+    '<animate', '<animateTransform', '<animateMotion',
+    '@keyframes', 'animation:', 'transition:', 'dur=', 'repeatCount='
+  ];
+  
+  return animationPatterns.some(pattern => svgContent.includes(pattern));
+};
+
+// Función para cargar SVG y detectar animación
+const loadAndDetectAnimation = async (path) => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/traits/${path}`;
+    
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    const svgContent = await response.text();
+    const isAnimated = detectSvgAnimation(svgContent);
+    
+    return {
+      content: svgContent,
+      isAnimated: isAnimated
+    };
+  } catch (error) {
+    console.error(`Error cargando SVG ${path}:`, error.message);
+    return { content: null, isAnimated: false };
+  }
+};
+
+// Función principal de detección híbrida
+const isTraitAnimated = async (traitData, traitPath) => {
+  // Prioridad 1: Metadata en traits.json
+  if (traitData && traitData.animated !== undefined) {
+    return traitData.animated;
+  }
+  
+  // Prioridad 2: Cache
+  if (animatedTraitsCache.has(traitPath)) {
+    return animatedTraitsCache.get(traitPath);
+  }
+  
+  // Prioridad 3: Detección dinámica
+  try {
+    const svgData = await loadAndDetectAnimation(traitPath);
+    animatedTraitsCache.set(traitPath, svgData.isAnimated);
+    return svgData.isAnimated;
+  } catch (error) {
+    console.warn(`No se pudo detectar animación para ${traitPath}:`, error);
+    return false;
+  }
+};
+
+// Función para generar GIF animado (placeholder)
+const generateAnimatedGif = async (tokenData, traitSvgContent) => {
+  // Por ahora, generamos un PNG con indicador de animación
+  // En el futuro, aquí iría la lógica de generación de GIF
+  console.log('[floppy-render] Generando GIF animado para trait animado');
+  
+  // Crear canvas con fondo blanco
+  const { createCanvas } = await import('canvas');
+  const canvas = createCanvas(768, 1024);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 768, 1024);
+  
+  // Añadir indicador de animación
+  ctx.fillStyle = '#ff0000';
+  ctx.font = 'bold 48px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('ANIMATED TRAIT DETECTED', 384, 512);
+  ctx.fillText('GIF generation coming soon', 384, 562);
+  
+  return canvas.toBuffer('image/png');
+};
+
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
@@ -119,6 +200,44 @@ async function handleRenderToken(req, res, tokenId) {
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
   console.log(`[floppy-render] Rarity calculada:`, rarity);
 
+  // DETECCIÓN DE ANIMACIONES
+  console.log('[floppy-render] Iniciando detección de animaciones...');
+  
+  // Construir path del trait para detección
+  const traitPath = `${tokenData.category}/${tokenData.tokenId}.svg`;
+  
+  // Detectar si el trait es animado
+  const isAnimated = await isTraitAnimated(tokenData, traitPath);
+  
+  if (isAnimated) {
+    console.log(`[floppy-render] Trait animado detectado: ${traitPath}`);
+  }
+  
+  console.log(`[floppy-render] Animación detectada: ${isAnimated}`);
+
+  // Si hay animaciones, generar GIF (por ahora PNG con indicador)
+  if (isAnimated) {
+    console.log('[floppy-render] Generando formato animado...');
+    const animatedBuffer = await generateAnimatedGif(tokenData, traitSvgContent);
+    
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
+    // Enviar imagen animada
+    res.setHeader('Content-Type', 'image/png'); // Por ahora PNG, en el futuro GIF
+    res.setHeader('Content-Length', animatedBuffer.length);
+    res.send(animatedBuffer);
+    
+    console.log('[floppy-render] Renderizado animado completado exitosamente');
+    return;
+  }
+
+  // Si no hay animaciones, continuar con renderizado SVG normal
+  console.log('[floppy-render] Generando SVG estático...');
+
   // ===== SOLUCIÓN DEFINITIVA: SVG COMPLETO CON TEXTO CONVERTIDO A PATHS =====
   console.log(`[floppy-render] ===== CREANDO SVG COMPLETO CON TEXTO A PATHS =====`);
   
@@ -160,7 +279,7 @@ async function handleRenderToken(req, res, tokenId) {
       <g transform="translate(0, 0) scale(1, 1.333)">
         <polygon class="cls-1" points="30.33 .49 .83 .49 .83 766.31 30.33 766.31 30.29 68.38 761.63 68.97 761.66 767.99 767.91 767.99 767.92 0 30.33 .49"/>
         <g>
-          <path d="M762.95,0v2.9H2.89s0,35.21,0,35.21h760.07v729.89H0V0h762.96ZM28.87,40.99H2.89v25.98h25.98v-25.98ZM58.31,40.99h-26.56v25.98h285.8v-25.98h-23.67v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v17.32c0,.14-2.89.14-2.89,0v-17.32h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98c.03,1.28-.26,8.66-.26,8.66h-2.63v-8.66ZM346.43,40.99h-25.98v25.98h285.23v-25.98h-23.1v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v17.32c0,.14-2.89.14-2.89,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66ZM635.12,40.99h-26.56v25.98h151.85v-25.98h-5.77v17.32c0,.17-3.46.17-3.46,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66h-2.89v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66ZM28.87,69.86H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.69c0,.06-.06.87,0,.87h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h25.98V69.86ZM760.41,765.69V70.73c0-.06.06-.87,0-.87H31.75c-.06,0,0,.8,0,.87v694.96h728.65ZM28.87,361.44H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.1,2.79,0,2.89-.41.41-8.66-.81-8.66.86v25.69h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.58,1.17,0,3.13,0,3.13H2.89v26.32h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h25.98v-285.23ZM28.87,649.55H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v31.86h25.98v-116.16Z"/>
+          <path d="M762.95,0v2.9H2.89s0,35.21,0,35.21h760.07v729.89H0V0h762.96ZM28.87,40.99H2.89v25.98h25.98v-25.98ZM58.31,40.99h-26.56v25.98h285.8v-25.98h-23.67v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v17.32c0,.14-2.89.14-2.89,0v-17.32h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98c.03,1.28-.26,8.66-.26,8.66h-2.63v-8.66ZM346.43,40.99h-25.98v25.98h285.23v-25.98h-23.1v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v17.32c0,.14-2.89.14-2.89,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66ZM635.12,40.99h-26.56v25.98h151.85v-25.98h-5.77v17.32c0,.17-3.46.17-3.46,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66h-2.89v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66ZM28.87,69.86H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.69c0,.06-.06.87,0,.87h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h25.98V69.86ZM760.41,765.69V70.73c0-.06.06-.87,0-.87H31.75c-.06,0,0,.8,0,.87v694.96h728.65ZM28.87,361.44H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.1,2.79,0,2.89-.41.41-8.66-.81-8.66.86v25.69h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.58,1.17,0,3.13,0,3.13H2.89v26.32h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h25.98v-285.23ZM28.87,649.55H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v31.86h25.98v-116.16Z"/>
           <rect x="46.77" y="5.77" width="716.19" height="2.89"/>
           <path d="M762.95,11.54v2.89H46.77c-.14,0,0-2.89,0-2.89h716.19Z"/>
           <rect x="46.77" y="17.32" width="716.19" height="2.89"/>
