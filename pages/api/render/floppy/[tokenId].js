@@ -1,6 +1,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import path from 'path';
 import fs from 'fs';
+import { createCanvas } from 'canvas';
 import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
 
 // Cache para traits animados
@@ -68,7 +69,6 @@ const generateAnimatedGif = async (tokenData, traitSvgContent) => {
   console.log('[floppy-render] Generando GIF animado para trait animado');
   
   // Crear canvas con fondo blanco
-  const { createCanvas } = await import('canvas');
   const canvas = createCanvas(768, 1024);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff';
