@@ -3069,6 +3069,71 @@
       "external_url": "https://adrianpunks.com/"
     },
     {
+      "tokenId": 247,
+      "name": "Big-L-Beard",
+      "category": "BEARD",
+      "fileName": "Big-L-Beard",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 248,
+      "name": "Big-L-Cardigan",
+      "category": "SWAG",
+      "fileName": "Big-L-Cardigan",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 249,
+      "name": "Big-L-Hair",
+      "category": "HEAD",
+      "fileName": "Big-L-Hair",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 250,
+      "name": "Big-L-Rug",
+      "category": "BACKGROUND",
+      "fileName": "Big-L-Rug",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 251,
+      "name": "Classic-Shades-Red",
+      "category": "EYES",
+      "fileName": "Classic-Shades-Red",
+      "maxSupply": 16,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
       "tokenId": 10000,
       "name": "OG Floppy",
       "category": "Floppy discs",
@@ -3190,7 +3255,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 245,
+    "totalTraits": 250,
     "categories": [
       "Background",
       "Ear",
