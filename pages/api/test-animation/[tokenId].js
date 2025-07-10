@@ -86,7 +86,7 @@ export default async function handler(req, res) {
     }
 
     // Construir path del trait
-    const traitPath = `${traitData.category}/${traitData.fileName}.svg`;
+    const traitPath = `${traitData.category}/${traitData.tokenId}.svg`;
     
     // Detectar animación
     const isAnimated = await isTraitAnimated(traitData, traitPath);
