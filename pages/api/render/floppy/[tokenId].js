@@ -68,20 +68,36 @@ const generateAnimatedGif = async (tokenData, traitSvgContent) => {
   // En el futuro, aquí iría la lógica de generación de GIF
   console.log('[floppy-render] Generando GIF animado para trait animado');
   
-  // Crear canvas con fondo blanco
-  const canvas = createCanvas(768, 1024);
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 768, 1024);
-  
-  // Añadir indicador de animación
-  ctx.fillStyle = '#ff0000';
-  ctx.font = 'bold 48px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('ANIMATED TRAIT DETECTED', 384, 512);
-  ctx.fillText('GIF generation coming soon', 384, 562);
-  
-  return canvas.toBuffer('image/png');
+  try {
+    // Crear canvas con fondo blanco
+    const canvas = createCanvas(768, 1024);
+    const ctx = canvas.getContext('2d');
+    
+    // Fondo blanco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 768, 1024);
+    
+    // Añadir indicador de animación
+    ctx.fillStyle = '#ff0000';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ANIMATED TRAIT DETECTED', 384, 512);
+    ctx.fillText('GIF generation coming soon', 384, 562);
+    
+    return canvas.toBuffer('image/png');
+  } catch (error) {
+    console.error('[floppy-render] Error generando imagen animada:', error);
+    // Fallback: crear una imagen simple de error
+    const canvas = createCanvas(768, 1024);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, 768, 1024);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 32px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ANIMATION ERROR', 384, 512);
+    return canvas.toBuffer('image/png');
+  }
 };
 
 // Función para normalizar categorías a mayúsculas
