@@ -3,7 +3,7 @@
     {
       "tokenId": 1,
       "name": "Dark Mode",
-      "category": "Background",
+      "category": "BACKGROUND",
       "fileName": "Dark-Mode",
       "maxSupply": 15,
       "floppy": "OG",
@@ -16,7 +16,7 @@
     {
       "tokenId": 2,
       "name": "Light Mode",
-      "category": "Background",
+      "category": "BACKGROUND",
       "fileName": "Light-Mode",
       "maxSupply": 30,
       "floppy": "OG",
@@ -29,7 +29,7 @@
     {
       "tokenId": 3,
       "name": "White",
-      "category": "Background",
+      "category": "BACKGROUND",
       "fileName": "White",
       "maxSupply": 10,
       "floppy": "OG",
@@ -42,7 +42,7 @@
     {
       "tokenId": 4,
       "name": "Diamond Earring",
-      "category": "Ear",
+      "category": "EAR",
       "fileName": "Diamond-Earring",
       "maxSupply": 15,
       "floppy": "OG",
@@ -55,7 +55,7 @@
     {
       "tokenId": 5,
       "name": "Gold Earring",
-      "category": "Ear",
+      "category": "EAR",
       "fileName": "Gold-Earring",
       "maxSupply": 12,
       "floppy": "OG",
@@ -68,7 +68,7 @@
     {
       "tokenId": 6,
       "name": "3D Glasses Big",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "3D-Glasses-Big",
       "maxSupply": 5,
       "floppy": "OG",
@@ -81,7 +81,7 @@
     {
       "tokenId": 7,
       "name": "3D Glasses",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "3D-Glasses",
       "maxSupply": 15,
       "floppy": "OG",
@@ -94,7 +94,7 @@
     {
       "tokenId": 8,
       "name": "3D Laser Eyes",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "3D-Laser-Eyes",
       "maxSupply": 12,
       "floppy": "OG",
@@ -107,7 +107,7 @@
     {
       "tokenId": 9,
       "name": "Regular Shades",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Regular-Shades",
       "maxSupply": 12,
       "floppy": "OG",
@@ -120,7 +120,7 @@
     {
       "tokenId": 13,
       "name": "Black Fedora",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Black-Fedora",
       "maxSupply": 10,
       "floppy": "OG",
@@ -133,7 +133,7 @@
     {
       "tokenId": 14,
       "name": "Buzz",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Buzz",
       "maxSupply": 10,
       "floppy": "OG",
@@ -146,7 +146,7 @@
     {
       "tokenId": 15,
       "name": "Cap Backward",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Backward",
       "maxSupply": 5,
       "floppy": "OG",
@@ -159,7 +159,7 @@
     {
       "tokenId": 16,
       "name": "Cap Forward",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Forward",
       "maxSupply": 10,
       "floppy": "OG",
@@ -172,7 +172,7 @@
     {
       "tokenId": 17,
       "name": "Crazy Hair 3D",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Crazy-Hair-3D",
       "maxSupply": 8,
       "floppy": "OG",
@@ -185,7 +185,7 @@
     {
       "tokenId": 18,
       "name": "Crazy Hair",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Crazy-Hair",
       "maxSupply": 10,
       "floppy": "OG",
@@ -198,7 +198,7 @@
     {
       "tokenId": 19,
       "name": "Short",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Short",
       "maxSupply": 5,
       "floppy": "OG",
@@ -211,7 +211,7 @@
     {
       "tokenId": 20,
       "name": "Tiara Tonsure",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tiara-Tonsure",
       "maxSupply": 10,
       "floppy": "OG",
@@ -224,7 +224,7 @@
     {
       "tokenId": 21,
       "name": "Wild",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Wild",
       "maxSupply": 12,
       "floppy": "OG",
@@ -237,7 +237,7 @@
     {
       "tokenId": 22,
       "name": "Cigarett",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Cigarett",
       "maxSupply": 5,
       "floppy": "OG",
@@ -250,7 +250,7 @@
     {
       "tokenId": 23,
       "name": "Drool",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Drool",
       "maxSupply": 13,
       "floppy": "OG",
@@ -263,7 +263,7 @@
     {
       "tokenId": 24,
       "name": "Joint",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Joint",
       "maxSupply": 5,
       "floppy": "OG",
@@ -276,7 +276,7 @@
     {
       "tokenId": 25,
       "name": "Pipe",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Pipe",
       "maxSupply": 5,
       "floppy": "OG",
@@ -289,7 +289,7 @@
     {
       "tokenId": 26,
       "name": "Sad",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Sad",
       "maxSupply": 12,
       "floppy": "OG",
@@ -302,7 +302,7 @@
     {
       "tokenId": 27,
       "name": "Smirk",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Smirk",
       "maxSupply": 5,
       "floppy": "OG",
@@ -315,7 +315,7 @@
     {
       "tokenId": 28,
       "name": "Vape",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Vape",
       "maxSupply": 5,
       "floppy": "OG",
@@ -328,7 +328,7 @@
     {
       "tokenId": 29,
       "name": "Gold Chain",
-      "category": "Neck",
+      "category": "NECK",
       "fileName": "Gold-Chain",
       "maxSupply": 5,
       "floppy": "OG",
@@ -341,7 +341,7 @@
     {
       "tokenId": 30,
       "name": "Neck Tattoo",
-      "category": "Neck",
+      "category": "NECK",
       "fileName": "Neck-Tattoo",
       "maxSupply": 12,
       "floppy": "OG",
@@ -354,7 +354,7 @@
     {
       "tokenId": 31,
       "name": "Tiger Tattoo",
-      "category": "Neck",
+      "category": "NECK",
       "fileName": "Tiger-Tattoo",
       "maxSupply": 5,
       "floppy": "OG",
@@ -367,7 +367,7 @@
     {
       "tokenId": 32,
       "name": "Nose Bleed",
-      "category": "Nose",
+      "category": "NOSE",
       "fileName": "Nose-Bleed",
       "maxSupply": 10,
       "floppy": "OG",
@@ -380,7 +380,7 @@
     {
       "tokenId": 33,
       "name": "Snot",
-      "category": "Nose",
+      "category": "NOSE",
       "fileName": "Snot",
       "maxSupply": 20,
       "floppy": "OG",
@@ -393,7 +393,7 @@
     {
       "tokenId": 37,
       "name": "OG GEN0 3D",
-      "category": "Skin",
+      "category": "SKIN",
       "fileName": "OG_GEN0_3D",
       "maxSupply": 10,
       "floppy": "OG",
@@ -406,7 +406,7 @@
     {
       "tokenId": 38,
       "name": "OG GEN0",
-      "category": "Skin",
+      "category": "SKIN",
       "fileName": "OG_GEN0",
       "maxSupply": 5,
       "floppy": "OG",
@@ -419,7 +419,7 @@
     {
       "tokenId": 43,
       "name": "Basic 3D Black T",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Basic_3D_Black_T",
       "maxSupply": 15,
       "floppy": "OG",
@@ -432,7 +432,7 @@
     {
       "tokenId": 44,
       "name": "Basic 3D White T",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Basic_3D_White_T",
       "maxSupply": 5,
       "floppy": "OG",
@@ -445,7 +445,7 @@
     {
       "tokenId": 45,
       "name": "Basic White T",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Basic_White_T",
       "maxSupply": 10,
       "floppy": "OG",
@@ -458,7 +458,7 @@
     {
       "tokenId": 46,
       "name": "Black T",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Black-T",
       "maxSupply": 10,
       "floppy": "OG",
@@ -887,7 +887,7 @@
     {
       "tokenId": 79,
       "name": "Adrian-Kimono",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Adrian-Kimono",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -900,7 +900,7 @@
     {
       "tokenId": 80,
       "name": "Bath-Rope",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Bath-Rope",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -913,7 +913,7 @@
     {
       "tokenId": 81,
       "name": "Batik-T-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Batik-T-Shirt",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -926,7 +926,7 @@
     {
       "tokenId": 82,
       "name": "Black-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Black-Suit",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -939,7 +939,7 @@
     {
       "tokenId": 83,
       "name": "Blood-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Blood-Shirt",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -952,7 +952,7 @@
     {
       "tokenId": 84,
       "name": "Bunny-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Bunny-Suit",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -965,7 +965,7 @@
     {
       "tokenId": 85,
       "name": "Camouflage-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Camouflage-Shirt",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -978,7 +978,7 @@
     {
       "tokenId": 86,
       "name": "Crip-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Crip-Shirt",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -991,7 +991,7 @@
     {
       "tokenId": 87,
       "name": "Desert-Camouflage-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Desert-Camouflage-Shirt",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -1004,7 +1004,7 @@
     {
       "tokenId": 88,
       "name": "Dess Shirt White",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Dess-Shirt-White",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1017,7 +1017,7 @@
     {
       "tokenId": 89,
       "name": "Dress-Shirt-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Dress-Shirt-Blue",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -1030,7 +1030,7 @@
     {
       "tokenId": 90,
       "name": "Dress-Shirt-Light-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Dress-Shirt-Light-Blue",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1043,7 +1043,7 @@
     {
       "tokenId": 91,
       "name": "Dress-Shirt-Pink-Stripes",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Dress-Shirt-Pink-Stripes",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1056,7 +1056,7 @@
     {
       "tokenId": 92,
       "name": "Football-Jersey-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Football-Jersey-Blue",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -1069,7 +1069,7 @@
     {
       "tokenId": 93,
       "name": "Football-Jersey-Green",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Football-Jersey-Green",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1082,7 +1082,7 @@
     {
       "tokenId": 94,
       "name": "Football-Jersey-Red",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Football-Jersey-Red",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -1095,7 +1095,7 @@
     {
       "tokenId": 95,
       "name": "Fred-Perry-Black",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Fred-Perry-Black",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -1108,7 +1108,7 @@
     {
       "tokenId": 96,
       "name": "Fred-Perry-White",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Fred-Perry-White",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1121,7 +1121,7 @@
     {
       "tokenId": 97,
       "name": "FUD-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "FUD-Shirt",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -1134,7 +1134,7 @@
     {
       "tokenId": 98,
       "name": "GI",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "GI",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1147,7 +1147,7 @@
     {
       "tokenId": 99,
       "name": "Gimp-Harness",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Gimp-Harness",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1160,7 +1160,7 @@
     {
       "tokenId": 100,
       "name": "Gimp-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Gimp-Suit",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1173,7 +1173,7 @@
     {
       "tokenId": 101,
       "name": "Hawaii-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Hawaii-Shirt",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1186,7 +1186,7 @@
     {
       "tokenId": 102,
       "name": "Hazmat-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Hazmat-Suit",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -1199,7 +1199,7 @@
     {
       "tokenId": 103,
       "name": "Hoodie",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Hoodie",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1212,7 +1212,7 @@
     {
       "tokenId": 104,
       "name": "Lumberjack-Shirt-Blue-Open",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Lumberjack-Shirt-Blue-Open",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1225,7 +1225,7 @@
     {
       "tokenId": 105,
       "name": "Lumberjack-Shirt-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Lumberjack-Shirt-Blue",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1238,7 +1238,7 @@
     {
       "tokenId": 106,
       "name": "Lumberjack-Shirt-Red-Open",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Lumberjack-Shirt-Red-Open",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1251,7 +1251,7 @@
     {
       "tokenId": 107,
       "name": "Lumberjack-Shirt-Red",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Lumberjack-Shirt-Red",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1264,7 +1264,7 @@
     {
       "tokenId": 108,
       "name": "MA-1",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "MA-1",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1277,7 +1277,7 @@
     {
       "tokenId": 109,
       "name": "Mafia-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Mafia-Suit",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1290,7 +1290,7 @@
     {
       "tokenId": 110,
       "name": "Matador-Jaket",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Matador-Jaket",
       "maxSupply": 18,
       "floppy": "STARTER",
@@ -1303,7 +1303,7 @@
     {
       "tokenId": 111,
       "name": "Nerd-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Nerd-Shirt",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1316,7 +1316,7 @@
     {
       "tokenId": 112,
       "name": "Net-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Net-Shirt",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -1329,7 +1329,7 @@
     {
       "tokenId": 113,
       "name": "Ninja-GI",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Ninja-GI",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1342,7 +1342,7 @@
     {
       "tokenId": 114,
       "name": "OG-107-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "OG-107-Shirt",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1355,7 +1355,7 @@
     {
       "tokenId": 115,
       "name": "Pink-Shirt-Open",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Pink-Shirt-Open",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -1368,7 +1368,7 @@
     {
       "tokenId": 116,
       "name": "Playboy-Bunny",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Playboy-Bunny",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1381,7 +1381,7 @@
     {
       "tokenId": 117,
       "name": "Polo-Purple",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Polo-Purple",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1394,7 +1394,7 @@
     {
       "tokenId": 118,
       "name": "Polo-Red",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Polo-Red",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1407,7 +1407,7 @@
     {
       "tokenId": 119,
       "name": "Polo-Yellow",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Polo-Yellow",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1420,7 +1420,7 @@
     {
       "tokenId": 120,
       "name": "Prison-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Prison-Suit",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -1433,7 +1433,7 @@
     {
       "tokenId": 121,
       "name": "S.W.A.T-Vest",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "S.W.A.T-Vest",
       "maxSupply": 18,
       "floppy": "STARTER",
@@ -1446,7 +1446,7 @@
     {
       "tokenId": 122,
       "name": "Scratch",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Scratch",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1459,7 +1459,7 @@
     {
       "tokenId": 123,
       "name": "Smoking-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Smoking-Blue",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -1472,7 +1472,7 @@
     {
       "tokenId": 124,
       "name": "Smoking-Gold",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Smoking-Gold",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -1485,7 +1485,7 @@
     {
       "tokenId": 125,
       "name": "Smoking",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Smoking",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1498,7 +1498,7 @@
     {
       "tokenId": 126,
       "name": "Space-Suit",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Space-Suit",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -1511,7 +1511,7 @@
     {
       "tokenId": 127,
       "name": "Suit-Blue-Red-Tie",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Suit-Blue-Red-Tie",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1524,7 +1524,7 @@
     {
       "tokenId": 128,
       "name": "Suit-Blue-Tie",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Suit-Blue-Tie",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1537,7 +1537,7 @@
     {
       "tokenId": 129,
       "name": "Sweatshirt-Grey",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Sweatshirt-Grey",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1550,7 +1550,7 @@
     {
       "tokenId": 130,
       "name": "Sweatshirt-HT",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Sweatshirt-HT",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1563,7 +1563,7 @@
     {
       "tokenId": 131,
       "name": "T-Shirt-Red",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "T-Shirt-Red",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1576,7 +1576,7 @@
     {
       "tokenId": 132,
       "name": "T-Shirt-White",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "T-Shirt-White",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -1589,7 +1589,7 @@
     {
       "tokenId": 133,
       "name": "Tank-Top-Black",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Tank-Top-Black",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -1602,7 +1602,7 @@
     {
       "tokenId": 134,
       "name": "Tank-Top-Pink",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Tank-Top-Pink",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1615,7 +1615,7 @@
     {
       "tokenId": 135,
       "name": "V-Shirt White",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "V-Shirt-White",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1628,7 +1628,7 @@
     {
       "tokenId": 136,
       "name": "Vareuse",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Vareuse",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -1641,7 +1641,7 @@
     {
       "tokenId": 137,
       "name": "Varsity-Blue",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Varsity-Blue",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1654,7 +1654,7 @@
     {
       "tokenId": 138,
       "name": "Varsity-Green",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Varsity-Green",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1667,7 +1667,7 @@
     {
       "tokenId": 139,
       "name": "Varsity-Red",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Varsity-Red",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1680,7 +1680,7 @@
     {
       "tokenId": 140,
       "name": "Warning-Vest",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Warning-Vest",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -1693,7 +1693,7 @@
     {
       "tokenId": 141,
       "name": "Wife-Beater",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Wife-Beater",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1706,7 +1706,7 @@
     {
       "tokenId": 142,
       "name": "Worker-Jacked",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Worker-Jacked",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1719,7 +1719,7 @@
     {
       "tokenId": 143,
       "name": "Yellow-Muscle-Shirt",
-      "category": "Swag",
+      "category": "SWAG",
       "fileName": "Yellow-Muscle-Shirt",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1732,7 +1732,7 @@
     {
       "tokenId": 144,
       "name": "Big-Pink-Shades",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Big-Pink-Shades",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1745,7 +1745,7 @@
     {
       "tokenId": 145,
       "name": "Blade-Blue",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Blade-Blue",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1758,7 +1758,7 @@
     {
       "tokenId": 146,
       "name": "Blade-Orange",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Blade-Orange",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1771,7 +1771,7 @@
     {
       "tokenId": 147,
       "name": "Blade-Purple",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Blade-Purple",
       "maxSupply": 19,
       "floppy": "STARTER",
@@ -1784,7 +1784,7 @@
     {
       "tokenId": 148,
       "name": "Classic-Shades_Purple",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Classic-Shades_Purple",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1797,7 +1797,7 @@
     {
       "tokenId": 149,
       "name": "Classic-Shades",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Classic-Shades",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1810,7 +1810,7 @@
     {
       "tokenId": 150,
       "name": "Eye-Patch-Right",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Eye-Patch-Right",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1823,7 +1823,7 @@
     {
       "tokenId": 151,
       "name": "Gas-Mask-Full",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Gas-Mask-Full",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -1836,7 +1836,7 @@
     {
       "tokenId": 152,
       "name": "Golden_Shades",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Golden_Shades",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1849,7 +1849,7 @@
     {
       "tokenId": 153,
       "name": "Googly-Eyes",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Googly-Eyes",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -1862,7 +1862,7 @@
     {
       "tokenId": 154,
       "name": "Graucho",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Graucho",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1875,7 +1875,7 @@
     {
       "tokenId": 155,
       "name": "Horned-Rimmed-Glasses",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Horned-Rimmed-Glasses",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1888,7 +1888,7 @@
     {
       "tokenId": 156,
       "name": "Nerd-Glasses-Big",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Nerd-Glasses-Big",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -1901,7 +1901,7 @@
     {
       "tokenId": 157,
       "name": "Pink-Visor",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Pink-Visor",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -1914,7 +1914,7 @@
     {
       "tokenId": 158,
       "name": "S.W.A.T.-Goggles",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "S.W.A.T.-Goggles",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1927,7 +1927,7 @@
     {
       "tokenId": 159,
       "name": "Ski-Goggles",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Ski-Goggles",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -1940,7 +1940,7 @@
     {
       "tokenId": 160,
       "name": "Small-Shades",
-      "category": "Eyes",
+      "category": "EYES",
       "fileName": "Small-Shades",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -1953,7 +1953,7 @@
     {
       "tokenId": 161,
       "name": "Buzz",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Buzz",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -1966,7 +1966,7 @@
     {
       "tokenId": 162,
       "name": "Clown-Green",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Clown-Green",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -1979,7 +1979,7 @@
     {
       "tokenId": 163,
       "name": "Clown-Red",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Clown-Red",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -1992,7 +1992,7 @@
     {
       "tokenId": 164,
       "name": "Crazy-Hair-Top",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Crazy-Hair-Top",
       "maxSupply": 8,
       "floppy": "STARTER",
@@ -2005,7 +2005,7 @@
     {
       "tokenId": 165,
       "name": "Filthy-Hair",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Filthy-Hair",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -2018,7 +2018,7 @@
     {
       "tokenId": 166,
       "name": "Flat-Top",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Flat-Top",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -2031,7 +2031,7 @@
     {
       "tokenId": 167,
       "name": "Fro",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Fro",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -2044,7 +2044,7 @@
     {
       "tokenId": 168,
       "name": "Longer-Hair-Blond",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Longer-Hair-Blond",
       "maxSupply": 8,
       "floppy": "STARTER",
@@ -2057,7 +2057,7 @@
     {
       "tokenId": 169,
       "name": "Longer-Hair-Brown",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Longer-Hair-Brown",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2070,7 +2070,7 @@
     {
       "tokenId": 170,
       "name": "Longer-Hair-White",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Longer-Hair-White",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2083,7 +2083,7 @@
     {
       "tokenId": 171,
       "name": "Mohawk-Green",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mohawk-Green",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2096,7 +2096,7 @@
     {
       "tokenId": 172,
       "name": "Mohawk-Red",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mohawk-Red",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2109,7 +2109,7 @@
     {
       "tokenId": 173,
       "name": "Mohawk",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mohawk",
       "maxSupply": 8,
       "floppy": "STARTER",
@@ -2122,7 +2122,7 @@
     {
       "tokenId": 174,
       "name": "Mullet-Blonde",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mullet-Blonde",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -2135,7 +2135,7 @@
     {
       "tokenId": 175,
       "name": "Mullet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mullet",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2148,7 +2148,7 @@
     {
       "tokenId": 176,
       "name": "Popper-Blonde",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Popper-Blonde",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2161,7 +2161,7 @@
     {
       "tokenId": 177,
       "name": "Popper",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Popper",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -2174,7 +2174,7 @@
     {
       "tokenId": 178,
       "name": "Short-Blond",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Short-Blond",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2187,7 +2187,7 @@
     {
       "tokenId": 179,
       "name": "Short-White",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Short-White",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2200,7 +2200,7 @@
     {
       "tokenId": 180,
       "name": "Short",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Short",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2213,7 +2213,7 @@
     {
       "tokenId": 181,
       "name": "Snoop",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Snoop",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2226,7 +2226,7 @@
     {
       "tokenId": 182,
       "name": "Spike",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Spike",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2239,7 +2239,7 @@
     {
       "tokenId": 183,
       "name": "Tonsure-White",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tonsure-White",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2252,7 +2252,7 @@
     {
       "tokenId": 184,
       "name": "Tonsure",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tonsure",
       "maxSupply": 8,
       "floppy": "STARTER",
@@ -2265,7 +2265,7 @@
     {
       "tokenId": 185,
       "name": "Wild-Blonde",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Wild-Blonde",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2278,7 +2278,7 @@
     {
       "tokenId": 186,
       "name": "Wild",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Wild",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2291,7 +2291,7 @@
     {
       "tokenId": 187,
       "name": "Bandana-Blue",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Bandana-Blue",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2304,7 +2304,7 @@
     {
       "tokenId": 188,
       "name": "Beats-Headphones",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Beats-Headphones",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -2317,7 +2317,7 @@
     {
       "tokenId": 189,
       "name": "Black-Hoodie-Up",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Black-Hoodie-Up",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2330,7 +2330,7 @@
     {
       "tokenId": 190,
       "name": "Bloods-Bandana",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Bloods-Bandana",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2343,7 +2343,7 @@
     {
       "tokenId": 191,
       "name": "Brain",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Brain",
       "maxSupply": 6,
       "floppy": "STARTER",
@@ -2356,7 +2356,7 @@
     {
       "tokenId": 192,
       "name": "Cap-Backward-Black",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Backward-Black",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2369,7 +2369,7 @@
     {
       "tokenId": 193,
       "name": "Cap-Backward-Blue",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Backward-Blue",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2382,7 +2382,7 @@
     {
       "tokenId": 194,
       "name": "Cap-Backward-Purple",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Backward-Purple",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2395,7 +2395,7 @@
     {
       "tokenId": 195,
       "name": "Cap-Forward",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cap-Forward",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2408,7 +2408,7 @@
     {
       "tokenId": 196,
       "name": "Cowboy-Hat-Black",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cowboy-Hat-Black",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2421,7 +2421,7 @@
     {
       "tokenId": 197,
       "name": "Cowboy-Hat",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cowboy-Hat",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2434,7 +2434,7 @@
     {
       "tokenId": 198,
       "name": "Crips-Bandana",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Crips-Bandana",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2447,7 +2447,7 @@
     {
       "tokenId": 199,
       "name": "Crown",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Crown",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -2460,7 +2460,7 @@
     {
       "tokenId": 200,
       "name": "Cyan-Cap",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Cyan-Cap",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2473,7 +2473,7 @@
     {
       "tokenId": 201,
       "name": "Dad-Cap-Beige",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Dad-Cap-Beige",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2486,7 +2486,7 @@
     {
       "tokenId": 202,
       "name": "Dad-Cap-Black",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Dad-Cap-Black",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2499,7 +2499,7 @@
     {
       "tokenId": 203,
       "name": "Do-rag",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Do-rag",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2512,7 +2512,7 @@
     {
       "tokenId": 204,
       "name": "Dojo-Headband",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Dojo-Headband",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2525,7 +2525,7 @@
     {
       "tokenId": 205,
       "name": "Drill-Sergeant",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Drill-Sergeant",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2538,7 +2538,7 @@
     {
       "tokenId": 206,
       "name": "Fedora-Brown",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Fedora-Brown",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2551,7 +2551,7 @@
     {
       "tokenId": 207,
       "name": "Fes",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Fes",
       "maxSupply": 7,
       "floppy": "STARTER",
@@ -2564,7 +2564,7 @@
     {
       "tokenId": 208,
       "name": "Football-Helmet-Blue",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Football-Helmet-Blue",
       "maxSupply": 8,
       "floppy": "STARTER",
@@ -2577,7 +2577,7 @@
     {
       "tokenId": 209,
       "name": "Football-Helmet-Green",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Football-Helmet-Green",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2590,7 +2590,7 @@
     {
       "tokenId": 210,
       "name": "Football-Helmet-Red",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Football-Helmet-Red",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2603,7 +2603,7 @@
     {
       "tokenId": 211,
       "name": "French-Barett",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "French-Barett",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2616,7 +2616,7 @@
     {
       "tokenId": 212,
       "name": "G.I.-Helmet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "G.I.-Helmet",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2629,7 +2629,7 @@
     {
       "tokenId": 213,
       "name": "Gimp-Mask",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Gimp-Mask",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2642,7 +2642,7 @@
     {
       "tokenId": 214,
       "name": "Gray-Hoodie-Up",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Gray-Hoodie-Up",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2655,7 +2655,7 @@
     {
       "tokenId": 215,
       "name": "Green-Barett",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Green-Barett",
       "maxSupply": 15,
       "floppy": "STARTER",
@@ -2668,7 +2668,7 @@
     {
       "tokenId": 216,
       "name": "Hard-Head",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Hard-Head",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2681,7 +2681,7 @@
     {
       "tokenId": 217,
       "name": "Hazmat-Helmet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Hazmat-Helmet",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2694,7 +2694,7 @@
     {
       "tokenId": 218,
       "name": "Head-Band",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Head-Band",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2707,7 +2707,7 @@
     {
       "tokenId": 219,
       "name": "Headphones",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Headphones",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2720,7 +2720,7 @@
     {
       "tokenId": 220,
       "name": "Lumberjack-Hat-Blue",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Lumberjack-Hat-Blue",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2733,7 +2733,7 @@
     {
       "tokenId": 221,
       "name": "Lumberjack-Hat-Red",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Lumberjack-Hat-Red",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2746,7 +2746,7 @@
     {
       "tokenId": 222,
       "name": "Mash-Cap-Black",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mash-Cap-Black",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -2759,7 +2759,7 @@
     {
       "tokenId": 223,
       "name": "Mash-Cap-HT",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Mash-Cap-HT",
       "maxSupply": 16,
       "floppy": "STARTER",
@@ -2772,7 +2772,7 @@
     {
       "tokenId": 224,
       "name": "Matador-Hat",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Matador-Hat",
       "maxSupply": 10,
       "floppy": "STARTER",
@@ -2785,7 +2785,7 @@
     {
       "tokenId": 225,
       "name": "MM-Club",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "MM-Club",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2798,7 +2798,7 @@
     {
       "tokenId": 226,
       "name": "Ninja-Headband",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Ninja-Headband",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2811,7 +2811,7 @@
     {
       "tokenId": 227,
       "name": "Pilot-Helmet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Pilot-Helmet",
       "maxSupply": 18,
       "floppy": "STARTER",
@@ -2824,7 +2824,7 @@
     {
       "tokenId": 228,
       "name": "Playboy-Bunny-Ears",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Playboy-Bunny-Ears",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2837,7 +2837,7 @@
     {
       "tokenId": 229,
       "name": "Police-Cap",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Police-Cap",
       "maxSupply": 20,
       "floppy": "STARTER",
@@ -2850,7 +2850,7 @@
     {
       "tokenId": 230,
       "name": "Purple-Cap",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Purple-Cap",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2863,7 +2863,7 @@
     {
       "tokenId": 231,
       "name": "Purple-Hoodie-Up",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Purple-Hoodie-Up",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -2876,7 +2876,7 @@
     {
       "tokenId": 232,
       "name": "Red-Barett",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Red-Barett",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -2889,7 +2889,7 @@
     {
       "tokenId": 233,
       "name": "S.W.A.T-Helmet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "S.W.A.T-Helmet",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -2902,7 +2902,7 @@
     {
       "tokenId": 234,
       "name": "Space-Helmet",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Space-Helmet",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2915,7 +2915,7 @@
     {
       "tokenId": 235,
       "name": "Tassle-Hat",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tassle-Hat",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -2928,7 +2928,7 @@
     {
       "tokenId": 236,
       "name": "Tiara",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tiara",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -2941,7 +2941,7 @@
     {
       "tokenId": 237,
       "name": "Tiger-Hat",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Tiger-Hat",
       "maxSupply": 5,
       "floppy": "STARTER",
@@ -2954,7 +2954,7 @@
     {
       "tokenId": 238,
       "name": "Top-Hat",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Top-Hat",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2967,7 +2967,7 @@
     {
       "tokenId": 239,
       "name": "Yellow-Cap",
-      "category": "Head",
+      "category": "HEAD",
       "fileName": "Yellow-Cap",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2980,7 +2980,7 @@
     {
       "tokenId": 240,
       "name": "Adrian-Tattoo",
-      "category": "Randomshit",
+      "category": "RANDOMSHIT",
       "fileName": "Adrian-Tattoo",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -2993,7 +2993,7 @@
     {
       "tokenId": 241,
       "name": "Hoop-Earring",
-      "category": "Randomshit",
+      "category": "RANDOMSHIT",
       "fileName": "Hoop-Earring",
       "maxSupply": 17,
       "floppy": "STARTER",
@@ -3006,7 +3006,7 @@
     {
       "tokenId": 242,
       "name": "Silver-Cross",
-      "category": "Randomshit",
+      "category": "RANDOMSHIT",
       "fileName": "Silver-Cross",
       "maxSupply": 14,
       "floppy": "STARTER",
@@ -3019,7 +3019,7 @@
     {
       "tokenId": 243,
       "name": "Bane-Mask",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Bane-Mask",
       "maxSupply": 13,
       "floppy": "STARTER",
@@ -3032,7 +3032,7 @@
     {
       "tokenId": 244,
       "name": "Blunt",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Blunt",
       "maxSupply": 12,
       "floppy": "STARTER",
@@ -3045,7 +3045,7 @@
     {
       "tokenId": 245,
       "name": "Gas-Mask",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Gas-Mask",
       "maxSupply": 9,
       "floppy": "STARTER",
@@ -3058,7 +3058,7 @@
     {
       "tokenId": 246,
       "name": "Red-Lip-Cigarett",
-      "category": "Mouth",
+      "category": "MOUTH",
       "fileName": "Red-Lip-Cigarett",
       "maxSupply": 11,
       "floppy": "STARTER",
@@ -3150,7 +3150,7 @@
     {
       "tokenId": 10000,
       "name": "OG Floppy",
-      "category": "Floppy discs",
+      "category": "FLOPPY DISCS",
       "fileName": "OG-Floppy",
       "maxSupply": 100,
       "floppy": "OG",
@@ -3164,7 +3164,7 @@
     {
       "tokenId": 10001,
       "name": "STARTER Floppy",
-      "category": "Floppy discs",
+      "category": "FLOPPY DISCS",
       "fileName": "STARTER-Floppy",
       "maxSupply": 1000,
       "floppy": "STARTER",
@@ -3178,7 +3178,7 @@
     {
       "tokenId": 10002,
       "name": "STARTER Floppy",
-      "category": "Floppy discs",
+      "category": "FLOPPY DISCS",
       "fileName": "STARTER-Floppy",
       "maxSupply": 1000,
       "floppy": "STARTER",
@@ -3192,7 +3192,7 @@
     {
       "tokenId": 15000,
       "name": "Professor_X",
-      "category": "Pagers",
+      "category": "PAGERS",
       "fileName": "Professor_X",
       "maxSupply": 1,
       "traitsInside": "IDK",
@@ -3205,7 +3205,7 @@
     {
       "tokenId": 15001,
       "name": "Gooost",
-      "category": "Pagers",
+      "category": "PAGERS",
       "fileName": "Gooost",
       "maxSupply": 1,
       "traitsInside": "IDK",
@@ -3218,7 +3218,7 @@
     {
       "tokenId": 15002,
       "name": "Cor727",
-      "category": "Pagers",
+      "category": "PAGERS",
       "fileName": "Cor727",
       "maxSupply": 1,
       "traitsInside": "IDK",
@@ -3231,7 +3231,7 @@
     {
       "tokenId": 15003,
       "name": "Filthy",
-      "category": "Pagers",
+      "category": "PAGERS",
       "fileName": "Filthy",
       "maxSupply": 1,
       "traitsInside": "IDK",
@@ -3244,7 +3244,7 @@
     {
       "tokenId": 15004,
       "name": "WasSa",
-      "category": "Pagers",
+      "category": "PAGERS",
       "fileName": "WasSa",
       "maxSupply": 1,
       "traitsInside": "IDK",
@@ -3257,7 +3257,7 @@
     {
       "tokenId": 15005,
       "name": "ActionPACK",
-      "category": "Action Packs",
+      "category": "ACTION PACKS",
       "fileName": "ActionPACK",
       "maxSupply": 1,
       "traitsInside": "IDK",

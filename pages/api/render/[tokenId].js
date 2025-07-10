@@ -87,23 +87,13 @@ const generateAnimatedGif = async (equippedTraits, baseImagePath, skinTraitPath)
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
+  // Todas las categorías ya están en mayúsculas en traits.json
+  // Solo mantener el mapeo PACKS->SWAG para compatibilidad con el contrato
   const categoryMap = {
-    'Head': 'HEAD',
-    'Swag': 'SWAG',
-    'PACKS': 'SWAG',  // Mapear PACKS a SWAG
-    'Background': 'BACKGROUND',
-    'Ear': 'EAR',
-    'Eyes': 'EYES',
-    'Mouth': 'MOUTH',
-    'Neck': 'NECK',
-    'Nose': 'NOSE',
-    'Skin': 'SKIN',
-    'Gear': 'GEAR',
-    'Beard': 'BEARD',
-    'Randomshit': 'RANDOMSHIT'
+    'PACKS': 'SWAG'  // Mapear PACKS a SWAG (discrepancia del contrato)
   };
   
-  return categoryMap[category] || category.toUpperCase();
+  return categoryMap[category] || category;
 };
 
 // =============================================
