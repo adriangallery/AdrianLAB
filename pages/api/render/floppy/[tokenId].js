@@ -109,10 +109,11 @@ async function handleRenderToken(req, res, tokenId) {
 
   // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
-    if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };    // Dorado
-    if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };        // Púrpura
-    if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };    // Azul
-    return { tag: 'COMMON', bg: '#a9a9a9' };                           // Gris
+    if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
+    if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
+    if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
+    if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
+    return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
   }
 
   const rarity = getRarityTagAndColor(tokenData.maxSupply);
