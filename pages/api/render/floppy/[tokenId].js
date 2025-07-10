@@ -84,6 +84,26 @@ const generateAnimatedGif = async (tokenData, traitSvgContent) => {
   return canvas.toBuffer('image/png');
 };
 
+// Función para normalizar categorías a mayúsculas
+const normalizeCategory = (category) => {
+  const categoryMap = {
+    'Head': 'HEAD',
+    'Swag': 'SWAG',
+    'Background': 'BACKGROUND',
+    'Ear': 'EAR',
+    'Eyes': 'EYES',
+    'Mouth': 'MOUTH',
+    'Neck': 'NECK',
+    'Nose': 'NOSE',
+    'Skin': 'SKIN',
+    'Gear': 'GEAR',
+    'Beard': 'BEARD',
+    'Randomshit': 'RANDOMSHIT'
+  };
+  
+  return categoryMap[category] || category.toUpperCase();
+};
+
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
@@ -204,7 +224,10 @@ async function handleRenderToken(req, res, tokenId) {
   console.log('[floppy-render] Iniciando detección de animaciones...');
   
   // Construir path del trait para detección
-  const traitPath = `${tokenData.category}/${tokenData.tokenId}.svg`;
+  const normalizedCategory = normalizeCategory(tokenData.category);
+  const traitPath = `${normalizedCategory}/${tokenData.tokenId}.svg`;
+  console.log(`[floppy-render] Categoría original: ${tokenData.category} -> Normalizada: ${normalizedCategory}`);
+  console.log(`[floppy-render] Path del trait: ${traitPath}`);
   
   // Detectar si el trait es animado
   const isAnimated = await isTraitAnimated(tokenData, traitPath);

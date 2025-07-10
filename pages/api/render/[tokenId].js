@@ -85,6 +85,26 @@ const generateAnimatedGif = async (equippedTraits, baseImagePath, skinTraitPath)
   return canvas.toBuffer('image/png');
 };
 
+// Función para normalizar categorías a mayúsculas
+const normalizeCategory = (category) => {
+  const categoryMap = {
+    'Head': 'HEAD',
+    'Swag': 'SWAG',
+    'Background': 'BACKGROUND',
+    'Ear': 'EAR',
+    'Eyes': 'EYES',
+    'Mouth': 'MOUTH',
+    'Neck': 'NECK',
+    'Nose': 'NOSE',
+    'Skin': 'SKIN',
+    'Gear': 'GEAR',
+    'Beard': 'BEARD',
+    'Randomshit': 'RANDOMSHIT'
+  };
+  
+  return categoryMap[category] || category.toUpperCase();
+};
+
 // =============================================
 // SECCIÓN DE EXCEPCIONES ESPECIALES
 // =============================================
@@ -280,7 +300,7 @@ export default async function handler(req, res) {
     // Crear mapa de traits equipados
     const equippedTraits = {};
     categories.forEach((category, index) => {
-      equippedTraits[category] = traitIds[index].toString();
+      equippedTraits[normalizeCategory(category)] = traitIds[index].toString();
     });
 
     // Verificar si hay un trait de skin excepcional
@@ -309,7 +329,7 @@ export default async function handler(req, res) {
     // Detectar si hay traits animados
     const hasAnyAnimation = await Promise.all(
       Object.entries(equippedTraits).map(async ([category, traitId]) => {
-        const traitPath = `${category}/${traitId}.svg`;
+        const traitPath = `${category}/${traitId}.svg`; // category ya está normalizada
         const traitData = labmetadata.traits.find(t => t.tokenId === parseInt(traitId));
         const isAnimated = await isTraitAnimated(traitData, traitPath);
         

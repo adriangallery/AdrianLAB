@@ -85,6 +85,26 @@ const generateAnimatedGif = async (finalTraits, baseImagePath, skinTraitPath) =>
   return canvas.toBuffer('image/png');
 };
 
+// Función para normalizar categorías a mayúsculas
+const normalizeCategory = (category) => {
+  const categoryMap = {
+    'Head': 'HEAD',
+    'Swag': 'SWAG',
+    'Background': 'BACKGROUND',
+    'Ear': 'EAR',
+    'Eyes': 'EYES',
+    'Mouth': 'MOUTH',
+    'Neck': 'NECK',
+    'Nose': 'NOSE',
+    'Skin': 'SKIN',
+    'Gear': 'GEAR',
+    'Beard': 'BEARD',
+    'Randomshit': 'RANDOMSHIT'
+  };
+  
+  return categoryMap[category] || category.toUpperCase();
+};
+
 // =============================================
 // SECCIÓN DE MAPEO DE TRAITS
 // =============================================
@@ -301,13 +321,19 @@ export default async function handler(req, res) {
     // Crear mapa de traits actuales
     const currentTraits = {};
     categories.forEach((category, index) => {
-      currentTraits[category] = traitIds[index].toString();
+      currentTraits[normalizeCategory(category)] = traitIds[index].toString();
     });
 
     console.log('[custom-render] Traits actuales:', currentTraits);
 
     // Aplicar traits personalizados (sustituir los especificados)
-    const finalTraits = { ...currentTraits, ...customTraits };
+    // Normalizar categorías en traits personalizados
+    const normalizedCustomTraits = {};
+    Object.entries(customTraits).forEach(([category, traitId]) => {
+      normalizedCustomTraits[normalizeCategory(category)] = traitId;
+    });
+    
+    const finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
 
     // DETECCIÓN DE ANIMACIONES
