@@ -3273,6 +3273,7 @@
       "category": "PAGERS",
       "fileName": "LaserMerl",
       "maxSupply": 1,
+      "animated": true,
       "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
