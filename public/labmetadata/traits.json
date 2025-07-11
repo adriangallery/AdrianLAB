@@ -3266,26 +3266,39 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 15006,
+      "name": "LaserMerl",
+      "category": "PAGERS",
+      "fileName": "LaserMerl",
+      "maxSupply": 1,
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 251,
+    "totalTraits": 252,
     "categories": [
-      "Background",
-      "Ear",
-      "Eyes",
-      "Head",
-      "Mouth",
-      "Neck",
-      "Nose",
-      "Skin",
-      "Swag",
+      "BACKGROUND",
+      "EAR",
+      "EYES",
+      "HEAD",
+      "MOUTH",
+      "NECK",
+      "NOSE",
+      "SKIN",
+      "SWAG",
       "GEAR",
       "BEARD",
-      "Randomshit",
-      "Floppy discs",
-      "Pagers",
-      "Action Packs"
+      "RANDOMSHIT",
+      "FLOPPY DISCS",
+      "PAGERS",
+      "ACTION PACKS"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
