@@ -3358,10 +3358,62 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 268,
+      "name": "Background-Lab",
+      "category": "BACKGROUND",
+      "fileName": "268",
+      "maxSupply": 1,
+      "floppy": "ActionPACK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 269,
+      "name": "Background-Toxic",
+      "category": "BACKGROUND",
+      "fileName": "269",
+      "maxSupply": 1,
+      "floppy": "ActionPACK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 270,
+      "name": "GOO",
+      "category": "TOP",
+      "fileName": "270",
+      "maxSupply": 1,
+      "floppy": "ActionPACK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 271,
+      "name": "Pink-GOO",
+      "category": "TOP",
+      "fileName": "271",
+      "maxSupply": 1,
+      "floppy": "ActionPACK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 255,
+    "totalTraits": 259,
     "categories": [
       "BACKGROUND",
       "EAR",
@@ -3375,6 +3427,7 @@
       "GEAR",
       "BEARD",
       "RANDOMSHIT",
+      "TOP",
       "FLOPPY DISCS",
       "PAGERS",
       "ACTION PACKS"

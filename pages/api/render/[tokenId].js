@@ -416,6 +416,23 @@ export default async function handler(req, res) {
       }
     }
 
+    // 4. CUARTO: Renderizar TOP layers (van encima de todas las demás)
+    console.log('[render] PASO 4 - Iniciando renderizado de TOP layers');
+    const topOrder = ['TOP'];
+
+    for (const category of topOrder) {
+      if (equippedTraits[category]) {
+        const traitPath = `${category}/${equippedTraits[category]}.svg`;
+        console.log(`[render] PASO 4 - Cargando TOP trait: ${traitPath}`);
+
+        const traitImage = await loadAndRenderSvg(traitPath);
+        if (traitImage) {
+          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+          console.log(`[render] PASO 4 - TOP trait ${category} renderizado correctamente`);
+        }
+      }
+    }
+
     // Configurar headers para evitar cache
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
