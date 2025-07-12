@@ -577,7 +577,7 @@
       "name": "Pink",
       "category": "BACKGROUND",
       "fileName": "Pink",
-      "maxSupply": 11,
+      "maxSupply": 55,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -3314,6 +3314,45 @@
       "maxSupply": 1,
       "animated": true,
       "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 255,
+      "name": "Devil-Mask",
+      "category": "HEAD",
+      "fileName": "Devil-Mask",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 256,
+      "name": "Fishtailparker-OG107",
+      "category": "SWAG",
+      "fileName": "Fishtailparker-OG107",
+      "maxSupply": 1,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 257,
+      "name": "Toothpick",
+      "category": "MOUTH",
+      "fileName": "Toothpick",
+      "maxSupply": 15,
+      "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
