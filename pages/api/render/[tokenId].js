@@ -400,8 +400,8 @@ export default async function handler(req, res) {
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
-    // Nuevo orden de renderizado con EYES después de HEAD y RANDOMSHIT después de SKIN
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'SWAG', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
+    // Nuevo orden de renderizado: SWAG antes que EYES, EYES va en capa superior
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'SWAG', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
@@ -412,6 +412,12 @@ export default async function handler(req, res) {
         if (category === 'GEAR' && equippedTraits[category] === '48') {
           console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 48 detectado, se renderizará en TOP`);
           continue; // Saltar este trait aquí, se renderizará en TOP
+        }
+
+        // LÓGICA ESPECIAL: Token 84 (Bunny-Suit) - no renderizar HEAD cuando está presente
+        if (category === 'HEAD' && equippedTraits['SWAG'] === '84') {
+          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 84 detectado, omitiendo HEAD`);
+          continue; // Saltar HEAD cuando token 84 está presente
         }
 
         const traitImage = await loadAndRenderSvg(traitPath);
