@@ -3148,6 +3148,45 @@
       "external_url": "https://adrianpunks.com/"
     },
     {
+      "tokenId": 255,
+      "name": "Trait 255",
+      "category": "HEAD",
+      "fileName": "255",
+      "maxSupply": 50,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 256,
+      "name": "Trait 256",
+      "category": "SWAG",
+      "fileName": "256",
+      "maxSupply": 50,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 257,
+      "name": "Trait 257",
+      "category": "MOUTH",
+      "fileName": "257",
+      "maxSupply": 50,
+      "floppy": "STARTER",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
       "tokenId": 10000,
       "name": "OG Floppy",
       "category": "FLOPPY DISCS",
@@ -3283,7 +3322,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 252,
+    "totalTraits": 255,
     "categories": [
       "BACKGROUND",
       "EAR",
