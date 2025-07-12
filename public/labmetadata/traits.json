@@ -577,7 +577,7 @@
       "name": "Pink",
       "category": "BACKGROUND",
       "fileName": "Pink",
-      "maxSupply": 55,
+      "maxSupply": 11,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -3149,11 +3149,11 @@
     },
     {
       "tokenId": 255,
-      "name": "Trait 255",
+      "name": "Devil-Mask",
       "category": "HEAD",
       "fileName": "255",
-      "maxSupply": 50,
-      "floppy": "STARTER",
+      "maxSupply": 1,
+      "floppy": "PAGER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -3165,8 +3165,8 @@
       "name": "Trait 256",
       "category": "SWAG",
       "fileName": "256",
-      "maxSupply": 50,
-      "floppy": "STARTER",
+      "maxSupply": 1,
+      "floppy": "PAGER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -3178,8 +3178,8 @@
       "name": "Trait 257",
       "category": "MOUTH",
       "fileName": "257",
-      "maxSupply": 50,
-      "floppy": "STARTER",
+      "maxSupply": 15,
+      "floppy": "PAGER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
