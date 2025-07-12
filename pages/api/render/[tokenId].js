@@ -408,6 +408,12 @@ export default async function handler(req, res) {
         const traitPath = `${category}/${equippedTraits[category]}.svg`;
         console.log(`[render] PASO 3 - Cargando trait: ${traitPath}`);
 
+        // LÓGICA ESPECIAL: Token 48 (S.W.A.T-Shild) se renderiza en TOP
+        if (category === 'GEAR' && equippedTraits[category] === '48') {
+          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 48 detectado, se renderizará en TOP`);
+          continue; // Saltar este trait aquí, se renderizará en TOP
+        }
+
         const traitImage = await loadAndRenderSvg(traitPath);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
@@ -430,6 +436,18 @@ export default async function handler(req, res) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
           console.log(`[render] PASO 4 - TOP trait ${category} renderizado correctamente`);
         }
+      }
+    }
+
+    // LÓGICA ESPECIAL: Renderizar token 48 (S.W.A.T-Shild) en TOP
+    if (equippedTraits['GEAR'] === '48') {
+      const specialTraitPath = `GEAR/48.svg`;
+      console.log(`[render] PASO 4 - 🎯 LÓGICA ESPECIAL: Renderizando token 48 en TOP: ${specialTraitPath}`);
+
+      const specialTraitImage = await loadAndRenderSvg(specialTraitPath);
+      if (specialTraitImage) {
+        ctx.drawImage(specialTraitImage, 0, 0, 1000, 1000);
+        console.log(`[render] PASO 4 - 🎯 Token 48 renderizado correctamente en TOP`);
       }
     }
 
