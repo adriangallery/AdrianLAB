@@ -34,56 +34,49 @@
     "name": "profiles",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "profileName",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "traitIds",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint256",
-            "name": "reward",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "active",
-            "type": "bool"
-          },
-          {
-            "internalType": "uint256",
-            "name": "recovered",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "checkGeneration",
-            "type": "bool"
-          },
-          {
-            "internalType": "uint256",
-            "name": "requiredGeneration",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "checkSkin",
-            "type": "bool"
-          },
-          {
-            "internalType": "string",
-            "name": "requiredSkin",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct PatientZERO.Profile",
-        "name": "",
-        "type": "tuple"
+        "internalType": "string",
+        "name": "profileName",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "traitIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "recovered",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "checkGeneration",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "requiredGeneration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "checkSkin",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "requiredSkin",
+        "type": "string"
       }
     ],
     "stateMutability": "view",

@@ -102,9 +102,22 @@ export default async function handler(req, res) {
         const status = tokenStatus[0];
         const profileId = tokenStatus[1];
         if (status) baseMetadata.status = status;
-        if (parseInt(profileId) > 0) {
+        if (parseInt(profileId.toString()) > 0) {
           try {
+            console.log('[metadata] Llamando a profiles desde PatientZERO...');
             const profileData = await patientZero.profiles(profileId);
+            console.log('[metadata] Respuesta de profiles:', {
+              profileName: profileData[0],
+              traitIds: profileData[1].map(id => id.toString()),
+              reward: profileData[2].toString(),
+              active: profileData[3],
+              recovered: profileData[4].toString(),
+              checkGeneration: profileData[5],
+              requiredGeneration: profileData[6].toString(),
+              checkSkin: profileData[7],
+              requiredSkin: profileData[8]
+            });
+            
             const profileName = profileData[0];
             if (profileName) baseMetadata.profileName = profileName;
           } catch (error) {
