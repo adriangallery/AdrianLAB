@@ -73,13 +73,15 @@ export default async function handler(req, res) {
       image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       external_url: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
       metadata_version: "2",
+      status: "DEPOSITED", // Campo por defecto
+      profileName: "Zombie Outbreak", // Campo por defecto
       attributes: []
     };
     
     try {
       // Test de conexión a contratos
       console.log('[metadata] Intentando conectar con los contratos...');
-      const { core, traitsExtension } = await getContracts();
+      const { core, traitsExtension, patientZero } = await getContracts();
       console.log('[metadata] Contratos conectados:', {
         core: {
           address: core.address,
@@ -88,6 +90,10 @@ export default async function handler(req, res) {
         traitsExtension: {
           address: traitsExtension.address,
           functions: Object.keys(traitsExtension.functions)
+        },
+        patientZero: {
+          address: patientZero.address,
+          functions: Object.keys(patientZero.functions)
         }
       });
 
@@ -112,6 +118,54 @@ export default async function handler(req, res) {
         categories,
         traitIds: traitIds.map(id => id.toString())
       });
+
+      // NUEVO: Obtener status del token desde PatientZERO
+      try {
+        console.log('[metadata] Llamando a getTokenStatus desde PatientZERO...');
+        const tokenStatus = await patientZero.getTokenStatus(tokenId);
+        console.log('[metadata] Respuesta de getTokenStatus:', {
+          status: tokenStatus[0],
+          profileId: tokenStatus[1].toString()
+        });
+        
+        // tokenStatus[0] = status, tokenStatus[1] = profileId
+        const status = tokenStatus[0];
+        const profileId = tokenStatus[1];
+        
+        // Actualizar status en metadata
+        baseMetadata.status = status;
+        
+        // NUEVO: Obtener profileName si profileId > 0
+        if (parseInt(profileId) > 0) {
+          try {
+            console.log('[metadata] Llamando a profiles desde PatientZERO...');
+            const profileData = await patientZero.profiles(profileId);
+            console.log('[metadata] Respuesta de profiles:', {
+              profileName: profileData[0],
+              traitIds: profileData[1].map(id => id.toString()),
+              reward: profileData[2].toString(),
+              active: profileData[3],
+              recovered: profileData[4].toString(),
+              checkGeneration: profileData[5],
+              requiredGeneration: profileData[6].toString(),
+              checkSkin: profileData[7],
+              requiredSkin: profileData[8]
+            });
+            
+            // profile[0] = profileName
+            const profileName = profileData[0];
+            baseMetadata.profileName = profileName;
+            
+          } catch (error) {
+            console.error('[metadata] Error obteniendo profile:', error);
+            // Mantener valor por defecto
+          }
+        }
+        
+      } catch (error) {
+        console.error('[metadata] Error obteniendo token status:', error);
+        // Mantener valores por defecto
+      }
 
       // Añadir atributos base
       baseMetadata.attributes.push(
@@ -175,6 +229,18 @@ export default async function handler(req, res) {
             result: {
               categories,
               traitIds: traitIds.map(id => id.toString())
+            }
+          },
+          patientZero: {
+            address: patientZero.address,
+            functions: {
+              getTokenStatus: {
+                called: true,
+                result: {
+                  status: baseMetadata.status,
+                  profileName: baseMetadata.profileName
+                }
+              }
             }
           }
         },
