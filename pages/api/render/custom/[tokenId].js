@@ -496,6 +496,20 @@ export default async function handler(req, res) {
       }
     }
 
+    // 2.5. RENDERIZAR SKIN TRAITS ESPECIALES (tokens 37, 38) encima del skin base
+    console.log('[custom-render] PASO 2.5 - Renderizando skin traits especiales');
+    if (finalTraits['SWAG'] === '37' || finalTraits['SWAG'] === '38') {
+      const skinTraitId = finalTraits['SWAG'];
+      const skinTraitPath = `SKIN/${skinTraitId}.svg`;
+      console.log(`[custom-render] PASO 2.5 - Renderizando skin trait especial: ${skinTraitPath}`);
+      
+      const skinTraitImage = await loadAndRenderSvg(skinTraitPath);
+      if (skinTraitImage) {
+        ctx.drawImage(skinTraitImage, 0, 0, 1000, 1000);
+        console.log(`[custom-render] PASO 2.5 - Skin trait especial ${skinTraitId} renderizado correctamente`);
+      }
+    }
+
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
     // Nuevo orden de renderizado: incluyendo SERUMS y SKIN
@@ -518,11 +532,17 @@ export default async function handler(req, res) {
           continue; // Saltar HEAD cuando token 84 está presente
         }
 
-        // LÓGICA ESPECIAL: Traits de SKIN categorizados incorrectamente como SWAG
-        let actualTraitPath = traitPath;
+        // LÓGICA ESPECIAL: Omitir skin traits especiales en SWAG (ya se renderizaron en paso 2.5)
         if (category === 'SWAG' && (finalTraits[category] === '37' || finalTraits[category] === '38')) {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Trait de SKIN detectado en SWAG, corrigiendo path`);
-          actualTraitPath = `SKIN/${finalTraits[category]}.svg`;
+          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Skin trait especial ya renderizado en paso 2.5, omitiendo`);
+          continue;
+        }
+
+        // LÓGICA ESPECIAL: Token 8 (3D Laser Eyes) se comporta como EYES aunque esté en SERUMS
+        let actualTraitPath = traitPath;
+        if (category === 'SERUMS' && finalTraits[category] === '8') {
+          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 8 detectado, se comportará como EYES`);
+          actualTraitPath = `EYES/8.svg`;
         }
 
         const traitImage = await loadAndRenderSvg(actualTraitPath);
