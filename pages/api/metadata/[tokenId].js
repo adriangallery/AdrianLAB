@@ -79,7 +79,7 @@ export default async function handler(req, res) {
     try {
       // Test de conexión a contratos
       console.log('[metadata] Intentando conectar con los contratos...');
-      const { core, traitsExtension, patientZero } = await getContracts();
+      const { core, traitsExtension, patientZero, serumModule } = await getContracts();
       console.log('[metadata] Contratos conectados:', {
         core: {
           address: core.address,
@@ -92,6 +92,10 @@ export default async function handler(req, res) {
         patientZero: {
           address: patientZero.address,
           functions: Object.keys(patientZero.functions)
+        },
+        serumModule: {
+          address: serumModule.address,
+          functions: Object.keys(serumModule.functions)
         }
       });
 
@@ -168,6 +172,42 @@ export default async function handler(req, res) {
         const trait = traitsData.traits.find(t => t.tokenId === parseInt(traitId));
         return trait ? trait.name : `#${traitId}`;
       };
+
+      // Obtener historial de serums desde SerumModule
+      try {
+        console.log('[metadata] Llamando a getTokenSerumHistory desde SerumModule...');
+        const serumHistory = await serumModule.getTokenSerumHistory(tokenId);
+        console.log('[metadata] Respuesta de getTokenSerumHistory:', {
+          history: serumHistory.map(serum => ({
+            serumId: serum[0].toString(),
+            success: serum[1],
+            timestamp: serum[2].toString(),
+            mutation: serum[3]
+          }))
+        });
+        
+        // Si hay serums en el historial, agregar el último como atributo
+        if (serumHistory && serumHistory.length > 0) {
+          const lastSerum = serumHistory[serumHistory.length - 1]; // Último serum aplicado
+          const serumSuccess = lastSerum[1];
+          const serumMutation = lastSerum[3];
+          
+          let usedSerumValue;
+          if (serumSuccess) {
+            usedSerumValue = serumMutation; // "AdrianGF"
+          } else {
+            usedSerumValue = "FAILED";
+          }
+          
+          baseMetadata.attributes.push({
+            trait_type: "UsedSerum",
+            value: usedSerumValue
+          });
+        }
+        
+      } catch (error) {
+        console.log('[metadata] Error obteniendo historial de serums:', error.message);
+      }
 
       // Añadir atributos base
       baseMetadata.attributes.push(
@@ -249,6 +289,16 @@ export default async function handler(req, res) {
                   status: baseMetadata.status,
                   profileName: baseMetadata.profileName
                 }
+              }
+            }
+          },
+          serumModule: {
+            address: serumModule.address,
+            functions: {
+              getTokenSerumHistory: {
+                called: true,
+                result: baseMetadata.attributes.find(attr => attr.trait_type === "UsedSerum") ? 
+                  baseMetadata.attributes.find(attr => attr.trait_type === "UsedSerum").value : "No serums found"
               }
             }
           }
