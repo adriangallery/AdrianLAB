@@ -183,7 +183,7 @@ export default async function handler(req, res) {
 
     // Conectar con los contratos
     console.log('[render] Conectando con los contratos...');
-    const { core, traitsExtension } = await getContracts();
+    const { core, traitsExtension, patientZero, serumModule } = await getContracts();
 
     // Obtener datos del token
     console.log('[render] Obteniendo datos del token...');
@@ -303,6 +303,26 @@ export default async function handler(req, res) {
       }
     }
 
+    // LÓGICA ESPECIAL: Detectar serum aplicado y cambiar skin base
+    let appliedSerum = null;
+    try {
+      console.log('[render] Verificando si hay serum aplicado...');
+      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      
+      if (serumHistory && serumHistory.length > 0) {
+        const lastSerum = serumHistory[serumHistory.length - 1];
+        const serumSuccess = lastSerum[1];
+        const serumMutation = lastSerum[3];
+        
+        if (serumSuccess && serumMutation) {
+          appliedSerum = serumMutation;
+          console.log(`[render] Serum aplicado detectado: ${appliedSerum}`);
+        }
+      }
+    } catch (error) {
+      console.log('[render] Error verificando serum aplicado:', error.message);
+    }
+
     // DETECCIÓN DE ANIMACIONES
     console.log('[render] Iniciando detección de animaciones...');
     
@@ -369,11 +389,28 @@ export default async function handler(req, res) {
       }
     }
 
-    // 2. SEGUNDO: Renderizar el SKIN (Adrian base o excepción)
+    // 2. SEGUNDO: Renderizar el SKIN (Adrian base, excepción o serum)
     console.log('[render] PASO 2 - Iniciando carga del skin');
     
+    // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
+    if (appliedSerum) {
+      const serumSkinPath = `ADRIAN/${appliedSerum}.svg`;
+      console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${serumSkinPath}`);
+      const serumSkinImage = await loadAndRenderSvg(serumSkinPath);
+      if (serumSkinImage) {
+        ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+        console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
+      } else {
+        console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
+      }
+    }
     // Si hay un trait de skin excepcional, usarlo en lugar del skin base
-    if (skinTraitPath) {
+    else if (skinTraitPath) {
       console.log(`[render] PASO 2 - Usando skin excepcional: ${skinTraitPath}`);
       const skinImage = await loadAndRenderSvg(skinTraitPath);
       if (skinImage) {
