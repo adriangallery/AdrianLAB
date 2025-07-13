@@ -400,8 +400,8 @@ export default async function handler(req, res) {
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
-    // Nuevo orden de renderizado: SWAG antes que EYES, EYES va en capa superior
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'SWAG', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
+    // Nuevo orden de renderizado: incluyendo SERUMS y SKIN
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'SWAG', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
@@ -420,7 +420,14 @@ export default async function handler(req, res) {
           continue; // Saltar HEAD cuando token 84 está presente
         }
 
-        const traitImage = await loadAndRenderSvg(traitPath);
+        // LÓGICA ESPECIAL: Traits de SKIN categorizados incorrectamente como SWAG
+        let actualTraitPath = traitPath;
+        if (category === 'SWAG' && (equippedTraits[category] === '37' || equippedTraits[category] === '38')) {
+          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Trait de SKIN detectado en SWAG, corrigiendo path`);
+          actualTraitPath = `SKIN/${equippedTraits[category]}.svg`;
+        }
+
+        const traitImage = await loadAndRenderSvg(actualTraitPath);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
           console.log(`[render] PASO 3 - Trait ${category} renderizado correctamente`);
