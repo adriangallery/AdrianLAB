@@ -150,6 +150,25 @@ export default async function handler(req, res) {
         traitIds: traitIds.map(id => id.toString())
       });
 
+      // Cargar datos de traits.json para mapear IDs a nombres
+      console.log('[metadata] Cargando datos de traits.json...');
+      const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+      let traitsData;
+      try {
+        const traitsBuffer = fs.readFileSync(traitsPath);
+        traitsData = JSON.parse(traitsBuffer.toString());
+        console.log(`[metadata] Traits cargados: ${traitsData.traits.length} traits encontrados`);
+      } catch (error) {
+        console.error('[metadata] Error cargando traits.json:', error);
+        traitsData = { traits: [] };
+      }
+
+      // Función para obtener nombre del trait por ID
+      const getTraitName = (traitId) => {
+        const trait = traitsData.traits.find(t => t.tokenId === parseInt(traitId));
+        return trait ? trait.name : `#${traitId}`;
+      };
+
       // Añadir atributos base
       baseMetadata.attributes.push(
         {
@@ -180,12 +199,14 @@ export default async function handler(req, res) {
         );
       }
 
-      // Añadir traits como atributos
+      // Añadir traits como atributos con nombres
       if (categories && categories.length > 0) {
         categories.forEach((category, index) => {
+          const traitId = traitIds[index].toString();
+          const traitName = getTraitName(traitId);
           baseMetadata.attributes.push({
             trait_type: category,
-            value: `#${traitIds[index].toString()}`
+            value: traitName
           });
         });
       }
@@ -211,7 +232,12 @@ export default async function handler(req, res) {
             functionCalled: 'getAllEquippedTraits',
             result: {
               categories,
-              traitIds: traitIds.map(id => id.toString())
+              traitIds: traitIds.map(id => id.toString()),
+              traitNames: categories.map((category, index) => ({
+                category,
+                traitId: traitIds[index].toString(),
+                traitName: getTraitName(traitIds[index].toString())
+              }))
             }
           },
           patientZero: {
