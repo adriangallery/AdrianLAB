@@ -258,7 +258,9 @@ export default async function handler(req, res) {
     // Función específica para cargar archivos ADRIAN desde sistema de archivos
     const loadAdrianSvg = async (serumName) => {
       try {
-        const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumName}.svg`);
+        // Convertir el nombre del serum a mayúsculas para que coincida con el archivo
+        const serumNameUpper = serumName.toUpperCase();
+        const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumNameUpper}.svg`);
         console.log(`[render] Cargando Adrian desde sistema de archivos: ${adrianPath}`);
         
         const svgContent = fs.readFileSync(adrianPath, 'utf8');
