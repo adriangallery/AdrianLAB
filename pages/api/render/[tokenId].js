@@ -255,6 +255,30 @@ export default async function handler(req, res) {
       }
     };
 
+    // Función específica para cargar archivos ADRIAN desde sistema de archivos
+    const loadAdrianSvg = async (serumName) => {
+      try {
+        const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumName}.svg`);
+        console.log(`[render] Cargando Adrian desde sistema de archivos: ${adrianPath}`);
+        
+        const svgContent = fs.readFileSync(adrianPath, 'utf8');
+        
+        // Renderizar SVG a PNG
+        const resvg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        return loadImage(pngBuffer);
+      } catch (error) {
+        console.error(`[render] Error cargando Adrian SVG ${serumName}:`, error.message);
+        return null;
+      }
+    };
+
     // Determinar la imagen base según generación y skin
     const gen = generation.toString();
     let baseImagePath;
@@ -394,9 +418,8 @@ export default async function handler(req, res) {
     
     // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
     if (appliedSerum) {
-      const serumSkinPath = `ADRIAN/${appliedSerum}.svg`;
-      console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${serumSkinPath}`);
-      const serumSkinImage = await loadAndRenderSvg(serumSkinPath);
+      console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}`);
+      const serumSkinImage = await loadAdrianSvg(appliedSerum);
       if (serumSkinImage) {
         ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
         console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
