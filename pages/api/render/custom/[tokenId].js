@@ -519,21 +519,17 @@ export default async function handler(req, res) {
     // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
     if (appliedSerum) {
       console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}`);
-      
-      // Primero renderizar el skin base normal
-      const baseImage = await loadAndRenderSvg(baseImagePath);
-      if (baseImage) {
-        ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-        console.log('[custom-render] PASO 2 - Skin base renderizado correctamente');
-      }
-      
-      // Luego aplicar el efecto del serum como overlay
       const serumSkinImage = await loadAdrianSvg(appliedSerum);
       if (serumSkinImage) {
         ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-        console.log(`[custom-render] PASO 2 - 🧬 Efecto de serum ${appliedSerum} aplicado correctamente`);
+        console.log(`[custom-render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
       } else {
-        console.error(`[custom-render] PASO 2 - Error al cargar efecto de serum, continuando sin efecto`);
+        console.error(`[custom-render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
       }
     }
     // Si hay un trait de skin excepcional, usarlo en lugar del skin base
@@ -614,8 +610,12 @@ export default async function handler(req, res) {
         const traitImage = await loadAndRenderSvg(actualTraitPath);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[custom-render] PASO 3 - Trait ${category} renderizado correctamente`);
+          console.log(`[custom-render] PASO 3 - Trait ${category} (${finalTraits[category]}) renderizado correctamente`);
+        } else {
+          console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${finalTraits[category]}) desde ${actualTraitPath}`);
         }
+      } else {
+        console.log(`[custom-render] PASO 3 - No hay trait para categoría ${category}`);
       }
     }
 
