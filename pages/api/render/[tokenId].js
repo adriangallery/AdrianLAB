@@ -421,21 +421,17 @@ export default async function handler(req, res) {
     // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
     if (appliedSerum) {
       console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}`);
-      
-      // Primero renderizar el skin base normal
-      const baseImage = await loadAndRenderSvg(baseImagePath);
-      if (baseImage) {
-        ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-        console.log('[render] PASO 2 - Skin base renderizado correctamente');
-      }
-      
-      // Luego aplicar el efecto del serum como overlay
       const serumSkinImage = await loadAdrianSvg(appliedSerum);
       if (serumSkinImage) {
         ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-        console.log(`[render] PASO 2 - 🧬 Efecto de serum ${appliedSerum} aplicado correctamente`);
+        console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
       } else {
-        console.error(`[render] PASO 2 - Error al cargar efecto de serum, continuando sin efecto`);
+        console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
       }
     }
     // Si hay un trait de skin excepcional, usarlo en lugar del skin base
@@ -507,10 +503,14 @@ export default async function handler(req, res) {
         }
 
         // LÓGICA ESPECIAL: Token 8 (3D Laser Eyes) se comporta como EYES aunque esté en SERUMS
+        // LÓGICA ESPECIAL: Token 7 (3D Glasses) se comporta como EYES aunque esté en SERUMS
         let actualTraitPath = traitPath;
         if (category === 'SERUMS' && equippedTraits[category] === '8') {
           console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 8 detectado, se comportará como EYES`);
           actualTraitPath = `EYES/8.svg`;
+        } else if (category === 'SERUMS' && equippedTraits[category] === '7') {
+          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 7 detectado, se comportará como EYES`);
+          actualTraitPath = `EYES/7.svg`;
         }
 
         const traitImage = await loadAndRenderSvg(actualTraitPath);

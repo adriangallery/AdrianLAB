@@ -601,10 +601,14 @@ export default async function handler(req, res) {
         }
 
         // LÓGICA ESPECIAL: Token 8 (3D Laser Eyes) se comporta como EYES aunque esté en SERUMS
+        // LÓGICA ESPECIAL: Token 7 (3D Glasses) se comporta como EYES aunque esté en SERUMS
         let actualTraitPath = traitPath;
         if (category === 'SERUMS' && finalTraits[category] === '8') {
           console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 8 detectado, se comportará como EYES`);
           actualTraitPath = `EYES/8.svg`;
+        } else if (category === 'SERUMS' && finalTraits[category] === '7') {
+          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 7 detectado, se comportará como EYES`);
+          actualTraitPath = `EYES/7.svg`;
         }
 
         const traitImage = await loadAndRenderSvg(actualTraitPath);
