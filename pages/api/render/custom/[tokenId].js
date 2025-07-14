@@ -340,9 +340,34 @@ export default async function handler(req, res) {
       hasBeenModified
     });
 
-    // Obtener skin del token
-    console.log('[custom-render] Obteniendo skin del token...');
-    const tokenSkinData = await core.getTokenSkin(cleanTokenId);
+    // LÓGICA ESPECIAL PARA TRAITLAB: Detectar serum ADRIANGF y cambiar token base
+    let baseTokenId = cleanTokenId;
+    let appliedSerumForBase = null;
+    
+    try {
+      console.log('[custom-render] Verificando si hay serum aplicado para determinar token base...');
+      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      
+      if (serumHistory && serumHistory.length > 0) {
+        const lastSerum = serumHistory[serumHistory.length - 1];
+        const serumSuccess = lastSerum[1];
+        const serumMutation = lastSerum[3];
+        
+        if (serumSuccess && serumMutation === "AdrianGF") {
+          appliedSerumForBase = serumMutation;
+          baseTokenId = "118"; // Usar token 118 como base para ADRIANGF
+          console.log(`[custom-render] 🧬 LÓGICA TRAITLAB: Serum ADRIANGF detectado, cambiando token base de ${cleanTokenId} a ${baseTokenId}`);
+        }
+      }
+    } catch (error) {
+      console.log('[custom-render] Error verificando serum para token base:', error.message);
+    }
+    
+    console.log(`[custom-render] Token base final: ${baseTokenId} (original: ${cleanTokenId})`);
+
+    // Obtener skin del token base
+    console.log('[custom-render] Obteniendo skin del token base...');
+    const tokenSkinData = await core.getTokenSkin(baseTokenId);
     const skinId = tokenSkinData[0].toString();
     const skinName = tokenSkinData[1];
     
@@ -351,9 +376,9 @@ export default async function handler(req, res) {
       skinName
     });
 
-    // Obtener traits equipados actuales
-    console.log('[custom-render] Obteniendo traits equipados actuales...');
-    const nested = await traitsExtension.getAllEquippedTraits(cleanTokenId);
+    // Obtener traits equipados actuales del token base
+    console.log('[custom-render] Obteniendo traits equipados actuales del token base...');
+    const nested = await traitsExtension.getAllEquippedTraits(baseTokenId);
     const categories = nested[0];
     const traitIds = nested[1];
     
