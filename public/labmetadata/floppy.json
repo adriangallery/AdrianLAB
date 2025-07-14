@@ -1,0 +1,44 @@
+{
+  "floppys": [
+    {
+      "tokenId": 10000,
+      "name": "STARTER Floppy",
+      "category": "Floppy discs",
+      "fileName": "STARTER-Floppy",
+      "maxSupply": 1000,
+      "floppy": "STARTER",
+      "traitsInside": 1,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10001,
+      "name": "STARTER Floppy",
+      "category": "Floppy discs",
+      "fileName": "STARTER-Floppy",
+      "maxSupply": 1000,
+      "floppy": "STARTER",
+      "traitsInside": 2,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10002,
+      "name": "STARTER Floppy",
+      "category": "Floppy discs",
+      "fileName": "STARTER-Floppy",
+      "maxSupply": 1000,
+      "floppy": "STARTER",
+      "traitsInside": 4,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
+    }
+  ],
+  "metadata": {
+    "totalFloppys": 3,
+    "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
+  }
+}
