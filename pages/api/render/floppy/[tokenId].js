@@ -163,12 +163,12 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
-    // Solo procesar tokens 1-9999 (traits)
-    if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
+    // Procesar tokens 1-9999 (traits) y 262144 (serum ADRIANGF)
+    if (tokenIdNum >= 1 && tokenIdNum <= 9999 || tokenIdNum === 262144) {
       console.log(`[floppy-render] Procesando trait ${tokenId} (renderizado PNG)`);
       await handleRenderToken(req, res, tokenId);
     } else {
-      res.status(400).json({ error: 'Este endpoint solo maneja tokens 1-9999 (traits). Para tokens 10000+ usa /api/metadata/floppy/[tokenId]' });
+      res.status(400).json({ error: 'Este endpoint solo maneja tokens 1-9999 (traits) y 262144 (serums). Para tokens 10000+ usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
     console.error('[floppy-render] Error:', error);
@@ -176,23 +176,45 @@ export default async function handler(req, res) {
   }
 }
 
-// FUNCIÓN PARA TOKENS 1-9999 (SVG COMPLETO CON TEXTO CONVERTIDO A PATHS)
+// FUNCIÓN PARA TOKENS 1-9999 Y 262144 (SVG COMPLETO CON TEXTO CONVERTIDO A PATHS)
 async function handleRenderToken(req, res, tokenId) {
-  // Cargar datos de labmetadata
-  const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-  let labmetadata;
+  const tokenIdNum = parseInt(tokenId);
+  let traitData;
   
-  try {
-    const labmetadataBuffer = fs.readFileSync(labmetadataPath);
-    labmetadata = JSON.parse(labmetadataBuffer.toString());
-    console.log(`[floppy-render] Labmetadata cargado, ${labmetadata.traits.length} traits encontrados`);
-  } catch (error) {
-    console.error('[floppy-render] Error cargando labmetadata:', error);
-    return res.status(500).json({ error: 'Error cargando datos de traits' });
-  }
+  // Determinar qué archivo cargar según el token ID
+  if (tokenIdNum === 262144) {
+    // Cargar datos de serums.json para token 262144
+    const serumsPath = path.join(process.cwd(), 'public', 'labmetadata', 'serums.json');
+    let serumsData;
+    
+    try {
+      const serumsBuffer = fs.readFileSync(serumsPath);
+      serumsData = JSON.parse(serumsBuffer.toString());
+      console.log(`[floppy-render] Serums data cargado, ${serumsData.serums.length} serums encontrados`);
+    } catch (error) {
+      console.error('[floppy-render] Error cargando serums data:', error);
+      return res.status(500).json({ error: 'Error cargando datos de serums' });
+    }
 
-  // Buscar el trait correspondiente al tokenId
-  const traitData = labmetadata.traits.find(trait => trait.tokenId === parseInt(tokenId));
+    // Buscar el serum correspondiente al tokenId
+    traitData = serumsData.serums.find(serum => serum.tokenId === tokenIdNum);
+  } else {
+    // Cargar datos de labmetadata para tokens 1-9999
+    const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+    let labmetadata;
+    
+    try {
+      const labmetadataBuffer = fs.readFileSync(labmetadataPath);
+      labmetadata = JSON.parse(labmetadataBuffer.toString());
+      console.log(`[floppy-render] Labmetadata cargado, ${labmetadata.traits.length} traits encontrados`);
+    } catch (error) {
+      console.error('[floppy-render] Error cargando labmetadata:', error);
+      return res.status(500).json({ error: 'Error cargando datos de traits' });
+    }
+
+    // Buscar el trait correspondiente al tokenId
+    traitData = labmetadata.traits.find(trait => trait.tokenId === tokenIdNum);
+  }
   
   if (!traitData) {
     console.log(`[floppy-render] Trait no encontrado para tokenId ${tokenId}, usando datos genéricos`);
