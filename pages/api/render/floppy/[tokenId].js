@@ -287,6 +287,33 @@ async function handleRenderToken(req, res, tokenId) {
     return;
   }
 
+  // LÓGICA ESPECIAL PARA TOKEN 262144 (SERUM ADRIANGF) - SERVIR GIF DIRECTAMENTE
+  if (tokenIdNum === 262144) {
+    console.log('[floppy-render] 🧬 LÓGICA ESPECIAL: Token 262144 detectado, sirviendo GIF directamente');
+    
+    const gifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.gif`);
+    console.log(`[floppy-render] Ruta GIF: ${gifPath}`);
+    console.log(`[floppy-render] Existe GIF: ${fs.existsSync(gifPath)}`);
+    
+    if (fs.existsSync(gifPath)) {
+      const gifBuffer = fs.readFileSync(gifPath);
+      console.log(`[floppy-render] GIF leído, tamaño: ${gifBuffer.length} bytes`);
+      
+      // Configurar headers para GIF
+      res.setHeader('Content-Type', 'image/gif');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      
+      // Devolver GIF directamente
+      console.log(`[floppy-render] ===== GIF SERVIDO DIRECTAMENTE =====`);
+      res.status(200).send(gifBuffer);
+      return;
+    } else {
+      console.error(`[floppy-render] GIF no encontrado para token 262144`);
+      res.status(404).json({ error: 'GIF no encontrado para serum ADRIANGF' });
+      return;
+    }
+  }
+
   // Si no hay animaciones, continuar con renderizado SVG normal
   console.log('[floppy-render] Generando SVG estático...');
 
