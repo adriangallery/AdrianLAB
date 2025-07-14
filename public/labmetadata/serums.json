@@ -1,0 +1,21 @@
+{
+  "serums": [
+    {
+      "tokenId": 262144,
+      "name": "AdrianGF",
+      "category": "SERUMS",
+      "fileName": "ADRIANGF",
+      "maxSupply": 1,
+      "floppy": "Serum",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    }
+  ],
+  "metadata": {
+    "totalSerums": 1,
+    "description": "Serums Collection - Base de datos de todos los Serums disponibles"
+  }
+} 
