@@ -237,8 +237,81 @@ export default async function handler(req, res) {
       
       return res.status(200).json(metadata);
       
+    } else if (tokenIdNum === 262144) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM ADRIANGF`);
+      
+      // Cargar datos de serums.json
+      const serumsPath = path.join(process.cwd(), 'public', 'labmetadata', 'serums.json');
+      let serumsData;
+      
+      try {
+        const serumsBuffer = fs.readFileSync(serumsPath);
+        serumsData = JSON.parse(serumsBuffer.toString());
+        console.log(`[floppy-metadata] Serums data cargado, ${serumsData.serums.length} serums encontrados`);
+      } catch (error) {
+        console.error('[floppy-metadata] Error cargando serums data:', error);
+        return res.status(500).json({ error: 'Error cargando datos de serums' });
+      }
+
+      // Buscar el serum correspondiente al tokenId
+      const serumData = serumsData.serums.find(serum => serum.tokenId === tokenIdNum);
+      
+      if (!serumData) {
+        console.log(`[floppy-metadata] Serum no encontrado para tokenId ${tokenIdNum}`);
+        return res.status(404).json({ error: 'Serum no encontrado' });
+      }
+
+      console.log(`[floppy-metadata] Serum encontrado:`, JSON.stringify(serumData, null, 2));
+
+      // Función para obtener tag y color según maxSupply
+      function getRarityTagAndColor(maxSupply) {
+        if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
+        if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
+        if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
+        if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
+        return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
+      }
+
+      const rarity = getRarityTagAndColor(serumData.maxSupply);
+
+      // Metadata para serum ADRIANGF
+      const metadata = {
+        name: serumData.name,
+        description: serumData.description,
+        image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
+        external_url: serumData.external_url,
+        attributes: [
+          {
+            trait_type: "Category",
+            value: serumData.category
+          },
+          {
+            trait_type: "Max Supply",
+            value: serumData.maxSupply
+          },
+          {
+            trait_type: "Floppy",
+            value: serumData.floppy
+          },
+          {
+            trait_type: "Rarity",
+            value: rarity.tag
+          }
+        ]
+      };
+
+      console.log(`[floppy-metadata] Metadata generada para serum ${tokenIdNum}:`, metadata);
+
+      // Configurar headers para evitar cache
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      
+      return res.status(200).json(metadata);
+      
     } else {
-      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-9999 para traits, 10000-15500 para floppy discs)' });
+      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-9999 para traits, 10000-15500 para floppy discs, 262144 para serums)' });
     }
     
   } catch (error) {
