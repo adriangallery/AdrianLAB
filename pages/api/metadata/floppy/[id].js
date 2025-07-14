@@ -278,7 +278,7 @@ export default async function handler(req, res) {
       const metadata = {
         name: serumData.name,
         description: serumData.description,
-        image: `${baseUrl}/api/render/floppy/${actualId}.gif?v=${version}`,
+        image: `${baseUrl}/labimages/${actualId}.gif?v=${version}`,
         external_url: serumData.external_url,
         attributes: [
           {
