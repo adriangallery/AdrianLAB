@@ -96,6 +96,16 @@ const normalizeCategory = (category) => {
   return categoryMap[category] || category;
 };
 
+// LÓGICA ESPECIAL: Mapear ciertos tokens de HEAD a HAIR
+const HEAD_TO_HAIR_TOKENS = [
+  14, 17, 18, 19, 20, 21, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 190, 198, 199, 203, 204, 207, 218, 219, 226, 236
+];
+
+// Función para verificar si un token debe renderizarse como HAIR
+const shouldRenderAsHair = (traitId) => {
+  return HEAD_TO_HAIR_TOKENS.includes(parseInt(traitId));
+};
+
 // =============================================
 // SECCIÓN DE MAPEO DE TRAITS
 // =============================================
@@ -385,7 +395,16 @@ export default async function handler(req, res) {
     // Crear mapa de traits actuales
     const currentTraits = {};
     categories.forEach((category, index) => {
-      currentTraits[normalizeCategory(category)] = traitIds[index].toString();
+      const normalizedCategory = normalizeCategory(category);
+      const traitId = traitIds[index].toString();
+      
+      // LÓGICA ESPECIAL: Si es HEAD y está en la lista de tokens que deben ser HAIR
+      if (normalizedCategory === 'HEAD' && shouldRenderAsHair(traitId)) {
+        console.log(`[custom-render] LÓGICA ESPECIAL: Token ${traitId} (${normalizedCategory}) será renderizado como HAIR`);
+        currentTraits['HAIR'] = traitId;
+      } else {
+        currentTraits[normalizedCategory] = traitId;
+      }
     });
 
     console.log('[custom-render] Traits actuales:', currentTraits);
@@ -769,8 +788,8 @@ export default async function handler(req, res) {
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
-    // Nuevo orden de renderizado: incluyendo SERUMS y SKIN
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'SWAG', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
+    // Nuevo orden de renderizado: incluyendo HAIR antes que HEAD
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HEAD', 'SWAG', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
@@ -787,6 +806,12 @@ export default async function handler(req, res) {
         if (category === 'HEAD' && finalTraits['SWAG'] === '84') {
           console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 84 detectado, omitiendo HEAD`);
           continue; // Saltar HEAD cuando token 84 está presente
+        }
+
+        // LÓGICA ESPECIAL: Si hay HAIR y HEAD, omitir HEAD para evitar conflictos
+        if (category === 'HEAD' && finalTraits['HAIR']) {
+          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: HAIR presente, omitiendo HEAD para evitar conflictos`);
+          continue; // Saltar HEAD cuando hay HAIR
         }
 
         // LÓGICA ESPECIAL: Omitir skin traits especiales en SWAG (ya se renderizaron en paso 2.5)
