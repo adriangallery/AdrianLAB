@@ -588,6 +588,7 @@ export default async function handler(req, res) {
     let appliedSerum = null;
     let serumSuccess = false;
     let hasSerumHistory = false;
+    let serumFailed = false;
     try {
       console.log('[custom-render] Verificando si hay serum aplicado...');
       const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
@@ -598,11 +599,27 @@ export default async function handler(req, res) {
         serumSuccess = lastSerum[1];
         const serumMutation = lastSerum[3];
         
+        console.log(`[custom-render] Historial de serum encontrado:`, {
+          success: serumSuccess,
+          mutation: serumMutation,
+          hasBeenModified: hasBeenModified
+        });
+        
+        // LÓGICA MEJORADA: Detectar serum fallido
+        // Un serum fallido es cuando hay historial pero no hay mutación O cuando hasBeenModified es false
         if (serumMutation) {
           appliedSerum = serumMutation;
           console.log(`[custom-render] Serum aplicado detectado: ${appliedSerum}, éxito: ${serumSuccess}`);
         } else {
-          console.log(`[custom-render] Serum aplicado pero sin mutación (fallido), éxito: ${serumSuccess}`);
+          // No hay mutación, pero hay historial = serum fallido
+          serumFailed = true;
+          console.log(`[custom-render] Serum fallido detectado: sin mutación`);
+        }
+        
+        // LÓGICA ADICIONAL: Si hasBeenModified es false pero hay historial, es un serum fallido
+        if (!hasBeenModified && hasSerumHistory) {
+          serumFailed = true;
+          console.log(`[custom-render] Serum fallido detectado: hasBeenModified = false`);
         }
       }
     } catch (error) {
@@ -686,7 +703,7 @@ export default async function handler(req, res) {
       }
     }
     // LÓGICA ESPECIAL: Si hay historial de serum pero no hay mutación (serum fallido)
-    else if (hasSerumHistory && !serumSuccess) {
+    else if (serumFailed) {
       console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum fallido detectado, usando GF-Fail`);
       const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
       try {
