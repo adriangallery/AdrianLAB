@@ -79,7 +79,7 @@ export default async function handler(req, res) {
     try {
       // Test de conexión a contratos
       console.log('[metadata] Intentando conectar con los contratos...');
-      const { core, traitsExtension, patientZero, serumModule } = await getContracts();
+      const { core, traitsExtension, patientZero, serumModule, adrianNameRegistry } = await getContracts();
       console.log('[metadata] Contratos conectados:', {
         core: {
           address: core.address,
@@ -96,6 +96,10 @@ export default async function handler(req, res) {
         serumModule: {
           address: serumModule.address,
           functions: Object.keys(serumModule.functions)
+        },
+        adrianNameRegistry: {
+          address: adrianNameRegistry.address,
+          functions: Object.keys(adrianNameRegistry.functions)
         }
       });
 
@@ -130,6 +134,33 @@ export default async function handler(req, res) {
         }
       } catch (error) {
         console.log('[metadata] Token no ha pasado por PatientZERO o error en read:', error.message);
+      }
+
+      // Obtener historial de nombres desde AdrianNameRegistry
+      try {
+        console.log('[metadata] Llamando a getTokenNameHistory desde AdrianNameRegistry...');
+        const nameHistory = await adrianNameRegistry.getTokenNameHistory(tokenId);
+        console.log('[metadata] Respuesta de getTokenNameHistory:', {
+          history: nameHistory.map(change => ({
+            name: change[0],
+            changer: change[1],
+            timestamp: change[2].toString(),
+            paidChange: change[3]
+          }))
+        });
+        
+        // Si hay cambios de nombre en el historial, usar el último nombre
+        if (nameHistory && nameHistory.length > 0) {
+          const lastNameChange = nameHistory[nameHistory.length - 1]; // Último cambio de nombre
+          const customName = lastNameChange[0]; // El nombre personalizado
+          
+          // Modificar el nombre del metadata
+          baseMetadata.name = `${customName} #${tokenId}`;
+          console.log(`[metadata] Nombre personalizado aplicado: ${baseMetadata.name}`);
+        }
+        
+      } catch (error) {
+        console.log('[metadata] Error obteniendo historial de nombres:', error.message);
       }
 
       // Obtener datos del token
