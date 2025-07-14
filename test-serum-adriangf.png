@@ -1,0 +1,1 @@
+{"error":"Este endpoint solo maneja tokens 1-9999 (traits). Para tokens 10000+ usa /api/metadata/floppy/[tokenId]"}

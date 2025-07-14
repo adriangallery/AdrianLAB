@@ -808,11 +808,7 @@ export default async function handler(req, res) {
           continue; // Saltar HEAD cuando token 84 está presente
         }
 
-        // LÓGICA ESPECIAL: Si hay HAIR y HEAD, omitir HEAD para evitar conflictos
-        if (category === 'HEAD' && finalTraits['HAIR']) {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: HAIR presente, omitiendo HEAD para evitar conflictos`);
-          continue; // Saltar HEAD cuando hay HAIR
-        }
+
 
         // LÓGICA ESPECIAL: Omitir skin traits especiales en SWAG (ya se renderizaron en paso 2.5)
         if (category === 'SWAG' && (finalTraits[category] === '37' || finalTraits[category] === '38')) {
