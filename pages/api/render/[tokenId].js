@@ -309,25 +309,55 @@ export default async function handler(req, res) {
     };
 
     // Función específica para cargar archivos ADRIAN desde sistema de archivos
-    const loadAdrianSvg = async (serumName) => {
+    const loadAdrianSvg = async (serumName, generation, skinType) => {
       try {
-        // Convertir el nombre del serum a mayúsculas para que coincida con el archivo
-        const serumNameUpper = serumName.toUpperCase();
-        const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumNameUpper}.svg`);
-        console.log(`[render] Cargando Adrian desde sistema de archivos: ${adrianPath}`);
-        
-        const svgContent = fs.readFileSync(adrianPath, 'utf8');
-        
-        // Renderizar SVG a PNG
-        const resvg = new Resvg(svgContent, {
-          fitTo: {
-            mode: 'width',
-            value: 1000
+        // LÓGICA ESPECIAL PARA ADRIANGF: Usar estructura de carpetas específica
+        if (serumName === "AdrianGF") {
+          console.log(`[render] 🧬 LÓGICA ESPECIAL: Cargando skin ADRIANGF para GEN${generation}, skin ${skinType}`);
+          
+          // Mapear skinType a formato de archivo
+          let skinFileName;
+          if (skinType === "Albino") {
+            skinFileName = `GEN${generation}_Albino.svg`;
+          } else {
+            // Para otros skins: GF{gen}-{skinType}.svg
+            skinFileName = `GF${generation}-${skinType}.svg`;
           }
-        });
-        
-        const pngBuffer = resvg.render().asPng();
-        return loadImage(pngBuffer);
+          
+          const adrianGfPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', `GF${generation}`, skinFileName);
+          console.log(`[render] Cargando ADRIANGF desde sistema de archivos: ${adrianGfPath}`);
+          
+          const svgContent = fs.readFileSync(adrianGfPath, 'utf8');
+          
+          // Renderizar SVG a PNG
+          const resvg = new Resvg(svgContent, {
+            fitTo: {
+              mode: 'width',
+              value: 1000
+            }
+          });
+          
+          const pngBuffer = resvg.render().asPng();
+          return loadImage(pngBuffer);
+        } else {
+          // Lógica original para otros serums
+          const serumNameUpper = serumName.toUpperCase();
+          const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumNameUpper}.svg`);
+          console.log(`[render] Cargando Adrian desde sistema de archivos: ${adrianPath}`);
+          
+          const svgContent = fs.readFileSync(adrianPath, 'utf8');
+          
+          // Renderizar SVG a PNG
+          const resvg = new Resvg(svgContent, {
+            fitTo: {
+              mode: 'width',
+              value: 1000
+            }
+          });
+          
+          const pngBuffer = resvg.render().asPng();
+          return loadImage(pngBuffer);
+        }
       } catch (error) {
         console.error(`[render] Error cargando Adrian SVG ${serumName}:`, error.message);
         return null;
@@ -493,16 +523,35 @@ export default async function handler(req, res) {
     // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
     if (appliedSerum) {
       console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}`);
-      const serumSkinImage = await loadAdrianSvg(appliedSerum);
-      if (serumSkinImage) {
-        ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-        console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
+      
+      // LÓGICA ESPECIAL PARA ADRIANGF: Manejar éxito y fallo
+      if (appliedSerum === "AdrianGF") {
+        // Serum exitoso: usar skin específico según GEN y tipo
+        const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+        if (serumSkinImage) {
+          ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+          console.log(`[render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
+        } else {
+          console.error(`[render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
+          const baseImage = await loadAndRenderSvg(baseImagePath);
+          if (baseImage) {
+            ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+            console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+          }
+        }
       } else {
-        console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
-        const baseImage = await loadAndRenderSvg(baseImagePath);
-        if (baseImage) {
-          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-          console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        // Otros serums: lógica original
+        const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+        if (serumSkinImage) {
+          ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+          console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
+        } else {
+          console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+          const baseImage = await loadAndRenderSvg(baseImagePath);
+          if (baseImage) {
+            ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+            console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+          }
         }
       }
     }
