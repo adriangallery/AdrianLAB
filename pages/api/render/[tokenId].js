@@ -97,6 +97,59 @@ const normalizeCategory = (category) => {
 };
 
 // =============================================
+// FUNCIÓN PARA CARGAR METADATA SEGÚN TOKEN ID
+// =============================================
+
+// Función para determinar qué archivo de metadata cargar según el token ID
+const getMetadataFileForToken = (tokenId) => {
+  const numTokenId = parseInt(tokenId);
+  
+  if (numTokenId >= 10000 && numTokenId <= 10002) {
+    return 'floppy.json';
+  } else if (numTokenId >= 15000 && numTokenId <= 15006) {
+    return 'pagers.json';
+  } else if (numTokenId === 262144) {
+    return 'serums.json';
+  } else {
+    return 'traits.json';
+  }
+};
+
+// Función para cargar metadata del archivo correcto
+const loadMetadataForToken = (tokenId) => {
+  try {
+    const metadataFile = getMetadataFileForToken(tokenId);
+    const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', metadataFile);
+    
+    console.log(`[render] Cargando metadata desde: ${metadataFile} para token ${tokenId}`);
+    
+    const metadataBuffer = fs.readFileSync(metadataPath);
+    const metadata = JSON.parse(metadataBuffer.toString());
+    
+    // Determinar qué array usar según el archivo
+    let traitsArray;
+    switch (metadataFile) {
+      case 'floppy.json':
+        traitsArray = metadata.floppys;
+        break;
+      case 'pagers.json':
+        traitsArray = metadata.pagers;
+        break;
+      case 'serums.json':
+        traitsArray = metadata.serums;
+        break;
+      default:
+        traitsArray = metadata.traits;
+    }
+    
+    return traitsArray;
+  } catch (error) {
+    console.error(`[render] Error cargando metadata para token ${tokenId}:`, error.message);
+    return [];
+  }
+};
+
+// =============================================
 // SECCIÓN DE EXCEPCIONES ESPECIALES
 // =============================================
 

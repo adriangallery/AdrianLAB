@@ -154,16 +154,64 @@ export default async function handler(req, res) {
         traitIds: traitIds.map(id => id.toString())
       });
 
-      // Cargar datos de traits.json para mapear IDs a nombres
-      console.log('[metadata] Cargando datos de traits.json...');
-      const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+      // Función para determinar qué archivo de metadata cargar según el token ID
+      const getMetadataFileForToken = (tokenId) => {
+        const numTokenId = parseInt(tokenId);
+        
+        if (numTokenId >= 10000 && numTokenId <= 10002) {
+          return 'floppy.json';
+        } else if (numTokenId >= 15000 && numTokenId <= 15006) {
+          return 'pagers.json';
+        } else if (numTokenId === 262144) {
+          return 'serums.json';
+        } else {
+          return 'traits.json';
+        }
+      };
+
+      // Función para cargar metadata del archivo correcto
+      const loadMetadataForToken = (tokenId) => {
+        try {
+          const metadataFile = getMetadataFileForToken(tokenId);
+          const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', metadataFile);
+          
+          console.log(`[metadata] Cargando metadata desde: ${metadataFile} para token ${tokenId}`);
+          
+          const metadataBuffer = fs.readFileSync(metadataPath);
+          const metadata = JSON.parse(metadataBuffer.toString());
+          
+          // Determinar qué array usar según el archivo
+          let traitsArray;
+          switch (metadataFile) {
+            case 'floppy.json':
+              traitsArray = metadata.floppys;
+              break;
+            case 'pagers.json':
+              traitsArray = metadata.pagers;
+              break;
+            case 'serums.json':
+              traitsArray = metadata.serums;
+              break;
+            default:
+              traitsArray = metadata.traits;
+          }
+          
+          return traitsArray;
+        } catch (error) {
+          console.error(`[metadata] Error cargando metadata para token ${tokenId}:`, error.message);
+          return [];
+        }
+      };
+
+      // Cargar datos de metadata según el token
+      console.log('[metadata] Cargando datos de metadata...');
       let traitsData;
       try {
-        const traitsBuffer = fs.readFileSync(traitsPath);
-        traitsData = JSON.parse(traitsBuffer.toString());
-        console.log(`[metadata] Traits cargados: ${traitsData.traits.length} traits encontrados`);
+        const traitsArray = loadMetadataForToken(tokenId);
+        traitsData = { traits: traitsArray };
+        console.log(`[metadata] Metadata cargado: ${traitsArray.length} items encontrados`);
       } catch (error) {
-        console.error('[metadata] Error cargando traits.json:', error);
+        console.error('[metadata] Error cargando metadata:', error);
         traitsData = { traits: [] };
       }
 

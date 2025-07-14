@@ -100,14 +100,62 @@ const normalizeCategory = (category) => {
 // SECCIÓN DE MAPEO DE TRAITS
 // =============================================
 
-// Función para cargar el mapeo de traits desde el JSON
-const loadTraitsMapping = () => {
+// Función para determinar qué archivo de metadata cargar según el token ID
+const getMetadataFileForToken = (tokenId) => {
+  const numTokenId = parseInt(tokenId);
+  
+  if (numTokenId >= 10000 && numTokenId <= 10002) {
+    return 'floppy.json';
+  } else if (numTokenId >= 15000 && numTokenId <= 15006) {
+    return 'pagers.json';
+  } else if (numTokenId === 262144) {
+    return 'serums.json';
+  } else {
+    return 'traits.json';
+  }
+};
+
+// Función para cargar metadata del archivo correcto
+const loadMetadataForToken = (tokenId) => {
   try {
-    const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-    const traitsData = JSON.parse(fs.readFileSync(traitsPath, 'utf8'));
+    const metadataFile = getMetadataFileForToken(tokenId);
+    const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', metadataFile);
+    
+    console.log(`[custom-render] Cargando metadata desde: ${metadataFile} para token ${tokenId}`);
+    
+    const metadataBuffer = fs.readFileSync(metadataPath);
+    const metadata = JSON.parse(metadataBuffer.toString());
+    
+    // Determinar qué array usar según el archivo
+    let traitsArray;
+    switch (metadataFile) {
+      case 'floppy.json':
+        traitsArray = metadata.floppys;
+        break;
+      case 'pagers.json':
+        traitsArray = metadata.pagers;
+        break;
+      case 'serums.json':
+        traitsArray = metadata.serums;
+        break;
+      default:
+        traitsArray = metadata.traits;
+    }
+    
+    return traitsArray;
+  } catch (error) {
+    console.error(`[custom-render] Error cargando metadata para token ${tokenId}:`, error.message);
+    return [];
+  }
+};
+
+// Función para cargar el mapeo de traits desde el JSON correcto según el token
+const loadTraitsMapping = (tokenId) => {
+  try {
+    const traitsArray = loadMetadataForToken(tokenId);
     
     const mapping = {};
-    traitsData.traits.forEach(trait => {
+    traitsArray.forEach(trait => {
       mapping[trait.tokenId] = {
         category: trait.category.toUpperCase(),
         name: trait.name,
@@ -208,7 +256,7 @@ export default async function handler(req, res) {
     }
 
     // Cargar mapeo de traits
-    const traitsMapping = loadTraitsMapping();
+    const traitsMapping = loadTraitsMapping(cleanTokenId);
     console.log(`[custom-render] Mapeo de traits cargado con ${Object.keys(traitsMapping).length} entries`);
 
     // Obtener parámetros de query para traits personalizados
