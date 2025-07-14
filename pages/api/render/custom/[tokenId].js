@@ -605,21 +605,21 @@ export default async function handler(req, res) {
           hasBeenModified: hasBeenModified
         });
         
-        // LÓGICA MEJORADA: Detectar serum fallido
-        // Un serum fallido es cuando hay historial pero no hay mutación O cuando hasBeenModified es false
-        if (serumMutation) {
-          appliedSerum = serumMutation;
-          console.log(`[custom-render] Serum aplicado detectado: ${appliedSerum}, éxito: ${serumSuccess}`);
+        // LÓGICA CORREGIDA según el contrato SerumModule:
+        // - Serum exitoso: success = true Y mutation tiene valor
+        // - Serum fallido: success = false (independientemente del valor de mutation)
+        if (serumSuccess) {
+          // Serum exitoso
+          if (serumMutation) {
+            appliedSerum = serumMutation;
+            console.log(`[custom-render] Serum exitoso detectado: ${appliedSerum}`);
+          } else {
+            console.warn(`[custom-render] Serum marcado como exitoso pero sin mutación, esto no debería pasar`);
+          }
         } else {
-          // No hay mutación, pero hay historial = serum fallido
+          // Serum fallido
           serumFailed = true;
-          console.log(`[custom-render] Serum fallido detectado: sin mutación`);
-        }
-        
-        // LÓGICA ADICIONAL: Si hasBeenModified es false pero hay historial, es un serum fallido
-        if (!hasBeenModified && hasSerumHistory) {
-          serumFailed = true;
-          console.log(`[custom-render] Serum fallido detectado: hasBeenModified = false`);
+          console.log(`[custom-render] Serum fallido detectado: success = false`);
         }
       }
     } catch (error) {
