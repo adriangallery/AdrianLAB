@@ -384,6 +384,7 @@ export default async function handler(req, res) {
 
     // LÓGICA ESPECIAL: Detectar serum aplicado y cambiar skin base
     let appliedSerum = null;
+    let serumFailed = false;
     try {
       console.log('[render] Verificando si hay serum aplicado...');
       const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
@@ -393,9 +394,27 @@ export default async function handler(req, res) {
         const serumSuccess = lastSerum[1];
         const serumMutation = lastSerum[3];
         
-        if (serumSuccess && serumMutation) {
-          appliedSerum = serumMutation;
-          console.log(`[render] Serum aplicado detectado: ${appliedSerum}`);
+        console.log(`[render] Historial de serum encontrado:`, {
+          success: serumSuccess,
+          mutation: serumMutation,
+          hasBeenModified: hasBeenModified
+        });
+        
+        // LÓGICA CORREGIDA según el contrato SerumModule (consistente con metadata):
+        // - Serum exitoso: success = true Y mutation tiene valor
+        // - Serum fallido: success = false (independientemente del valor de mutation)
+        if (serumSuccess) {
+          // Serum exitoso
+          if (serumMutation) {
+            appliedSerum = serumMutation;
+            console.log(`[render] Serum exitoso detectado: ${appliedSerum}`);
+          } else {
+            console.warn(`[render] Serum marcado como exitoso pero sin mutación, esto no debería pasar`);
+          }
+        } else {
+          // Serum fallido (consistente con metadata: "FAILED")
+          serumFailed = true;
+          console.log(`[render] Serum fallido detectado: success = false (será "FAILED" en metadata)`);
         }
       }
     } catch (error) {
@@ -480,6 +499,31 @@ export default async function handler(req, res) {
         console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
       } else {
         console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
+      }
+    }
+    // LÓGICA ESPECIAL: Si hay serum fallido, usar GF-Fail
+    else if (serumFailed) {
+      console.log(`[render] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum fallido detectado, usando GF-Fail`);
+      const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
+      try {
+        const svgContent = fs.readFileSync(failPath, 'utf8');
+        const resvg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        const pngBuffer = resvg.render().asPng();
+        const failImage = await loadImage(pngBuffer);
+        ctx.drawImage(failImage, 0, 0, 1000, 1000);
+        console.log('[render] PASO 2 - 🧬 Skin ADRIANGF fallido (GF-Fail) renderizado correctamente');
+      } catch (error) {
+        console.error(`[render] PASO 2 - Error al cargar GF-Fail, usando skin base normal:`, error.message);
         const baseImage = await loadAndRenderSvg(baseImagePath);
         if (baseImage) {
           ctx.drawImage(baseImage, 0, 0, 1000, 1000);
