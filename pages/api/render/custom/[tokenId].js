@@ -605,7 +605,7 @@ export default async function handler(req, res) {
           hasBeenModified: hasBeenModified
         });
         
-        // LÓGICA CORREGIDA según el contrato SerumModule:
+        // LÓGICA CORREGIDA según el contrato SerumModule (consistente con metadata):
         // - Serum exitoso: success = true Y mutation tiene valor
         // - Serum fallido: success = false (independientemente del valor de mutation)
         if (serumSuccess) {
@@ -617,9 +617,9 @@ export default async function handler(req, res) {
             console.warn(`[custom-render] Serum marcado como exitoso pero sin mutación, esto no debería pasar`);
           }
         } else {
-          // Serum fallido
+          // Serum fallido (consistente con metadata: "FAILED")
           serumFailed = true;
-          console.log(`[custom-render] Serum fallido detectado: success = false`);
+          console.log(`[custom-render] Serum fallido detectado: success = false (será "FAILED" en metadata)`);
         }
       }
     } catch (error) {
