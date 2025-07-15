@@ -772,7 +772,7 @@
       "name": "Goat-Beard",
       "category": "BEARD",
       "fileName": "Goat-Beard",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1110,7 +1110,7 @@
       "name": "Fred-Perry-White",
       "category": "SWAG",
       "fileName": "Fred-Perry-White",
-      "maxSupply": 14,
+      "maxSupply": 340,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1591,7 +1591,7 @@
       "name": "Tank-Top-Black",
       "category": "SWAG",
       "fileName": "Tank-Top-Black",
-      "maxSupply": 16,
+      "maxSupply": 160,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1643,7 +1643,7 @@
       "name": "Varsity-Blue",
       "category": "SWAG",
       "fileName": "Varsity-Blue",
-      "maxSupply": 14,
+      "maxSupply": 240,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2137,7 +2137,7 @@
       "name": "Mullet",
       "category": "HEAD",
       "fileName": "Mullet",
-      "maxSupply": 16,
+      "maxSupply": 260,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2241,7 +2241,7 @@
       "name": "Tonsure-White",
       "category": "HEAD",
       "fileName": "Tonsure-White",
-      "maxSupply": 13,
+      "maxSupply": 330,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2254,7 +2254,7 @@
       "name": "Tonsure",
       "category": "HEAD",
       "fileName": "Tonsure",
-      "maxSupply": 8,
+      "maxSupply": 180,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2501,7 +2501,7 @@
       "name": "Do-rag",
       "category": "HEAD",
       "fileName": "Do-rag",
-      "maxSupply": 9,
+      "maxSupply": 190,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
