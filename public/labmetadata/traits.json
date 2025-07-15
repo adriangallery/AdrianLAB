@@ -525,7 +525,7 @@
       "name": "Blue",
       "category": "BACKGROUND",
       "fileName": "Blue",
-      "maxSupply": 15,
+      "maxSupply": 150,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -603,7 +603,7 @@
       "name": "Red",
       "category": "BACKGROUND",
       "fileName": "Red",
-      "maxSupply": 13,
+      "maxSupply": 130,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -642,7 +642,7 @@
       "name": "Beard-Full-Black",
       "category": "BEARD",
       "fileName": "Beard-Full-Black",
-      "maxSupply": 13,
+      "maxSupply": 130,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -668,7 +668,7 @@
       "name": "Beard-Full",
       "category": "BEARD",
       "fileName": "Beard-Full",
-      "maxSupply": 13,
+      "maxSupply": 130,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -694,7 +694,7 @@
       "name": "Chinstrap",
       "category": "BEARD",
       "fileName": "Chinstrap",
-      "maxSupply": 11,
+      "maxSupply": 110,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -759,7 +759,7 @@
       "name": "Goat-Beard-Blond",
       "category": "BEARD",
       "fileName": "Goat-Beard-Blond",
-      "maxSupply": 11,
+      "maxSupply": 211,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -863,7 +863,7 @@
       "name": "Normal-Beard",
       "category": "BEARD",
       "fileName": "Normal-Beard",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -876,7 +876,7 @@
       "name": "Shadow-Beard",
       "category": "BEARD",
       "fileName": "Shadow-Beard",
-      "maxSupply": 16,
+      "maxSupply": 160,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1006,7 +1006,7 @@
       "name": "Dess Shirt White",
       "category": "SWAG",
       "fileName": "Dess-Shirt-White",
-      "maxSupply": 12,
+      "maxSupply": 300,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1019,7 +1019,7 @@
       "name": "Dress-Shirt-Blue",
       "category": "SWAG",
       "fileName": "Dress-Shirt-Blue",
-      "maxSupply": 10,
+      "maxSupply": 100,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1123,7 +1123,7 @@
       "name": "FUD-Shirt",
       "category": "SWAG",
       "fileName": "FUD-Shirt",
-      "maxSupply": 9,
+      "maxSupply": 190,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1396,7 +1396,7 @@
       "name": "Polo-Red",
       "category": "SWAG",
       "fileName": "Polo-Red",
-      "maxSupply": 14,
+      "maxSupply": 240,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1565,7 +1565,7 @@
       "name": "T-Shirt-Red",
       "category": "SWAG",
       "fileName": "T-Shirt-Red",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1578,7 +1578,7 @@
       "name": "T-Shirt-White",
       "category": "SWAG",
       "fileName": "T-Shirt-White",
-      "maxSupply": 13,
+      "maxSupply": 130,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1955,7 +1955,7 @@
       "name": "Buzz",
       "category": "HEAD",
       "fileName": "Buzz",
-      "maxSupply": 17,
+      "maxSupply": 170,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1994,7 +1994,7 @@
       "name": "Crazy-Hair-Top",
       "category": "HEAD",
       "fileName": "Crazy-Hair-Top",
-      "maxSupply": 8,
+      "maxSupply": 180,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2059,7 +2059,7 @@
       "name": "Longer-Hair-Brown",
       "category": "HEAD",
       "fileName": "Longer-Hair-Brown",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2202,7 +2202,7 @@
       "name": "Short",
       "category": "HEAD",
       "fileName": "Short",
-      "maxSupply": 16,
+      "maxSupply": 160,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2280,7 +2280,7 @@
       "name": "Wild",
       "category": "HEAD",
       "fileName": "Wild",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2371,7 +2371,7 @@
       "name": "Cap-Backward-Blue",
       "category": "HEAD",
       "fileName": "Cap-Backward-Blue",
-      "maxSupply": 14,
+      "maxSupply": 140,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2397,7 +2397,7 @@
       "name": "Cap-Forward",
       "category": "HEAD",
       "fileName": "Cap-Forward",
-      "maxSupply": 15,
+      "maxSupply": 250,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -3034,7 +3034,7 @@
       "name": "Blunt",
       "category": "MOUTH",
       "fileName": "Blunt",
-      "maxSupply": 12,
+      "maxSupply": 320,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
