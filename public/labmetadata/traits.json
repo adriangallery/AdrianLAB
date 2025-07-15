@@ -3410,10 +3410,49 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 272,
+      "name": "Smoke",
+      "category": "TOP",
+      "fileName": "Smoke",
+      "maxSupply": 1,
+      "floppy": "Pager-JimRo",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 273,
+      "name": "Mask-LT3-Jimro",
+      "category": "HEAD",
+      "fileName": "Mask-LT3-Jimro",
+      "maxSupply": 1,
+      "floppy": "Pager-JimRo",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 274,
+      "name": "Windrunner-Green",
+      "category": "SWAG",
+      "fileName": "Windrunner-Green",
+      "maxSupply": 1,
+      "floppy": "Pager-JimRo",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 259,
+    "totalTraits": 262,
     "categories": [
       "BACKGROUND",
       "EAR",
