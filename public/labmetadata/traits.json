@@ -1695,7 +1695,7 @@
       "name": "Wife-Beater",
       "category": "SWAG",
       "fileName": "Wife-Beater",
-      "maxSupply": 14,
+      "maxSupply": 300,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -1799,7 +1799,7 @@
       "name": "Classic-Shades",
       "category": "EYES",
       "fileName": "Classic-Shades",
-      "maxSupply": 15,
+      "maxSupply": 250,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2150,7 +2150,7 @@
       "name": "Popper-Blonde",
       "category": "HEAD",
       "fileName": "Popper-Blonde",
-      "maxSupply": 12,
+      "maxSupply": 90,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2163,7 +2163,7 @@
       "name": "Popper",
       "category": "HEAD",
       "fileName": "Popper",
-      "maxSupply": 17,
+      "maxSupply": 180,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2228,7 +2228,7 @@
       "name": "Spike",
       "category": "HEAD",
       "fileName": "Spike",
-      "maxSupply": 15,
+      "maxSupply": 320,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2540,7 +2540,7 @@
       "name": "Fedora-Brown",
       "category": "HEAD",
       "fileName": "Fedora-Brown",
-      "maxSupply": 11,
+      "maxSupply": 180,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2696,7 +2696,7 @@
       "name": "Head-Band",
       "category": "HEAD",
       "fileName": "Head-Band",
-      "maxSupply": 14,
+      "maxSupply": 240,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2722,7 +2722,7 @@
       "name": "Lumberjack-Hat-Blue",
       "category": "HEAD",
       "fileName": "Lumberjack-Hat-Blue",
-      "maxSupply": 12,
+      "maxSupply": 120,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2748,7 +2748,7 @@
       "name": "Mash-Cap-Black",
       "category": "HEAD",
       "fileName": "Mash-Cap-Black",
-      "maxSupply": 9,
+      "maxSupply": 190,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2852,7 +2852,7 @@
       "name": "Purple-Cap",
       "category": "HEAD",
       "fileName": "Purple-Cap",
-      "maxSupply": 12,
+      "maxSupply": 300,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -2969,7 +2969,7 @@
       "name": "Yellow-Cap",
       "category": "HEAD",
       "fileName": "Yellow-Cap",
-      "maxSupply": 13,
+      "maxSupply": 230,
       "floppy": "STARTER",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
