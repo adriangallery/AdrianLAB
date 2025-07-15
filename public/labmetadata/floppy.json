@@ -35,10 +35,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10003,
+      "name": "GLITCH Floppy",
+      "category": "Floppy discs",
+      "fileName": "GLITCH-Floppy",
+      "maxSupply": 1,
+      "floppy": "GLITCH",
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 3,
+    "totalFloppys": 4,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
