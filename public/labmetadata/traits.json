@@ -3449,10 +3449,49 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 252,
+      "name": "Filthy-Earring",
+      "category": "RANDOMSHIT",
+      "fileName": "Filthy-Earring",
+      "maxSupply": 1,
+      "floppy": "Pager-Filthy",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 254,
+      "name": "Red-Lip-Cigarett",
+      "category": "MOUTH",
+      "fileName": "Red-Lip-Cigarett",
+      "maxSupply": 1,
+      "floppy": "Pager-Filthy",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 266,
+      "name": "Background-Brown",
+      "category": "BACKGROUND",
+      "fileName": "Background-Brown",
+      "maxSupply": 1,
+      "floppy": "Pager-Wassa",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 262,
+    "totalTraits": 265,
     "categories": [
       "BACKGROUND",
       "EAR",
