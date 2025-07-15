@@ -112,27 +112,46 @@ export default async function handler(req, res) {
     return res.status(200).json(metadata);
       
     } else if (tokenIdNum >= 10000 && tokenIdNum <= 15500) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS (10000+)`);
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS/PAGERS (10000+)`);
       
-      // Cargar datos de labmetadata
-      const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-      let labmetadata;
+      // Determinar qué archivo cargar según el rango del token
+      let metadataPath;
+      let dataKey;
+      
+      if (tokenIdNum >= 10000 && tokenIdNum <= 10003) {
+        // Floppy discs (10000-10003)
+        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'floppy.json');
+        dataKey = 'floppys';
+        console.log(`[floppy-metadata] Cargando desde floppy.json para token ${tokenIdNum}`);
+      } else if (tokenIdNum >= 15000 && tokenIdNum <= 15007) {
+        // Pagers (15000-15007)
+        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'pagers.json');
+        dataKey = 'pagers';
+        console.log(`[floppy-metadata] Cargando desde pagers.json para token ${tokenIdNum}`);
+      } else {
+        // Fallback a traits.json para otros rangos
+        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+        dataKey = 'traits';
+        console.log(`[floppy-metadata] Cargando desde traits.json para token ${tokenIdNum}`);
+      }
+      
+      let metadataFile;
       
       try {
-        const labmetadataBuffer = fs.readFileSync(labmetadataPath);
-        labmetadata = JSON.parse(labmetadataBuffer.toString());
-        console.log(`[floppy-metadata] Labmetadata cargado para token ${tokenIdNum}, ${labmetadata.traits.length} traits encontrados`);
+        const metadataBuffer = fs.readFileSync(metadataPath);
+        metadataFile = JSON.parse(metadataBuffer.toString());
+        console.log(`[floppy-metadata] Metadata cargado para token ${tokenIdNum}, ${metadataFile[dataKey].length} items encontrados`);
       } catch (error) {
-        console.error('[floppy-metadata] Error cargando labmetadata:', error);
-        return res.status(500).json({ error: 'Error cargando datos de traits' });
+        console.error('[floppy-metadata] Error cargando metadata:', error);
+        return res.status(500).json({ error: 'Error cargando datos de metadata' });
       }
 
-      // Buscar el trait correspondiente al tokenId
-      const traitData = labmetadata.traits.find(trait => trait.tokenId === tokenIdNum);
+      // Buscar el item correspondiente al tokenId
+      const itemData = metadataFile[dataKey].find(item => item.tokenId === tokenIdNum);
       
-      if (!traitData) {
-        console.log(`[floppy-metadata] Trait no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
-        // Datos genéricos si no se encuentra el trait
+      if (!itemData) {
+        console.log(`[floppy-metadata] Item no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
+        // Datos genéricos si no se encuentra el item
         const tokenData = {
           name: `ANIMATED TRAIT #${tokenIdNum}`,
           description: `Un trait animado especial del token ${tokenIdNum}`,
@@ -142,11 +161,11 @@ export default async function handler(req, res) {
           external_url: "https://adrianpunks.com/"
         };
       } else {
-        console.log(`[floppy-metadata] Trait encontrado:`, JSON.stringify(traitData, null, 2));
+        console.log(`[floppy-metadata] Item encontrado:`, JSON.stringify(itemData, null, 2));
       }
 
-      // Usar los datos del trait encontrado o datos genéricos
-      const tokenData = traitData || {
+      // Usar los datos del item encontrado o datos genéricos
+      const tokenData = itemData || {
         name: `ANIMATED TRAIT #${tokenIdNum}`,
         description: `Un trait animado especial del token ${tokenIdNum}`,
         category: "SPECIAL",
