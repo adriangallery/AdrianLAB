@@ -245,15 +245,15 @@ async function handleRenderToken(req, res, tokenId) {
   // Obtener datos onchain para calcular total minted
   let totalMinted = 0;
   try {
-    console.log(`[floppy-render] Obteniendo availableSupply para trait ${tokenId}...`);
-    const availableSupply = await traitsCore.getAvailableSupply(tokenId);
-    console.log(`[floppy-render] AvailableSupply obtenido: ${availableSupply.toString()}`);
+    console.log(`[floppy-render] Obteniendo totalMintedPerAsset para trait ${tokenId}...`);
+    const mintedAmount = await traitsCore.totalMintedPerAsset(tokenId);
+    console.log(`[floppy-render] TotalMintedPerAsset obtenido: ${mintedAmount.toString()}`);
     
-    // Calcular total minted: maxSupply - availableSupply
-    totalMinted = tokenData.maxSupply - availableSupply.toNumber();
-    console.log(`[floppy-render] Total minted calculado: ${totalMinted} (${tokenData.maxSupply} - ${availableSupply.toString()})`);
+    // Usar directamente el valor obtenido del contrato
+    totalMinted = mintedAmount.toNumber();
+    console.log(`[floppy-render] Total minted obtenido del contrato: ${totalMinted}`);
   } catch (error) {
-    console.error(`[floppy-render] Error obteniendo availableSupply:`, error.message);
+    console.error(`[floppy-render] Error obteniendo totalMintedPerAsset:`, error.message);
     // Fallback: usar maxSupply como total minted si falla la llamada onchain
     totalMinted = tokenData.maxSupply;
     console.log(`[floppy-render] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
