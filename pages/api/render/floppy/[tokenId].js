@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { createCanvas } from 'canvas';
 import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
+import { getContracts } from '../../../../lib/contracts.js';
 
 // Cache para traits animados
 const animatedTraitsCache = new Map();
@@ -181,6 +182,10 @@ async function handleRenderToken(req, res, tokenId) {
   const tokenIdNum = parseInt(tokenId);
   let traitData;
   
+  // Conectar con los contratos para obtener datos onchain
+  console.log('[floppy-render] Conectando con los contratos...');
+  const { traitsCore } = await getContracts();
+  
   // Determinar qué archivo cargar según el token ID
   if (tokenIdNum === 262144) {
     // Cargar datos de serums.json para token 262144
@@ -236,6 +241,23 @@ async function handleRenderToken(req, res, tokenId) {
   };
 
   console.log(`[floppy-render] Datos del token:`, JSON.stringify(tokenData, null, 2));
+
+  // Obtener datos onchain para calcular total minted
+  let totalMinted = 0;
+  try {
+    console.log(`[floppy-render] Obteniendo availableSupply para trait ${tokenId}...`);
+    const availableSupply = await traitsCore.getAvailableSupply(tokenId);
+    console.log(`[floppy-render] AvailableSupply obtenido: ${availableSupply.toString()}`);
+    
+    // Calcular total minted: maxSupply - availableSupply
+    totalMinted = tokenData.maxSupply - availableSupply.toNumber();
+    console.log(`[floppy-render] Total minted calculado: ${totalMinted} (${tokenData.maxSupply} - ${availableSupply.toString()})`);
+  } catch (error) {
+    console.error(`[floppy-render] Error obteniendo availableSupply:`, error.message);
+    // Fallback: usar maxSupply como total minted si falla la llamada onchain
+    totalMinted = tokenData.maxSupply;
+    console.log(`[floppy-render] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
+  }
 
   // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
@@ -416,7 +438,7 @@ async function handleRenderToken(req, res, tokenId) {
           anchor: 'start middle'
         },
         {
-          text: `MAX SUPPLY: ${tokenData.maxSupply}`,
+          text: `TOT. MINTED: ${totalMinted}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 915,
           fontSize: 32,  // Aumentado de 24 a 32
