@@ -438,7 +438,7 @@ async function handleRenderToken(req, res, tokenId) {
           anchor: 'start middle'
         },
         {
-          text: `TOT. MINTED: ${totalMinted}`,
+          text: `TOTAL MINTED: ${totalMinted}`,
           x: 84 + 10,  // Margen izquierdo de 10px
           y: 915,
           fontSize: 32,  // Aumentado de 24 a 32
