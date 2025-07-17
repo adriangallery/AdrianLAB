@@ -392,6 +392,36 @@ export default async function handler(req, res) {
       }
     };
 
+    // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId
+    const loadTraitFromLabimages = async (traitId) => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+        console.log(`[render] Cargando trait desde labimages: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        
+        // Renderizar SVG a PNG
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        return loadImage(pngBuffer);
+      } catch (error) {
+        console.error(`[render] Error cargando trait ${traitId} desde labimages:`, error.message);
+        return null;
+      }
+    };
+
     // Determinar la imagen base según generación y skin
     const gen = generation.toString();
     let baseImagePath;
@@ -666,41 +696,16 @@ export default async function handler(req, res) {
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
-        const traitPath = `${category}/${equippedTraits[category]}.svg`;
-        console.log(`[render] PASO 3 - Cargando trait: ${traitPath}`);
-
-        // LÓGICA ESPECIAL: Token 48 (S.W.A.T-Shild) se renderiza en TOP
-        if (category === 'GEAR' && equippedTraits[category] === '48') {
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 48 detectado, se renderizará en TOP`);
-          continue; // Saltar este trait aquí, se renderizará en TOP
-        }
-
-        // LÓGICA ESPECIAL: Token 84 (Bunny-Suit) - no renderizar HEAD cuando está presente
-        if (category === 'HEAD' && equippedTraits['SWAG'] === '84') {
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 84 detectado, omitiendo HEAD`);
-          continue; // Saltar HEAD cuando token 84 está presente
-        }
-
-
-
-        // LÓGICA ESPECIAL: Omitir skin traits especiales en SWAG (ya se renderizaron en paso 2.5)
-        if (category === 'SWAG' && (equippedTraits[category] === '37' || equippedTraits[category] === '38')) {
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Skin trait especial ya renderizado en paso 2.5, omitiendo`);
-          continue;
-        }
-
-        // LÓGICA ESPECIAL: Tokens 7, 8, 9 se comportan como EYES aunque estén en SERUMS
-        let actualTraitPath = traitPath;
-        if (category === 'SERUMS' && (equippedTraits[category] === '7' || equippedTraits[category] === '8' || equippedTraits[category] === '9')) {
-          const tokenId = equippedTraits[category];
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token ${tokenId} detectado, se comportará como EYES`);
-          actualTraitPath = `EYES/${tokenId}.svg`;
-        }
-
-        const traitImage = await loadAndRenderSvg(actualTraitPath);
-        if (traitImage) {
-          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[render] PASO 3 - Trait ${category} renderizado correctamente`);
+        // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
+        if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
+          const traitId = equippedTraits[category];
+          const traitImage = await loadTraitFromLabimages(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          } else {
+            console.error(`[render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+          }
         }
       }
     }
