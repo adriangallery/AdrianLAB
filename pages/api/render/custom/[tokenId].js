@@ -566,6 +566,36 @@ export default async function handler(req, res) {
       }
     };
 
+    // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId
+    const loadTraitFromLabimages = async (traitId) => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+        console.log(`[custom-render] Cargando trait desde labimages: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        
+        // Renderizar SVG a PNG
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        return loadImage(pngBuffer);
+      } catch (error) {
+        console.error(`[custom-render] Error cargando trait ${traitId} desde labimages:`, error.message);
+        return null;
+      }
+    };
+
     // Determinar la imagen base según generación y skin
     const gen = generation.toString();
     let baseImagePath;
@@ -793,49 +823,17 @@ export default async function handler(req, res) {
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
-        const traitPath = `${category}/${finalTraits[category]}.svg`;
-        console.log(`[custom-render] PASO 3 - Cargando trait: ${traitPath}`);
-
-        // LÓGICA ESPECIAL: Token 48 (S.W.A.T-Shild) se renderiza en TOP
-        if (category === 'GEAR' && finalTraits[category] === '48') {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 48 detectado, se renderizará en TOP`);
-          continue; // Saltar este trait aquí, se renderizará en TOP
+        // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
+        if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
+          const traitId = finalTraits[category];
+          const traitImage = await loadTraitFromLabimages(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          } else {
+            console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+          }
         }
-
-        // LÓGICA ESPECIAL: Token 84 (Bunny-Suit) - no renderizar HEAD cuando está presente
-        if (category === 'HEAD' && finalTraits['SWAG'] === '84') {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 84 detectado, omitiendo HEAD`);
-          continue; // Saltar HEAD cuando token 84 está presente
-        }
-
-
-
-        // LÓGICA ESPECIAL: Omitir skin traits especiales en SWAG (ya se renderizaron en paso 2.5)
-        if (category === 'SWAG' && (finalTraits[category] === '37' || finalTraits[category] === '38')) {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Skin trait especial ya renderizado en paso 2.5, omitiendo`);
-          continue;
-        }
-
-        // LÓGICA ESPECIAL: Token 8 (3D Laser Eyes) se comporta como EYES aunque esté en SERUMS
-        // LÓGICA ESPECIAL: Token 7 (3D Glasses) se comporta como EYES aunque esté en SERUMS
-        let actualTraitPath = traitPath;
-        if (category === 'SERUMS' && finalTraits[category] === '8') {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 8 detectado, se comportará como EYES`);
-          actualTraitPath = `EYES/8.svg`;
-        } else if (category === 'SERUMS' && finalTraits[category] === '7') {
-          console.log(`[custom-render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 7 detectado, se comportará como EYES`);
-          actualTraitPath = `EYES/7.svg`;
-        }
-
-        const traitImage = await loadAndRenderSvg(actualTraitPath);
-        if (traitImage) {
-          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[custom-render] PASO 3 - Trait ${category} (${finalTraits[category]}) renderizado correctamente`);
-        } else {
-          console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${finalTraits[category]}) desde ${actualTraitPath}`);
-        }
-      } else {
-        console.log(`[custom-render] PASO 3 - No hay trait para categoría ${category}`);
       }
     }
 
