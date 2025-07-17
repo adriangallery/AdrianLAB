@@ -15,11 +15,11 @@ export default function Home() {
   const loadTraits = async () => {
     setLoading(true);
     try {
-      // Cargar traits del 1 al 250 (traits normales)
+      // Cargar traits del 1 al 393 (traits normales)
       const traitsData = [];
       
-      // Traits normales (1-250)
-      for (let i = 1; i <= 250; i++) {
+      // Traits normales (1-393)
+      for (let i = 1; i <= 393; i++) {
         traitsData.push({
           id: i,
           name: `Trait #${i}`,
