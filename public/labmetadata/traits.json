@@ -3488,10 +3488,790 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 334,
+      "name": "3D-Eye-Mask",
+      "category": "EYES",
+      "fileName": "3D-Eye-Mask",
+      "maxSupply": 127,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 335,
+      "name": "3D-Eye-Patch_Left",
+      "category": "EYES",
+      "fileName": "3D-Eye-Patch_Left",
+      "maxSupply": 204,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 336,
+      "name": "3D-Glasses",
+      "category": "EYES",
+      "fileName": "3D-Glasses",
+      "maxSupply": 117,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 337,
+      "name": "3D-Golden-Shades",
+      "category": "EYES",
+      "fileName": "3D-Golden-Shades",
+      "maxSupply": 39,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 338,
+      "name": "3D-Goggles",
+      "category": "EYES",
+      "fileName": "3D-Goggles",
+      "maxSupply": 131,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 339,
+      "name": "3D-Laser-Eyes",
+      "category": "EYES",
+      "fileName": "3D-Laser-Eyes",
+      "maxSupply": 96,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 340,
+      "name": "3D-Nerd-Glasses",
+      "category": "EYES",
+      "fileName": "3D-Nerd-Glasses",
+      "maxSupply": 213,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 341,
+      "name": "3D-Smooth-Shades",
+      "category": "EYES",
+      "fileName": "3D-Smooth-Shades",
+      "maxSupply": 45,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 342,
+      "name": "3D-Toned-Rimmed-Glasses",
+      "category": "EYES",
+      "fileName": "3D-Toned-Rimmed-Glasses",
+      "maxSupply": 127,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 343,
+      "name": "3D-Eye-Patch_Right",
+      "category": "EYES",
+      "fileName": "3D-Eye-Patch_Right",
+      "maxSupply": 146,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 344,
+      "name": "3D-Glasses-Big",
+      "category": "EYES",
+      "fileName": "3D-Glasses-Big",
+      "maxSupply": 99,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 345,
+      "name": "3D-Classic-Shades",
+      "category": "EYES",
+      "fileName": "3D-Classic-Shades",
+      "maxSupply": 112,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 346,
+      "name": "3D-Big-Shades",
+      "category": "EYES",
+      "fileName": "3D-Big-Shades",
+      "maxSupply": 141,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 347,
+      "name": "3D-Visor",
+      "category": "EYES",
+      "fileName": "3D-Visor",
+      "maxSupply": 124,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 348,
+      "name": "Bandana",
+      "category": "HEAD",
+      "fileName": "Bandana",
+      "maxSupply": 128,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 349,
+      "name": "Basic_3D_Black_T",
+      "category": "SWAG",
+      "fileName": "Basic_3D_Black_T",
+      "maxSupply": 176,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 350,
+      "name": "Basic_3D_White",
+      "category": "SWAG",
+      "fileName": "Basic_3D_White",
+      "maxSupply": 155,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 351,
+      "name": "Black-Fedora",
+      "category": "HEAD",
+      "fileName": "Black-Fedora",
+      "maxSupply": 174,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 352,
+      "name": "Black-T",
+      "category": "SWAG",
+      "fileName": "Black-T",
+      "maxSupply": 77,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 353,
+      "name": "BOB",
+      "category": "HAIR",
+      "fileName": "BOB",
+      "maxSupply": 26,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 354,
+      "name": "Buzz",
+      "category": "HAIR",
+      "fileName": "Buzz",
+      "maxSupply": 112,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 355,
+      "name": "Basic_White_T",
+      "category": "SWAG",
+      "fileName": "Basic_White_T",
+      "maxSupply": 182,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 356,
+      "name": "Cap-Backward",
+      "category": "HEAD",
+      "fileName": "Cap-Backward",
+      "maxSupply": 62,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 357,
+      "name": "Cap-Forward",
+      "category": "HEAD",
+      "fileName": "Cap-Forward",
+      "maxSupply": 154,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 358,
+      "name": "Choker",
+      "category": "NECK",
+      "fileName": "Choker",
+      "maxSupply": 216,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 359,
+      "name": "Cigarett",
+      "category": "MOUTH",
+      "fileName": "Cigarett",
+      "maxSupply": 212,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 360,
+      "name": "Crazy-Hair",
+      "category": "HAIR",
+      "fileName": "Crazy-Hair",
+      "maxSupply": 45,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 361,
+      "name": "Crown-Wild",
+      "category": "HAIR",
+      "fileName": "Crown-Wild",
+      "maxSupply": 185,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 362,
+      "name": "Crazy-Hair-3D",
+      "category": "HAIR",
+      "fileName": "Crazy-Hair-3D",
+      "maxSupply": 82,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 363,
+      "name": "Cowboy-Hat-Black",
+      "category": "HEAD",
+      "fileName": "Cowboy-Hat-Black",
+      "maxSupply": 46,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 364,
+      "name": "Dark-Mode",
+      "category": "BACKGROUND",
+      "fileName": "Dark-Mode",
+      "maxSupply": 113,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 365,
+      "name": "Do-rag",
+      "category": "HEAD",
+      "fileName": "Do-rag",
+      "maxSupply": 73,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 366,
+      "name": "Flat-Top",
+      "category": "HAIR",
+      "fileName": "Flat-Top",
+      "maxSupply": 83,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 367,
+      "name": "Gold-Earring",
+      "category": "EAR",
+      "fileName": "Gold-Earring",
+      "maxSupply": 194,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 368,
+      "name": "Gold-Chain",
+      "category": "NECK",
+      "fileName": "Gold-Chain",
+      "maxSupply": 212,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 369,
+      "name": "Head-Band",
+      "category": "HEAD",
+      "fileName": "Head-Band",
+      "maxSupply": 39,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 370,
+      "name": "Joint_painted",
+      "category": "MOUTH",
+      "fileName": "Joint_painted",
+      "maxSupply": 214,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 371,
+      "name": "Light-Mode",
+      "category": "BACKGROUND",
+      "fileName": "Light-Mode",
+      "maxSupply": 214,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 372,
+      "name": "Longer-Hair",
+      "category": "HAIR",
+      "fileName": "Longer-Hair",
+      "maxSupply": 199,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 373,
+      "name": "Long-Hair",
+      "category": "HAIR",
+      "fileName": "Long-Hair",
+      "maxSupply": 214,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 374,
+      "name": "Mohawk",
+      "category": "HAIR",
+      "fileName": "Mohawk",
+      "maxSupply": 75,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 375,
+      "name": "Mullet",
+      "category": "HAIR",
+      "fileName": "Mullet",
+      "maxSupply": 132,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 376,
+      "name": "Nerd-Glasses",
+      "category": "EYES",
+      "fileName": "Nerd-Glasses",
+      "maxSupply": 79,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 377,
+      "name": "Pipe",
+      "category": "MOUTH",
+      "fileName": "Pipe",
+      "maxSupply": 88,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 378,
+      "name": "Police_Cap",
+      "category": "HEAD",
+      "fileName": "Police_Cap",
+      "maxSupply": 155,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 379,
+      "name": "Purple-Cap",
+      "category": "HEAD",
+      "fileName": "Purple-Cap",
+      "maxSupply": 75,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 380,
+      "name": "Pepper",
+      "category": "HAIR",
+      "fileName": "Pepper",
+      "maxSupply": 159,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 381,
+      "name": "Regular-Shades",
+      "category": "EYES",
+      "fileName": "Regular-Shades",
+      "maxSupply": 45,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 382,
+      "name": "Short",
+      "category": "HAIR",
+      "fileName": "Short",
+      "maxSupply": 97,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 383,
+      "name": "Spike",
+      "category": "HAIR",
+      "fileName": "Spike",
+      "maxSupply": 191,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 384,
+      "name": "Tiger-Tattoo",
+      "category": "NECK",
+      "fileName": "Tiger-Tattoo",
+      "maxSupply": 42,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 385,
+      "name": "Top-Hat",
+      "category": "HEAD",
+      "fileName": "Top-Hat",
+      "maxSupply": 156,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 386,
+      "name": "Varsity_3D",
+      "category": "SWAG",
+      "fileName": "Varsity_3D",
+      "maxSupply": 113,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 387,
+      "name": "Nose-Bleed",
+      "category": "NOSE",
+      "fileName": "Nose-Bleed",
+      "maxSupply": 84,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 388,
+      "name": "Tiara-Tonsure",
+      "category": "HAIR",
+      "fileName": "Tiara-Tonsure",
+      "maxSupply": 38,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 389,
+      "name": "Pipe",
+      "category": "MOUTH",
+      "fileName": "Pipe",
+      "maxSupply": 33,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 390,
+      "name": "Diamond-Earring",
+      "category": "EAR",
+      "fileName": "Diamond-Earring",
+      "maxSupply": 114,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 391,
+      "name": "Wild",
+      "category": "HAIR",
+      "fileName": "Wild",
+      "maxSupply": 77,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 392,
+      "name": "Red-Cap",
+      "category": "HEAD",
+      "fileName": "Red-Cap",
+      "maxSupply": 154,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 393,
+      "name": "Monocle",
+      "category": "EYES",
+      "fileName": "Monocle",
+      "maxSupply": 108,
+      "floppy": "GLITCH",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 265,
+    "totalTraits": 393,
     "categories": [
       "BACKGROUND",
       "EAR",
@@ -3508,7 +4288,8 @@
       "TOP",
       "FLOPPY DISCS",
       "PAGERS",
-      "ACTION PACKS"
+      "ACTION PACKS",
+      "HAIR"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
