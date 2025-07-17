@@ -28,4 +28,4 @@ npm run build
 
 # Iniciar servidor de producción
 npm start
-``` 
+``` # Force redeploy Thu Jul 17 21:33:50 CEST 2025
