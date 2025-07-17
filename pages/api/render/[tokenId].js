@@ -106,6 +106,24 @@ const shouldRenderAsHair = (traitId) => {
   return HEAD_TO_HAIR_TOKENS.includes(parseInt(traitId));
 };
 
+// LÓGICA ESPECIAL: Mapear tokens mal categorizados en el contrato
+const CATEGORY_CORRECTIONS = {
+  // Token 8 (3D Laser Eyes) y Token 7 (3D Glasses) están en SERUMS pero son EYES
+  7: 'EYES',
+  8: 'EYES',
+  9: 'EYES'  // Token 9 también está mal categorizado
+};
+
+// Función para corregir categoría según el token ID
+const correctCategory = (category, traitId) => {
+  const correctedCategory = CATEGORY_CORRECTIONS[parseInt(traitId)];
+  if (correctedCategory) {
+    console.log(`[render] LÓGICA ESPECIAL: Token ${traitId} corregido de ${category} a ${correctedCategory}`);
+    return correctedCategory;
+  }
+  return category;
+};
+
 // =============================================
 // FUNCIÓN PARA CARGAR METADATA SEGÚN TOKEN ID
 // =============================================
@@ -487,12 +505,14 @@ export default async function handler(req, res) {
     // Detectar si hay traits animados
     const hasAnyAnimation = await Promise.all(
       Object.entries(equippedTraits).map(async ([category, traitId]) => {
-        const traitPath = `${category}/${traitId}.svg`; // category ya está normalizada
+        // Aplicar corrección de categoría para tokens mal categorizados
+        const correctedCategory = correctCategory(category, traitId);
+        const traitPath = `${correctedCategory}/${traitId}.svg`;
         const traitData = labmetadata.traits.find(t => t.tokenId === parseInt(traitId));
         const isAnimated = await isTraitAnimated(traitData, traitPath);
         
         if (isAnimated) {
-          console.log(`[render] Trait animado detectado: ${category}/${traitId}`);
+          console.log(`[render] Trait animado detectado: ${correctedCategory}/${traitId}`);
         }
         
         return isAnimated;
@@ -669,15 +689,12 @@ export default async function handler(req, res) {
           continue;
         }
 
-        // LÓGICA ESPECIAL: Token 8 (3D Laser Eyes) se comporta como EYES aunque esté en SERUMS
-        // LÓGICA ESPECIAL: Token 7 (3D Glasses) se comporta como EYES aunque esté en SERUMS
+        // LÓGICA ESPECIAL: Tokens 7, 8, 9 se comportan como EYES aunque estén en SERUMS
         let actualTraitPath = traitPath;
-        if (category === 'SERUMS' && equippedTraits[category] === '8') {
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 8 detectado, se comportará como EYES`);
-          actualTraitPath = `EYES/8.svg`;
-        } else if (category === 'SERUMS' && equippedTraits[category] === '7') {
-          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token 7 detectado, se comportará como EYES`);
-          actualTraitPath = `EYES/7.svg`;
+        if (category === 'SERUMS' && (equippedTraits[category] === '7' || equippedTraits[category] === '8' || equippedTraits[category] === '9')) {
+          const tokenId = equippedTraits[category];
+          console.log(`[render] PASO 3 - ⚠️  LÓGICA ESPECIAL: Token ${tokenId} detectado, se comportará como EYES`);
+          actualTraitPath = `EYES/${tokenId}.svg`;
         }
 
         const traitImage = await loadAndRenderSvg(actualTraitPath);
