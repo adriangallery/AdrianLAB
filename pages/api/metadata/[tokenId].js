@@ -103,7 +103,33 @@ export default async function handler(req, res) {
         }
       });
 
-      // Obtener status y profileName desde PatientZERO
+      // Obtener historial de nombres desde AdrianNameRegistry (prioridad baja)
+      let customName = null;
+      try {
+        console.log('[metadata] Llamando a getTokenNameHistory desde AdrianNameRegistry...');
+        const nameHistory = await adrianNameRegistry.getTokenNameHistory(tokenId);
+        console.log('[metadata] Respuesta de getTokenNameHistory:', {
+          history: nameHistory.map(change => ({
+            name: change[0],
+            changer: change[1],
+            timestamp: change[2].toString(),
+            paidChange: change[3]
+          }))
+        });
+        
+        // Si hay cambios de nombre en el historial, guardar el último nombre
+        if (nameHistory && nameHistory.length > 0) {
+          const lastNameChange = nameHistory[nameHistory.length - 1]; // Último cambio de nombre
+          customName = lastNameChange[0]; // El nombre personalizado
+          console.log(`[metadata] Nombre personalizado encontrado: ${customName}`);
+        }
+        
+      } catch (error) {
+        console.log('[metadata] Error obteniendo historial de nombres:', error.message);
+      }
+
+      // Obtener status y profileName desde PatientZERO (prioridad alta)
+      let profileName = null;
       try {
         console.log('[metadata] Llamando a getTokenStatus desde PatientZERO...');
         const tokenStatus = await patientZero.getTokenStatus(tokenId);
@@ -126,7 +152,7 @@ export default async function handler(req, res) {
               requiredSkin: profileData[8]
             });
             
-            const profileName = profileData[0];
+            profileName = profileData[0];
             if (profileName) baseMetadata.profileName = profileName;
           } catch (error) {
             console.error('[metadata] Error obteniendo profile:', error);
@@ -136,31 +162,19 @@ export default async function handler(req, res) {
         console.log('[metadata] Token no ha pasado por PatientZERO o error en read:', error.message);
       }
 
-      // Obtener historial de nombres desde AdrianNameRegistry
-      try {
-        console.log('[metadata] Llamando a getTokenNameHistory desde AdrianNameRegistry...');
-        const nameHistory = await adrianNameRegistry.getTokenNameHistory(tokenId);
-        console.log('[metadata] Respuesta de getTokenNameHistory:', {
-          history: nameHistory.map(change => ({
-            name: change[0],
-            changer: change[1],
-            timestamp: change[2].toString(),
-            paidChange: change[3]
-          }))
-        });
-        
-        // Si hay cambios de nombre en el historial, usar el último nombre
-        if (nameHistory && nameHistory.length > 0) {
-          const lastNameChange = nameHistory[nameHistory.length - 1]; // Último cambio de nombre
-          const customName = lastNameChange[0]; // El nombre personalizado
-          
-          // Modificar el nombre del metadata
-          baseMetadata.name = `${customName} #${tokenId}`;
-          console.log(`[metadata] Nombre personalizado aplicado: ${baseMetadata.name}`);
-        }
-        
-      } catch (error) {
-        console.log('[metadata] Error obteniendo historial de nombres:', error.message);
+      // LÓGICA DE PRIORIDAD PARA EL NOMBRE:
+      // 1. profileName (PatientZERO) tiene prioridad máxima
+      // 2. customName (AdrianNameRegistry) tiene prioridad media
+      // 3. "AdrianZero" es el fallback por defecto
+      if (profileName) {
+        baseMetadata.name = `${profileName} #${tokenId}`;
+        console.log(`[metadata] Nombre de perfil aplicado (prioridad alta): ${baseMetadata.name}`);
+      } else if (customName) {
+        baseMetadata.name = `${customName} #${tokenId}`;
+        console.log(`[metadata] Nombre personalizado aplicado (prioridad media): ${baseMetadata.name}`);
+      } else {
+        baseMetadata.name = `AdrianZero #${tokenId}`;
+        console.log(`[metadata] Nombre por defecto aplicado: ${baseMetadata.name}`);
       }
 
       // Obtener datos del token
