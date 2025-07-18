@@ -172,9 +172,12 @@ export default async function handler(req, res) {
 
       // Obtener skin del token
       console.log('[metadata] Llamando a getTokenSkin...');
-      const skinId = await core.getTokenSkin(tokenId);
+      const tokenSkinData = await core.getTokenSkin(tokenId);
+      const skinId = tokenSkinData[0]; // Extraer skinId del array
+      const skinName = tokenSkinData[1]; // Extraer skinName del array
       console.log('[metadata] Respuesta de getTokenSkin:', {
-        skinId: skinId.toString()
+        skinId: skinId.toString(),
+        skinName: skinName
       });
 
       // Obtener traits equipados
@@ -293,12 +296,21 @@ export default async function handler(req, res) {
         {
           trait_type: "Generation",
           value: tokenData[0].toString()
-        },
-        {
-          trait_type: "Skin",
-          value: `#${skinId.toString()}`
         }
       );
+
+      // Lógica del skin: mostrar "NOT_ASSIGNED" si skinId es 0, sino mostrar el nombre del skin
+      if (skinId.toString() === "0") {
+        baseMetadata.attributes.push({
+          trait_type: "Skin",
+          value: "NOT_ASSIGNED"
+        });
+      } else {
+        baseMetadata.attributes.push({
+          trait_type: "Skin",
+          value: skinName || `#${skinId.toString()}`
+        });
+      }
 
       // Añadir atributos de mutación si está mutado
       if (tokenData[2]) { // isMutated
@@ -342,7 +354,10 @@ export default async function handler(req, res) {
               },
               getTokenSkin: {
                 called: true,
-                result: skinId.toString()
+                result: {
+                  skinId: skinId.toString(),
+                  skinName: skinName
+                }
               }
             }
           },

@@ -428,6 +428,7 @@ export default async function handler(req, res) {
 
     // Mapear skin para determinar la imagen a mostrar
     let skinType;
+    let useMannequin = false;
     
     console.log('[render] Analizando skin:', {
       skinId,
@@ -435,7 +436,11 @@ export default async function handler(req, res) {
       generacion: gen
     });
     
-    if (skinName === "Zero" || skinId === "0" || skinId === "1") {
+    // Si skinId es 0, usar mannequin.svg (no hay skin asignado)
+    if (skinId.toString() === "0") {
+      useMannequin = true;
+      console.log('[render] Skin no asignado detectado, usando mannequin.svg');
+    } else if (skinName === "Zero" || skinId === "1") {
       skinType = "Medium";
       console.log('[render] Skin Zero detectado, usando Medium');
     } else if (skinId === "2" || skinName === "Dark") {
@@ -446,8 +451,10 @@ export default async function handler(req, res) {
       skinType = skinName || "Medium";
     }
 
-    // Construir path del Adrian base
-    baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
+    // Construir path del Adrian base (solo si no usamos mannequin)
+    if (!useMannequin) {
+      baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
+    }
     console.log('[render] Path de imagen base:', baseImagePath);
     console.log('[render] Mapeo aplicado:', {
       skinId,
@@ -658,19 +665,45 @@ export default async function handler(req, res) {
         console.log('[render] PASO 2 - Skin excepcional renderizado correctamente');
       }
     } else {
-      // Usar skin base normal
-      console.log('[render] PASO 2 - Usando skin base normal');
-      const baseImage = await loadAndRenderSvg(baseImagePath);
-      if (baseImage) {
-        ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-        console.log('[render] PASO 2 - Skin base renderizado correctamente');
+      // Usar skin base normal o mannequin
+      if (useMannequin) {
+        console.log('[render] PASO 2 - Usando mannequin.svg (skin no asignado)');
+        const mannequinPath = path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg');
+        try {
+          const svgContent = fs.readFileSync(mannequinPath, 'utf8');
+          const resvg = new Resvg(svgContent, {
+            fitTo: {
+              mode: 'width',
+              value: 1000
+            }
+          });
+          const pngBuffer = resvg.render().asPng();
+          const mannequinImage = await loadImage(pngBuffer);
+          ctx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Mannequin renderizado correctamente');
+        } catch (error) {
+          console.error('[render] PASO 2 - Error al cargar mannequin, intentando fallback:', error.message);
+          const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
+          const fallbackImage = await loadAndRenderSvg(fallbackPath);
+          if (fallbackImage) {
+            ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+            console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+          }
+        }
       } else {
-        console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
-        const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
-        const fallbackImage = await loadAndRenderSvg(fallbackPath);
-        if (fallbackImage) {
-          ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
-          console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+        console.log('[render] PASO 2 - Usando skin base normal');
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 2 - Skin base renderizado correctamente');
+        } else {
+          console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
+          const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
+          const fallbackImage = await loadAndRenderSvg(fallbackPath);
+          if (fallbackImage) {
+            ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+            console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
+          }
         }
       }
     }
