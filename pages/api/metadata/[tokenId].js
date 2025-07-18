@@ -135,10 +135,18 @@ export default async function handler(req, res) {
         const tokenStatus = await patientZero.getTokenStatus(tokenId);
         const status = tokenStatus[0];
         const profileId = tokenStatus[1];
+        
+        console.log('[metadata] TokenStatus obtenido:', {
+          status: status,
+          profileId: profileId.toString()
+        });
+        
         if (status) baseMetadata.status = status;
-        if (parseInt(profileId.toString()) > 0) {
+        
+        // Solo intentar obtener profile si profileId es válido y mayor que 0
+        if (profileId && parseInt(profileId.toString()) > 0) {
           try {
-            console.log('[metadata] Llamando a profiles desde PatientZERO...');
+            console.log('[metadata] Llamando a profiles desde PatientZERO con profileId: ' + profileId.toString());
             const profileData = await patientZero.profiles(profileId);
             console.log('[metadata] Respuesta de profiles:', {
               profileName: profileData[0],
@@ -153,10 +161,18 @@ export default async function handler(req, res) {
             });
             
             profileName = profileData[0];
-            if (profileName) baseMetadata.profileName = profileName;
-          } catch (error) {
-            console.error('[metadata] Error obteniendo profile:', error);
+            if (profileName && profileName.trim() !== '') {
+              baseMetadata.profileName = profileName;
+              console.log('[metadata] ProfileName válido encontrado: "' + profileName + '"');
+            } else {
+              console.log('[metadata] ProfileName vacío o inválido, ignorando');
+            }
+          } catch (profileError) {
+            console.error('[metadata] Error obteniendo profile para profileId ' + profileId.toString() + ':', profileError.message);
+            console.log('[metadata] Continuando sin profileName...');
           }
+        } else {
+          console.log('[metadata] No hay profileId válido, saltando llamada a profiles');
         }
       } catch (error) {
         console.log('[metadata] Token no ha pasado por PatientZERO o error en read:', error.message);
