@@ -436,19 +436,26 @@ export default async function handler(req, res) {
       generacion: gen
     });
     
-    // Si skinId es 0, usar mannequin.svg (no hay skin asignado)
+    // Lógica del skin basada en el contrato:
+    // - skinId = 0: No hay skin asignado (usar mannequin.svg)
+    // - skinId = 1: Skin "Zero" (usar Medium)
+    // - skinId = 2: Skin "Dark" (usar Dark)
+    // - skinId = 3: Skin "Alien" (usar Alien)
     if (skinId.toString() === "0") {
       useMannequin = true;
-      console.log('[render] Skin no asignado detectado, usando mannequin.svg');
-    } else if (skinName === "Zero" || skinId === "1") {
+      console.log('[render] Skin no asignado detectado (skinId = 0), usando mannequin.svg');
+    } else if (skinId.toString() === "1" || skinName === "Zero") {
       skinType = "Medium";
-      console.log('[render] Skin Zero detectado, usando Medium');
-    } else if (skinId === "2" || skinName === "Dark") {
+      console.log('[render] Skin Zero detectado (skinId = 1), usando Medium');
+    } else if (skinId.toString() === "2" || skinName === "Dark") {
       skinType = "Dark";
-    } else if (skinId === "3" || skinName === "Alien") {
+      console.log('[render] Skin Dark detectado (skinId = 2), usando Dark');
+    } else if (skinId.toString() === "3" || skinName === "Alien") {
       skinType = "Alien";
+      console.log('[render] Skin Alien detectado (skinId = 3), usando Alien');
     } else {
       skinType = skinName || "Medium";
+      console.log(`[render] Skin personalizado detectado: ${skinName} (skinId = ${skinId})`);
     }
 
     // Construir path del Adrian base (solo si no usamos mannequin)

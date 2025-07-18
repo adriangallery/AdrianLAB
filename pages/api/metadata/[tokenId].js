@@ -299,7 +299,10 @@ export default async function handler(req, res) {
         }
       );
 
-      // Lógica del skin: mostrar "NOT_ASSIGNED" si skinId es 0, sino mostrar el nombre del skin
+      // Lógica del skin: 
+      // - skinId = 0: No hay skin asignado (debería mostrar "NOT_ASSIGNED")
+      // - skinId = 1: Skin "Zero" (debería mostrar "Zero")
+      // - skinId > 1: Otros skins (debería mostrar el nombre del skin)
       if (skinId.toString() === "0") {
         baseMetadata.attributes.push({
           trait_type: "Skin",
@@ -308,7 +311,7 @@ export default async function handler(req, res) {
       } else {
         baseMetadata.attributes.push({
           trait_type: "Skin",
-          value: skinName || `#${skinId.toString()}`
+          value: skinName
         });
       }
 
