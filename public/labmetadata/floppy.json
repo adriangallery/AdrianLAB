@@ -47,10 +47,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 10004,
+      "name": "GF Floppy",
+      "category": "Floppy discs",
+      "fileName": "GF-Floppy",
+      "maxSupply": 1,
+      "floppy": "GF",
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 4,
+    "totalFloppys": 5,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
