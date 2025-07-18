@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { getContracts } from '../../../../lib/contracts.js';
 
 export default async function handler(req, res) {
   try {
@@ -64,6 +65,21 @@ export default async function handler(req, res) {
         maxSupply: 300
       };
 
+      // Obtener total minted del contrato
+      let totalMinted = 0;
+      try {
+        console.log(`[floppy-metadata] Obteniendo totalMintedPerAsset para trait ${tokenIdNum}...`);
+        const { traitsCore } = await getContracts();
+        const mintedAmount = await traitsCore.totalMintedPerAsset(tokenIdNum);
+        totalMinted = mintedAmount.toNumber();
+        console.log(`[floppy-metadata] Total minted obtenido del contrato: ${totalMinted}`);
+      } catch (error) {
+        console.error(`[floppy-metadata] Error obteniendo totalMintedPerAsset:`, error.message);
+        // Fallback: usar maxSupply como total minted si falla la llamada onchain
+        totalMinted = tokenData.maxSupply;
+        console.log(`[floppy-metadata] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
+      }
+
         // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
     if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
@@ -78,17 +94,17 @@ export default async function handler(req, res) {
       // Metadata para tokens del 1 al 9999 (traits con renderizado dinámico)
     const metadata = {
         name: tokenData.name,
-        description: `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
+        description: tokenData.description || `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
         image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-        external_url: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
+        external_url: tokenData.external_url || `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
       attributes: [
         {
             trait_type: "Category",
             value: tokenData.category
           },
           {
-            trait_type: "Max Supply",
-            value: tokenData.maxSupply
+            trait_type: "TOTAL MINTED",
+            value: totalMinted
           },
           {
             trait_type: "Floppy",
@@ -118,8 +134,8 @@ export default async function handler(req, res) {
       let metadataPath;
       let dataKey;
       
-      if (tokenIdNum >= 10000 && tokenIdNum <= 10003) {
-        // Floppy discs (10000-10003)
+      if (tokenIdNum >= 10000 && tokenIdNum <= 10004) {
+        // Floppy discs (10000-10004) - Incluir 10004
         metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'floppy.json');
         dataKey = 'floppys';
         console.log(`[floppy-metadata] Cargando desde floppy.json para token ${tokenIdNum}`);
