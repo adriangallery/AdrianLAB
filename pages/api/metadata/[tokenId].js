@@ -146,8 +146,8 @@ export default async function handler(req, res) {
         // Solo intentar obtener profile si profileId es válido y mayor que 0
         if (profileId && parseInt(profileId.toString()) > 0) {
           try {
-            console.log('[metadata] Llamando a profiles desde PatientZERO con profileId: ' + profileId.toString());
-            const profileData = await patientZero.profiles(profileId);
+            console.log('[metadata] Llamando a getProfile desde PatientZERO con profileId: ' + profileId.toString());
+            const profileData = await patientZero.getProfile(profileId);
             console.log('[metadata] Respuesta de profiles:', {
               profileName: profileData[0],
               traitIds: profileData[1].map(id => id.toString()),
