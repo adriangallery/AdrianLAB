@@ -819,7 +819,7 @@ export default async function handler(req, res) {
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
     // Nuevo orden de renderizado: incluyendo HAIR antes que HEAD y HAT después de HAIR
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HAT', 'HEAD', 'SWAG', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HEAD', 'SWAG', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS', 'RANDOMSHIT'];
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
