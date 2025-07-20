@@ -742,6 +742,15 @@ export default async function handler(req, res) {
       if (equippedTraits[category]) {
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
         if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
+          // LÓGICA DE EXCLUSIVIDAD: SERUMS solo si NO hay EYES
+          if (category === 'SERUMS') {
+            const eyesTrait = equippedTraits['EYES'];
+            if (eyesTrait && eyesTrait !== 'None' && eyesTrait !== '') {
+              console.log(`[render] PASO 3 - 🚫 LÓGICA DE EXCLUSIVIDAD: Saltando SERUMS (${equippedTraits[category]}) porque hay EYES (${eyesTrait}) activado`);
+              continue; // Saltar SERUMS si hay EYES activados
+            }
+          }
+          
           const traitId = equippedTraits[category];
           const traitImage = await loadTraitFromLabimages(traitId);
           if (traitImage) {
