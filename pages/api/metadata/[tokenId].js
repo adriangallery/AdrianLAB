@@ -148,16 +148,12 @@ export default async function handler(req, res) {
           try {
             console.log('[metadata] Llamando a getProfile desde PatientZERO con profileId: ' + profileId.toString());
             const profileData = await patientZero.getProfile(profileId);
-            console.log('[metadata] Respuesta de profiles:', {
+            console.log('[metadata] Respuesta de getProfile:', {
               profileName: profileData[0],
               traitIds: profileData[1].map(id => id.toString()),
               reward: profileData[2].toString(),
               active: profileData[3],
-              recovered: profileData[4].toString(),
-              checkGeneration: profileData[5],
-              requiredGeneration: profileData[6].toString(),
-              checkSkin: profileData[7],
-              requiredSkin: profileData[8]
+              recovered: profileData[4].toString()
             });
             
             profileName = profileData[0];
