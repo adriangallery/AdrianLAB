@@ -441,6 +441,7 @@ export default async function handler(req, res) {
     // - skinId = 1: Skin "Zero" (usar Medium)
     // - skinId = 2: Skin "Dark" (usar Dark)
     // - skinId = 3: Skin "Alien" (usar Alien)
+    // - skinId = 4: Skin "Albino" (usar Albino)
     if (skinId.toString() === "0") {
       useMannequin = true;
       console.log('[render] Skin no asignado detectado (skinId = 0), usando mannequin.svg');
@@ -453,6 +454,9 @@ export default async function handler(req, res) {
     } else if (skinId.toString() === "3" || skinName === "Alien") {
       skinType = "Alien";
       console.log('[render] Skin Alien detectado (skinId = 3), usando Alien');
+    } else if (skinId.toString() === "4" || skinName === "Albino") {
+      skinType = "Albino";
+      console.log('[render] Skin Albino detectado (skinId = 4), usando Albino');
     } else {
       skinType = skinName || "Medium";
       console.log(`[render] Skin personalizado detectado: ${skinName} (skinId = ${skinId})`);
