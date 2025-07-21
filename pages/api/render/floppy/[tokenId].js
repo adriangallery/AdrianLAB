@@ -422,7 +422,7 @@ async function handleRenderToken(req, res, tokenId) {
       ${textToSVGElement(tokenData.name, {
         x: 84 + 600 / 2,  // Centro horizontal del rectángulo
         y: 760 + 80 / 2,  // Centro vertical del rectángulo
-        fontSize: 110,
+        fontSize: 85,
         fill: '#ffffff',
         anchor: 'center middle'
       })}
