@@ -138,7 +138,7 @@ export default async function handler(req, res) {
     }
 
     // 3. Dibujar el AdrianZERO pequeño en el canvas final
-    const adrianX = (CANVAS_SIZE - ADRIAN_SIZE) / 2;
+    const adrianX = (CANVAS_SIZE - ADRIAN_SIZE) / 2 - 30; // mover 30px a la izquierda
     const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
     const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
     const adrianY = CANVAS_SIZE - lamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
