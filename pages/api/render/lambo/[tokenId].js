@@ -141,7 +141,7 @@ export default async function handler(req, res) {
     const adrianX = (CANVAS_SIZE - ADRIAN_SIZE) / 2;
     const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
     const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
-    const adrianY = CANVAS_SIZE - lamboHeightPx - ADRIAN_SIZE + 10 + 100; // +100 para bajarlo más
+    const adrianY = CANVAS_SIZE - lamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
     ctx.drawImage(adrianBuffer, adrianX, adrianY, ADRIAN_SIZE, ADRIAN_SIZE);
 
     // 4. Renderizar el Lambo como capa superior
