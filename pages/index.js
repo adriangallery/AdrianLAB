@@ -97,9 +97,9 @@ export default function Home() {
             <p>API for token rendering. Example: /api/render/1</p>
           </a>
 
-          <a href="/api/render/lambo/1" className={styles.card}>
+          <a href="/api/render/lambo/1?lambo=Lambo_Variant_Red" className={styles.card}>
             <h2>Lambo Render &rarr;</h2>
-            <p>Render de AdrianZERO sobre Lambo. Ejemplo: /api/render/lambo/1</p>
+            <p>Render de AdrianZERO sobre Lambo. Puedes elegir el color del Lambo con el parámetro <code>?lambo=</code>. Ejemplo: /api/render/lambo/1?lambo=Lambo_Variant_Red</p>
           </a>
 
           <a href="/api/metadata/1" className={styles.card}>
