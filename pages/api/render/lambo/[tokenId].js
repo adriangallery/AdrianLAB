@@ -4,14 +4,42 @@ import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getContracts } from '../../../../lib/contracts.js';
 
-// Utilidad para elegir el Lambo (por ahora fijo, luego se puede parametrizar)
-const LAMBO_FILE = 'Lambo_Variant_Yellow.svg';
+const LAMBO_DEFAULT = 'Lambo_Variant_Yellow';
 const LAMBO_WIDTH = 188.6;
 const LAMBO_HEIGHT = 52.275;
 const CANVAS_SIZE = 1000;
 
+// Utilidad para cargar y renderizar un trait SVG desde labimages
+async function loadTraitFromLabimages(traitId) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const svgBuffer = await response.arrayBuffer();
+    const resvg = new Resvg(Buffer.from(svgBuffer), { fitTo: { mode: 'width', value: 1000 } });
+    const pngBuffer = resvg.render().asPng();
+    return loadImage(pngBuffer);
+  } catch (error) {
+    console.error(`[lambo-render] Error cargando trait ${traitId} desde labimages:`, error.message);
+    return null;
+  }
+}
+
+// Utilidad para cargar y renderizar un SVG desde traits/
+async function loadAndRenderSvg(svgPath) {
+  try {
+    const svgContent = fs.readFileSync(path.join(process.cwd(), 'public', 'traits', svgPath), 'utf8');
+    const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+    const pngBuffer = resvg.render().asPng();
+    return loadImage(pngBuffer);
+  } catch (error) {
+    console.error(`[lambo-render] Error cargando SVG ${svgPath}:`, error.message);
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
-  // Permitir CORS universal
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -21,15 +49,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extraer tokenId
-    const { tokenId } = req.query;
+    // Token y lambo
+    const { tokenId, lambo } = req.query;
     const cleanTokenId = tokenId.replace('.png', '');
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
+    const lamboFile = `${lambo || LAMBO_DEFAULT}.svg`;
 
     // Conectar con los contratos
-    const { core } = await getContracts();
+    const { core, traitsExtension } = await getContracts();
     // Obtener datos del token
     const tokenData = await core.getTokenData(cleanTokenId);
     const [generation] = tokenData;
@@ -37,51 +66,79 @@ export default async function handler(req, res) {
     const tokenSkinData = await core.getTokenSkin(cleanTokenId);
     const skinId = tokenSkinData[0].toString();
     const skinName = tokenSkinData[1];
-    // Determinar el Adrian base
+    // Obtener traits equipados
+    const nested = await traitsExtension.getAllEquippedTraits(cleanTokenId);
+    const categories = nested[0];
+    const traitIds = nested[1];
+    // Mapear traits
+    const equippedTraits = {};
+    categories.forEach((category, index) => {
+      equippedTraits[category.toUpperCase()] = traitIds[index].toString();
+    });
+
+    // Lógica de skin
     let skinType;
-    if (skinName === "Zero" || skinId === "0" || skinId === "1") {
-      skinType = "Medium";
-    } else if (skinId === "2" || skinName === "Dark") {
-      skinType = "Dark";
-    } else if (skinId === "3" || skinName === "Alien") {
-      skinType = "Alien";
-    } else {
-      skinType = skinName || "Medium";
-    }
-    const baseImagePath = `ADRIAN/GEN${generation}-${skinType}.svg`;
+    let useMannequin = false;
+    if (skinId === "0") useMannequin = true;
+    else if (skinId === "1" || skinName === "Zero") skinType = "Medium";
+    else if (skinId === "2" || skinName === "Dark") skinType = "Dark";
+    else if (skinId === "3" || skinName === "Alien") skinType = "Alien";
+    else if (skinId === "4" || skinName === "Albino") skinType = "Albino";
+    else skinType = skinName || "Medium";
+    const gen = generation.toString();
+    let baseImagePath = !useMannequin ? `ADRIAN/GEN${gen}-${skinType}.svg` : null;
 
     // Crear canvas
     const canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // 1. Renderizar el Lambo como base (centrado abajo)
-    const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', LAMBO_FILE);
+    // 1. Renderizar BACKGROUND si existe
+    if (equippedTraits['BACKGROUND']) {
+      const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
+      const bgImage = await loadAndRenderSvg(bgPath);
+      if (bgImage) ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+    }
+
+    // 2. Renderizar SKIN base o mannequin
+    if (useMannequin) {
+      const mannequinPath = path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg');
+      const svgContent = fs.readFileSync(mannequinPath, 'utf8');
+      const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+      const pngBuffer = resvg.render().asPng();
+      const mannequinImage = await loadImage(pngBuffer);
+      ctx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+    } else {
+      const baseImage = await loadAndRenderSvg(baseImagePath);
+      if (baseImage) ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+    }
+
+    // 3. Renderizar traits adicionales (orden visual)
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    for (const category of traitOrder) {
+      if (equippedTraits[category]) {
+        const traitId = equippedTraits[category];
+        const traitImage = await loadTraitFromLabimages(traitId);
+        if (traitImage) ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+      }
+    }
+
+    // 4. Renderizar TOP layers
+    if (equippedTraits['TOP']) {
+      const traitPath = `TOP/${equippedTraits['TOP']}.svg`;
+      const traitImage = await loadAndRenderSvg(traitPath);
+      if (traitImage) ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+    }
+
+    // 5. Renderizar el Lambo como capa superior
+    const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', lamboFile);
     const lamboSvgContent = fs.readFileSync(lamboSvgPath, 'utf8');
-    const resvgLambo = new Resvg(lamboSvgContent, {
-      fitTo: { mode: 'width', value: CANVAS_SIZE },
-    });
+    const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: CANVAS_SIZE } });
     const lamboPng = resvgLambo.render().asPng();
     const lamboImg = await loadImage(lamboPng);
-    // El Lambo va centrado horizontal y pegado abajo
     const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
     const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
     ctx.drawImage(lamboImg, 0, CANVAS_SIZE - lamboHeightPx, CANVAS_SIZE, lamboHeightPx);
-
-    // 2. Renderizar el AdrianZERO encima (centrado, más pequeño)
-    const adrianSvgPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `GEN${generation}-${skinType}.svg`);
-    const adrianSvgContent = fs.readFileSync(adrianSvgPath, 'utf8');
-    // Escalamos el Adrian para que quede bien sobre el Lambo
-    const adrianScale = 0.6; // Ajustable
-    const adrianSize = CANVAS_SIZE * adrianScale;
-    const adrianX = (CANVAS_SIZE - adrianSize) / 2;
-    const adrianY = CANVAS_SIZE - lamboHeightPx - adrianSize + 60; // +60 para que sobresalga
-    const resvgAdrian = new Resvg(adrianSvgContent, {
-      fitTo: { mode: 'width', value: adrianSize },
-    });
-    const adrianPng = resvgAdrian.render().asPng();
-    const adrianImg = await loadImage(adrianPng);
-    ctx.drawImage(adrianImg, adrianX, adrianY, adrianSize, adrianSize);
 
     // Devolver imagen
     res.setHeader('Content-Type', 'image/png');
