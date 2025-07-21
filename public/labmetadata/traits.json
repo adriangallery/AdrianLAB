@@ -7076,10 +7076,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 556,
+      "name": "Pink-Snot",
+      "category": "NOSE",
+      "fileName": "Pink-Snot",
+      "maxSupply": 53,
+      "floppy": "GF",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 557,
+      "name": "Bubble-Gum",
+      "category": "MOUTH",
+      "fileName": "Bubble-Gum",
+      "maxSupply": 96,
+      "floppy": "GF",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 544,
+    "totalTraits": 546,
     "categories": [
       "BACKGROUND",
       "EAR",
