@@ -97,6 +97,11 @@ export default function Home() {
             <p>API for token rendering. Example: /api/render/1</p>
           </a>
 
+          <a href="/api/render/lambo/1" className={styles.card}>
+            <h2>Lambo Render &rarr;</h2>
+            <p>Render de AdrianZERO sobre Lambo. Ejemplo: /api/render/lambo/1</p>
+          </a>
+
           <a href="/api/metadata/1" className={styles.card}>
             <h2>MetadataZERO &rarr;</h2>
             <p>API for token metadata. Example: /api/metadata/1</p>
