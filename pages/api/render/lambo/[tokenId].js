@@ -8,6 +8,8 @@ const LAMBO_DEFAULT = 'Lambo_Variant_Yellow';
 const LAMBO_WIDTH = 188.6;
 const LAMBO_HEIGHT = 52.275;
 const CANVAS_SIZE = 1000;
+const ADRIAN_SCALE = 0.25; // 1/4 del tamaño original
+const ADRIAN_SIZE = CANVAS_SIZE * ADRIAN_SCALE;
 
 // Utilidad para cargar y renderizar un trait SVG desde labimages
 async function loadTraitFromLabimages(traitId) {
@@ -88,56 +90,66 @@ export default async function handler(req, res) {
     const gen = generation.toString();
     let baseImagePath = !useMannequin ? `ADRIAN/GEN${gen}-${skinType}.svg` : null;
 
-    // Crear canvas
+    // Crear canvas final
     const canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // 1. Renderizar BACKGROUND si existe
+    // 1. Renderizar BACKGROUND si existe (en el canvas final, ocupa todo)
     if (equippedTraits['BACKGROUND']) {
       const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
       const bgImage = await loadAndRenderSvg(bgPath);
-      if (bgImage) ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+      if (bgImage) ctx.drawImage(bgImage, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
     }
 
-    // 2. Renderizar SKIN base o mannequin
+    // 2. Renderizar AdrianZERO completo en un buffer temporal (1000x1000)
+    const adrianBuffer = createCanvas(1000, 1000);
+    const adrianCtx = adrianBuffer.getContext('2d');
+    adrianCtx.clearRect(0, 0, 1000, 1000);
+
+    // SKIN base o mannequin
     if (useMannequin) {
       const mannequinPath = path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg');
       const svgContent = fs.readFileSync(mannequinPath, 'utf8');
       const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
       const pngBuffer = resvg.render().asPng();
       const mannequinImage = await loadImage(pngBuffer);
-      ctx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+      adrianCtx.drawImage(mannequinImage, 0, 0, 1000, 1000);
     } else {
       const baseImage = await loadAndRenderSvg(baseImagePath);
-      if (baseImage) ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+      if (baseImage) adrianCtx.drawImage(baseImage, 0, 0, 1000, 1000);
     }
 
-    // 3. Renderizar traits adicionales (orden visual)
+    // Traits adicionales (orden visual)
     const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
         const traitId = equippedTraits[category];
         const traitImage = await loadTraitFromLabimages(traitId);
-        if (traitImage) ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+        if (traitImage) adrianCtx.drawImage(traitImage, 0, 0, 1000, 1000);
       }
     }
 
-    // 4. Renderizar TOP layers
+    // TOP layers
     if (equippedTraits['TOP']) {
       const traitPath = `TOP/${equippedTraits['TOP']}.svg`;
       const traitImage = await loadAndRenderSvg(traitPath);
-      if (traitImage) ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+      if (traitImage) adrianCtx.drawImage(traitImage, 0, 0, 1000, 1000);
     }
 
-    // 5. Renderizar el Lambo como capa superior
+    // 3. Dibujar el AdrianZERO pequeño en el canvas final
+    const adrianX = (CANVAS_SIZE - ADRIAN_SIZE) / 2;
+    const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
+    const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
+    const adrianY = CANVAS_SIZE - lamboHeightPx - ADRIAN_SIZE + 10; // +10 para que sobresalga un poco
+    ctx.drawImage(adrianBuffer, adrianX, adrianY, ADRIAN_SIZE, ADRIAN_SIZE);
+
+    // 4. Renderizar el Lambo como capa superior
     const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', lamboFile);
     const lamboSvgContent = fs.readFileSync(lamboSvgPath, 'utf8');
     const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: CANVAS_SIZE } });
     const lamboPng = resvgLambo.render().asPng();
     const lamboImg = await loadImage(lamboPng);
-    const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
-    const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
     ctx.drawImage(lamboImg, 0, CANVAS_SIZE - lamboHeightPx, CANVAS_SIZE, lamboHeightPx);
 
     // Devolver imagen
