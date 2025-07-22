@@ -140,18 +140,19 @@ export default async function handler(req, res) {
 
     // 3. Dibujar el AdrianZERO pequeño en el canvas final
     const adrianX = (CANVAS_WIDTH - ADRIAN_SIZE) / 2 - 30; // mover 30px a la izquierda
-    const lamboScale = CANVAS_WIDTH / LAMBO_WIDTH;
-    const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
-    const adrianY = CANVAS_HEIGHT - lamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
+    const originalLamboScale = 1000 / LAMBO_WIDTH; // Usar el tamaño original de 1000px
+    const originalLamboHeightPx = LAMBO_HEIGHT * originalLamboScale;
+    const adrianY = CANVAS_HEIGHT - originalLamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
     ctx.drawImage(adrianBuffer, adrianX, adrianY, ADRIAN_SIZE, ADRIAN_SIZE);
 
     // 4. Renderizar el Lambo como capa superior
     const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', lamboFile);
     const lamboSvgContent = fs.readFileSync(lamboSvgPath, 'utf8');
-    const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: CANVAS_WIDTH } });
+    const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: 1000 } }); // Mantener el tamaño original de 1000px
     const lamboPng = resvgLambo.render().asPng();
     const lamboImg = await loadImage(lamboPng);
-    ctx.drawImage(lamboImg, 0, CANVAS_HEIGHT - lamboHeightPx, CANVAS_WIDTH, lamboHeightPx);
+    const lamboX = (CANVAS_WIDTH - 1000) / 2; // Centrar el Lambo horizontalmente
+    ctx.drawImage(lamboImg, lamboX, CANVAS_HEIGHT - originalLamboHeightPx, 1000, originalLamboHeightPx);
 
     // Devolver imagen
     res.setHeader('Content-Type', 'image/png');
