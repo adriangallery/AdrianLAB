@@ -823,6 +823,11 @@ export default async function handler(req, res) {
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
+        // LÓGICA ESPECIAL: No renderizar HAIR 21 si HEAD 209 está activo
+        if (category === 'HAIR' && finalTraits['HAIR'] === '21' && finalTraits['HEAD'] === '209') {
+          console.log('[custom-render] LÓGICA ESPECIAL: No renderizar HAIR 21 porque HEAD 209 está activo');
+          continue;
+        }
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
         if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
           const traitId = finalTraits[category];

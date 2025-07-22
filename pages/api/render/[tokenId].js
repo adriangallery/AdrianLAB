@@ -740,6 +740,11 @@ export default async function handler(req, res) {
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
+        // LÓGICA ESPECIAL: No renderizar HAIR 21 si HEAD 209 está activo
+        if (category === 'HAIR' && equippedTraits['HAIR'] === '21' && equippedTraits['HEAD'] === '209') {
+          console.log('[render] LÓGICA ESPECIAL: No renderizar HAIR 21 porque HEAD 209 está activo');
+          continue;
+        }
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
         if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
           // LÓGICA DE EXCLUSIVIDAD: SERUMS solo si NO hay EYES
@@ -750,7 +755,6 @@ export default async function handler(req, res) {
               continue; // Saltar SERUMS si hay EYES activados
             }
           }
-          
           const traitId = equippedTraits[category];
           const traitImage = await loadTraitFromLabimages(traitId);
           if (traitImage) {
