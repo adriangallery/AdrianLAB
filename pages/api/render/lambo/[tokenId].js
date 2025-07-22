@@ -7,9 +7,10 @@ import { getContracts } from '../../../../lib/contracts.js';
 const LAMBO_DEFAULT = 'Lambo_Variant_Yellow';
 const LAMBO_WIDTH = 188.6;
 const LAMBO_HEIGHT = 52.275;
-const CANVAS_SIZE = 1000;
+const CANVAS_WIDTH = 1500;
+const CANVAS_HEIGHT = 500;
 const ADRIAN_SCALE = 0.25; // 1/4 del tamaño original
-const ADRIAN_SIZE = CANVAS_SIZE * ADRIAN_SCALE;
+const ADRIAN_SIZE = 1000 * ADRIAN_SCALE; // Mantener el tamaño del AdrianZERO basado en 1000px
 
 // Utilidad para cargar y renderizar un trait SVG desde labimages
 async function loadTraitFromLabimages(traitId) {
@@ -91,15 +92,15 @@ export default async function handler(req, res) {
     let baseImagePath = !useMannequin ? `ADRIAN/GEN${gen}-${skinType}.svg` : null;
 
     // Crear canvas final
-    const canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
+    const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // 1. Renderizar BACKGROUND si existe (en el canvas final, ocupa todo)
     if (equippedTraits['BACKGROUND']) {
       const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
       const bgImage = await loadAndRenderSvg(bgPath);
-      if (bgImage) ctx.drawImage(bgImage, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      if (bgImage) ctx.drawImage(bgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 
     // 2. Renderizar AdrianZERO completo en un buffer temporal (1000x1000)
@@ -138,19 +139,19 @@ export default async function handler(req, res) {
     }
 
     // 3. Dibujar el AdrianZERO pequeño en el canvas final
-    const adrianX = (CANVAS_SIZE - ADRIAN_SIZE) / 2 - 30; // mover 30px a la izquierda
-    const lamboScale = CANVAS_SIZE / LAMBO_WIDTH;
+    const adrianX = (CANVAS_WIDTH - ADRIAN_SIZE) / 2 - 30; // mover 30px a la izquierda
+    const lamboScale = CANVAS_WIDTH / LAMBO_WIDTH;
     const lamboHeightPx = LAMBO_HEIGHT * lamboScale;
-    const adrianY = CANVAS_SIZE - lamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
+    const adrianY = CANVAS_HEIGHT - lamboHeightPx - ADRIAN_SIZE + 10 + 100 - 20; // subir 20px
     ctx.drawImage(adrianBuffer, adrianX, adrianY, ADRIAN_SIZE, ADRIAN_SIZE);
 
     // 4. Renderizar el Lambo como capa superior
     const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', lamboFile);
     const lamboSvgContent = fs.readFileSync(lamboSvgPath, 'utf8');
-    const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: CANVAS_SIZE } });
+    const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: CANVAS_WIDTH } });
     const lamboPng = resvgLambo.render().asPng();
     const lamboImg = await loadImage(lamboPng);
-    ctx.drawImage(lamboImg, 0, CANVAS_SIZE - lamboHeightPx, CANVAS_SIZE, lamboHeightPx);
+    ctx.drawImage(lamboImg, 0, CANVAS_HEIGHT - lamboHeightPx, CANVAS_WIDTH, lamboHeightPx);
 
     // Devolver imagen
     res.setHeader('Content-Type', 'image/png');
