@@ -132,8 +132,8 @@ export default async function handler(req, res) {
 
     // TOP layers
     if (equippedTraits['TOP']) {
-      const traitPath = `TOP/${equippedTraits['TOP']}.svg`;
-      const traitImage = await loadAndRenderSvg(traitPath);
+      const traitId = equippedTraits['TOP'];
+      const traitImage = await loadTraitFromLabimages(traitId);
       if (traitImage) adrianCtx.drawImage(traitImage, 0, 0, 1000, 1000);
     }
 

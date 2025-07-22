@@ -769,13 +769,15 @@ export default async function handler(req, res) {
 
     for (const category of topOrder) {
       if (equippedTraits[category]) {
-        const traitPath = `${category}/${equippedTraits[category]}.svg`;
-        console.log(`[render] PASO 4 - Cargando TOP trait: ${traitPath}`);
+        const traitId = equippedTraits[category];
+        console.log(`[render] PASO 4 - Cargando TOP trait: ${traitId}`);
 
-        const traitImage = await loadAndRenderSvg(traitPath);
+        const traitImage = await loadTraitFromLabimages(traitId);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[render] PASO 4 - TOP trait ${category} renderizado correctamente`);
+          console.log(`[render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+        } else {
+          console.error(`[render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
         }
       }
     }
