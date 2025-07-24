@@ -365,7 +365,7 @@ export default async function handler(req, res) {
         
         if (serumSuccess && serumMutation === "AdrianGF") {
           appliedSerumForBase = serumMutation;
-          baseTokenId = "118"; // Usar token 118 como base para ADRIANGF
+          baseTokenId = "146"; // Usar token 146 como base para ADRIANGF
           console.log(`[custom-render] 🧬 LÓGICA TRAITLAB: Serum ADRIANGF detectado, cambiando token base de ${cleanTokenId} a ${baseTokenId}`);
         }
       }
