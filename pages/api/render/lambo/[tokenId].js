@@ -121,8 +121,8 @@ export default async function handler(req, res) {
       if (baseImage) adrianCtx.drawImage(baseImage, 0, 0, 1000, 1000);
     }
 
-    // Traits adicionales (orden visual)
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HAIR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    // Traits adicionales (orden visual) - HAIR después de SWAG para que se renderice encima
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
         const traitId = equippedTraits[category];
