@@ -2,12 +2,12 @@
   "floppys": [
     {
       "tokenId": 10000,
-      "name": "STARTER Floppy",
+      "name": "OG Floppy",
       "category": "Floppy discs",
       "fileName": "STARTER-Floppy",
-      "maxSupply": 1000,
-      "floppy": "STARTER",
-      "traitsInside": 1,
+      "maxSupply": 100,
+      "floppy": "OG",
+      "traitsInside": 3,
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianpunks.com/"
@@ -53,7 +53,7 @@
       "name": "GF Floppy",
       "category": "Floppy discs",
       "fileName": "GF-Floppy",
-      "maxSupply": 1,
+      "maxSupply": 300,
       "floppy": "GF",
       "traitsInside": "IDK",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
