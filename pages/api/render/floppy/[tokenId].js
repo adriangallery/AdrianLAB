@@ -4,6 +4,11 @@ import fs from 'fs';
 import { createCanvas } from 'canvas';
 import { textToSVGElement, linesToSVG } from '../../../../lib/text-to-svg.js';
 import { getContracts } from '../../../../lib/contracts.js';
+import { 
+  getCachedFloppyRender, 
+  setCachedFloppyRender, 
+  getFloppyRenderTTL 
+} from '../../../../lib/cache.js';
 
 // Cache para traits animados
 const animatedTraitsCache = new Map();
@@ -161,6 +166,23 @@ export default async function handler(req, res) {
     }
 
     const tokenIdNum = parseInt(tokenId);
+
+    // ===== SISTEMA DE CACHÉ PARA FLOPPY RENDER =====
+    const cachedImage = getCachedFloppyRender(tokenIdNum);
+    
+    if (cachedImage) {
+      console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
+      
+      // Configurar headers de caché
+      const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Content-Type', 'image/png');
+      
+      return res.status(200).send(cachedImage);
+    }
+
+    console.log(`[floppy-render] 💾 CACHE MISS para token ${tokenIdNum} - Generando imagen...`);
     console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
@@ -495,9 +517,16 @@ async function handleRenderToken(req, res, tokenId) {
     const pngBuffer = resvg.render().asPng();
     console.log(`[floppy-render] SVG completo renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
 
+    // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+    setCachedFloppyRender(tokenIdNum, pngBuffer);
+    
+    const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+    console.log(`[floppy-render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+
     // Configurar headers
+    res.setHeader('X-Cache', 'MISS');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
     // Devolver imagen
     console.log(`[floppy-render] ===== RENDERIZADO SVG COMPLETO FINALIZADO =====`);

@@ -8,13 +8,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const traitsPerPage = 6;
 
-  // Estados para el caché de floppy metadata
+  // Estados para el caché de floppy metadata y render
   const [floppyCacheStats, setFloppyCacheStats] = useState(null);
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
-    endId: ''
+    endId: '',
+    type: 'both' // 'metadata', 'render', 'both'
   });
 
   useEffect(() => {
@@ -88,7 +89,11 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action, ...params })
+        body: JSON.stringify({ 
+          action, 
+          ...params,
+          type: floppyRefreshForm.type // Incluir el tipo seleccionado
+        })
       });
       
       const data = await response.json();
@@ -239,37 +244,97 @@ export default function Home() {
           )}
         </div>
 
-        {/* Nueva sección de administración de caché para floppy metadata */}
+        {/* Nueva sección de administración de caché para floppy metadata y render */}
         <div className={styles.adminSection}>
-          <h2 className={styles.adminTitle}>🗄️ Floppy Metadata Cache Management</h2>
+          <h2 className={styles.adminTitle}>🗄️ Floppy Cache Management (Metadata + Render)</h2>
           
           {floppyCacheLoading ? (
             <p>Loading cache stats...</p>
           ) : floppyCacheStats ? (
             <div className={styles.cacheStats}>
+              {/* Metadata Stats */}
+              <h3>📄 Metadata Cache</h3>
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
-                  <h3>Total Cached</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.stats.total}</p>
+                  <h3>Total Metadata</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.total}</p>
                 </div>
                 <div className={styles.statCard}>
                   <h3>Traits (1-9999)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.stats.traits}</p>
-                  <small>{floppyCacheStats.ttlConfig.traits}</small>
+                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.traits}</p>
+                  <small>{floppyCacheStats.metadata.ttlConfig.traits}</small>
                 </div>
                 <div className={styles.statCard}>
                   <h3>Floppys (10000+)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.stats.floppys}</p>
-                  <small>{floppyCacheStats.ttlConfig.floppys}</small>
+                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.floppys}</p>
+                  <small>{floppyCacheStats.metadata.ttlConfig.floppys}</small>
                 </div>
                 <div className={styles.statCard}>
                   <h3>Serum (262144)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.stats.serums}</p>
-                  <small>{floppyCacheStats.ttlConfig.serum}</small>
+                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.serums}</p>
+                  <small>{floppyCacheStats.metadata.ttlConfig.serum}</small>
+                </div>
+              </div>
+              
+              {/* Render Stats */}
+              <h3>🖼️ Render Cache</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Renders</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.total}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Traits (1-9999)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.traits}</p>
+                  <small>{floppyCacheStats.render.ttlConfig.traits}</small>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Floppys (10000+)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.floppys}</p>
+                  <small>{floppyCacheStats.render.ttlConfig.floppys}</small>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Serum (262144)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.serums}</p>
+                  <small>{floppyCacheStats.render.ttlConfig.serum}</small>
                 </div>
               </div>
               
               <div className={styles.cacheActions}>
+                <h3>🎛️ Cache Type Selector</h3>
+                <div className={styles.typeSelector}>
+                  <label>
+                    <input
+                      type="radio"
+                      name="cacheType"
+                      value="both"
+                      checked={floppyRefreshForm.type === 'both'}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
+                    />
+                    Both (Metadata + Render)
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="cacheType"
+                      value="metadata"
+                      checked={floppyRefreshForm.type === 'metadata'}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
+                    />
+                    Metadata Only
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="cacheType"
+                      value="render"
+                      checked={floppyRefreshForm.type === 'render'}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
+                    />
+                    Render Only
+                  </label>
+                </div>
+                
                 <h3>🔄 Quick Actions</h3>
                 <div className={styles.actionButtons}>
                   <button 
