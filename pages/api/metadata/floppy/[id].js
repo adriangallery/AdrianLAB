@@ -1,6 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import { getContracts } from '../../../../lib/contracts.js';
+import { 
+  getCachedFloppyMetadata, 
+  setCachedFloppyMetadata, 
+  getFloppyMetadataTTL 
+} from '../../../../lib/cache.js';
 
 export default async function handler(req, res) {
   try {
@@ -16,10 +21,27 @@ export default async function handler(req, res) {
 
     const tokenIdNum = parseInt(id);
     const actualId = id;
-    const version = Date.now();
 
+    // ===== SISTEMA DE CACHÉ PARA FLOPPY METADATA =====
+    const cachedMetadata = getCachedFloppyMetadata(tokenIdNum);
+    
+    if (cachedMetadata) {
+      console.log(`[floppy-metadata] 🎯 CACHE HIT para token ${tokenIdNum}`);
+      
+      // Configurar headers de caché
+      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+      res.setHeader('X-Cache', 'HIT');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Content-Type', 'application/json');
+      
+      return res.status(200).json(cachedMetadata);
+    }
+
+    console.log(`[floppy-metadata] 💾 CACHE MISS para token ${tokenIdNum} - Generando metadata...`);
     console.log(`[floppy-metadata] ===== METADATA REQUEST =====`);
     console.log(`[floppy-metadata] Token ID: ${tokenIdNum}`);
+
+    const version = Date.now();
 
     // Configurar URL base
     const baseUrl = process.env.VERCEL_URL 
@@ -119,13 +141,18 @@ export default async function handler(req, res) {
 
       console.log(`[floppy-metadata] Metadata generada para trait ${tokenIdNum}:`, metadata);
 
-    // Configurar headers para evitar cache
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('Surrogate-Control', 'no-store');
-    
-    return res.status(200).json(metadata);
+      // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+      setCachedFloppyMetadata(tokenIdNum, metadata);
+      
+      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+      console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+      
+      // Configurar headers
+      res.setHeader('X-Cache', 'MISS');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Content-Type', 'application/json');
+      
+      return res.status(200).json(metadata);
       
     } else if (tokenIdNum >= 10000 && tokenIdNum <= 15500) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS/PAGERS (10000+)`);
@@ -266,9 +293,16 @@ export default async function handler(req, res) {
 
       console.log(`[floppy-metadata] Metadata generada para floppy disc ${tokenIdNum}:`, metadata);
 
-      // Configurar headers para JSON
+      // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+      setCachedFloppyMetadata(tokenIdNum, metadata);
+      
+      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+      console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+      
+      // Configurar headers
+      res.setHeader('X-Cache', 'MISS');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
       
       return res.status(200).json(metadata);
       
@@ -337,11 +371,16 @@ export default async function handler(req, res) {
 
       console.log(`[floppy-metadata] Metadata generada para serum ${tokenIdNum}:`, metadata);
 
-      // Configurar headers para evitar cache
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('Surrogate-Control', 'no-store');
+      // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+      setCachedFloppyMetadata(tokenIdNum, metadata);
+      
+      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+      console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+      
+      // Configurar headers
+      res.setHeader('X-Cache', 'MISS');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Content-Type', 'application/json');
       
       return res.status(200).json(metadata);
       

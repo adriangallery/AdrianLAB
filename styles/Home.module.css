@@ -215,6 +215,122 @@
   font-weight: 500;
 }
 
+/* Estilos para administración de caché */
+.cacheStats {
+  margin-top: 1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.statCard h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0070f3;
+  margin: 0;
+}
+
+.statCard small {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.cacheActions {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.cacheActions h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.actionButton {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #0070f3;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: #0051a2;
+}
+
+.actionButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.dangerButton {
+  background: #dc3545 !important;
+}
+
+.dangerButton:hover:not(:disabled) {
+  background: #c82333 !important;
+}
+
+.refreshForm {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.formGroup label {
+  min-width: 100px;
+  font-weight: 500;
+}
+
+.formInput {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100px;
+}
+
+.refreshButton {
+  margin-top: 1rem;
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;

@@ -8,8 +8,18 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const traitsPerPage = 6;
 
+  // Estados para el caché de floppy metadata
+  const [floppyCacheStats, setFloppyCacheStats] = useState(null);
+  const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
+  const [floppyRefreshForm, setFloppyRefreshForm] = useState({
+    tokenId: '',
+    startId: '',
+    endId: ''
+  });
+
   useEffect(() => {
     loadTraits();
+    fetchFloppyCacheStats();
   }, []);
 
   const loadTraits = async () => {
@@ -53,6 +63,48 @@ export default function Home() {
       console.error('Error loading traits:', error);
     }
     setLoading(false);
+  };
+
+  // Función para obtener estadísticas del caché de floppy
+  const fetchFloppyCacheStats = async () => {
+    try {
+      setFloppyCacheLoading(true);
+      const response = await fetch('/api/admin/floppy-cache');
+      const data = await response.json();
+      setFloppyCacheStats(data);
+    } catch (error) {
+      console.error('Error fetching floppy cache stats:', error);
+    } finally {
+      setFloppyCacheLoading(false);
+    }
+  };
+
+  // Función para invalidar caché de floppy
+  const invalidateFloppyCache = async (action, params = {}) => {
+    try {
+      setFloppyCacheLoading(true);
+      const response = await fetch('/api/admin/floppy-cache', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action, ...params })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        alert(`✅ ${data.message}\n📊 Entradas invalidadas: ${data.invalidated}`);
+        fetchFloppyCacheStats(); // Actualizar estadísticas
+      } else {
+        alert('❌ Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error invalidating floppy cache:', error);
+      alert('❌ Error invalidando caché');
+    } finally {
+      setFloppyCacheLoading(false);
+    }
   };
 
   const nextPage = () => {
@@ -184,6 +236,137 @@ export default function Home() {
                 </button>
               </div>
             </>
+          )}
+        </div>
+
+        {/* Nueva sección de administración de caché para floppy metadata */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🗄️ Floppy Metadata Cache Management</h2>
+          
+          {floppyCacheLoading ? (
+            <p>Loading cache stats...</p>
+          ) : floppyCacheStats ? (
+            <div className={styles.cacheStats}>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Cached</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.stats.total}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Traits (1-9999)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.stats.traits}</p>
+                  <small>{floppyCacheStats.ttlConfig.traits}</small>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Floppys (10000+)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.stats.floppys}</p>
+                  <small>{floppyCacheStats.ttlConfig.floppys}</small>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Serum (262144)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.stats.serums}</p>
+                  <small>{floppyCacheStats.ttlConfig.serum}</small>
+                </div>
+              </div>
+              
+              <div className={styles.cacheActions}>
+                <h3>🔄 Quick Actions</h3>
+                <div className={styles.actionButtons}>
+                  <button 
+                    onClick={() => invalidateFloppyCache('invalidate_traits')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🎨 Refresh Traits (24h TTL)
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('invalidate_floppys')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    💾 Refresh Floppys (48h TTL)
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('invalidate_serum')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🧬 Refresh Serum (48h TTL)
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('clear_all')}
+                    className={`${styles.actionButton} ${styles.dangerButton}`}
+                    disabled={floppyCacheLoading}
+                  >
+                    🗑️ Clear All Floppy Cache
+                  </button>
+                </div>
+                
+                <h3>🎯 Targeted Refresh</h3>
+                <div className={styles.refreshForm}>
+                  <div className={styles.formGroup}>
+                    <label>Single Token:</label>
+                    <input
+                      type="number"
+                      placeholder="Token ID"
+                      value={floppyRefreshForm.tokenId}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, tokenId: e.target.value})}
+                      className={styles.formInput}
+                    />
+                    <button
+                      onClick={() => invalidateFloppyCache('invalidate_token', { tokenId: floppyRefreshForm.tokenId })}
+                      disabled={!floppyRefreshForm.tokenId || floppyCacheLoading}
+                      className={styles.actionButton}
+                    >
+                      Refresh Token
+                    </button>
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label>Token Range:</label>
+                    <input
+                      type="number"
+                      placeholder="Start ID"
+                      value={floppyRefreshForm.startId}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, startId: e.target.value})}
+                      className={styles.formInput}
+                    />
+                    <input
+                      type="number"
+                      placeholder="End ID"
+                      value={floppyRefreshForm.endId}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, endId: e.target.value})}
+                      className={styles.formInput}
+                    />
+                    <button
+                      onClick={() => invalidateFloppyCache('invalidate_range', { 
+                        startId: parseInt(floppyRefreshForm.startId), 
+                        endId: parseInt(floppyRefreshForm.endId) 
+                      })}
+                      disabled={!floppyRefreshForm.startId || !floppyRefreshForm.endId || floppyCacheLoading}
+                      className={styles.actionButton}
+                    >
+                      Refresh Range
+                    </button>
+                  </div>
+                </div>
+                
+                <div className={styles.refreshButton}>
+                  <button
+                    onClick={fetchFloppyCacheStats}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🔄 Refresh Stats
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Error loading floppy cache stats</p>
           )}
         </div>
       </main>
