@@ -7115,10 +7115,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianpunks.com/"
+    },
+    {
+      "tokenId": 559,
+      "name": "Space-T-Shirt",
+      "category": "SWAG",
+      "fileName": "Space-T-Shirt",
+      "maxSupply": 50,
+      "floppy": "TraitSHOP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianpunks.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 547,
+    "totalTraits": 548,
     "categories": [
       "BACKGROUND",
       "EAR",
