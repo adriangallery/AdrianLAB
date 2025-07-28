@@ -24,10 +24,10 @@ const detectSvgAnimation = (svgContent) => {
 };
 
 // Función para cargar SVG y detectar animación
-const loadAndDetectAnimation = async (path) => {
+const loadAndDetectAnimation = async (svgFileName) => {
   try {
     // Leer directamente del filesystem en lugar de hacer fetch HTTP
-    const svgPath = path.join(process.cwd(), 'public', 'labimages', path);
+    const svgPath = path.join(process.cwd(), 'public', 'labimages', svgFileName);
     console.log(`[loadAndDetectAnimation] Ruta SVG: ${svgPath}`);
     console.log(`[loadAndDetectAnimation] Existe SVG: ${fs.existsSync(svgPath)}`);
     
@@ -46,7 +46,7 @@ const loadAndDetectAnimation = async (path) => {
       isAnimated: isAnimated
     };
   } catch (error) {
-    console.error(`Error cargando SVG ${path}:`, error.message);
+    console.error(`Error cargando SVG ${svgFileName}:`, error.message);
     return { content: null, isAnimated: false };
   }
 };
