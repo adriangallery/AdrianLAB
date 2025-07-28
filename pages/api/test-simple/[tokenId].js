@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     const cleanTokenId = tokenId.replace('.png', '') || '559';
     
-    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION COMPLETA SIN FRAME`);
+    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION COMPLETA SIN FRAME - METODO PERSONALIZADO`);
 
     // Validar tokenId
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
@@ -113,33 +113,95 @@ export default async function handler(req, res) {
       }
     }
 
-    // Leer el SVG original del trait usando fetch HTTP
-    let traitSvgContent = '';
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-      const imageUrl = `${baseUrl}/labimages/${cleanTokenId}.svg`;
-      console.log(`[test-simple] Cargando SVG desde URL: ${imageUrl}`);
-      
-      const response = await fetch(imageUrl);
-      if (response.ok) {
+    // NUEVA FUNCIÓN: Cargar trait desde labimages y renderizar a PNG (mismo método que render personalizado)
+    const loadTraitFromLabimages = async (traitId) => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+        console.log(`[test-simple] Cargando trait desde labimages: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const svgBuffer = await response.arrayBuffer();
-        traitSvgContent = Buffer.from(svgBuffer).toString();
         console.log(`[test-simple] SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // Renderizar SVG a PNG PRIMERO (mismo método que render personalizado)
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 600  // Tamaño para el contenedor
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        console.log(`[test-simple] Trait renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+        
+        // Convertir a base64 para usar en <image>
+        const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+        return base64Image;
+      } catch (error) {
+        console.error(`[test-simple] Error cargando trait ${traitId} desde labimages:`, error.message);
+        return null;
       }
-    } catch (error) {
-      console.log(`[test-simple] Error cargando SVG, creando placeholder: ${error.message}`);
-      // SVG placeholder simple
-      traitSvgContent = `
-        <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
-          <rect width="600" height="600" fill="#f0f0f0"/>
-          <text x="300" y="300" font-family="Arial, sans-serif" font-size="48" text-anchor="middle" fill="#999999">TRAIT ${cleanTokenId}</text>
-        </svg>
-      `;
+    };
+
+    // Cargar el trait usando el nuevo método
+    console.log(`[test-simple] Cargando trait ${cleanTokenId} usando método personalizado...`);
+    const traitImageData = await loadTraitFromLabimages(cleanTokenId);
+    
+    if (!traitImageData) {
+      console.error(`[test-simple] No se pudo cargar el trait ${cleanTokenId}`);
+      res.status(500).json({ error: 'Error cargando trait' });
+      return;
     }
 
-    // Crear SVG COMPLETO SIN FRAME (todo lo demás igual que floppy)
+    // Cargar mannequin también usando el mismo método
+    const loadMannequinFromLabimages = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/mannequin.svg`;
+        console.log(`[test-simple] Cargando mannequin desde labimages: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        console.log(`[test-simple] Mannequin SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+        
+        // Renderizar SVG a PNG PRIMERO
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 600  // Tamaño para el contenedor
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        console.log(`[test-simple] Mannequin renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+        
+        // Convertir a base64 para usar en <image>
+        const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+        return base64Image;
+      } catch (error) {
+        console.error(`[test-simple] Error cargando mannequin desde labimages:`, error.message);
+        return null;
+      }
+    };
+
+    const mannequinImageData = await loadMannequinFromLabimages();
+    
+    if (!mannequinImageData) {
+      console.error(`[test-simple] No se pudo cargar el mannequin`);
+      res.status(500).json({ error: 'Error cargando mannequin' });
+      return;
+    }
+
+    // Crear SVG COMPLETO SIN FRAME usando <image> en lugar de SVG raw
     const completeSvg = `
       <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
         <!-- Capa base en gris claro (bajo todos los elementos) -->
@@ -148,29 +210,11 @@ export default async function handler(req, res) {
         <!-- Contenedor de imagen con fondo dinámico -->
         <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
         
-        <!-- Mannequin (base del personaje) -->
-        <g transform="translate(84, 120) scale(16.22)">
-          ${(() => {
-            try {
-              const mannequinContent = fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg'), 'utf8');
-              console.log(`[test-simple] DEBUG - Mannequin cargado, tamaño: ${mannequinContent.length} bytes`);
-              return mannequinContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '');
-            } catch (error) {
-              console.error(`[test-simple] DEBUG - Error cargando mannequin: ${error.message}`);
-              return '';
-            }
-          })()}
-        </g>
+        <!-- Mannequin (base del personaje) usando <image> -->
+        <image x="84" y="120" width="600" height="600" href="${mannequinImageData}" />
         
-        <!-- Imagen del trait (centrada en el contenedor) -->
-        <g transform="translate(84, 120) scale(16.22)">
-          ${(() => {
-            const processedTrait = traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '');
-            console.log(`[test-simple] DEBUG - Trait procesado, tamaño: ${processedTrait.length} bytes`);
-            console.log(`[test-simple] DEBUG - Trait contenido (primeros 200 chars): ${processedTrait.substring(0, 200)}...`);
-            return processedTrait;
-          })()}
-        </g>
+        <!-- Imagen del trait (centrada en el contenedor) usando <image> -->
+        <image x="84" y="120" width="600" height="600" href="${traitImageData}" />
         
         <!-- Tag de rareza (superior izquierda) -->
         <rect x="84" y="120" width="160" height="60" fill="${rarity.bg}"/>
@@ -191,7 +235,7 @@ export default async function handler(req, res) {
         
         <!-- Indicador de test sin frame -->
         <rect x="84" y="980" width="600" height="40" fill="#ff6b6b"/>
-        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST SIN FRAME - SIN CACHE</text>
+        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST SIN FRAME - METODO PERSONALIZADO</text>
       </svg>
     `;
 
@@ -199,8 +243,8 @@ export default async function handler(req, res) {
     console.log(`[test-simple] DEBUG - Orden de capas:`);
     console.log(`[test-simple] DEBUG - 1. Fondo gris claro`);
     console.log(`[test-simple] DEBUG - 2. Contenedor con fondo dinámico (${rarity.bg}20)`);
-    console.log(`[test-simple] DEBUG - 3. Mannequin (base del personaje)`);
-    console.log(`[test-simple] DEBUG - 4. Trait ${cleanTokenId} (encima del mannequin)`);
+    console.log(`[test-simple] DEBUG - 3. Mannequin (base del personaje) - MÉTODO PERSONALIZADO`);
+    console.log(`[test-simple] DEBUG - 4. Trait ${cleanTokenId} (encima del mannequin) - MÉTODO PERSONALIZADO`);
     console.log(`[test-simple] DEBUG - 5. Tag de rareza: ${rarity.tag}`);
     console.log(`[test-simple] DEBUG - 6. Nombre: ${tokenData.name}`);
     console.log(`[test-simple] DEBUG - 7. Datos: ${tokenData.category}, ${tokenData.maxSupply}, ${tokenData.floppy || 'OG'}`);
@@ -227,9 +271,7 @@ export default async function handler(req, res) {
       res.setHeader('Expires', '0');
       res.setHeader('X-Test-Simple', 'true');
       res.setHeader('X-Token-ID', cleanTokenId);
-      res.setHeader('X-SVG-Size', traitSvgContent.length.toString());
-      res.setHeader('X-PNG-Size', pngBuffer.length.toString());
-      res.setHeader('X-Version', 'COMPLETA-SIN-FRAME');
+      res.setHeader('X-Version', 'COMPLETA-SIN-FRAME-METODO-PERSONALIZADO');
       
       // Devolver imagen
       console.log(`[test-simple] ===== RENDERIZADO SIN FRAME FINALIZADO =====`);
