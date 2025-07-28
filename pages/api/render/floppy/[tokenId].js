@@ -298,7 +298,7 @@ async function handleRenderToken(req, res, tokenId) {
   
   // Construir path del trait para detección
   const normalizedCategory = normalizeCategory(tokenData.category);
-  const traitPath = `${normalizedCategory}/${tokenData.tokenId}.svg`;
+  const traitPath = `${tokenData.tokenId}.svg`; // Usar solo el tokenId, no la categoría
   console.log(`[floppy-render] Categoría original: ${tokenData.category} -> Normalizada: ${normalizedCategory}`);
   console.log(`[floppy-render] Path del trait: ${traitPath}`);
   
