@@ -23,23 +23,24 @@ const detectSvgAnimation = (svgContent) => {
   return animationPatterns.some(pattern => svgContent.includes(pattern));
 };
 
-// Función para cargar SVG y detectar animación
+// Función para cargar SVG y detectar animación (usando fetch HTTP como el render personalizado)
 const loadAndDetectAnimation = async (svgFileName) => {
   try {
-    // Leer directamente del filesystem en lugar de hacer fetch HTTP
-    const svgPath = path.join(process.cwd(), 'public', 'labimages', svgFileName);
-    console.log(`[loadAndDetectAnimation] Ruta SVG: ${svgPath}`);
-    console.log(`[loadAndDetectAnimation] Existe SVG: ${fs.existsSync(svgPath)}`);
+    // Usar fetch HTTP como el render personalizado para mayor tolerancia
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/labimages/${svgFileName}`;
+    console.log(`[loadAndDetectAnimation] Cargando SVG desde URL: ${imageUrl}`);
     
-    if (!fs.existsSync(svgPath)) {
-      throw new Error(`SVG no encontrado: ${svgPath}`);
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const svgBuffer = fs.readFileSync(svgPath);
-    const svgContent = svgBuffer.toString();
+    const svgBuffer = await response.arrayBuffer();
+    const svgContent = Buffer.from(svgBuffer).toString();
     const isAnimated = detectSvgAnimation(svgContent);
     
-    console.log(`[loadAndDetectAnimation] SVG leído, tamaño: ${svgBuffer.length} bytes, animado: ${isAnimated}`);
+    console.log(`[loadAndDetectAnimation] SVG cargado, tamaño: ${svgBuffer.byteLength} bytes, animado: ${isAnimated}`);
     
     return {
       content: svgContent,
@@ -370,18 +371,23 @@ async function handleRenderToken(req, res, tokenId) {
   // ===== SOLUCIÓN DEFINITIVA: SVG COMPLETO CON TEXTO CONVERTIDO A PATHS =====
   console.log(`[floppy-render] ===== CREANDO SVG COMPLETO CON TEXTO A PATHS =====`);
   
-  // Leer el SVG original del trait
+  // Leer el SVG original del trait usando fetch HTTP (más tolerante)
   let traitSvgContent = '';
-  const svgPath = path.join(process.cwd(), 'public', 'labimages', `${tokenId}.svg`);
-  console.log(`[floppy-render] Ruta SVG: ${svgPath}`);
-  console.log(`[floppy-render] Existe SVG: ${fs.existsSync(svgPath)}`);
-  
-  if (fs.existsSync(svgPath)) {
-    const svgBuffer = fs.readFileSync(svgPath);
-    traitSvgContent = svgBuffer.toString();
-    console.log(`[floppy-render] SVG leído, tamaño: ${svgBuffer.length} bytes`);
-  } else {
-    console.log(`[floppy-render] SVG no encontrado, creando placeholder`);
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/labimages/${tokenId}.svg`;
+    console.log(`[floppy-render] Cargando SVG desde URL: ${imageUrl}`);
+    
+    const response = await fetch(imageUrl);
+    if (response.ok) {
+      const svgBuffer = await response.arrayBuffer();
+      traitSvgContent = Buffer.from(svgBuffer).toString();
+      console.log(`[floppy-render] SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+    } else {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.log(`[floppy-render] Error cargando SVG, creando placeholder: ${error.message}`);
     // SVG placeholder simple
     traitSvgContent = `
       <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
