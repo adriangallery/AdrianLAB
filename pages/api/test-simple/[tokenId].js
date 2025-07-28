@@ -72,7 +72,7 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     const cleanTokenId = tokenId.replace('.png', '') || '559';
     
-    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId}`);
+    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION ACTUALIZADA`);
 
     // Validar tokenId
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
