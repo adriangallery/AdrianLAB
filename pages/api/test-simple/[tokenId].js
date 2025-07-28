@@ -230,7 +230,10 @@ export default async function handler(req, res) {
         
         <!-- Frame SVG (fondo de todas las capas) -->
         <g transform="translate(0, 0) scale(1, 1.333)">
-          ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
+          ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
+            .replace(/<\?xml[^>]*\?>/, '')  // Eliminar declaración XML
+            .replace(/<svg[^>]*>/, '')       // Eliminar tag de apertura SVG
+            .replace(/<\/svg>/, '')}         // Eliminar tag de cierre SVG
         </g>
         
         <!-- Contenedor de imagen con fondo dinámico -->
