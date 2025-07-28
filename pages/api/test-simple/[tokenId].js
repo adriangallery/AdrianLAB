@@ -150,12 +150,26 @@ export default async function handler(req, res) {
         
         <!-- Mannequin (base del personaje) -->
         <g transform="translate(84, 120) scale(16.22)">
-          ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
+          ${(() => {
+            try {
+              const mannequinContent = fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg'), 'utf8');
+              console.log(`[test-simple] DEBUG - Mannequin cargado, tamaño: ${mannequinContent.length} bytes`);
+              return mannequinContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '');
+            } catch (error) {
+              console.error(`[test-simple] DEBUG - Error cargando mannequin: ${error.message}`);
+              return '';
+            }
+          })()}
         </g>
         
         <!-- Imagen del trait (centrada en el contenedor) -->
         <g transform="translate(84, 120) scale(16.22)">
-          ${traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
+          ${(() => {
+            const processedTrait = traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '');
+            console.log(`[test-simple] DEBUG - Trait procesado, tamaño: ${processedTrait.length} bytes`);
+            console.log(`[test-simple] DEBUG - Trait contenido (primeros 200 chars): ${processedTrait.substring(0, 200)}...`);
+            return processedTrait;
+          })()}
         </g>
         
         <!-- Tag de rareza (superior izquierda) -->
@@ -182,6 +196,16 @@ export default async function handler(req, res) {
     `;
 
     console.log(`[test-simple] SVG completo sin frame generado, tamaño: ${completeSvg.length} bytes`);
+    console.log(`[test-simple] DEBUG - Orden de capas:`);
+    console.log(`[test-simple] DEBUG - 1. Fondo gris claro`);
+    console.log(`[test-simple] DEBUG - 2. Contenedor con fondo dinámico (${rarity.bg}20)`);
+    console.log(`[test-simple] DEBUG - 3. Mannequin (base del personaje)`);
+    console.log(`[test-simple] DEBUG - 4. Trait ${cleanTokenId} (encima del mannequin)`);
+    console.log(`[test-simple] DEBUG - 5. Tag de rareza: ${rarity.tag}`);
+    console.log(`[test-simple] DEBUG - 6. Nombre: ${tokenData.name}`);
+    console.log(`[test-simple] DEBUG - 7. Datos: ${tokenData.category}, ${tokenData.maxSupply}, ${tokenData.floppy || 'OG'}`);
+    console.log(`[test-simple] DEBUG - 8. Logo AdrianLAB`);
+    console.log(`[test-simple] DEBUG - 9. Indicador de test`);
 
     try {
       // Renderizar SVG completo a PNG usando Resvg
