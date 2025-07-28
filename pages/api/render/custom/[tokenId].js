@@ -21,14 +21,20 @@ const detectSvgAnimation = (svgContent) => {
 // Función para cargar SVG y detectar animación
 const loadAndDetectAnimation = async (path) => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-    const imageUrl = `${baseUrl}/traits/${path}`;
+    // Leer directamente del filesystem en lugar de hacer fetch HTTP
+    const svgPath = path.join(process.cwd(), 'public', 'labimages', path);
+    console.log(`[loadAndDetectAnimation] Ruta SVG: ${svgPath}`);
+    console.log(`[loadAndDetectAnimation] Existe SVG: ${fs.existsSync(svgPath)}`);
     
-    const response = await fetch(imageUrl);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!fs.existsSync(svgPath)) {
+      throw new Error(`SVG no encontrado: ${svgPath}`);
+    }
     
-    const svgContent = await response.text();
+    const svgBuffer = fs.readFileSync(svgPath);
+    const svgContent = svgBuffer.toString();
     const isAnimated = detectSvgAnimation(svgContent);
+    
+    console.log(`[loadAndDetectAnimation] SVG leído, tamaño: ${svgBuffer.length} bytes, animado: ${isAnimated}`);
     
     return {
       content: svgContent,
@@ -436,7 +442,7 @@ export default async function handler(req, res) {
     // Detectar si hay traits animados
     const hasAnyAnimation = await Promise.all(
       Object.entries(finalTraits).map(async ([category, traitId]) => {
-        const traitPath = `${category}/${traitId}.svg`;
+        const traitPath = `${traitId}.svg`; // Usar solo el traitId, no la categoría
         const traitData = labmetadata.traits.find(t => t.tokenId === parseInt(traitId));
         const isAnimated = await isTraitAnimated(traitData, traitPath);
         
