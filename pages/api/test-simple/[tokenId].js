@@ -131,7 +131,7 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
       // Crear un objeto de respuesta con información de los frames
       const responseData = {
         type: 'animated_frames',
-        tokenId: cleanTokenId,
+        tokenId: tokenId,
         frameCount: gifFrames.length,
         frameDelay: 100, // ms
         fps: 10,
@@ -537,7 +537,7 @@ export default async function handler(req, res) {
       res.setHeader('X-Test-Simple', 'true');
       res.setHeader('X-Token-ID', cleanTokenId);
       
-      // Devolver GIF
+      // Devolver respuesta
       console.log(`[test-simple] ===== GIF ANIMADO GENERADO EXITOSAMENTE =====`);
       res.status(200).send(gifBuffer);
       
@@ -550,4 +550,4 @@ export default async function handler(req, res) {
     console.error('[test-simple] Error general:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
-} 
+}
