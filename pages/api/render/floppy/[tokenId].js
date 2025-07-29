@@ -124,6 +124,75 @@ const normalizeCategory = (category) => {
   return categoryMap[category] || category;
 };
 
+// NUEVAS FUNCIONES: Método personalizado para renderizado individual (como test-simple)
+const loadTraitFromLabimages = async (traitId) => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+    console.log(`[floppy-render] Cargando trait desde labimages: ${imageUrl}`);
+
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const svgBuffer = await response.arrayBuffer();
+    console.log(`[floppy-render] SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+    
+    // Renderizar SVG a PNG PRIMERO (mismo método que render personalizado)
+    const resvg = new Resvg(Buffer.from(svgBuffer), {
+      fitTo: {
+        mode: 'width',
+        value: 600  // Tamaño para el contenedor
+      }
+    });
+    
+    const pngBuffer = resvg.render().asPng();
+    console.log(`[floppy-render] Trait renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+    
+    // Convertir a base64 para usar en <image>
+    const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    return base64Image;
+  } catch (error) {
+    console.error(`[floppy-render] Error cargando trait ${traitId} desde labimages:`, error.message);
+    return null;
+  }
+};
+
+const loadMannequinFromLabimages = async () => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const imageUrl = `${baseUrl}/labimages/mannequin.svg`;
+    console.log(`[floppy-render] Cargando mannequin desde labimages: ${imageUrl}`);
+
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const svgBuffer = await response.arrayBuffer();
+    console.log(`[floppy-render] Mannequin SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+    
+    // Renderizar SVG a PNG PRIMERO
+    const resvg = new Resvg(Buffer.from(svgBuffer), {
+      fitTo: {
+        mode: 'width',
+        value: 600  // Tamaño para el contenedor
+      }
+    });
+    
+    const pngBuffer = resvg.render().asPng();
+    console.log(`[floppy-render] Mannequin renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+    
+    // Convertir a base64 para usar en <image>
+    const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    return base64Image;
+  } catch (error) {
+    console.error(`[floppy-render] Error cargando mannequin desde labimages:`, error.message);
+    return null;
+  }
+};
+
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
@@ -185,6 +254,7 @@ export default async function handler(req, res) {
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/png');
+      res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
       
       return res.status(200).send(cachedImage);
     }
@@ -371,30 +441,22 @@ async function handleRenderToken(req, res, tokenId) {
   // ===== SOLUCIÓN DEFINITIVA: SVG COMPLETO CON TEXTO CONVERTIDO A PATHS =====
   console.log(`[floppy-render] ===== CREANDO SVG COMPLETO CON TEXTO A PATHS =====`);
   
-  // Leer el SVG original del trait usando fetch HTTP (más tolerante)
-  let traitSvgContent = '';
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-    const imageUrl = `${baseUrl}/labimages/${tokenId}.svg`;
-    console.log(`[floppy-render] Cargando SVG desde URL: ${imageUrl}`);
-    
-    const response = await fetch(imageUrl);
-    if (response.ok) {
-      const svgBuffer = await response.arrayBuffer();
-      traitSvgContent = Buffer.from(svgBuffer).toString();
-      console.log(`[floppy-render] SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
-    } else {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  } catch (error) {
-    console.log(`[floppy-render] Error cargando SVG, creando placeholder: ${error.message}`);
-    // SVG placeholder simple
-    traitSvgContent = `
-      <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
-        <rect width="600" height="600" fill="#f0f0f0"/>
-        <text x="300" y="300" font-family="Arial, sans-serif" font-size="48" text-anchor="middle" fill="#999999">TRAIT ${tokenId}</text>
-      </svg>
-    `;
+  // Cargar trait y mannequin usando método personalizado (como test-simple)
+  console.log(`[floppy-render] Cargando trait ${tokenId} usando método personalizado...`);
+  const traitImageData = await loadTraitFromLabimages(tokenId);
+  
+  if (!traitImageData) {
+    console.error(`[floppy-render] No se pudo cargar el trait ${tokenId}`);
+    res.status(500).json({ error: 'Error cargando trait' });
+    return;
+  }
+
+  const mannequinImageData = await loadMannequinFromLabimages();
+  
+  if (!mannequinImageData) {
+    console.error(`[floppy-render] No se pudo cargar el mannequin`);
+    res.status(500).json({ error: 'Error cargando mannequin' });
+    return;
   }
 
   // Crear SVG completo con texto convertido a paths
@@ -404,42 +466,21 @@ async function handleRenderToken(req, res, tokenId) {
       <rect width="768" height="1024" fill="#f5f5f5"/>
       
       <!-- Frame SVG (fondo de todas las capas) -->
-      <defs>
-        <style>
-          .cls-1 { fill: #fff; }
-        </style>
-      </defs>
-      
-      <!-- Frame original adaptado a 768x1024 -->
-      <g transform="translate(0, 0) scale(1, 1.333)">
-        <polygon class="cls-1" points="30.33 .49 .83 .49 .83 766.31 30.33 766.31 30.29 68.38 761.63 68.97 761.66 767.99 767.91 767.99 767.92 0 30.33 .49"/>
-        <g>
-          <path d="M762.95,0v2.9H2.89s0,35.21,0,35.21h760.07v729.89H0V0h762.96ZM28.87,40.99H2.89v25.98h25.98v-25.98ZM58.31,40.99h-26.56v25.98h285.8v-25.98h-23.67v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v17.32c0,.14-2.89.14-2.89,0v-17.32h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98c.03,1.28-.26,8.66-.26,8.66h-2.63v-8.66ZM346.43,40.99h-25.98v25.98h285.23v-25.98h-23.1v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v17.32c0,.14-2.89.14-2.89,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66c0,.14-2.89.14-2.89,0v-8.66ZM635.12,40.99h-26.56v25.98h151.85v-25.98h-5.77v17.32c0,.17-3.46.17-3.46,0v-17.32h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-26.56v8.66h-2.89v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66h-25.98v8.66c0,.14-2.89.14-2.89,0v-8.66ZM28.87,69.86H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.69c0,.06-.06.87,0,.87h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h25.98V69.86ZM760.41,765.69V70.73c0-.06.06-.87,0-.87H31.75c-.06,0,0,.8,0,.87v694.96h728.65ZM28.87,361.44H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.1,2.79,0,2.89-.41.41-8.66-.81-8.66.86v25.69h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.58,1.17,0,3.13,0,3.13H2.89v26.32h17.32c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h25.98v-285.23ZM28.87,649.55H2.89v23.1h8.66c.14,0,.14,2.89,0,2.89H2.89v26.56h8.66c.14,0,.14,2.89,0,2.89H2.89v25.98h8.66c.14,0,.14,2.89,0,2.89H2.89v31.86h25.98v-116.16Z"/>
-          <rect x="46.77" y="5.77" width="716.19" height="2.89"/>
-          <path d="M762.95,11.54v2.89H46.77c-.14,0,0-2.89,0-2.89h716.19Z"/>
-          <rect x="46.77" y="17.32" width="716.19" height="2.89"/>
-          <rect x="46.77" y="23.67" width="716.19" height="2.89"/>
-          <rect x="46.77" y="29.44" width="716.19" height="2.89"/>
-          <path d="M14.43,8.53c.08.12.14,20.83,0,20.92-.62-.08-2.89,0-2.89,0V8.53s2.13.09,2.89,0Z"/>
-          <path d="M14.43,8.53v-2.77h20.21s-.08,2.15,0,2.77c-.07.06-20.21,0-20.21,0Z"/>
-          <path d="M34.64,29.45c-.04.67,0,2.89,0,2.89H14.43v-2.89s20.26.08,20.21,0Z"/>
-          <path d="M34.64,29.45c-.07.02-.07-20.86,0-20.92-.13-.06,2.88,0,2.88,0v20.92h-2.88Z"/>
-          <rect class="cls-1" x="2.89" y="40.99" width="25.98" height="25.98"/>
-        </g>
+      <g transform="translate(0, 0)">
+        ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
+          .replace(/<\?xml[^>]*\?>/, '')  // Eliminar declaración XML
+          .replace(/<svg[^>]*>/, '')       // Eliminar tag de apertura SVG
+          .replace(/<\/svg>/, '')}         // Eliminar tag de cierre SVG
       </g>
       
       <!-- Contenedor de imagen con fondo dinámico -->
       <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
       
-      <!-- Mannequin (base del personaje) -->
-      <g transform="translate(84, 120) scale(16.22)">
-        ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg'), 'utf8').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
-      </g>
+      <!-- Mannequin (base del personaje) usando <image> -->
+      <image x="84" y="120" width="600" height="600" href="${mannequinImageData}" />
       
-      <!-- Imagen del trait (centrada en el contenedor) -->
-      <g transform="translate(84, 120) scale(16.22)">
-        ${traitSvgContent.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '')}
-      </g>
+      <!-- Imagen del trait (centrada en el contenedor) usando <image> -->
+      <image x="84" y="120" width="600" height="600" href="${traitImageData}" />
       
       <!-- Tag de rareza (superior izquierda) - convertido a path -->
       <rect x="84" y="120" width="160" height="60" fill="${rarity.bg}"/>
@@ -539,6 +580,7 @@ async function handleRenderToken(req, res, tokenId) {
     res.setHeader('X-Cache', 'MISS');
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+    res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
     
     // Devolver imagen
     console.log(`[floppy-render] ===== RENDERIZADO SVG COMPLETO FINALIZADO =====`);
