@@ -229,7 +229,7 @@ export default async function handler(req, res) {
         <rect width="768" height="1024" fill="#f5f5f5"/>
         
         <!-- Frame SVG (fondo de todas las capas) -->
-        <g transform="translate(0, 0) scale(1, 1.333)">
+        <g transform="translate(0, 0)">
           ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
             .replace(/<\?xml[^>]*\?>/, '')  // Eliminar declaración XML
             .replace(/<svg[^>]*>/, '')       // Eliminar tag de apertura SVG
