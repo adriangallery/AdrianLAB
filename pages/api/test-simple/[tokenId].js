@@ -7,6 +7,7 @@ import { getContracts } from '../../../lib/contracts.js';
 // Función para generar GIF animado simple
 const generateAnimatedGif = async (svgContent, tokenId) => {
   console.log(`[test-simple] 🎬 Generando GIF animado para token ${tokenId}`);
+  console.log(`[test-simple] 🎬 SVG original tamaño: ${svgContent.length} bytes`);
   
   try {
     // Crear múltiples frames con pequeñas variaciones
@@ -14,17 +15,55 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
     const numFrames = 10; // 10 frames para la animación
     
     for (let i = 0; i < numFrames; i++) {
-      // Crear una pequeña variación en el SVG para cada frame
+      console.log(`[test-simple] 🎬 Generando frame ${i + 1}/${numFrames}...`);
+      
+      // Crear una variación del SVG para cada frame
       let frameSvg = svgContent;
       
-      // Añadir un efecto de "pulso" sutil al contenedor del trait
-      const pulseOpacity = 0.8 + (0.2 * Math.sin(i * 0.5)); // Opacidad que varía entre 0.8 y 1.0
+      // Añadir diferentes efectos para cada frame
+      const frameTime = (i / numFrames) * 2; // Tiempo de 0 a 2 segundos
       
-      // Reemplazar la opacidad del contenedor del trait
+      // 1. Efecto de "pulso" sutil al contenedor del trait
+      const pulseOpacity = 0.8 + (0.2 * Math.sin(frameTime * Math.PI));
+      
+      // 2. Efecto de rotación sutil en el test-animation
+      const rotationAngle = (i * 36) % 360; // Rotación de 0 a 360 grados
+      
+      // 3. Efecto de escala en el test-animation
+      const scaleFactor = 0.8 + (0.4 * Math.sin(frameTime * Math.PI));
+      
+      // Aplicar transformaciones al test-animation
+      const originalImageTag = /<image x="200" y="200" width="300" height="300" href="data:image\/svg\+xml;base64,([^"]+)"/;
+      const newImageTag = `<image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,$1" transform="rotate(${rotationAngle} 350 350) scale(${scaleFactor})" opacity="${pulseOpacity.toFixed(2)}"`;
+      
+      if (frameSvg.match(originalImageTag)) {
+        frameSvg = frameSvg.replace(originalImageTag, newImageTag);
+        console.log(`[test-simple] 🎬 Frame ${i + 1} - Transformación aplicada: rotate(${rotationAngle}°) scale(${scaleFactor.toFixed(2)}) opacity(${pulseOpacity.toFixed(2)})`);
+      } else {
+        console.log(`[test-simple] ⚠️ Frame ${i + 1} - No se encontró el tag de imagen para transformar`);
+      }
+      
+      // Aplicar efecto de pulso al contenedor del trait
       frameSvg = frameSvg.replace(
         /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
         `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
       );
+      
+      // Añadir un indicador de frame para debugging
+      frameSvg = frameSvg.replace(
+        /<text x="50" y="1020" text-anchor="middle" font-family="Arial" font-size="12" fill="#ff0000">GIF ANIMADO<\/text>/,
+        `<text x="50" y="1020" text-anchor="middle" font-family="Arial" font-size="12" fill="#ff0000">GIF ANIMADO - FRAME ${i + 1}</text>`
+      );
+      
+      console.log(`[test-simple] 🎬 Frame ${i + 1} modificado - Rotación: ${rotationAngle}°, Escala: ${scaleFactor.toFixed(2)}, Opacidad: ${pulseOpacity.toFixed(2)}`);
+      
+      // Log del contenido modificado solo para el primer frame
+      if (i === 0) {
+        console.log(`[test-simple] 🎬 Frame 1 contenido modificado (primeras 500 chars): ${frameSvg.substring(0, 500)}`);
+        console.log(`[test-simple] 🎬 Frame 1 contiene 'transform=': ${frameSvg.includes('transform=')}`);
+        console.log(`[test-simple] 🎬 Frame 1 contiene 'rotate(': ${frameSvg.includes('rotate(')}`);
+        console.log(`[test-simple] 🎬 Frame 1 contiene 'scale(': ${frameSvg.includes('scale(')}`);
+      }
       
       // Renderizar cada frame a PNG
       const resvg = new Resvg(Buffer.from(frameSvg), {
@@ -43,6 +82,7 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
     // Por ahora, devolvemos el primer frame como PNG
     // En el futuro, aquí iría la lógica para combinar los frames en un GIF
     console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
+    console.log(`[test-simple] 🎬 Tamaños de frames: ${frames.map(f => f.length).join(', ')} bytes`);
     return frames[0]; // Temporalmente devolvemos solo el primer frame
     
   } catch (error) {
