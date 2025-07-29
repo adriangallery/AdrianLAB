@@ -4,104 +4,6 @@ import path from 'path';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
 
-// Función para crear GIF simple manualmente
-const createSimpleGif = (frames, width, height, delay) => {
-  console.log(`[test-simple] 🎬 Creando GIF simple manualmente con ${frames.length} frames...`);
-  
-  // Header GIF
-  const gifHeader = Buffer.from([
-    0x47, 0x49, 0x46, 0x38, 0x39, 0x61, // GIF89a
-    width & 0xFF, (width >> 8) & 0xFF, // Width (little endian)
-    height & 0xFF, (height >> 8) & 0xFF, // Height (little endian)
-    0xF7, // Global Color Table Flag + Color Resolution + Sort Flag + Size of Global Color Table
-    0x00, // Background Color Index
-    0x00  // Pixel Aspect Ratio
-  ]);
-  
-  // Global Color Table (256 colors, 3 bytes each)
-  const globalColorTable = Buffer.alloc(768);
-  for (let i = 0; i < 256; i++) {
-    globalColorTable[i * 3] = i;     // R
-    globalColorTable[i * 3 + 1] = i; // G
-    globalColorTable[i * 3 + 2] = i; // B
-  }
-  
-  // Application Extension (for loop)
-  const appExtension = Buffer.from([
-    0x21, 0xFF, // Extension Introducer + Application Extension Label
-    0x0B, // Block Size
-    0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2E, 0x30, // "NETSCAPE2.0"
-    0x03, // Block Size
-    0x01, // Sub-block ID
-    0x00, 0x00, // Loop count (0 = infinite)
-    0x00 // Block Terminator
-  ]);
-  
-  // Graphics Control Extension (for delay)
-  const graphicsControlExtension = Buffer.from([
-    0x21, 0xF9, // Extension Introducer + Graphics Control Label
-    0x04, // Block Size
-    0x00, // Disposal Method + User Input Flag + Transparency Color Flag
-    delay & 0xFF, (delay >> 8) & 0xFF, // Delay Time (little endian)
-    0x00, // Transparency Color Index
-    0x00  // Block Terminator
-  ]);
-  
-  // Image Descriptor
-  const imageDescriptor = Buffer.from([
-    0x2C, // Image Separator
-    0x00, 0x00, // Image Left Position
-    0x00, 0x00, // Image Top Position
-    width & 0xFF, (width >> 8) & 0xFF, // Image Width
-    height & 0xFF, (height >> 8) & 0xFF, // Image Height
-    0x00 // Local Color Table Flag + Interlace Flag + Sort Flag + Reserved + Size of Local Color Table
-  ]);
-  
-  // LZW Minimum Code Size
-  const lzwMinCodeSize = Buffer.from([0x08]); // 8 bits
-  
-  // Trailer
-  const trailer = Buffer.from([0x3B]);
-  
-  // Construir GIF
-  let gifBuffer = Buffer.concat([gifHeader, globalColorTable, appExtension]);
-  
-  // Añadir cada frame
-  for (let i = 0; i < frames.length; i++) {
-    console.log(`[test-simple] 🎬 Añadiendo frame ${i + 1} al GIF...`);
-    
-    // Convertir PNG a datos de imagen simples (simulación)
-    // En una implementación real, aquí se procesaría el PNG
-    const frameData = Buffer.alloc(width * height);
-    for (let j = 0; j < width * height; j++) {
-      frameData[j] = Math.floor(Math.random() * 256); // Datos simulados
-    }
-    
-    // Comprimir frame con LZW simple (simulación)
-    const compressedFrame = Buffer.alloc(Math.ceil(frameData.length / 2));
-    for (let j = 0; j < frameData.length; j += 2) {
-      compressedFrame[j / 2] = frameData[j];
-    }
-    
-    // Añadir Graphics Control Extension + Image Descriptor + Frame Data
-    const frameBlock = Buffer.concat([
-      graphicsControlExtension,
-      imageDescriptor,
-      lzwMinCodeSize,
-      compressedFrame,
-      Buffer.from([0x00]) // Block Terminator
-    ]);
-    
-    gifBuffer = Buffer.concat([gifBuffer, frameBlock]);
-  }
-  
-  // Añadir trailer
-  gifBuffer = Buffer.concat([gifBuffer, trailer]);
-  
-  console.log(`[test-simple] ✅ GIF simple creado, tamaño: ${gifBuffer.length} bytes`);
-  return gifBuffer;
-};
-
 export default async function handler(req, res) {
   // Configuración CORS
   const allowedOrigins = [
@@ -133,10 +35,10 @@ export default async function handler(req, res) {
     const cleanTokenId = tokenId.replace(/\.(png|jpg|jpeg|gif|svg)$/, '');
     
     // Detectar formato solicitado
-    const format = req.query.format || 'gif'; // Por defecto GIF, pero acepta ?format=json
+    const format = req.query.format || 'png'; // Por defecto PNG, pero acepta ?format=json
     const wantJson = format === 'json';
     
-    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION GIF ANIMADO - METODO PERSONALIZADO - FORMATO: ${format.toUpperCase()}`);
+    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION ANIMADO - METODO PERSONALIZADO - FORMATO: ${format.toUpperCase()}`);
 
     // Cargar labmetadata
     const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
@@ -175,7 +77,7 @@ export default async function handler(req, res) {
                    totalMinted <= 10 ? { tag: 'RARE', bg: '#4169e1' } :
                    totalMinted <= 50 ? { tag: 'EPIC', bg: '#9932cc' } :
                    { tag: 'LEGENDARY', bg: '#ffd700' };
-    console.log(`[test-simple] Rarity calculada: ${rarity}`);
+    console.log(`[test-simple] Rarity calculada:`, rarity);
 
     // Función para cargar SVG desde labimages usando fetch HTTP (método personalizado)
     const loadTraitFromLabimages = async (tokenId) => {
@@ -337,8 +239,8 @@ export default async function handler(req, res) {
           ${logoText}
         </g>
         
-        <!-- Indicador de test GIF -->
-        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST GIF ANIMADO - METODO PERSONALIZADO</text>
+        <!-- Indicador de test -->
+        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - METODO PERSONALIZADO</text>
       </svg>
     `;
 
@@ -356,141 +258,111 @@ export default async function handler(req, res) {
     console.log(`[test-simple] DEBUG - 9. Nombre: ${trait.name}`);
     console.log(`[test-simple] DEBUG - 10. Datos: ${trait.category}, ${totalMinted}, ${trait.floppy}`);
     console.log(`[test-simple] DEBUG - 11. Logo AdrianLAB`);
-    console.log(`[test-simple] DEBUG - 12. Indicador de test GIF`);
+    console.log(`[test-simple] DEBUG - 12. Indicador de test`);
 
-    // Función para generar GIF animado simple
-    const generateAnimatedGif = async (svgContent, tokenId, res) => {
-      console.log(`[test-simple] 🎬 Generando GIF animado para token ${tokenId} - FORMATO: ${wantJson ? 'JSON' : 'GIF'}`);
-      console.log(`[test-simple] 🎬 SVG original tamaño: ${svgContent.length} bytes`);
+    if (wantJson) {
+      // Generar múltiples frames para JSON debug
+      console.log(`[test-simple] 🎬 Generando frames para JSON debug...`);
       
-      try {
-        const frames = [];
-        const numFrames = 10;
+      const frames = [];
+      const numFrames = 10;
+      
+      for (let i = 0; i < numFrames; i++) {
+        console.log(`[test-simple] 🎬 Generando frame ${i + 1}/${numFrames}...`);
         
-        for (let i = 0; i < numFrames; i++) {
-          console.log(`[test-simple] 🎬 Generando frame ${i + 1}/${numFrames}...`);
-          
-          let frameSvg = svgContent;
-          
-          const frameTime = (i / numFrames) * 2;
-          const pulseOpacity = 0.8 + (0.2 * Math.sin(frameTime * Math.PI));
-          const rotationAngle = (i * 36) % 360;
-          const scaleFactor = 0.8 + (0.4 * Math.sin(frameTime * Math.PI));
-          
-          const originalImageTag = /<image x="200" y="200" width="300" height="300" href="data:image\/svg\+xml;base64,([^"]+)"/;
-          const newImageTag = `<image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,$1" transform="rotate(${rotationAngle} 350 350) scale(${scaleFactor})" opacity="${pulseOpacity.toFixed(2)}"`;
-          
-          if (frameSvg.match(originalImageTag)) {
-            frameSvg = frameSvg.replace(originalImageTag, newImageTag);
-            console.log(`[test-simple] 🎬 Frame ${i + 1} - Transformación aplicada: rotate(${rotationAngle}°) scale(${scaleFactor.toFixed(2)}) opacity(${pulseOpacity.toFixed(2)})`);
-          } else {
-            console.log(`[test-simple] ⚠️ Frame ${i + 1} - No se encontró el tag de imagen para transformar`);
-          }
-          
-          frameSvg = frameSvg.replace(
-            /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
-            `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
-          );
-          
-          frameSvg = frameSvg.replace(
-            /<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST GIF ANIMADO - METODO PERSONALIZADO<\/text>/,
-            `<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST GIF ANIMADO - FRAME ${i + 1}</text>`
-          );
-          
-          console.log(`[test-simple] 🎬 Frame ${i + 1} modificado - Rotación: ${rotationAngle}°, Escala: ${scaleFactor.toFixed(2)}, Opacidad: ${pulseOpacity.toFixed(2)}`);
-          
-          if (i === 0) {
-            console.log(`[test-simple] 🎬 Frame 1 contenido modificado (primeras 500 chars): ${frameSvg.substring(0, 500)}`);
-            console.log(`[test-simple] 🎬 Frame 1 contiene 'transform=': ${frameSvg.includes('transform=')}`);
-            console.log(`[test-simple] 🎬 Frame 1 contiene 'rotate(': ${frameSvg.includes('rotate(')}`);
-            console.log(`[test-simple] 🎬 Frame 1 contiene 'scale(': ${frameSvg.includes('scale(')}`);
-          }
-          
-          const resvg = new Resvg(Buffer.from(frameSvg), {
-            fitTo: {
-              mode: 'width',
-              value: 768
-            }
-          });
-          
-          const pngBuffer = resvg.render().asPng();
-          frames.push(pngBuffer);
-          
-          console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
+        let frameSvg = completeSvg;
+        
+        const frameTime = (i / numFrames) * 2;
+        const pulseOpacity = 0.8 + (0.2 * Math.sin(frameTime * Math.PI));
+        const rotationAngle = (i * 36) % 360;
+        const scaleFactor = 0.8 + (0.4 * Math.sin(frameTime * Math.PI));
+        
+        const originalImageTag = /<image x="200" y="200" width="300" height="300" href="data:image\/svg\+xml;base64,([^"]+)"/;
+        const newImageTag = `<image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,$1" transform="rotate(${rotationAngle} 350 350) scale(${scaleFactor})" opacity="${pulseOpacity.toFixed(2)}"`;
+        
+        if (frameSvg.match(originalImageTag)) {
+          frameSvg = frameSvg.replace(originalImageTag, newImageTag);
+          console.log(`[test-simple] 🎬 Frame ${i + 1} - Transformación aplicada: rotate(${rotationAngle}°) scale(${scaleFactor.toFixed(2)}) opacity(${pulseOpacity.toFixed(2)})`);
         }
         
-        if (wantJson) {
-          // Devolver JSON para debug
-          console.log(`[test-simple] 🎬 Generando respuesta JSON con ${frames.length} frames...`);
-          
-          const responseData = {
-            type: 'animated_frames',
-            tokenId: tokenId,
-            frameCount: frames.length,
-            frameDelay: 100, // ms
-            fps: 10,
-            dimensions: {
-              width: 768,
-              height: 1024
-            },
-            frames: frames.map((frame, index) => ({
-              frameNumber: index + 1,
-              size: frame.length,
-              transformations: {
-                rotation: (index * 36) % 360,
-                scale: 0.8 + (0.4 * Math.sin((index / frames.length) * 2 * Math.PI)),
-                opacity: 0.8 + (0.2 * Math.sin((index / frames.length) * 2 * Math.PI))
-              }
-            })),
-            message: 'Frames generados exitosamente. JSON para debugging.',
-            timestamp: new Date().toISOString()
-          };
-          
-          console.log(`[test-simple] ✅ Respuesta JSON con ${frames.length} frames generada`);
-          console.log(`[test-simple] 🎬 Tamaños de frames PNG: ${frames.map(f => f.length).join(', ')} bytes`);
-          console.log(`[test-simple] 🎬 Transformaciones aplicadas correctamente`);
-          
-          res.setHeader('Content-Type', 'application/json');
-          res.setHeader('X-Version', 'JSON-DEBUG-METODO-PERSONALIZADO');
-          res.setHeader('X-Frame-Count', frames.length.toString());
-          res.setHeader('X-Frame-Delay', '100ms');
-          res.setHeader('X-Animation-FPS', '10');
-          
-          return res.status(200).json(responseData);
-          
-        } else {
-          // Generar GIF simple manualmente
-          console.log(`[test-simple] 🎬 Generando GIF simple manualmente...`);
-          
-          const gifBuffer = createSimpleGif(frames, 768, 1024, 100);
-          console.log(`[test-simple] ✅ GIF simple generado, tamaño: ${gifBuffer.length} bytes`);
-          
-          res.setHeader('Content-Type', 'image/gif');
-          res.setHeader('X-Version', 'GIF-SIMPLE-METODO-PERSONALIZADO');
-          res.setHeader('X-Frame-Count', frames.length.toString());
-          res.setHeader('X-Frame-Delay', '100ms');
-          res.setHeader('X-Animation-FPS', '10');
-          
-          return res.status(200).send(gifBuffer);
-        }
+        frameSvg = frameSvg.replace(
+          /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
+          `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
+        );
         
-      } catch (encodeError) {
-        console.error('[test-simple] Error generando respuesta:', encodeError);
+        frameSvg = frameSvg.replace(
+          /<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - METODO PERSONALIZADO<\/text>/,
+          `<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - FRAME ${i + 1}</text>`
+        );
         
-        // Fallback: devolver el primer frame como PNG
-        console.log('[test-simple] 🚨 Fallback: devolviendo primer frame como PNG');
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('X-Version', 'FALLBACK-PNG-METODO-PERSONALIZADO');
-        return res.status(200).send(frames[0]);
+        const resvg = new Resvg(Buffer.from(frameSvg), {
+          fitTo: {
+            mode: 'width',
+            value: 768
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        frames.push(pngBuffer);
+        
+        console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
       }
-    };
-
-    // Generar GIF animado
-    console.log(`[test-simple] 🎬 Generando GIF animado...`);
-    const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId, res);
-    console.log(`[test-simple] GIF animado generado, tamaño: ${gifBuffer.length} bytes`);
-
-    console.log(`[test-simple] ===== GIF ANIMADO GENERADO EXITOSAMENTE =====`);
+      
+      // Devolver JSON con información de frames
+      const responseData = {
+        type: 'animated_frames',
+        tokenId: cleanTokenId,
+        frameCount: frames.length,
+        frameDelay: 100, // ms
+        fps: 10,
+        dimensions: {
+          width: 768,
+          height: 1024
+        },
+        frames: frames.map((frame, index) => ({
+          frameNumber: index + 1,
+          size: frame.length,
+          transformations: {
+            rotation: (index * 36) % 360,
+            scale: 0.8 + (0.4 * Math.sin((index / frames.length) * 2 * Math.PI)),
+            opacity: 0.8 + (0.2 * Math.sin((index / frames.length) * 2 * Math.PI))
+          }
+        })),
+        message: 'Frames generados exitosamente. JSON para debugging.',
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`[test-simple] ✅ Respuesta JSON con ${frames.length} frames generada`);
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Version', 'JSON-DEBUG-METODO-PERSONALIZADO');
+      res.setHeader('X-Frame-Count', frames.length.toString());
+      res.setHeader('X-Frame-Delay', '100ms');
+      res.setHeader('X-Animation-FPS', '10');
+      
+      return res.status(200).json(responseData);
+      
+    } else {
+      // Devolver solo el primer frame como PNG
+      console.log(`[test-simple] 🎬 Generando frame único como PNG...`);
+      
+      const resvg = new Resvg(Buffer.from(completeSvg), {
+        fitTo: {
+          mode: 'width',
+          value: 768
+        }
+      });
+      
+      const pngBuffer = resvg.render().asPng();
+      console.log(`[test-simple] ✅ PNG generado, tamaño: ${pngBuffer.length} bytes`);
+      
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('X-Version', 'PNG-SIMPLE-METODO-PERSONALIZADO');
+      res.setHeader('X-Frame-Count', '1');
+      res.setHeader('X-Animation-FPS', '1');
+      
+      return res.status(200).send(pngBuffer);
+    }
 
   } catch (error) {
     console.error('[test-simple] Error:', error);
