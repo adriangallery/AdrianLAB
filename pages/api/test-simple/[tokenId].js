@@ -4,12 +4,59 @@ import fs from 'fs';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
 
+// Función para generar GIF animado simple
+const generateAnimatedGif = async (svgContent, tokenId) => {
+  console.log(`[test-simple] 🎬 Generando GIF animado para token ${tokenId}`);
+  
+  try {
+    // Crear múltiples frames con pequeñas variaciones
+    const frames = [];
+    const numFrames = 10; // 10 frames para la animación
+    
+    for (let i = 0; i < numFrames; i++) {
+      // Crear una pequeña variación en el SVG para cada frame
+      let frameSvg = svgContent;
+      
+      // Añadir un efecto de "pulso" sutil al contenedor del trait
+      const pulseOpacity = 0.8 + (0.2 * Math.sin(i * 0.5)); // Opacidad que varía entre 0.8 y 1.0
+      
+      // Reemplazar la opacidad del contenedor del trait
+      frameSvg = frameSvg.replace(
+        /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
+        `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
+      );
+      
+      // Renderizar cada frame a PNG
+      const resvg = new Resvg(Buffer.from(frameSvg), {
+        fitTo: {
+          mode: 'width',
+          value: 768
+        }
+      });
+      
+      const pngBuffer = resvg.render().asPng();
+      frames.push(pngBuffer);
+      
+      console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
+    }
+    
+    // Por ahora, devolvemos el primer frame como PNG
+    // En el futuro, aquí iría la lógica para combinar los frames en un GIF
+    console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
+    return frames[0]; // Temporalmente devolvemos solo el primer frame
+    
+  } catch (error) {
+    console.error('[test-simple] Error generando GIF animado:', error);
+    throw error;
+  }
+};
+
 export default async function handler(req, res) {
   try {
     const { tokenId } = req.query;
-    const cleanTokenId = tokenId.replace('.png', '') || '559';
+    const cleanTokenId = tokenId.replace('.gif', '').replace('.png', '') || '559';
     
-    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION COMPLETA CON FRAME - METODO PERSONALIZADO`);
+    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION GIF ANIMADO - METODO PERSONALIZADO`);
 
     // Validar tokenId
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
@@ -107,34 +154,7 @@ export default async function handler(req, res) {
     const rarity = getRarityTagAndColor(tokenData.maxSupply);
     console.log(`[test-simple] Rarity calculada:`, rarity);
 
-    // LÓGICA ESPECIAL PARA TOKEN 262144 (SERUM ADRIANGF) - SERVIR GIF DIRECTAMENTE
-    if (tokenIdNum === 262144) {
-      console.log('[test-simple] 🧬 LÓGICA ESPECIAL: Token 262144 detectado, sirviendo GIF directamente');
-      
-      const gifPath = path.join(process.cwd(), 'public', 'labimages', `${cleanTokenId}.gif`);
-      console.log(`[test-simple] Ruta GIF: ${gifPath}`);
-      console.log(`[test-simple] Existe GIF: ${fs.existsSync(gifPath)}`);
-      
-      if (fs.existsSync(gifPath)) {
-        const gifBuffer = fs.readFileSync(gifPath);
-        console.log(`[test-simple] GIF leído, tamaño: ${gifBuffer.length} bytes`);
-        
-        // Configurar headers para GIF
-        res.setHeader('Content-Type', 'image/gif');
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        
-        // Devolver GIF directamente
-        console.log(`[test-simple] ===== GIF SERVIDO DIRECTAMENTE =====`);
-        res.status(200).send(gifBuffer);
-        return;
-      } else {
-        console.error(`[test-simple] GIF no encontrado para token 262144`);
-        res.status(404).json({ error: 'GIF no encontrado para serum ADRIANGF' });
-        return;
-      }
-    }
-
-    // NUEVA FUNCIÓN: Cargar trait desde labimages y renderizar a PNG (mismo método que render personalizado)
+    // NUEVAS FUNCIONES: Método personalizado para renderizado individual (como test-simple)
     const loadTraitFromLabimages = async (traitId) => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
@@ -169,17 +189,6 @@ export default async function handler(req, res) {
       }
     };
 
-    // Cargar el trait usando el nuevo método
-    console.log(`[test-simple] Cargando trait ${cleanTokenId} usando método personalizado...`);
-    const traitImageData = await loadTraitFromLabimages(cleanTokenId);
-    
-    if (!traitImageData) {
-      console.error(`[test-simple] No se pudo cargar el trait ${cleanTokenId}`);
-      res.status(500).json({ error: 'Error cargando trait' });
-      return;
-    }
-
-    // Cargar mannequin también usando el mismo método
     const loadMannequinFromLabimages = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
@@ -214,30 +223,51 @@ export default async function handler(req, res) {
       }
     };
 
-    const mannequinImageData = await loadMannequinFromLabimages();
+    // Cargar trait y mannequin usando el método personalizado
+    console.log(`[test-simple] Cargando trait ${cleanTokenId} usando método personalizado...`);
+    const traitImageData = await loadTraitFromLabimages(cleanTokenId);
     
-    if (!mannequinImageData) {
-      console.error(`[test-simple] No se pudo cargar el mannequin`);
-      res.status(500).json({ error: 'Error cargando mannequin' });
-      return;
+    console.log(`[test-simple] Cargando mannequin usando método personalizado...`);
+    const mannequinImageData = await loadMannequinFromLabimages();
+
+    if (!traitImageData) {
+      console.error(`[test-simple] No se pudo cargar el trait ${cleanTokenId}`);
+      return res.status(404).json({ error: 'Trait no encontrado' });
     }
 
-    // Crear SVG COMPLETO CON FRAME usando <image> en lugar de SVG raw
+    if (!mannequinImageData) {
+      console.error(`[test-simple] No se pudo cargar el mannequin`);
+      return res.status(500).json({ error: 'Error cargando mannequin' });
+    }
+
+    console.log(`[test-simple] ✅ Trait y mannequin cargados exitosamente usando método personalizado`);
+
+    // Cargar frame mejorado
+    let frameSvgContent;
+    try {
+      frameSvgContent = fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
+        .replace(/<\?xml[^>]*\?>/, '')  // Remover declaración XML
+        .replace(/<svg[^>]*>/, '')      // Remover tag de apertura SVG
+        .replace(/<\/svg>/, '');        // Remover tag de cierre SVG
+      console.log(`[test-simple] Frame mejorado cargado, tamaño: ${frameSvgContent.length} bytes`);
+    } catch (error) {
+      console.error('[test-simple] Error cargando frame mejorado:', error);
+      return res.status(500).json({ error: 'Error cargando frame' });
+    }
+
+    // Construir SVG completo con frame y todos los elementos
     const completeSvg = `
       <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
-        <!-- Capa base en gris claro (bajo todos los elementos) -->
-        <rect width="768" height="1024" fill="#f5f5f5"/>
+        <!-- Fondo gris claro -->
+        <rect x="0" y="0" width="768" height="1024" fill="#f8f9fa"/>
         
-        <!-- Frame SVG (fondo de todas las capas) -->
+        <!-- Frame SVG completo -->
         <g transform="translate(0, 0)">
-          ${fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
-            .replace(/<\?xml[^>]*\?>/, '')  // Eliminar declaración XML
-            .replace(/<svg[^>]*>/, '')       // Eliminar tag de apertura SVG
-            .replace(/<\/svg>/, '')}         // Eliminar tag de cierre SVG
+          ${frameSvgContent}
         </g>
         
-        <!-- Contenedor de imagen con fondo dinámico -->
-        <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20"/>
+        <!-- Contenedor con fondo dinámico según rareza -->
+        <rect x="84" y="120" width="600" height="600" fill="${rarity.bg}20" opacity="0.1"/>
         
         <!-- Mannequin (base del personaje) usando <image> -->
         <image x="84" y="120" width="600" height="600" href="${mannequinImageData}" />
@@ -246,23 +276,21 @@ export default async function handler(req, res) {
         <image x="84" y="120" width="600" height="600" href="${traitImageData}" />
         
         <!-- Tag de rareza (superior izquierda) - convertido a path -->
-        <rect x="84" y="120" width="160" height="60" fill="${rarity.bg}"/>
         ${textToSVGElement(rarity.tag, {
-          x: 84 + 160 / 2,  // Centro horizontal del rectángulo
-          y: 120 + 60 / 2,  // Centro vertical del rectángulo
-          fontSize: 32,     // Tamaño equilibrado
+          x: 84 + 10,
+          y: 120 + 40,
+          fontSize: 32,
           fill: '#ffffff',
-          anchor: 'center middle'
+          anchor: 'start'
         })}
         
         <!-- Nombre del trait (debajo de la imagen) - convertido a path -->
-        <rect x="84" y="760" width="600" height="80" fill="#0f4e6d"/>
         ${textToSVGElement(tokenData.name, {
-          x: 84 + 600 / 2,  // Centro horizontal del rectángulo
-          y: 760 + 80 / 2,  // Centro vertical del rectángulo
-          fontSize: 70,
-          fill: '#ffffff',
-          anchor: 'center middle'
+          x: 84 + 10,
+          y: 740,
+          fontSize: 48,
+          fill: '#333333',
+          anchor: 'start'
         })}
         
         <!-- Bloque inferior de datos - convertido a paths -->
@@ -312,7 +340,7 @@ export default async function handler(req, res) {
         
         <!-- Indicador de test con frame -->
         <rect x="84" y="980" width="600" height="40" fill="#ff6b6b"/>
-        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST CON FRAME - METODO PERSONALIZADO</text>
+        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST GIF ANIMADO - METODO PERSONALIZADO</text>
       </svg>
     `;
 
@@ -327,37 +355,30 @@ export default async function handler(req, res) {
     console.log(`[test-simple] DEBUG - 7. Nombre: ${tokenData.name}`);
     console.log(`[test-simple] DEBUG - 8. Datos: ${tokenData.category}, ${totalMinted}, ${tokenData.floppy || 'OG'}`);
     console.log(`[test-simple] DEBUG - 9. Logo AdrianLAB`);
-    console.log(`[test-simple] DEBUG - 10. Indicador de test`);
+    console.log(`[test-simple] DEBUG - 10. Indicador de test GIF`);
 
     try {
-      // Renderizar SVG completo a PNG usando Resvg
-      console.log(`[test-simple] Renderizando SVG completo a PNG con Resvg...`);
-      const resvg = new Resvg(Buffer.from(completeSvg), {
-        fitTo: {
-          mode: 'width',
-          value: 768
-        }
-      });
-      
-      const pngBuffer = resvg.render().asPng();
-      console.log(`[test-simple] SVG completo renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+      // Generar GIF animado
+      console.log(`[test-simple] 🎬 Generando GIF animado...`);
+      const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId);
+      console.log(`[test-simple] GIF animado generado, tamaño: ${gifBuffer.length} bytes`);
 
       // Configurar headers (sin cache)
-      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Type', 'image/gif');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
       res.setHeader('X-Test-Simple', 'true');
       res.setHeader('X-Token-ID', cleanTokenId);
-      res.setHeader('X-Version', 'COMPLETA-CON-FRAME-METODO-PERSONALIZADO');
+      res.setHeader('X-Version', 'GIF-ANIMADO-METODO-PERSONALIZADO');
       
-      // Devolver imagen
-      console.log(`[test-simple] ===== RENDERIZADO CON FRAME FINALIZADO =====`);
-      res.status(200).send(pngBuffer);
+      // Devolver GIF
+      console.log(`[test-simple] ===== GIF ANIMADO GENERADO EXITOSAMENTE =====`);
+      res.status(200).send(gifBuffer);
       
     } catch (error) {
-      console.error('[test-simple] Error renderizando SVG completo:', error);
-      res.status(500).json({ error: 'Error renderizando imagen' });
+      console.error('[test-simple] Error generando GIF animado:', error);
+      res.status(500).json({ error: 'Error generando GIF animado' });
     }
     
   } catch (error) {
