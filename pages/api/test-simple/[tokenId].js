@@ -255,6 +255,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Error cargando frame' });
     }
 
+    // Verificar que los traits animados existen
+    try {
+      const trait600Path = path.join(process.cwd(), 'public', 'labimages', '600.svg');
+      const trait601Path = path.join(process.cwd(), 'public', 'labimages', '601.svg');
+      
+      console.log(`[test-simple] Verificando trait 600: ${trait600Path} - Existe: ${fs.existsSync(trait600Path)}`);
+      console.log(`[test-simple] Verificando trait 601: ${trait601Path} - Existe: ${fs.existsSync(trait601Path)}`);
+      
+      if (fs.existsSync(trait600Path)) {
+        const trait600Content = fs.readFileSync(trait600Path, 'utf8');
+        console.log(`[test-simple] Trait 600 cargado, tamaño: ${trait600Content.length} bytes`);
+      }
+      
+      if (fs.existsSync(trait601Path)) {
+        const trait601Content = fs.readFileSync(trait601Path, 'utf8');
+        console.log(`[test-simple] Trait 601 cargado, tamaño: ${trait601Content.length} bytes`);
+        console.log(`[test-simple] Trait 601 contenido (primeras 200 chars): ${trait601Content.substring(0, 200)}`);
+      }
+    } catch (error) {
+      console.error('[test-simple] Error verificando traits animados:', error);
+    }
+
     // Construir SVG completo con frame y todos los elementos
     const completeSvg = `
       <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
@@ -278,8 +300,8 @@ export default async function handler(req, res) {
         <!-- TRAIT ANIMADO 600.svg en capa superior -->
         <image x="84" y="120" width="600" height="600" href="data:image/svg+xml;base64,${Buffer.from(fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', '600.svg'), 'utf8')).toString('base64')}" />
         
-        <!-- TRAIT ANIMADO 601.svg en capa superior -->
-        <image x="84" y="120" width="600" height="600" href="data:image/svg+xml;base64,${Buffer.from(fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', '601.svg'), 'utf8')).toString('base64')}" />
+        <!-- TRAIT ANIMADO 601.svg en capa superior (posicionado diferente para visibilidad) -->
+        <image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,${Buffer.from(fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', '601.svg'), 'utf8')).toString('base64')}" />
         
         <!-- Tag de rareza (superior izquierda) - convertido a path -->
         ${textToSVGElement(rarity.tag, {
