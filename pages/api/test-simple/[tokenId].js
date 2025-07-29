@@ -140,7 +140,8 @@ export default async function handler(req, res) {
 
     // Cargar labmetadata
     const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-    const labmetadata = JSON.parse(fs.readFileSync(labmetadataPath, 'utf8'));
+    const labmetadataData = JSON.parse(fs.readFileSync(labmetadataPath, 'utf8'));
+    const labmetadata = labmetadataData.traits; // Acceder a la propiedad 'traits'
     console.log(`[test-simple] Labmetadata cargado, ${labmetadata.length} traits encontrados`);
 
     // Buscar el trait
