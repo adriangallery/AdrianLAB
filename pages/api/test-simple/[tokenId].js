@@ -7,7 +7,7 @@ import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
 
 // Función para generar GIF animado simple
-const generateAnimatedGif = async (svgContent, tokenId) => {
+const generateAnimatedGif = async (svgContent, tokenId, res) => {
   console.log(`[test-simple] 🎬 Generando GIF animado para token ${tokenId}`);
   console.log(`[test-simple] 🎬 SVG original tamaño: ${svgContent.length} bytes`);
   
@@ -524,7 +524,7 @@ export default async function handler(req, res) {
     try {
       // Generar GIF animado
       console.log(`[test-simple] 🎬 Generando GIF animado...`);
-      const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId);
+      const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId, res);
       console.log(`[test-simple] GIF animado generado, tamaño: ${gifBuffer.length} bytes`);
 
       // Configurar headers para respuesta JSON
