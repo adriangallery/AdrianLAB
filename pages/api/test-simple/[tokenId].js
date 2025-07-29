@@ -1,5 +1,6 @@
 import { GifFrame, GifUtil } from 'gifwrap';
 import { Resvg } from '@resvg/resvg-js';
+import { createCanvas, loadImage } from 'canvas';
 import fs from 'fs';
 import path from 'path';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
@@ -88,11 +89,35 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
       const pngBuffer = frames[i];
       console.log(`[test-simple] 🎬 Convirtiendo frame ${i + 1} a GifFrame...`);
       
-      // Crear GifFrame desde el buffer PNG
-      const gifFrame = new GifFrame(pngBuffer);
-      gifFrames.push(gifFrame);
-      
-      console.log(`[test-simple] 🎬 Frame ${i + 1} convertido a GifFrame`);
+      try {
+        // Usar canvas para cargar la imagen PNG
+        const image = await loadImage(pngBuffer);
+        const canvas = createCanvas(image.width, image.height);
+        const ctx = canvas.getContext('2d');
+        
+        // Dibujar la imagen en el canvas
+        ctx.drawImage(image, 0, 0);
+        
+        // Obtener los datos de imagen del canvas
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Crear GifFrame desde los datos de imagen
+        const gifFrame = new GifFrame(imageData);
+        gifFrames.push(gifFrame);
+        
+        console.log(`[test-simple] 🎬 Frame ${i + 1} convertido a GifFrame exitosamente (${canvas.width}x${canvas.height})`);
+      } catch (error) {
+        console.error(`[test-simple] ❌ Error convirtiendo frame ${i + 1}:`, error);
+        // Si falla la conversión, intentar crear un frame simple
+        try {
+          const simpleFrame = new GifFrame(768, 1024, 0x00000000); // Frame negro transparente
+          gifFrames.push(simpleFrame);
+          console.log(`[test-simple] 🎬 Frame ${i + 1} creado como frame simple`);
+        } catch (fallbackError) {
+          console.error(`[test-simple] ❌ Error creando frame simple ${i + 1}:`, fallbackError);
+          throw fallbackError;
+        }
+      }
     }
     
     // Crear GIF animado
