@@ -272,6 +272,12 @@ export default async function handler(req, res) {
         const testAnimationContent = fs.readFileSync(testAnimationPath, 'utf8');
         console.log(`[test-simple] Test-animation cargado, tamaño: ${testAnimationContent.length} bytes`);
         console.log(`[test-simple] Test-animation contenido (primeras 200 chars): ${testAnimationContent.substring(0, 200)}`);
+        console.log(`[test-simple] Test-animation contenido (últimas 200 chars): ${testAnimationContent.substring(testAnimationContent.length - 200)}`);
+        console.log(`[test-simple] Test-animation contiene 'animate': ${testAnimationContent.includes('animate')}`);
+        console.log(`[test-simple] Test-animation contiene 'circle': ${testAnimationContent.includes('circle')}`);
+        console.log(`[test-simple] Test-animation contiene 'rect': ${testAnimationContent.includes('rect')}`);
+      } else {
+        console.error(`[test-simple] ERROR: test-animation.svg no existe en ${testAnimationPath}`);
       }
     } catch (error) {
       console.error('[test-simple] Error verificando traits animados:', error);
