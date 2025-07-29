@@ -13,6 +13,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "canvas": "^3.1.0",
     "ethers": "^5.6.0",
+    "gifwrap": "^0.10.1",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",

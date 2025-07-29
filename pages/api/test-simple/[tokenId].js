@@ -1,6 +1,7 @@
+import { GifFrame, GifUtil } from 'gifwrap';
 import { Resvg } from '@resvg/resvg-js';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
 
@@ -79,11 +80,32 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
       console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
     }
     
-    // Por ahora, devolvemos el primer frame como PNG
-    // En el futuro, aquí iría la lógica para combinar los frames en un GIF
+    // Convertir PNG frames a GIF frames usando gifwrap
+    console.log(`[test-simple] 🎬 Convirtiendo ${frames.length} frames PNG a GIF...`);
+    const gifFrames = [];
+    
+    for (let i = 0; i < frames.length; i++) {
+      const pngBuffer = frames[i];
+      console.log(`[test-simple] 🎬 Convirtiendo frame ${i + 1} a GifFrame...`);
+      
+      // Crear GifFrame desde el buffer PNG
+      const gifFrame = new GifFrame(pngBuffer);
+      gifFrames.push(gifFrame);
+      
+      console.log(`[test-simple] 🎬 Frame ${i + 1} convertido a GifFrame`);
+    }
+    
+    // Crear GIF animado
+    console.log(`[test-simple] 🎬 Creando GIF animado con ${gifFrames.length} frames...`);
+    const gifBuffer = GifUtil.write('output.gif', gifFrames, { 
+      delay: 100, // 100ms entre frames (10 FPS)
+      repeat: 0    // Repetir infinitamente
+    });
+    
     console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
-    console.log(`[test-simple] 🎬 Tamaños de frames: ${frames.map(f => f.length).join(', ')} bytes`);
-    return frames[0]; // Temporalmente devolvemos solo el primer frame
+    console.log(`[test-simple] 🎬 Tamaños de frames PNG: ${frames.map(f => f.length).join(', ')} bytes`);
+    console.log(`[test-simple] 🎬 Tamaño del GIF final: ${gifBuffer.length} bytes`);
+    return gifBuffer;
     
   } catch (error) {
     console.error('[test-simple] Error generando GIF animado:', error);
@@ -439,14 +461,15 @@ export default async function handler(req, res) {
       const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId);
       console.log(`[test-simple] GIF animado generado, tamaño: ${gifBuffer.length} bytes`);
 
-      // Configurar headers (sin cache)
+      // Configurar headers para GIF animado
       res.setHeader('Content-Type', 'image/gif');
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache por 1 hora
+      res.setHeader('X-Version', 'GIF-REAL-ANIMADO-METODO-PERSONALIZADO');
+      res.setHeader('X-Frame-Count', '10');
+      res.setHeader('X-Frame-Delay', '100ms');
+      res.setHeader('X-Animation-FPS', '10');
       res.setHeader('X-Test-Simple', 'true');
       res.setHeader('X-Token-ID', cleanTokenId);
-      res.setHeader('X-Version', 'GIF-ANIMADO-METODO-PERSONALIZADO');
       
       // Devolver GIF
       console.log(`[test-simple] ===== GIF ANIMADO GENERADO EXITOSAMENTE =====`);
