@@ -124,28 +124,49 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
     console.log(`[test-simple] 🎬 Creando GIF animado con ${gifFrames.length} frames...`);
     
     try {
-      // Usar GifCodec directamente para mayor control
-      const codec = new GifCodec();
+      // Por ahora, devolvemos todos los frames como respuesta JSON
+      // Esto nos permite verificar que las animaciones funcionan
+      console.log(`[test-simple] 🎬 Generando respuesta con ${gifFrames.length} frames...`);
       
-      // Configurar opciones de codificación
-      const encodeOptions = {
-        loops: 0,        // Repetir infinitamente
-        delay: 100,      // 100ms entre frames
-        disposal: 2,     // Disposal method
-        transparent: null // Sin transparencia
+      // Crear un objeto de respuesta con información de los frames
+      const responseData = {
+        type: 'animated_frames',
+        tokenId: cleanTokenId,
+        frameCount: gifFrames.length,
+        frameDelay: 100, // ms
+        fps: 10,
+        dimensions: {
+          width: 768,
+          height: 1024
+        },
+        frames: frames.map((frame, index) => ({
+          frameNumber: index + 1,
+          size: frame.length,
+          transformations: {
+            rotation: (index * 36) % 360,
+            scale: 0.8 + (0.4 * Math.sin((index / gifFrames.length) * 2 * Math.PI)),
+            opacity: 0.8 + (0.2 * Math.sin((index / gifFrames.length) * 2 * Math.PI))
+          }
+        })),
+        message: 'Frames generados exitosamente. GIF real pendiente de implementación.',
+        timestamp: new Date().toISOString()
       };
       
-      // Codificar el GIF
-      const result = await codec.encodeGif(gifFrames, encodeOptions);
-      const gifBuffer = result.buffer;
-      
-      console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
+      console.log(`[test-simple] ✅ Respuesta con ${gifFrames.length} frames generada`);
       console.log(`[test-simple] 🎬 Tamaños de frames PNG: ${frames.map(f => f.length).join(', ')} bytes`);
-      console.log(`[test-simple] 🎬 Tamaño del GIF final: ${gifBuffer.length} bytes`);
-      return gifBuffer;
+      console.log(`[test-simple] 🎬 Transformaciones aplicadas correctamente`);
+      
+      // Cambiar Content-Type a JSON
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Version', 'FRAMES-JSON-METODO-PERSONALIZADO');
+      res.setHeader('X-Frame-Count', gifFrames.length.toString());
+      res.setHeader('X-Frame-Delay', '100ms');
+      res.setHeader('X-Animation-FPS', '10');
+      
+      return res.status(200).json(responseData);
       
     } catch (encodeError) {
-      console.error('[test-simple] Error codificando GIF:', encodeError);
+      console.error('[test-simple] Error generando respuesta JSON:', encodeError);
       
       // Fallback: devolver el primer frame como PNG
       console.log('[test-simple] 🚨 Fallback: devolviendo primer frame como PNG');
@@ -506,10 +527,10 @@ export default async function handler(req, res) {
       const gifBuffer = await generateAnimatedGif(completeSvg, cleanTokenId);
       console.log(`[test-simple] GIF animado generado, tamaño: ${gifBuffer.length} bytes`);
 
-      // Configurar headers para GIF animado
-      res.setHeader('Content-Type', 'image/gif');
+      // Configurar headers para respuesta JSON
+      res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache por 1 hora
-      res.setHeader('X-Version', 'GIF-REAL-ANIMADO-METODO-PERSONALIZADO');
+      res.setHeader('X-Version', 'FRAMES-JSON-METODO-PERSONALIZADO');
       res.setHeader('X-Frame-Count', '10');
       res.setHeader('X-Frame-Delay', '100ms');
       res.setHeader('X-Animation-FPS', '10');
