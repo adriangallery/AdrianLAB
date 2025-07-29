@@ -34,16 +34,12 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     const cleanTokenId = tokenId.replace(/\.(png|jpg|jpeg|gif|svg)$/, '');
     
-    // Detectar formato solicitado
-    const format = req.query.format || 'png'; // Por defecto PNG, pero acepta ?format=json
-    const wantJson = format === 'json';
-    
-    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION ANIMADO - METODO PERSONALIZADO - FORMATO: ${format.toUpperCase()}`);
+    console.log(`[test-simple] 🧪 Iniciando test simple para token ${cleanTokenId} - VERSION SIMPLIFICADA CON 662.GIF`);
 
     // Cargar labmetadata
     const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
     const labmetadataData = JSON.parse(fs.readFileSync(labmetadataPath, 'utf8'));
-    const labmetadata = labmetadataData.traits; // Acceder a la propiedad 'traits'
+    const labmetadata = labmetadataData.traits;
     console.log(`[test-simple] Labmetadata cargado, ${labmetadata.length} traits encontrados`);
 
     // Buscar el trait
@@ -53,7 +49,6 @@ export default async function handler(req, res) {
     }
 
     console.log(`[test-simple] Trait encontrado:`, trait);
-    console.log(`[test-simple] Datos del token:`, trait);
 
     // Conectar con contratos
     console.log(`[test-simple] Conectando con los contratos...`);
@@ -162,29 +157,17 @@ export default async function handler(req, res) {
       frameSvgContent = '';
     }
 
-    // Verificar traits animados
-    const trait600Path = path.join(process.cwd(), 'public', 'labimages', '600.svg');
-    const testAnimationPath = path.join(process.cwd(), 'public', 'labimages', 'test-animation.svg');
+    // Cargar 662.gif
+    const gif662Path = path.join(process.cwd(), 'public', 'labimages', '662.gif');
+    console.log(`[test-simple] Verificando 662.gif: ${gif662Path} - Existe: ${fs.existsSync(gif662Path)}`);
     
-    console.log(`[test-simple] Verificando trait 600: ${trait600Path} - Existe: ${fs.existsSync(trait600Path)}`);
-    console.log(`[test-simple] Verificando test-animation: ${testAnimationPath} - Existe: ${fs.existsSync(testAnimationPath)}`);
-    
-    let trait600Content = '';
-    let testAnimationContent = '';
-    
-    if (fs.existsSync(trait600Path)) {
-      trait600Content = fs.readFileSync(trait600Path, 'utf8');
-      console.log(`[test-simple] Trait 600 cargado, tamaño: ${trait600Content.length} bytes`);
-    }
-    
-    if (fs.existsSync(testAnimationPath)) {
-      testAnimationContent = fs.readFileSync(testAnimationPath, 'utf8');
-      console.log(`[test-simple] Test-animation cargado, tamaño: ${testAnimationContent.length} bytes`);
-      console.log(`[test-simple] Test-animation contenido (primeras 200 chars): ${testAnimationContent.substring(0, 200)}`);
-      console.log(`[test-simple] Test-animation contenido (últimas 200 chars): ${testAnimationContent.substring(testAnimationContent.length - 200)}`);
-      console.log(`[test-simple] Test-animation contiene 'animate': ${testAnimationContent.includes('animate')}`);
-      console.log(`[test-simple] Test-animation contiene 'circle': ${testAnimationContent.includes('circle')}`);
-      console.log(`[test-simple] Test-animation contiene 'rect': ${testAnimationContent.includes('rect')}`);
+    let gif662Base64 = '';
+    if (fs.existsSync(gif662Path)) {
+      const gif662Buffer = fs.readFileSync(gif662Path);
+      gif662Base64 = `data:image/gif;base64,${gif662Buffer.toString('base64')}`;
+      console.log(`[test-simple] 662.gif cargado, tamaño: ${gif662Buffer.length} bytes`);
+    } else {
+      console.log(`[test-simple] ⚠️ 662.gif no encontrado, usando placeholder`);
     }
 
     // Generar textos usando text-to-svg
@@ -193,7 +176,7 @@ export default async function handler(req, res) {
     const dataText = textToSVGElement(`${trait.category}, ${totalMinted}, ${trait.floppy}`, 12, '#ffffff', 'Arial, sans-serif');
     const logoText = textToSVGElement('AdrianLAB', 14, '#ffffff', 'Arial, sans-serif');
 
-    // Generar SVG completo
+    // Generar SVG completo simplificado
     const completeSvg = `
       <svg width="768" height="1024" xmlns="http://www.w3.org/2000/svg">
         <!-- Fondo gris claro -->
@@ -213,11 +196,8 @@ export default async function handler(req, res) {
         <!-- Imagen del trait (centrada en el contenedor) usando <image> -->
         <image x="84" y="120" width="600" height="600" href="${traitImageData}" />
         
-        <!-- TRAIT ANIMADO 600.svg -->
-        <image x="84" y="120" width="600" height="600" href="data:image/svg+xml;base64,${Buffer.from(trait600Content).toString('base64')}" />
-        
-        <!-- TRAIT ANIMADO DE PRUEBA (test-animation.svg) en capa superior -->
-        <image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,${Buffer.from(testAnimationContent).toString('base64')}" />
+        <!-- 662.GIF en capa superior -->
+        <image x="200" y="200" width="300" height="300" href="${gif662Base64}" />
         
         <!-- Tag de rareza -->
         <g transform="translate(384, 750)">
@@ -240,11 +220,11 @@ export default async function handler(req, res) {
         </g>
         
         <!-- Indicador de test -->
-        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - METODO PERSONALIZADO</text>
+        <text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST SIMPLIFICADO CON 662.GIF</text>
       </svg>
     `;
 
-    console.log(`[test-simple] SVG completo con frame generado, tamaño: ${completeSvg.length} bytes`);
+    console.log(`[test-simple] SVG completo simplificado generado, tamaño: ${completeSvg.length} bytes`);
     
     console.log(`[test-simple] DEBUG - Orden de capas:`);
     console.log(`[test-simple] DEBUG - 1. Fondo gris claro`);
@@ -252,101 +232,51 @@ export default async function handler(req, res) {
     console.log(`[test-simple] DEBUG - 3. Contenedor con fondo dinámico (${rarity.bg}20)`);
     console.log(`[test-simple] DEBUG - 4. Mannequin (base del personaje) - MÉTODO PERSONALIZADO`);
     console.log(`[test-simple] DEBUG - 5. Trait ${cleanTokenId} (encima del mannequin) - MÉTODO PERSONALIZADO`);
-    console.log(`[test-simple] DEBUG - 6. TRAIT ANIMADO 600.svg`);
-    console.log(`[test-simple] DEBUG - 7. TRAIT ANIMADO DE PRUEBA (test-animation.svg)`);
-    console.log(`[test-simple] DEBUG - 8. Tag de rareza: ${rarity.tag}`);
-    console.log(`[test-simple] DEBUG - 9. Nombre: ${trait.name}`);
-    console.log(`[test-simple] DEBUG - 10. Datos: ${trait.category}, ${totalMinted}, ${trait.floppy}`);
-    console.log(`[test-simple] DEBUG - 11. Logo AdrianLAB`);
-    console.log(`[test-simple] DEBUG - 12. Indicador de test`);
+    console.log(`[test-simple] DEBUG - 6. 662.GIF en capa superior`);
+    console.log(`[test-simple] DEBUG - 7. Tag de rareza: ${rarity.tag}`);
+    console.log(`[test-simple] DEBUG - 8. Nombre: ${trait.name}`);
+    console.log(`[test-simple] DEBUG - 9. Datos: ${trait.category}, ${totalMinted}, ${trait.floppy}`);
+    console.log(`[test-simple] DEBUG - 10. Logo AdrianLAB`);
+    console.log(`[test-simple] DEBUG - 11. Indicador de test`);
 
-    if (wantJson) {
-      // Generar múltiples frames para JSON debug
-      console.log(`[test-simple] 🎬 Generando frames para JSON debug...`);
+    // Generar múltiples frames para crear GIF animado
+    console.log(`[test-simple] 🎬 Generando frames para GIF animado...`);
+    
+    const frames = [];
+    const numFrames = 10;
+    
+    for (let i = 0; i < numFrames; i++) {
+      console.log(`[test-simple] 🎬 Generando frame ${i + 1}/${numFrames}...`);
       
-      const frames = [];
-      const numFrames = 10;
+      let frameSvg = completeSvg;
       
-      for (let i = 0; i < numFrames; i++) {
-        console.log(`[test-simple] 🎬 Generando frame ${i + 1}/${numFrames}...`);
-        
-        let frameSvg = completeSvg;
-        
-        const frameTime = (i / numFrames) * 2;
-        const pulseOpacity = 0.8 + (0.2 * Math.sin(frameTime * Math.PI));
-        const rotationAngle = (i * 36) % 360;
-        const scaleFactor = 0.8 + (0.4 * Math.sin(frameTime * Math.PI));
-        
-        const originalImageTag = /<image x="200" y="200" width="300" height="300" href="data:image\/svg\+xml;base64,([^"]+)"/;
-        const newImageTag = `<image x="200" y="200" width="300" height="300" href="data:image/svg+xml;base64,$1" transform="rotate(${rotationAngle} 350 350) scale(${scaleFactor})" opacity="${pulseOpacity.toFixed(2)}"`;
-        
-        if (frameSvg.match(originalImageTag)) {
-          frameSvg = frameSvg.replace(originalImageTag, newImageTag);
-          console.log(`[test-simple] 🎬 Frame ${i + 1} - Transformación aplicada: rotate(${rotationAngle}°) scale(${scaleFactor.toFixed(2)}) opacity(${pulseOpacity.toFixed(2)})`);
-        }
-        
-        frameSvg = frameSvg.replace(
-          /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
-          `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
-        );
-        
-        frameSvg = frameSvg.replace(
-          /<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - METODO PERSONALIZADO<\/text>/,
-          `<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST ANIMADO - FRAME ${i + 1}</text>`
-        );
-        
-        const resvg = new Resvg(Buffer.from(frameSvg), {
-          fitTo: {
-            mode: 'width',
-            value: 768
-          }
-        });
-        
-        const pngBuffer = resvg.render().asPng();
-        frames.push(pngBuffer);
-        
-        console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
+      const frameTime = (i / numFrames) * 2;
+      const pulseOpacity = 0.8 + (0.2 * Math.sin(frameTime * Math.PI));
+      const rotationAngle = (i * 36) % 360;
+      const scaleFactor = 0.8 + (0.4 * Math.sin(frameTime * Math.PI));
+      
+      // Aplicar transformaciones al 662.gif
+      const originalImageTag = /<image x="200" y="200" width="300" height="300" href="data:image\/gif;base64,([^"]+)"/;
+      const newImageTag = `<image x="200" y="200" width="300" height="300" href="data:image/gif;base64,$1" transform="rotate(${rotationAngle} 350 350) scale(${scaleFactor})" opacity="${pulseOpacity.toFixed(2)}"`;
+      
+      if (frameSvg.match(originalImageTag)) {
+        frameSvg = frameSvg.replace(originalImageTag, newImageTag);
+        console.log(`[test-simple] 🎬 Frame ${i + 1} - Transformación aplicada: rotate(${rotationAngle}°) scale(${scaleFactor.toFixed(2)}) opacity(${pulseOpacity.toFixed(2)})`);
       }
       
-      // Devolver JSON con información de frames
-      const responseData = {
-        type: 'animated_frames',
-        tokenId: cleanTokenId,
-        frameCount: frames.length,
-        frameDelay: 100, // ms
-        fps: 10,
-        dimensions: {
-          width: 768,
-          height: 1024
-        },
-        frames: frames.map((frame, index) => ({
-          frameNumber: index + 1,
-          size: frame.length,
-          transformations: {
-            rotation: (index * 36) % 360,
-            scale: 0.8 + (0.4 * Math.sin((index / frames.length) * 2 * Math.PI)),
-            opacity: 0.8 + (0.2 * Math.sin((index / frames.length) * 2 * Math.PI))
-          }
-        })),
-        message: 'Frames generados exitosamente. JSON para debugging.',
-        timestamp: new Date().toISOString()
-      };
+      // Aplicar efecto de pulso al contenedor
+      frameSvg = frameSvg.replace(
+        /<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="0\.1"\/>/,
+        `<rect x="84" y="120" width="600" height="600" fill="#f0f0f0" opacity="${pulseOpacity.toFixed(2)}"/>`
+      );
       
-      console.log(`[test-simple] ✅ Respuesta JSON con ${frames.length} frames generada`);
+      // Cambiar texto del frame
+      frameSvg = frameSvg.replace(
+        /<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST SIMPLIFICADO CON 662\.GIF<\/text>/,
+        `<text x="384" y="1005" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#ffffff">TEST SIMPLIFICADO - FRAME ${i + 1}</text>`
+      );
       
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('X-Version', 'JSON-DEBUG-METODO-PERSONALIZADO');
-      res.setHeader('X-Frame-Count', frames.length.toString());
-      res.setHeader('X-Frame-Delay', '100ms');
-      res.setHeader('X-Animation-FPS', '10');
-      
-      return res.status(200).json(responseData);
-      
-    } else {
-      // Devolver solo el primer frame como PNG
-      console.log(`[test-simple] 🎬 Generando frame único como PNG...`);
-      
-      const resvg = new Resvg(Buffer.from(completeSvg), {
+      const resvg = new Resvg(Buffer.from(frameSvg), {
         fitTo: {
           mode: 'width',
           value: 768
@@ -354,14 +284,51 @@ export default async function handler(req, res) {
       });
       
       const pngBuffer = resvg.render().asPng();
-      console.log(`[test-simple] ✅ PNG generado, tamaño: ${pngBuffer.length} bytes`);
+      frames.push(pngBuffer);
       
+      console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
+    }
+    
+    // Crear GIF usando gif-frames
+    console.log(`[test-simple] 🎬 Creando GIF con ${frames.length} frames...`);
+    
+    try {
+      const gifFrames = require('gif-frames');
+      
+      // Convertir PNG buffers a streams para gif-frames
+      const frameStreams = frames.map((pngBuffer, index) => ({
+        stream: require('stream').Readable.from(pngBuffer),
+        delay: 100 // 100ms delay entre frames
+      }));
+      
+      // Crear GIF
+      const gifBuffer = await gifFrames.createGif(frameStreams, {
+        width: 768,
+        height: 1024,
+        repeat: 0 // Loop infinito
+      });
+      
+      console.log(`[test-simple] ✅ GIF generado exitosamente, tamaño: ${gifBuffer.length} bytes`);
+      
+      res.setHeader('Content-Type', 'image/gif');
+      res.setHeader('X-Version', 'GIF-SIMPLIFICADO-662');
+      res.setHeader('X-Frame-Count', frames.length.toString());
+      res.setHeader('X-Frame-Delay', '100ms');
+      res.setHeader('X-Animation-FPS', '10');
+      
+      return res.status(200).send(gifBuffer);
+      
+    } catch (gifError) {
+      console.error('[test-simple] Error generando GIF:', gifError);
+      
+      // Fallback: devolver el primer frame como PNG
+      console.log('[test-simple] 🚨 Fallback: devolviendo primer frame como PNG');
       res.setHeader('Content-Type', 'image/png');
-      res.setHeader('X-Version', 'PNG-SIMPLE-METODO-PERSONALIZADO');
+      res.setHeader('X-Version', 'FALLBACK-PNG-SIMPLIFICADO');
       res.setHeader('X-Frame-Count', '1');
       res.setHeader('X-Animation-FPS', '1');
       
-      return res.status(200).send(pngBuffer);
+      return res.status(200).send(frames[0]);
     }
 
   } catch (error) {
