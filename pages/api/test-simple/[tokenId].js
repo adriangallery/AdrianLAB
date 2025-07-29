@@ -1,4 +1,4 @@
-import { GifFrame, GifUtil } from 'gifwrap';
+import { GifFrame, GifUtil, GifCodec } from 'gifwrap';
 import { Resvg } from '@resvg/resvg-js';
 import { createCanvas, loadImage } from 'canvas';
 import fs from 'fs';
@@ -122,15 +122,35 @@ const generateAnimatedGif = async (svgContent, tokenId) => {
     
     // Crear GIF animado
     console.log(`[test-simple] 🎬 Creando GIF animado con ${gifFrames.length} frames...`);
-    const gifBuffer = GifUtil.write('output.gif', gifFrames, { 
-      delay: 100, // 100ms entre frames (10 FPS)
-      repeat: 0    // Repetir infinitamente
-    });
     
-    console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
-    console.log(`[test-simple] 🎬 Tamaños de frames PNG: ${frames.map(f => f.length).join(', ')} bytes`);
-    console.log(`[test-simple] 🎬 Tamaño del GIF final: ${gifBuffer.length} bytes`);
-    return gifBuffer;
+    try {
+      // Usar GifCodec directamente para mayor control
+      const codec = new GifCodec();
+      
+      // Configurar opciones de codificación
+      const encodeOptions = {
+        loops: 0,        // Repetir infinitamente
+        delay: 100,      // 100ms entre frames
+        disposal: 2,     // Disposal method
+        transparent: null // Sin transparencia
+      };
+      
+      // Codificar el GIF
+      const result = await codec.encodeGif(gifFrames, encodeOptions);
+      const gifBuffer = result.buffer;
+      
+      console.log(`[test-simple] ✅ GIF animado generado con ${numFrames} frames`);
+      console.log(`[test-simple] 🎬 Tamaños de frames PNG: ${frames.map(f => f.length).join(', ')} bytes`);
+      console.log(`[test-simple] 🎬 Tamaño del GIF final: ${gifBuffer.length} bytes`);
+      return gifBuffer;
+      
+    } catch (encodeError) {
+      console.error('[test-simple] Error codificando GIF:', encodeError);
+      
+      // Fallback: devolver el primer frame como PNG
+      console.log('[test-simple] 🚨 Fallback: devolviendo primer frame como PNG');
+      return frames[0];
+    }
     
   } catch (error) {
     console.error('[test-simple] Error generando GIF animado:', error);
