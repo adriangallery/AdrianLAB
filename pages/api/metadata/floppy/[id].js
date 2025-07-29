@@ -8,6 +8,36 @@ import {
 } from '../../../../lib/cache.js';
 
 export default async function handler(req, res) {
+  // ===== CONFIGURACIÓN CORS =====
+  const allowedOrigins = [
+    'https://opensea.io',
+    'https://magiceden.io',
+    'https://element.market',
+    'https://tensor.trade',
+    'https://okx.com',
+    'https://binance.com',
+    'https://coinbase.com',
+    'https://adrianzero.com',
+    'https://adrianpunks.com',
+    'https://adriangallery.com'
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    // Para requests sin origin (como imágenes directas) o orígenes no listados
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     let { id } = req.query;
     
@@ -102,212 +132,75 @@ export default async function handler(req, res) {
         console.log(`[floppy-metadata] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
       }
 
-        // Función para obtener tag y color según maxSupply (niveles actualizados)
-  function getRarityTagAndColor(maxSupply) {
-    if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
-    if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
-    if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
-    if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
-    return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
-  }
+      // Función para obtener tag y color según maxSupply (niveles actualizados)
+      function getRarityTagAndColor(maxSupply) {
+        if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
+        if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
+        if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
+        if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
+        return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
+      }
 
       const rarity = getRarityTagAndColor(tokenData.maxSupply);
+      console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
-      // Metadata para tokens del 1 al 9999 (traits con renderizado dinámico)
-    const metadata = {
-        name: tokenData.name,
-        description: tokenData.description || `A ${tokenData.category.toLowerCase()} trait from AdrianLAB collection`,
-        image: `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-        external_url: tokenData.external_url || `${baseUrl}/api/render/floppy/${actualId}.png?v=${version}`,
-      attributes: [
-        {
-            trait_type: "Category",
-            value: tokenData.category
-          },
-          {
-            trait_type: "TOTAL MINTED",
-            value: totalMinted
-          },
-          {
-            trait_type: "Floppy",
-            value: tokenData.floppy || "OG"
-        },
-        {
-          trait_type: "Rarity",
-            value: rarity.tag
-        }
-      ]
-    };
-
-      console.log(`[floppy-metadata] Metadata generada para trait ${tokenIdNum}:`, metadata);
-
-      // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-      setCachedFloppyMetadata(tokenIdNum, metadata);
-      
-      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
-      console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
-      
-      // Configurar headers
-      res.setHeader('X-Cache', 'MISS');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('Content-Type', 'application/json');
-      
-      return res.status(200).json(metadata);
-      
-    } else if (tokenIdNum >= 10000 && tokenIdNum <= 15500) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPY DISCS/PAGERS (10000+)`);
-      
-      // Determinar qué archivo cargar según el rango del token
-      let metadataPath;
-      let dataKey;
-      
-      if (tokenIdNum >= 10000 && tokenIdNum <= 10004) {
-        // Floppy discs (10000-10004) - Incluir 10004
-        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'floppy.json');
-        dataKey = 'floppys';
-        console.log(`[floppy-metadata] Cargando desde floppy.json para token ${tokenIdNum}`);
-      } else if (tokenIdNum >= 15000 && tokenIdNum <= 15007) {
-        // Pagers (15000-15007)
-        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'pagers.json');
-        dataKey = 'pagers';
-        console.log(`[floppy-metadata] Cargando desde pagers.json para token ${tokenIdNum}`);
-      } else {
-        // Fallback a traits.json para otros rangos
-        metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-        dataKey = 'traits';
-        console.log(`[floppy-metadata] Cargando desde traits.json para token ${tokenIdNum}`);
-      }
-      
-      let metadataFile;
-      
-      try {
-        const metadataBuffer = fs.readFileSync(metadataPath);
-        metadataFile = JSON.parse(metadataBuffer.toString());
-        console.log(`[floppy-metadata] Metadata cargado para token ${tokenIdNum}, ${metadataFile[dataKey].length} items encontrados`);
-      } catch (error) {
-        console.error('[floppy-metadata] Error cargando metadata:', error);
-        return res.status(500).json({ error: 'Error cargando datos de metadata' });
-      }
-
-      // Buscar el item correspondiente al tokenId
-      const itemData = metadataFile[dataKey].find(item => item.tokenId === tokenIdNum);
-      
-      if (!itemData) {
-        console.log(`[floppy-metadata] Item no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
-        // Datos genéricos si no se encuentra el item
-        const tokenData = {
-          name: `ANIMATED TRAIT #${tokenIdNum}`,
-          description: `Un trait animado especial del token ${tokenIdNum}`,
-          category: "SPECIAL",
-          maxSupply: 200,
-          floppy: "OG",
-          external_url: "https://adrianpunks.com/"
-        };
-      } else {
-        console.log(`[floppy-metadata] Item encontrado:`, JSON.stringify(itemData, null, 2));
-      }
-
-      // Usar los datos del item encontrado o datos genéricos
-      const tokenData = itemData || {
-        name: `ANIMATED TRAIT #${tokenIdNum}`,
-        description: `Un trait animado especial del token ${tokenIdNum}`,
-        category: "SPECIAL",
-        maxSupply: 200,
-        floppy: "OG",
-        external_url: "https://adrianpunks.com/"
-      };
-
-      // Verificar si existe el GIF correspondiente
-      const gifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.gif`);
-      const gifExists = fs.existsSync(gifPath);
-      console.log(`[floppy-metadata] GIF existe: ${gifExists}, ruta: ${gifPath}`);
-
-      // Verificar si existe el PNG correspondiente (para Action Packs)
-      const pngPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.png`);
-      const pngExists = fs.existsSync(pngPath);
-      console.log(`[floppy-metadata] PNG existe: ${pngExists}, ruta: ${pngPath}`);
-
-      // Determinar el tipo de imagen según la categoría
-      let imageUrl = null;
-      let imageType = null;
-      
-      if (tokenData.category === "Action Packs" && pngExists) {
-        imageUrl = `${baseUrl}/labimages/${tokenIdNum}.png?v=${version}`;
-        imageType = "image/png";
-        console.log(`[floppy-metadata] Usando PNG para Action Pack ${tokenIdNum}`);
-      } else if (gifExists) {
-        imageUrl = `${baseUrl}/labimages/${tokenIdNum}.gif?v=${version}`;
-        imageType = "image/gif";
-        console.log(`[floppy-metadata] Usando GIF para ${tokenData.category} ${tokenIdNum}`);
-      }
-
-        // Función para obtener tag y color según maxSupply (niveles actualizados)
-  function getRarityTagAndColor(maxSupply) {
-    if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
-    if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
-    if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
-    if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
-    return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
-  }
-
-      const rarity = getRarityTagAndColor(tokenData.maxSupply);
-      
-      // Construir JSON de metadata usando solo datos del traits.json
+      // Generar metadata para traits
       const metadata = {
         name: tokenData.name,
-        description: tokenData.description,
-        image: imageUrl,
-        external_url: tokenData.external_url,
+        description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+        external_url: tokenData.external_url || "https://adrianpunks.com/",
         attributes: [
           {
             trait_type: "Category",
             value: tokenData.category
           },
           {
+            trait_type: "Rarity",
+            value: rarity.tag
+          },
+          {
             trait_type: "Max Supply",
             value: tokenData.maxSupply
           },
           {
+            trait_type: "Total Minted",
+            value: totalMinted
+          },
+          {
             trait_type: "Floppy",
-            value: tokenData.floppy
-          },
-          {
-            trait_type: "Traits Inside",
-            value: tokenData.traitsInside || 0
-          },
-          {
-            trait_type: "Rarity",
-            value: rarity.tag
+            value: tokenData.floppy || "OG"
           }
         ],
         properties: {
           files: [
             {
-              uri: imageUrl,
-              type: imageType
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+              type: "image/png"
             }
           ],
-          category: "image"
+          category: "image",
+          creators: tokenData.masterminds || ["Adrian | HalfxTiger"]
         }
       };
-
-      console.log(`[floppy-metadata] Metadata generada para floppy disc ${tokenIdNum}:`, metadata);
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
       setCachedFloppyMetadata(tokenIdNum, metadata);
       
       const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
       console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
-      
+
       // Configurar headers
       res.setHeader('X-Cache', 'MISS');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       
-      return res.status(200).json(metadata);
-      
+      // Devolver metadata
+      console.log(`[floppy-metadata] ===== METADATA TRAIT GENERADA EXITOSAMENTE =====`);
+      res.status(200).json(metadata);
+
     } else if (tokenIdNum === 262144) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM ADRIANGF`);
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM ADRIANGF (262144)`);
       
       // Cargar datos de serums.json
       const serumsPath = path.join(process.cwd(), 'public', 'labmetadata', 'serums.json');
@@ -326,13 +219,39 @@ export default async function handler(req, res) {
       const serumData = serumsData.serums.find(serum => serum.tokenId === tokenIdNum);
       
       if (!serumData) {
-        console.log(`[floppy-metadata] Serum no encontrado para tokenId ${tokenIdNum}`);
-        return res.status(404).json({ error: 'Serum no encontrado' });
+        console.log(`[floppy-metadata] Serum no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
+        const tokenData = {
+          name: `SERUM #${tokenIdNum}`,
+          category: "SERUMS",
+          maxSupply: 1
+        };
+      } else {
+        console.log(`[floppy-metadata] Serum encontrado:`, JSON.stringify(serumData, null, 2));
       }
 
-      console.log(`[floppy-metadata] Serum encontrado:`, JSON.stringify(serumData, null, 2));
+      // Usar los datos del serum encontrado o datos genéricos
+      const tokenData = serumData || {
+        name: `SERUM #${tokenIdNum}`,
+        category: "SERUMS",
+        maxSupply: 1
+      };
 
-      // Función para obtener tag y color según maxSupply
+      // Obtener total minted del contrato
+      let totalMinted = 0;
+      try {
+        console.log(`[floppy-metadata] Obteniendo totalMintedPerAsset para serum ${tokenIdNum}...`);
+        const { traitsCore } = await getContracts();
+        const mintedAmount = await traitsCore.totalMintedPerAsset(tokenIdNum);
+        totalMinted = mintedAmount.toNumber();
+        console.log(`[floppy-metadata] Total minted obtenido del contrato: ${totalMinted}`);
+      } catch (error) {
+        console.error(`[floppy-metadata] Error obteniendo totalMintedPerAsset:`, error.message);
+        // Fallback: usar maxSupply como total minted si falla la llamada onchain
+        totalMinted = tokenData.maxSupply;
+        console.log(`[floppy-metadata] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
+      }
+
+      // Función para obtener tag y color según maxSupply (niveles actualizados)
       function getRarityTagAndColor(maxSupply) {
         if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
         if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
@@ -341,53 +260,188 @@ export default async function handler(req, res) {
         return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
       }
 
-      const rarity = getRarityTagAndColor(serumData.maxSupply);
+      const rarity = getRarityTagAndColor(tokenData.maxSupply);
+      console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
-      // Metadata para serum ADRIANGF
+      // Generar metadata para serum
       const metadata = {
-        name: serumData.name,
-        description: serumData.description,
-        image: `${baseUrl}/labimages/${actualId}.gif?v=${version}`,
-        external_url: serumData.external_url,
+        name: tokenData.name,
+        description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+        external_url: tokenData.external_url || "https://adrianpunks.com/",
         attributes: [
           {
             trait_type: "Category",
-            value: serumData.category
-          },
-          {
-            trait_type: "Max Supply",
-            value: serumData.maxSupply
-          },
-          {
-            trait_type: "Floppy",
-            value: serumData.floppy
+            value: tokenData.category
           },
           {
             trait_type: "Rarity",
             value: rarity.tag
+          },
+          {
+            trait_type: "Max Supply",
+            value: tokenData.maxSupply
+          },
+          {
+            trait_type: "Total Minted",
+            value: totalMinted
+          },
+          {
+            trait_type: "Floppy",
+            value: tokenData.floppy || "Serum"
           }
-        ]
+        ],
+        properties: {
+          files: [
+            {
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+              type: "image/gif"
+            }
+          ],
+          category: "image",
+          creators: tokenData.masterminds || ["Adrian | HalfxTiger"]
+        }
       };
-
-      console.log(`[floppy-metadata] Metadata generada para serum ${tokenIdNum}:`, metadata);
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
       setCachedFloppyMetadata(tokenIdNum, metadata);
       
       const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
       console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
-      
+
       // Configurar headers
       res.setHeader('X-Cache', 'MISS');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       
-      return res.status(200).json(metadata);
-      
+      // Devolver metadata
+      console.log(`[floppy-metadata] ===== METADATA SERUM GENERADA EXITOSAMENTE =====`);
+      res.status(200).json(metadata);
+
     } else {
-      return res.status(400).json({ error: 'Token ID fuera de rango válido (1-9999 para traits, 10000-15500 para floppy discs, 262144 para serums)' });
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS (10000+)`);
+      
+      // Cargar datos de floppy.json
+      const floppyPath = path.join(process.cwd(), 'public', 'labmetadata', 'floppy.json');
+      let floppyData;
+      
+      try {
+        const floppyBuffer = fs.readFileSync(floppyPath);
+        floppyData = JSON.parse(floppyBuffer.toString());
+        console.log(`[floppy-metadata] Floppy data cargado, ${floppyData.floppys.length} floppys encontrados`);
+      } catch (error) {
+        console.error('[floppy-metadata] Error cargando floppy data:', error);
+        return res.status(500).json({ error: 'Error cargando datos de floppys' });
+      }
+
+      // Buscar el floppy correspondiente al tokenId
+      const floppyItem = floppyData.floppys.find(floppy => floppy.tokenId === tokenIdNum);
+      
+      if (!floppyItem) {
+        console.log(`[floppy-metadata] Floppy no encontrado para tokenId ${tokenIdNum}, usando datos genéricos`);
+        const tokenData = {
+          name: `FLOPPY #${tokenIdNum}`,
+          category: "Floppy discs",
+          maxSupply: 100
+        };
+      } else {
+        console.log(`[floppy-metadata] Floppy encontrado:`, JSON.stringify(floppyItem, null, 2));
+      }
+
+      // Usar los datos del floppy encontrado o datos genéricos
+      const tokenData = floppyItem || {
+        name: `FLOPPY #${tokenIdNum}`,
+        category: "Floppy discs",
+        maxSupply: 100
+      };
+
+      // Obtener total minted del contrato
+      let totalMinted = 0;
+      try {
+        console.log(`[floppy-metadata] Obteniendo totalMintedPerAsset para floppy ${tokenIdNum}...`);
+        const { traitsCore } = await getContracts();
+        const mintedAmount = await traitsCore.totalMintedPerAsset(tokenIdNum);
+        totalMinted = mintedAmount.toNumber();
+        console.log(`[floppy-metadata] Total minted obtenido del contrato: ${totalMinted}`);
+      } catch (error) {
+        console.error(`[floppy-metadata] Error obteniendo totalMintedPerAsset:`, error.message);
+        // Fallback: usar maxSupply como total minted si falla la llamada onchain
+        totalMinted = tokenData.maxSupply;
+        console.log(`[floppy-metadata] Usando fallback: totalMinted = maxSupply = ${totalMinted}`);
+      }
+
+      // Función para obtener tag y color según maxSupply (niveles actualizados)
+      function getRarityTagAndColor(maxSupply) {
+        if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
+        if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
+        if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
+        if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };      // Azul
+        return { tag: 'COMMON', bg: '#a9a9a9' };                             // Gris
+      }
+
+      const rarity = getRarityTagAndColor(tokenData.maxSupply);
+      console.log(`[floppy-metadata] Rarity calculada:`, rarity);
+
+      // Generar metadata para floppys
+      const metadata = {
+        name: tokenData.name,
+        description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+        external_url: tokenData.external_url || "https://adrianpunks.com/",
+        attributes: [
+          {
+            trait_type: "Category",
+            value: tokenData.category
+          },
+          {
+            trait_type: "Rarity",
+            value: rarity.tag
+          },
+          {
+            trait_type: "Max Supply",
+            value: tokenData.maxSupply
+          },
+          {
+            trait_type: "Total Minted",
+            value: totalMinted
+          },
+          {
+            trait_type: "Floppy",
+            value: tokenData.floppy || "OG"
+          },
+          {
+            trait_type: "Traits Inside",
+            value: tokenData.traitsInside || "Random"
+          }
+        ],
+        properties: {
+          files: [
+            {
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+              type: "image/png"
+            }
+          ],
+          category: "image",
+          creators: tokenData.masterminds || ["Adrian | HalfxTiger"]
+        }
+      };
+
+      // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+      setCachedFloppyMetadata(tokenIdNum, metadata);
+      
+      const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+      console.log(`[floppy-metadata] ✅ Metadata cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+
+      // Configurar headers
+      res.setHeader('X-Cache', 'MISS');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      
+      // Devolver metadata
+      console.log(`[floppy-metadata] ===== METADATA FLOPPY GENERADA EXITOSAMENTE =====`);
+      res.status(200).json(metadata);
     }
-    
+
   } catch (error) {
     console.error('[floppy-metadata] Error:', error);
     res.status(500).json({ error: 'Error interno del servidor' });

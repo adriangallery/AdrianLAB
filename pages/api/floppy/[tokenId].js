@@ -6,7 +6,9 @@ import { getFloppyData } from '../../../lib/floppy.js';
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
+    'https://adrianzero.com',
     'https://adrianpunks.com',
+    'https://adriangallery.com',
     'https://opensea.io',
     'https://testnets.opensea.io',
     'https://rarible.com',
