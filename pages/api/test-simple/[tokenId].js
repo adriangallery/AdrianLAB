@@ -278,6 +278,9 @@ export default async function handler(req, res) {
         <!-- TRAIT ANIMADO 600.svg en capa superior -->
         <image x="84" y="120" width="600" height="600" href="data:image/svg+xml;base64,${Buffer.from(fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', '600.svg'), 'utf8')).toString('base64')}" />
         
+        <!-- TRAIT ANIMADO 601.svg en capa superior -->
+        <image x="84" y="120" width="600" height="600" href="data:image/svg+xml;base64,${Buffer.from(fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', '601.svg'), 'utf8')).toString('base64')}" />
+        
         <!-- Tag de rareza (superior izquierda) - convertido a path -->
         ${textToSVGElement(rarity.tag, {
           x: 84 + 10,
@@ -355,11 +358,12 @@ export default async function handler(req, res) {
     console.log(`[test-simple] DEBUG - 4. Mannequin (base del personaje) - MÉTODO PERSONALIZADO`);
     console.log(`[test-simple] DEBUG - 5. Trait ${cleanTokenId} (encima del mannequin) - MÉTODO PERSONALIZADO`);
     console.log(`[test-simple] DEBUG - 6. TRAIT ANIMADO 600.svg`);
-    console.log(`[test-simple] DEBUG - 7. Tag de rareza: ${rarity.tag}`);
-    console.log(`[test-simple] DEBUG - 8. Nombre: ${tokenData.name}`);
-    console.log(`[test-simple] DEBUG - 9. Datos: ${tokenData.category}, ${totalMinted}, ${tokenData.floppy || 'OG'}`);
-    console.log(`[test-simple] DEBUG - 10. Logo AdrianLAB`);
-    console.log(`[test-simple] DEBUG - 11. Indicador de test GIF`);
+    console.log(`[test-simple] DEBUG - 7. TRAIT ANIMADO 601.svg`);
+    console.log(`[test-simple] DEBUG - 8. Tag de rareza: ${rarity.tag}`);
+    console.log(`[test-simple] DEBUG - 9. Nombre: ${tokenData.name}`);
+    console.log(`[test-simple] DEBUG - 10. Datos: ${tokenData.category}, ${totalMinted}, ${tokenData.floppy || 'OG'}`);
+    console.log(`[test-simple] DEBUG - 11. Logo AdrianLAB`);
+    console.log(`[test-simple] DEBUG - 12. Indicador de test GIF`);
 
     try {
       // Generar GIF animado
