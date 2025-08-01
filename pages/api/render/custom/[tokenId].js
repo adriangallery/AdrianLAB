@@ -1016,22 +1016,8 @@ export default async function handler(req, res) {
       }
     }
 
-
-    // 2.6. RENDERIZAR TRAITS EXTERNOS ESPECIALES (tokens 30000-35000) encima del skin base
-    console.log('[custom-render] PASO 2.6 - Renderizando traits externos especiales');
-    if (finalTraits['SWAG'] && traitsMapping[finalTraits['SWAG']] && traitsMapping[finalTraits['SWAG']].isExternal) {
-      const externalTraitId = finalTraits['SWAG'];
-      const externalTraitInfo = traitsMapping[externalTraitId];
-      console.log(`[custom-render] PASO 2.6 - LÓGICA ESPECIAL: Renderizando trait externo especial: ${externalTraitId} (${externalTraitInfo.name})`);
-      
-      const externalTraitImage = await loadTraitFromLabimages(externalTraitId);
-      if (externalTraitImage) {
-        ctx.drawImage(externalTraitImage, 0, 0, 1000, 1000);
-        console.log(`[custom-render] PASO 2.6 - Trait externo especial ${externalTraitId} renderizado correctamente`);
-      } else {
-        console.error(`[custom-render] PASO 2.6 - Error al cargar trait externo especial ${externalTraitId}`);
-      }
-    }
+    // NOTA: Los traits externos de SWAG (30000+) se renderizan en el PASO 3 con el orden normal de capas
+    // No necesitan lógica especial aquí porque siguen la misma jerarquía que los traits SWAG normales
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
@@ -1045,8 +1031,8 @@ export default async function handler(req, res) {
           console.log('[custom-render] LÓGICA ESPECIAL: No renderizar HAIR 21 porque HEAD 209 está activo');
           continue;
         }
-        // Solo para traits visuales normales (no ADRIAN ni ADRIANGF) y no externos
-        if (category !== 'ADRIAN' && category !== 'ADRIANGF' && (!traitsMapping[traitId] || !traitsMapping[traitId].isExternal)) {
+        // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
+        if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
           const traitId = finalTraits[category];
           
           // Debug mejorado para traits externos
