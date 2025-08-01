@@ -44,7 +44,7 @@ const loadExternalSvg = async (url) => {
 };
 
 // Función para cargar SVG desde sistema local
-const loadLocalSvg = async (path) => {
+const loadAndRenderSvg = async (path) => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
     const imageUrl = `${baseUrl}/traits/${path}`;
@@ -69,6 +69,62 @@ const loadLocalSvg = async (path) => {
     return loadImage(pngBuffer);
   } catch (error) {
     console.error(`[test-external] Error cargando SVG local ${path}:`, error.message);
+    return null;
+  }
+};
+
+// Función específica para cargar archivos ADRIAN desde sistema de archivos
+const loadAdrianSvg = async (serumName, generation, skinType) => {
+  try {
+    // LÓGICA ESPECIAL PARA ADRIANGF: Usar estructura de carpetas específica
+    if (serumName === "AdrianGF") {
+      console.log(`[test-external] 🧬 LÓGICA ESPECIAL: Cargando skin ADRIANGF para GEN${generation}, skin ${skinType}`);
+      
+      // Mapear skinType a formato de archivo
+      let skinFileName;
+      if (skinType === "Albino") {
+        skinFileName = `GEN${generation}_Albino.svg`;
+      } else {
+        // Para otros skins: GF{gen}-{skinType}.svg
+        skinFileName = `GF${generation}-${skinType}.svg`;
+      }
+      
+      const adrianGfPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', `GF${generation}`, skinFileName);
+      console.log(`[test-external] Cargando ADRIANGF desde sistema de archivos: ${adrianGfPath}`);
+      
+      const svgContent = fs.readFileSync(adrianGfPath, 'utf8');
+      
+      // Renderizar SVG a PNG
+      const resvg = new Resvg(svgContent, {
+        fitTo: {
+          mode: 'width',
+          value: 1000
+        }
+      });
+      
+      const pngBuffer = resvg.render().asPng();
+      return loadImage(pngBuffer);
+    } else {
+      // Lógica original para otros serums
+      const serumNameUpper = serumName.toUpperCase();
+      const adrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', `${serumNameUpper}.svg`);
+      console.log(`[test-external] Cargando Adrian desde sistema de archivos: ${adrianPath}`);
+      
+      const svgContent = fs.readFileSync(adrianPath, 'utf8');
+      
+      // Renderizar SVG a PNG
+      const resvg = new Resvg(svgContent, {
+        fitTo: {
+          mode: 'width',
+          value: 1000
+        }
+      });
+      
+      const pngBuffer = resvg.render().asPng();
+      return loadImage(pngBuffer);
+    }
+  } catch (error) {
+    console.error(`[test-external] Error cargando Adrian SVG ${serumName}:`, error.message);
     return null;
   }
 };
@@ -171,7 +227,7 @@ export default async function handler(req, res) {
 
     // Conectar con los contratos
     console.log('[test-external] Conectando con los contratos...');
-    const { core, traitsExtension } = await getContracts();
+    const { core, traitsExtension, serumModule } = await getContracts();
 
     // Obtener datos del token
     console.log('[test-external] Obteniendo datos del token...');
@@ -221,6 +277,62 @@ export default async function handler(req, res) {
     const finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[test-external] Traits finales (con modificaciones):', finalTraits);
 
+    // LÓGICA ESPECIAL: Detectar serum aplicado y cambiar token base
+    let baseTokenId = cleanTokenId;
+    let appliedSerumForBase = null;
+    
+    try {
+      console.log('[test-external] Verificando si hay serum aplicado para determinar token base...');
+      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      
+      if (serumHistory && serumHistory.length > 0) {
+        const lastSerum = serumHistory[serumHistory.length - 1];
+        const serumSuccess = lastSerum[1];
+        const serumMutation = lastSerum[3];
+        
+        if (serumSuccess && serumMutation === "AdrianGF") {
+          appliedSerumForBase = serumMutation;
+          baseTokenId = "146"; // Usar token 146 como base para ADRIANGF
+          console.log(`[test-external] 🧬 LÓGICA TRAITLAB: Serum ADRIANGF detectado, cambiando token base de ${cleanTokenId} a ${baseTokenId}`);
+        }
+      }
+    } catch (error) {
+      console.log('[test-external] Error verificando serum para token base:', error.message);
+    }
+    
+    console.log(`[test-external] Token base final: ${baseTokenId} (original: ${cleanTokenId})`);
+
+    // Obtener skin del token base
+    console.log('[test-external] Obteniendo skin del token base...');
+    const tokenSkinDataBase = await core.getTokenSkin(baseTokenId);
+    const skinIdBase = tokenSkinDataBase[0].toString();
+    const skinNameBase = tokenSkinDataBase[1];
+    
+    console.log('[test-external] Skin info base:', {
+      skinId: skinIdBase,
+      skinName: skinNameBase
+    });
+
+    // Obtener traits equipados del token base
+    console.log('[test-external] Obteniendo traits equipados del token base...');
+    const nestedBase = await traitsExtension.getAllEquippedTraits(baseTokenId);
+    const categoriesBase = nestedBase[0];
+    const traitIdsBase = nestedBase[1];
+    
+    // Crear mapa de traits del token base
+    const baseTraits = {};
+    categoriesBase.forEach((category, index) => {
+      const normalizedCategory = normalizeCategory(category);
+      const traitId = traitIdsBase[index].toString();
+      baseTraits[normalizedCategory] = traitId;
+    });
+
+    console.log('[test-external] Traits del token base:', baseTraits);
+
+    // Aplicar traits personalizados sobre los del token base
+    const finalTraitsWithBase = { ...baseTraits, ...normalizedCustomTraits };
+    console.log('[test-external] Traits finales (base + modificaciones):', finalTraitsWithBase);
+
     // Crear canvas
     const canvas = createCanvas(1000, 1000);
     const ctx = canvas.getContext('2d');
@@ -231,62 +343,253 @@ export default async function handler(req, res) {
     const gen = generation.toString();
     let skinType;
     
-    if (skinName === "Zero" || skinId === "0" || skinId === "1") {
+    if (skinNameBase === "Zero" || skinIdBase === "0" || skinIdBase === "1") {
       skinType = "Medium";
-    } else if (skinId === "2" || skinName === "Dark") {
+    } else if (skinIdBase === "2" || skinNameBase === "Dark") {
       skinType = "Dark";
-    } else if (skinId === "3" || skinName === "Alien") {
+    } else if (skinIdBase === "3" || skinNameBase === "Alien") {
       skinType = "Alien";
     } else {
-      skinType = skinName || "Medium";
+      skinType = skinNameBase || "Medium";
     }
 
     const baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
     console.log('[test-external] Path de imagen base:', baseImagePath);
 
-    // 1. Renderizar skin base
-    console.log('[test-external] PASO 1 - Renderizando skin base');
-    const baseImage = await loadLocalSvg(baseImagePath);
-    if (baseImage) {
-      ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-      console.log('[test-external] PASO 1 - Skin base renderizado correctamente');
+    // LÓGICA ESPECIAL: Detectar serum aplicado
+    let appliedSerum = null;
+    let serumSuccess = false;
+    let hasSerumHistory = false;
+    let serumFailed = false;
+    try {
+      console.log('[test-external] Verificando si hay serum aplicado...');
+      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      
+      if (serumHistory && serumHistory.length > 0) {
+        hasSerumHistory = true;
+        const lastSerum = serumHistory[serumHistory.length - 1];
+        serumSuccess = lastSerum[1];
+        const serumMutation = lastSerum[3];
+        
+        console.log(`[test-external] Historial de serum encontrado:`, {
+          success: serumSuccess,
+          mutation: serumMutation,
+          hasBeenModified: hasBeenModified
+        });
+        
+        if (serumSuccess) {
+          if (serumMutation) {
+            appliedSerum = serumMutation;
+            console.log(`[test-external] Serum exitoso detectado: ${appliedSerum}`);
+          } else {
+            console.warn(`[test-external] Serum marcado como exitoso pero sin mutación, esto no debería pasar`);
+          }
+        } else {
+          serumFailed = true;
+          console.log(`[test-external] Serum fallido detectado: success = false (será "FAILED" en metadata)`);
+        }
+      }
+    } catch (error) {
+      console.log('[test-external] Error verificando serum aplicado:', error.message);
     }
 
-    // 2. Renderizar traits normales
-    console.log('[test-external] PASO 2 - Renderizando traits normales');
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'SKIN', 'EYES', 'MOUTH', 'NECK', 'NOSE'];
+    // 1. PRIMERO: Renderizar BACKGROUND si existe
+    if (finalTraitsWithBase['BACKGROUND']) {
+      const bgPath = `BACKGROUND/${finalTraitsWithBase['BACKGROUND']}.svg`;
+      console.log(`[test-external] PASO 1 - Cargando background: ${bgPath}`);
+      
+      const bgImage = await loadAndRenderSvg(bgPath);
+      if (bgImage) {
+        ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+        console.log('[test-external] PASO 1 - Background renderizado correctamente');
+      }
+    }
 
-    for (const category of traitOrder) {
-      if (finalTraits[category]) {
-        const traitId = finalTraits[category];
-        const traitImage = await loadTraitFromLabimages(traitId);
-        if (traitImage) {
-          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[test-external] PASO 2 - Trait ${category} (${traitId}) renderizado correctamente`);
+    // 2. SEGUNDO: Renderizar el SKIN (Adrian base, excepción o serum)
+    console.log('[test-external] PASO 2 - Iniciando carga del skin');
+    
+    // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
+    if (appliedSerum) {
+      console.log(`[test-external] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}, éxito: ${serumSuccess}`);
+      
+      // LÓGICA ESPECIAL PARA ADRIANGF: Manejar éxito y fallo
+      if (appliedSerum === "AdrianGF") {
+        if (serumSuccess) {
+          // Serum exitoso: usar skin específico según GEN y tipo
+          const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+          if (serumSkinImage) {
+            ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+            console.log(`[test-external] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
+          } else {
+            console.error(`[test-external] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
+            const baseImage = await loadAndRenderSvg(baseImagePath);
+            if (baseImage) {
+              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+              console.log('[test-external] PASO 2 - Skin base renderizado correctamente (fallback)');
+            }
+          }
+        } else {
+          // Serum fallido: usar GF-Fail.svg
+          console.log(`[test-external] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum ADRIANGF fallido, usando GF-Fail`);
+          const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
+          try {
+            const svgContent = fs.readFileSync(failPath, 'utf8');
+            const resvg = new Resvg(svgContent, {
+              fitTo: {
+                mode: 'width',
+                value: 1000
+              }
+            });
+            const pngBuffer = resvg.render().asPng();
+            const failImage = await loadImage(pngBuffer);
+            ctx.drawImage(failImage, 0, 0, 1000, 1000);
+            console.log('[test-external] PASO 2 - 🧬 Skin ADRIANGF fallido (GF-Fail) renderizado correctamente');
+          } catch (error) {
+            console.error(`[test-external] PASO 2 - Error al cargar GF-Fail, usando skin base normal:`, error.message);
+            const baseImage = await loadAndRenderSvg(baseImagePath);
+            if (baseImage) {
+              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+              console.log('[test-external] PASO 2 - Skin base renderizado correctamente (fallback)');
+            }
+          }
+        }
+      } else {
+        // Otros serums: lógica original
+        const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+        if (serumSkinImage) {
+          ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+          console.log(`[test-external] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
+        } else {
+          console.error(`[test-external] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
+          const baseImage = await loadAndRenderSvg(baseImagePath);
+          if (baseImage) {
+            ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+            console.log('[test-external] PASO 2 - Skin base renderizado correctamente (fallback)');
+          }
+        }
+      }
+    }
+    // LÓGICA ESPECIAL: Si hay historial de serum pero no hay mutación (serum fallido)
+    else if (serumFailed) {
+      console.log(`[test-external] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum fallido detectado, usando GF-Fail`);
+      const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
+      try {
+        const svgContent = fs.readFileSync(failPath, 'utf8');
+        const resvg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        const pngBuffer = resvg.render().asPng();
+        const failImage = await loadImage(pngBuffer);
+        ctx.drawImage(failImage, 0, 0, 1000, 1000);
+        console.log('[test-external] PASO 2 - 🧬 Skin ADRIANGF fallido (GF-Fail) renderizado correctamente');
+      } catch (error) {
+        console.error(`[test-external] PASO 2 - Error al cargar GF-Fail, usando skin base normal:`, error.message);
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[test-external] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
+      }
+    } else {
+      // Usar skin base normal
+      console.log('[test-external] PASO 2 - Usando skin base normal');
+      const baseImage = await loadAndRenderSvg(baseImagePath);
+      if (baseImage) {
+        ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+        console.log('[test-external] PASO 2 - Skin base renderizado correctamente');
+      } else {
+        console.error('[test-external] PASO 2 - Error al cargar el skin, intentando fallback');
+        const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
+        const fallbackImage = await loadAndRenderSvg(fallbackPath);
+        if (fallbackImage) {
+          ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+          console.log('[test-external] PASO 2 - Skin fallback renderizado correctamente');
         }
       }
     }
 
-    // 3. Renderizar trait externo (TEST)
-    if (finalTraits['EXTERNAL_TEST']) {
-      console.log('[test-external] PASO 3 - Renderizando trait externo de test');
-      const externalImage = await loadExternalSvg('https://adrianzero.com/designs/30004.svg');
-      if (externalImage) {
-        ctx.drawImage(externalImage, 0, 0, 1000, 1000);
-        console.log('[test-external] PASO 3 - Trait externo renderizado correctamente');
-      } else {
-        console.error('[test-external] PASO 3 - Error al cargar trait externo');
+    // 2.5. RENDERIZAR SKIN TRAITS ESPECIALES (tokens 37, 38) encima del skin base
+    console.log('[test-external] PASO 2.5 - Renderizando skin traits especiales');
+    if (finalTraitsWithBase['SWAG'] === '37' || finalTraitsWithBase['SWAG'] === '38') {
+      const skinTraitId = finalTraitsWithBase['SWAG'];
+      const skinTraitPath = `SKIN/${skinTraitId}.svg`;
+      console.log(`[test-external] PASO 2.5 - Renderizando skin trait especial: ${skinTraitPath}`);
+      
+      const skinTraitImage = await loadAndRenderSvg(skinTraitPath);
+      if (skinTraitImage) {
+        ctx.drawImage(skinTraitImage, 0, 0, 1000, 1000);
+        console.log(`[test-external] PASO 2.5 - Skin trait especial ${skinTraitId} renderizado correctamente`);
       }
     }
 
-    // 4. Renderizar TOP layers
-    console.log('[test-external] PASO 4 - Renderizando TOP layers');
-    if (finalTraits['TOP']) {
-      const traitId = finalTraits['TOP'];
-      const traitImage = await loadTraitFromLabimages(traitId);
-      if (traitImage) {
-        ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-        console.log(`[test-external] PASO 4 - TOP trait (${traitId}) renderizado correctamente`);
+    // 3. TERCERO: Renderizar resto de traits
+    console.log('[test-external] PASO 3 - Iniciando renderizado de traits adicionales');
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'HEAD', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+
+    for (const category of traitOrder) {
+      if (finalTraitsWithBase[category]) {
+        // LÓGICA ESPECIAL: No renderizar HAIR 21 si HEAD 209 está activo
+        if (category === 'HAIR' && finalTraitsWithBase['HAIR'] === '21' && finalTraitsWithBase['HEAD'] === '209') {
+          console.log('[test-external] LÓGICA ESPECIAL: No renderizar HAIR 21 porque HEAD 209 está activo');
+          continue;
+        }
+        // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
+        if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
+          const traitId = finalTraitsWithBase[category];
+          const traitImage = await loadTraitFromLabimages(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[test-external] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          } else {
+            console.error(`[test-external] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+          }
+        }
+      }
+    }
+
+    // 4. CUARTO: Renderizar trait externo (TEST) - va encima de todos los traits normales
+    if (finalTraitsWithBase['EXTERNAL_TEST']) {
+      console.log('[test-external] PASO 4 - Renderizando trait externo de test');
+      const externalImage = await loadExternalSvg('https://adrianzero.com/designs/30004.svg');
+      if (externalImage) {
+        ctx.drawImage(externalImage, 0, 0, 1000, 1000);
+        console.log('[test-external] PASO 4 - Trait externo renderizado correctamente');
+      } else {
+        console.error('[test-external] PASO 4 - Error al cargar trait externo');
+      }
+    }
+
+    // 5. QUINTO: Renderizar TOP layers (van encima de todas las demás)
+    console.log('[test-external] PASO 5 - Renderizando TOP layers');
+    const topOrder = ['TOP'];
+
+    for (const category of topOrder) {
+      if (finalTraitsWithBase[category]) {
+        const traitId = finalTraitsWithBase[category];
+        console.log(`[test-external] PASO 5 - Cargando TOP trait: ${traitId}`);
+
+        const traitImage = await loadTraitFromLabimages(traitId);
+        if (traitImage) {
+          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+          console.log(`[test-external] PASO 5 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+        } else {
+          console.error(`[test-external] PASO 5 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+        }
+      }
+    }
+
+    // LÓGICA ESPECIAL: Renderizar token 48 (S.W.A.T-Shild) en TOP
+    if (finalTraitsWithBase['GEAR'] === '48') {
+      const specialTraitPath = `GEAR/48.svg`;
+      console.log(`[test-external] PASO 5 - 🎯 LÓGICA ESPECIAL: Renderizando token 48 en TOP: ${specialTraitPath}`);
+
+      const specialTraitImage = await loadAndRenderSvg(specialTraitPath);
+      if (specialTraitImage) {
+        ctx.drawImage(specialTraitImage, 0, 0, 1000, 1000);
+        console.log(`[test-external] PASO 5 - 🎯 Token 48 renderizado correctamente en TOP`);
       }
     }
 
