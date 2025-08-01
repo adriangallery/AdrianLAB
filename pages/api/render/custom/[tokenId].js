@@ -115,6 +115,7 @@ const loadExternalTrait = async (traitId) => {
     }
     
     const svgBuffer = await response.arrayBuffer();
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: SVG descargado desde URL externa, tamaño: ${svgBuffer.byteLength} bytes`);
     
     // Renderizar SVG a PNG
     const resvg = new Resvg(Buffer.from(svgBuffer), {
@@ -125,11 +126,14 @@ const loadExternalTrait = async (traitId) => {
     });
     
     const pngBuffer = resvg.render().asPng();
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: PNG generado desde URL externa, tamaño: ${pngBuffer.length} bytes`);
+    
     const image = await loadImage(pngBuffer);
     console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} cargado exitosamente desde URL externa`);
     return image;
   } catch (error) {
     console.error(`[custom-render] 🌐 LÓGICA EXTERNA: Error cargando trait ${traitId} desde URL externa:`, error.message);
+    console.error(`[custom-render] 🌐 LÓGICA EXTERNA: Stack trace:`, error.stack);
     return null;
   }
 };
@@ -249,6 +253,68 @@ const loadTraitsMapping = (tokenId) => {
   }
 };
 
+// NUEVA FUNCIÓN: Cargar mapeo combinado de traits (traits.json + studio.json para tokens 30000+)
+const loadCombinedTraitsMapping = (tokenId) => {
+  try {
+    console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Iniciando carga de mapeo combinado para token ${tokenId}`);
+    
+    // Cargar mapeo base desde traits.json
+    const baseTraitsArray = loadMetadataForToken(tokenId);
+    const baseMapping = {};
+    baseTraitsArray.forEach(trait => {
+      baseMapping[trait.tokenId] = {
+        category: trait.category.toUpperCase(),
+        name: trait.name,
+        fileName: trait.fileName
+      };
+    });
+    
+    console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo base cargado con ${Object.keys(baseMapping).length} entries`);
+    
+    // Verificar si necesitamos cargar studio.json para traits externos
+    const numTokenId = parseInt(tokenId);
+    if (numTokenId >= 30000 && numTokenId <= 35000) {
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Token ${tokenId} en rango 30000-35000, cargando studio.json`);
+      
+      try {
+        const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
+        const studioBuffer = fs.readFileSync(studioPath);
+        const studioData = JSON.parse(studioBuffer.toString());
+        
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Studio.json cargado con ${Object.keys(studioData).length} entries`);
+        
+        // Combinar studio.json con el mapeo base
+        Object.entries(studioData).forEach(([traitId, trait]) => {
+          baseMapping[traitId] = {
+            category: trait.category.toUpperCase(),
+            name: trait.name,
+            fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
+            external_url: trait.external_url, // Añadir URL externa para referencia
+            isExternal: true // Marcar como trait externo
+          };
+        });
+        
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo combinado completado con ${Object.keys(baseMapping).length} entries totales`);
+        
+        // Debug: Mostrar algunos traits externos cargados
+        const externalTraits = Object.entries(baseMapping).filter(([id, trait]) => trait.isExternal);
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Traits externos cargados:`, externalTraits.slice(0, 5).map(([id, trait]) => `${id}: ${trait.name} (${trait.category})`));
+        
+      } catch (error) {
+        console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando studio.json:`, error.message);
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Continuando solo con mapeo base`);
+      }
+    } else {
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Token ${tokenId} fuera del rango 30000-35000, usando solo mapeo base`);
+    }
+    
+    return baseMapping;
+  } catch (error) {
+    console.error('[custom-render] 🔄 LÓGICA COMBINADA: Error cargando mapeo combinado:', error);
+    return {};
+  }
+};
+
 // =============================================
 // SECCIÓN DE EXCEPCIONES ESPECIALES
 // =============================================
@@ -336,8 +402,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // Cargar mapeo de traits
-    const traitsMapping = loadTraitsMapping(cleanTokenId);
+    // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS
+    console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Analizando token ${cleanTokenId} para traits externos`);
+    const numTokenId = parseInt(cleanTokenId);
+    const isExternalToken = numTokenId >= 30000 && numTokenId <= 35000;
+    
+    if (isExternalToken) {
+      console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Token ${cleanTokenId} detectado en rango externo (30000-35000)`);
+    } else {
+      console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Token ${cleanTokenId} fuera del rango externo, usando lógica normal`);
+    }
+
+    // Cargar mapeo de traits (combinado si es necesario)
+    const traitsMapping = loadCombinedTraitsMapping(cleanTokenId);
     console.log(`[custom-render] Mapeo de traits cargado con ${Object.keys(traitsMapping).length} entries`);
 
     // Obtener parámetros de query para traits personalizados
@@ -376,12 +453,18 @@ export default async function handler(req, res) {
           categoryConflicts[category].push({
             id: traitId,
             name: traitInfo.name,
-            fileName: traitInfo.fileName
+            fileName: traitInfo.fileName,
+            isExternal: traitInfo.isExternal || false
           });
           
-          console.log(`[custom-render] Trait ID ${traitId} (${traitInfo.name}) mapeado a categoría ${category}`);
+          // Debug mejorado para traits externos
+          if (traitInfo.isExternal) {
+            console.log(`[custom-render] 🌐 TRAIT EXTERNO: Trait ID ${traitId} (${traitInfo.name}) mapeado a categoría ${category} - URL: ${traitInfo.external_url}`);
+          } else {
+            console.log(`[custom-render] Trait ID ${traitId} (${traitInfo.name}) mapeado a categoría ${category}`);
+          }
         } else {
-          console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo`);
+          console.warn(`[custom-render] Trait ID ${traitId} no encontrado en el mapeo combinado`);
         }
       });
       
@@ -392,14 +475,21 @@ export default async function handler(req, res) {
           console.log(`[custom-render] ⚠️  Conflicto detectado en categoría ${category}:`);
           traits.forEach((trait, index) => {
             const status = index === traits.length - 1 ? '✅ SELECCIONADO' : '❌ DESCARTADO';
-            console.log(`[custom-render]   ${status} - Trait ${trait.id} (${trait.name})`);
+            const externalFlag = trait.isExternal ? '🌐 EXTERNO' : '';
+            console.log(`[custom-render]   ${status} - Trait ${trait.id} (${trait.name}) ${externalFlag}`);
           });
         }
         
         // Usar solo el último trait de la categoría
         const lastTrait = traits[traits.length - 1];
         customTraits[category] = lastTrait.id.toString();
-        console.log(`[custom-render] Final: Categoría ${category} = Trait ${lastTrait.id} (${lastTrait.name})`);
+        
+        // Debug mejorado para traits externos
+        if (lastTrait.isExternal) {
+          console.log(`[custom-render] 🌐 FINAL EXTERNO: Categoría ${category} = Trait ${lastTrait.id} (${lastTrait.name}) - EXTERNO`);
+        } else {
+          console.log(`[custom-render] Final: Categoría ${category} = Trait ${lastTrait.id} (${lastTrait.name})`);
+        }
       });
     }
 
@@ -646,16 +736,43 @@ export default async function handler(req, res) {
 
     // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId
     const loadTraitFromLabimages = async (traitId) => {
+      console.log(`[custom-render] 🎨 CARGANDO TRAIT: Iniciando carga de trait ${traitId}`);
+      
       // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
       if (isExternalTrait(traitId)) {
         console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} detectado en rango externo, usando carga externa`);
+        
+        // Verificar si el trait está en el mapeo combinado
+        if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+          console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} confirmado en mapeo combinado como externo`);
+          console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Info del trait:`, {
+            name: traitsMapping[traitId].name,
+            category: traitsMapping[traitId].category,
+            external_url: traitsMapping[traitId].external_url
+          });
+        } else {
+          console.warn(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} en rango externo pero no encontrado en mapeo combinado`);
+        }
+        
         return await loadExternalTrait(traitId);
+      }
+      
+      // Verificar si el trait está en el mapeo combinado para debug
+      if (traitsMapping[traitId]) {
+        console.log(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} encontrado en mapeo:`, {
+          name: traitsMapping[traitId].name,
+          category: traitsMapping[traitId].category,
+          fileName: traitsMapping[traitId].fileName,
+          isExternal: traitsMapping[traitId].isExternal || false
+        });
+      } else {
+        console.warn(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} no encontrado en mapeo combinado`);
       }
       
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
         const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
-        console.log(`[custom-render] Cargando trait desde labimages: ${imageUrl}`);
+        console.log(`[custom-render] 🎨 CARGANDO TRAIT: Cargando desde labimages: ${imageUrl}`);
 
         const response = await fetch(imageUrl);
         if (!response.ok) {
@@ -663,6 +780,7 @@ export default async function handler(req, res) {
         }
         
         const svgBuffer = await response.arrayBuffer();
+        console.log(`[custom-render] 🎨 CARGANDO TRAIT: SVG descargado, tamaño: ${svgBuffer.byteLength} bytes`);
         
         // Renderizar SVG a PNG
         const resvg = new Resvg(Buffer.from(svgBuffer), {
@@ -673,9 +791,13 @@ export default async function handler(req, res) {
         });
         
         const pngBuffer = resvg.render().asPng();
-        return loadImage(pngBuffer);
+        console.log(`[custom-render] 🎨 CARGANDO TRAIT: PNG generado, tamaño: ${pngBuffer.length} bytes`);
+        
+        const image = await loadImage(pngBuffer);
+        console.log(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} cargado exitosamente desde labimages`);
+        return image;
       } catch (error) {
-        console.error(`[custom-render] Error cargando trait ${traitId} desde labimages:`, error.message);
+        console.error(`[custom-render] 🎨 CARGANDO TRAIT: Error cargando trait ${traitId} desde labimages:`, error.message);
         return null;
       }
     };
@@ -915,10 +1037,22 @@ export default async function handler(req, res) {
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
         if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
           const traitId = finalTraits[category];
+          
+          // Debug mejorado para traits externos
+          if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+            console.log(`[custom-render] 🌐 PASO 3 - Renderizando trait externo: ${category} (${traitId}) - ${traitsMapping[traitId].name}`);
+          }
+          
           const traitImage = await loadTraitFromLabimages(traitId);
           if (traitImage) {
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-            console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+            
+            // Debug mejorado para traits externos
+            if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+              console.log(`[custom-render] 🌐 PASO 3 - Trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+            } else {
+              console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+            }
           } else {
             console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
           }
@@ -933,12 +1067,24 @@ export default async function handler(req, res) {
     for (const category of topOrder) {
       if (finalTraits[category]) {
         const traitId = finalTraits[category];
-        console.log(`[custom-render] PASO 4 - Cargando TOP trait: ${traitId}`);
+        
+        // Debug mejorado para traits externos
+        if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+          console.log(`[custom-render] 🌐 PASO 4 - Cargando TOP trait externo: ${traitId} - ${traitsMapping[traitId].name}`);
+        } else {
+          console.log(`[custom-render] PASO 4 - Cargando TOP trait: ${traitId}`);
+        }
 
         const traitImage = await loadTraitFromLabimages(traitId);
         if (traitImage) {
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          
+          // Debug mejorado para traits externos
+          if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+            console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+          } else {
+            console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          }
         } else {
           console.error(`[custom-render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
         }
