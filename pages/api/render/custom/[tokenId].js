@@ -178,6 +178,8 @@ const getMetadataFileForToken = (tokenId) => {
     return 'pagers.json';
   } else if (numTokenId === 262144) {
     return 'serums.json';
+  } else if (numTokenId >= 30000 && numTokenId <= 35000) {
+    return 'studio.json';
   } else {
     return 'traits.json';
   }
@@ -205,6 +207,15 @@ const loadMetadataForToken = (tokenId) => {
         break;
       case 'serums.json':
         traitsArray = metadata.serums;
+        break;
+      case 'studio.json':
+        // Para studio.json, convertir el objeto a array
+        traitsArray = Object.entries(metadata).map(([tokenId, trait]) => ({
+          tokenId: tokenId,
+          category: trait.category,
+          name: trait.name,
+          fileName: `${tokenId}.svg`
+        }));
         break;
       default:
         traitsArray = metadata.traits;
