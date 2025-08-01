@@ -329,6 +329,22 @@ export default async function handler(req, res) {
 
     console.log('[test-external] Traits del token base:', baseTraits);
 
+    // LÓGICA ESPECIAL: Si el token base no tiene traits, usar token 1 como fallback
+    if (Object.keys(baseTraits).length === 0) {
+      console.log('[test-external] Token base no tiene traits, usando token 1 como fallback...');
+      const fallbackNested = await traitsExtension.getAllEquippedTraits("1");
+      const fallbackCategories = fallbackNested[0];
+      const fallbackTraitIds = fallbackNested[1];
+      
+      fallbackCategories.forEach((category, index) => {
+        const normalizedCategory = normalizeCategory(category);
+        const traitId = fallbackTraitIds[index].toString();
+        baseTraits[normalizedCategory] = traitId;
+      });
+      
+      console.log('[test-external] Traits del fallback (token 1):', baseTraits);
+    }
+
     // Aplicar traits personalizados sobre los del token base
     const finalTraitsWithBase = { ...baseTraits, ...normalizedCustomTraits };
     console.log('[test-external] Traits finales (base + modificaciones):', finalTraitsWithBase);
