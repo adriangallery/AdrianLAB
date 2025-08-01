@@ -99,7 +99,59 @@ const normalizeCategory = (category) => {
     'PACKS': 'SWAG'  // Mapear PACKS a SWAG (discrepancia del contrato)
   };
   
-  return categoryMap[category] || category;
+  const normalized = categoryMap[category] || category;
+  return normalized;
+};
+
+// NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
+const loadExternalTrait = async (traitId) => {
+  try {
+    const externalUrl = `https://adrianzero.com/designs/${traitId}.svg`;
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Cargando trait ${traitId} desde URL externa: ${externalUrl}`);
+    
+    const response = await fetch(externalUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const svgBuffer = await response.arrayBuffer();
+    
+    // Renderizar SVG a PNG
+    const resvg = new Resvg(Buffer.from(svgBuffer), {
+      fitTo: {
+        mode: 'width',
+        value: 1000
+      }
+    });
+    
+    const pngBuffer = resvg.render().asPng();
+    const image = await loadImage(pngBuffer);
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} cargado exitosamente desde URL externa`);
+    return image;
+  } catch (error) {
+    console.error(`[custom-render] 🌐 LÓGICA EXTERNA: Error cargando trait ${traitId} desde URL externa:`, error.message);
+    return null;
+  }
+};
+
+// NUEVA FUNCIÓN: Extraer traitId de un path
+const extractTraitIdFromPath = (path) => {
+  try {
+    // Extraer el número del final del path (antes de .svg)
+    const match = path.match(/(\d+)\.svg$/);
+    if (match) {
+      const traitId = parseInt(match[1]);
+      return traitId;
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+};
+
+// NUEVA FUNCIÓN: Verificar si un traitId está en el rango externo
+const isExternalTrait = (traitId) => {
+  return traitId >= 30000 && traitId <= 35000;
 };
 
 // LÓGICA ESPECIAL: Mapear ciertos tokens de HEAD a HAIR (solo peinados reales, no accesorios)
@@ -490,6 +542,13 @@ export default async function handler(req, res) {
 
     // Función para cargar y renderizar SVG
     const loadAndRenderSvg = async (path) => {
+      // LÓGICA ESPECIAL: Verificar si el path contiene un traitId en rango externo
+      const traitId = extractTraitIdFromPath(path);
+      if (traitId && isExternalTrait(traitId)) {
+        console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Path ${path} contiene trait ${traitId} en rango externo, usando carga externa`);
+        return await loadExternalTrait(traitId);
+      }
+      
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
         const imageUrl = `${baseUrl}/traits/${path}`;
@@ -576,6 +635,12 @@ export default async function handler(req, res) {
 
     // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId
     const loadTraitFromLabimages = async (traitId) => {
+      // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
+      if (isExternalTrait(traitId)) {
+        console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} detectado en rango externo, usando carga externa`);
+        return await loadExternalTrait(traitId);
+      }
+      
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
         const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
