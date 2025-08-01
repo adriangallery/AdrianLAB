@@ -271,11 +271,8 @@ const loadCombinedTraitsMapping = (tokenId) => {
     
     console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo base cargado con ${Object.keys(baseMapping).length} entries`);
     
-    // Verificar si necesitamos cargar studio.json para traits externos
-    const numTokenId = parseInt(tokenId);
-    if (numTokenId >= 30000 && numTokenId <= 35000) {
-      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Token ${tokenId} en rango 30000-35000, cargando studio.json`);
-      
+    // CARGAR SIEMPRE studio.json para traits externos (disponibles para todos los tokens)
+    console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Cargando studio.json para traits externos`);
       try {
         const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
         const studioBuffer = fs.readFileSync(studioPath);
@@ -304,9 +301,6 @@ const loadCombinedTraitsMapping = (tokenId) => {
         console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando studio.json:`, error.message);
         console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Continuando solo con mapeo base`);
       }
-    } else {
-      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Token ${tokenId} fuera del rango 30000-35000, usando solo mapeo base`);
-    }
     
     return baseMapping;
   } catch (error) {
