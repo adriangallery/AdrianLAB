@@ -193,6 +193,43 @@ const loadMannequinFromLabimages = async () => {
   }
 };
 
+// NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
+const loadExternalTraitForFloppy = async (traitId) => {
+  try {
+    const baseUrl = 'https://adrianzero.com/designs';
+    const imageUrl = `${baseUrl}/${traitId}.svg`;
+    console.log(`[floppy-render] 🌐 Cargando trait ${traitId} desde URL externa: ${imageUrl}`);
+
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const svgBuffer = await response.arrayBuffer();
+    console.log(`[floppy-render] 🌐 SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+    
+    // Renderizar SVG a PNG
+    const resvg = new Resvg(Buffer.from(svgBuffer), {
+      fitTo: {
+        mode: 'width',
+        value: 600  // Tamaño para el contenedor floppy
+      }
+    });
+    
+    const pngBuffer = resvg.render().asPng();
+    console.log(`[floppy-render] 🌐 Trait renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+    
+    // Convertir a base64 para usar en <image>
+    const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    console.log(`[floppy-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} cargado exitosamente desde URL externa`);
+    return base64Image;
+  } catch (error) {
+    console.error(`[floppy-render] 🌐 LÓGICA EXTERNA: Error cargando trait ${traitId} desde URL externa:`, error.message);
+    console.error(`[floppy-render] 🌐 LÓGICA EXTERNA: Stack trace:`, error.stack);
+    return null;
+  }
+};
+
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
@@ -304,6 +341,22 @@ async function handleRenderToken(req, res, tokenId) {
 
     // Buscar el serum correspondiente al tokenId
     traitData = serumsData.serums.find(serum => serum.tokenId === tokenIdNum);
+  } else if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+    // Cargar datos de studio.json para tokens 30000-35000
+    const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
+    let studioData;
+    
+    try {
+      const studioBuffer = fs.readFileSync(studioPath);
+      studioData = JSON.parse(studioBuffer.toString());
+      console.log(`[floppy-render] Studio data cargado, ${Object.keys(studioData).length} tokens encontrados`);
+    } catch (error) {
+      console.error('[floppy-render] Error cargando studio data:', error);
+      return res.status(500).json({ error: 'Error cargando datos de studio' });
+    }
+
+    // Buscar el token correspondiente al tokenId
+    traitData = studioData[tokenIdNum.toString()];
   } else {
     // Cargar datos de labmetadata para tokens 1-9999
     const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
@@ -445,12 +498,23 @@ async function handleRenderToken(req, res, tokenId) {
   
   // Cargar trait y mannequin usando método personalizado (como test-simple)
   console.log(`[floppy-render] Cargando trait ${tokenId} usando método personalizado...`);
-  const traitImageData = await loadTraitFromLabimages(tokenId);
   
-  if (!traitImageData) {
-    console.error(`[floppy-render] No se pudo cargar el trait ${tokenId}`);
-    res.status(500).json({ error: 'Error cargando trait' });
-    return;
+  // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
+  let traitImageData;
+  if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+    traitImageData = await loadExternalTraitForFloppy(tokenId);
+    if (!traitImageData) {
+      console.error(`[floppy-render] 🌐 No se pudo cargar el trait ${tokenId} desde URL externa`);
+      res.status(500).json({ error: 'Error cargando trait desde URL externa' });
+      return;
+    }
+  } else {
+    traitImageData = await loadTraitFromLabimages(tokenId);
+    if (!traitImageData) {
+      console.error(`[floppy-render] No se pudo cargar el trait ${tokenId}`);
+      res.status(500).json({ error: 'Error cargando trait' });
+      return;
+    }
   }
 
   const mannequinImageData = await loadMannequinFromLabimages();
