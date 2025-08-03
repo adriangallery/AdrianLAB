@@ -138,6 +138,8 @@ const getMetadataFileForToken = (tokenId) => {
     return 'pagers.json';
   } else if (numTokenId === 262144) {
     return 'serums.json';
+  } else if (numTokenId >= 30000 && numTokenId <= 35000) {
+    return 'studio.json';
   } else {
     return 'traits.json';
   }
@@ -165,6 +167,15 @@ const loadMetadataForToken = (tokenId) => {
         break;
       case 'serums.json':
         traitsArray = metadata.serums;
+        break;
+      case 'studio.json':
+        // Para studio.json, convertir el objeto a array
+        traitsArray = Object.entries(metadata).map(([tokenId, trait]) => ({
+          tokenId: tokenId,
+          category: trait.category,
+          name: trait.name,
+          fileName: `${tokenId}.svg`
+        }));
         break;
       default:
         traitsArray = metadata.traits;
@@ -420,6 +431,42 @@ export default async function handler(req, res) {
         return loadImage(pngBuffer);
       } catch (error) {
         console.error(`[render] Error cargando trait ${traitId} desde labimages:`, error.message);
+        return null;
+      }
+    };
+
+    // NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
+    const loadExternalTrait = async (traitId) => {
+      try {
+        const baseUrl = 'https://adrianzero.com/designs';
+        const imageUrl = `${baseUrl}/${traitId}.svg`;
+        console.log(`[render] 🌐 Cargando trait ${traitId} desde URL externa: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        console.log(`[render] 🌐 SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
+        
+        // Renderizar SVG a PNG
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        console.log(`[render] 🌐 Trait renderizado a PNG, tamaño: ${pngBuffer.length} bytes`);
+        
+        const image = await loadImage(pngBuffer);
+        console.log(`[render] 🌐 LÓGICA EXTERNA: Trait ${traitId} cargado exitosamente desde URL externa`);
+        return image;
+      } catch (error) {
+        console.error(`[render] 🌐 LÓGICA EXTERNA: Error cargando trait ${traitId} desde URL externa:`, error.message);
+        console.error(`[render] 🌐 LÓGICA EXTERNA: Stack trace:`, error.stack);
         return null;
       }
     };
@@ -758,12 +805,25 @@ export default async function handler(req, res) {
             }
           }
           const traitId = equippedTraits[category];
-          const traitImage = await loadTraitFromLabimages(traitId);
-          if (traitImage) {
-            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-            console.log(`[render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          
+          // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
+          let traitImage;
+          if (traitId >= 30000 && traitId <= 35000) {
+            traitImage = await loadExternalTrait(traitId);
+            if (traitImage) {
+              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              console.log(`[render] PASO 3 - 🌐 Trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
+            } else {
+              console.error(`[render] PASO 3 - 🌐 Error al cargar trait ${category} (${traitId}) desde URL externa`);
+            }
           } else {
-            console.error(`[render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+            traitImage = await loadTraitFromLabimages(traitId);
+            if (traitImage) {
+              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              console.log(`[render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+            } else {
+              console.error(`[render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+            }
           }
         }
       }
@@ -778,12 +838,24 @@ export default async function handler(req, res) {
         const traitId = equippedTraits[category];
         console.log(`[render] PASO 4 - Cargando TOP trait: ${traitId}`);
 
-        const traitImage = await loadTraitFromLabimages(traitId);
-        if (traitImage) {
-          ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          console.log(`[render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+        // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
+        let traitImage;
+        if (traitId >= 30000 && traitId <= 35000) {
+          traitImage = await loadExternalTrait(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[render] PASO 4 - 🌐 TOP trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
+          } else {
+            console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
+          }
         } else {
-          console.error(`[render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+          traitImage = await loadTraitFromLabimages(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+          } else {
+            console.error(`[render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+          }
         }
       }
     }
