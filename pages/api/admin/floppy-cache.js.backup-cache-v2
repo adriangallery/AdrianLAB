@@ -15,10 +15,7 @@ import {
   invalidateAdrianZeroRender,
   invalidateAdrianZeroRenderRange,
   getAdrianZeroRenderCacheStats,
-  getAdrianZeroRenderTTL,
-  invalidateAdrianZeroCustomRender,
-  getAdrianZeroCustomRenderCacheStats,
-  getAdrianZeroCustomRenderTTL
+  getAdrianZeroRenderTTL
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -33,7 +30,6 @@ export default async function handler(req, res) {
       const metadataStats = getFloppyMetadataCacheStats();
       const renderStats = getFloppyRenderCacheStats();
       const adrianZeroStats = getAdrianZeroRenderCacheStats();
-      const adrianZeroCustomStats = getAdrianZeroCustomRenderCacheStats();
       
       return res.status(200).json({
         success: true,
@@ -59,14 +55,6 @@ export default async function handler(req, res) {
             normal: `${getAdrianZeroRenderTTL(1) / 3600000}h`,
             tshirts: `${getAdrianZeroRenderTTL(30000) / 3600000}h`,
             serum: `${getAdrianZeroRenderTTL(262144) / 3600000}h`
-          }
-        },
-        adrianZeroCustom: {
-          stats: adrianZeroCustomStats,
-          ttlConfig: {
-            normal: `${getAdrianZeroCustomRenderTTL(1) / 3600000}h`,
-            tshirts: `${getAdrianZeroCustomRenderTTL(30000) / 3600000}h`,
-            serum: `${getAdrianZeroCustomRenderTTL(262144) / 3600000}h`
           }
         }
       });
@@ -204,24 +192,6 @@ export default async function handler(req, res) {
           result.message = adrianZeroSerumInvalidated 
             ? 'AdrianZero render caché de serum (262144) invalidado'
             : 'Serum no estaba en AdrianZero render caché';
-          break;
-
-        case 'invalidate_adrianzero_custom_normal':
-          result.invalidated = invalidateAdrianZeroCustomRender(1); // Ejemplo para token 1
-          result.message = 'AdrianZero custom render caché de tokens normales invalidado';
-          break;
-
-        case 'invalidate_adrianzero_custom_tshirts':
-          result.invalidated = invalidateAdrianZeroCustomRender(30000); // Ejemplo para token 30000
-          result.message = 'AdrianZero custom render caché de T-shirts invalidado';
-          break;
-
-        case 'invalidate_adrianzero_custom_serum':
-          const adrianZeroCustomSerumInvalidated = invalidateAdrianZeroCustomRender(262144);
-          result.invalidated = adrianZeroCustomSerumInvalidated;
-          result.message = adrianZeroCustomSerumInvalidated > 0
-            ? 'AdrianZero custom render caché de serum (262144) invalidado'
-            : 'Serum no estaba en AdrianZero custom render caché';
           break;
 
         default:

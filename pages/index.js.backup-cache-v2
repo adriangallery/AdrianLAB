@@ -12,7 +12,6 @@ export default function Home() {
   const [floppyCacheStats, setFloppyCacheStats] = useState(null);
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
   const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
-  const [adrianZeroCustomCacheStats, setAdrianZeroCustomCacheStats] = useState(null);
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
@@ -76,7 +75,6 @@ export default function Home() {
       const data = await response.json();
       setFloppyCacheStats(data);
       setAdrianZeroCacheStats(data.adrianZero); // NUEVO
-      setAdrianZeroCustomCacheStats(data.adrianZeroCustom); // NUEVO
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
     } finally {
@@ -501,79 +499,6 @@ export default function Home() {
             </div>
           ) : (
             <p>Error loading AdrianZero cache stats</p>
-          )}
-        </div>
-
-        {/* Nueva sección de administración de caché para AdrianZero Custom render */}
-        <div className={styles.adminSection}>
-          <h2 className={styles.adminTitle}>🎨 AdrianZero Custom Render Cache Management (7 días TTL)</h2>
-          
-          {floppyCacheLoading ? (
-            <p>Loading cache stats...</p>
-          ) : adrianZeroCustomCacheStats ? (
-            <div className={styles.cacheStats}>
-              <h3>🎨 AdrianZero Custom Render Cache</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <h3>Total Custom</h3>
-                  <p className={styles.statNumber}>{adrianZeroCustomCacheStats.stats.total}</p>
-                  <small>{adrianZeroCustomCacheStats.totalKeys} combinaciones únicas</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Normal (1-9999)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCustomCacheStats.stats.normal}</p>
-                  <small>{adrianZeroCustomCacheStats.ttlConfig.normal}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>T-shirts (30000+)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCustomCacheStats.stats.tshirts}</p>
-                  <small>{adrianZeroCustomCacheStats.ttlConfig.tshirts}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Serum (262144)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCustomCacheStats.stats.serum}</p>
-                  <small>{adrianZeroCustomCacheStats.ttlConfig.serum}</small>
-                </div>
-              </div>
-              
-              <div className={styles.cacheActions}>
-                <h3>🔄 Quick Actions</h3>
-                <div className={styles.actionButtons}>
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_custom_normal')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    🎨 Refresh AdrianZero Custom Normal (7 días TTL)
-                  </button>
-                  
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_custom_tshirts')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    👕 Refresh AdrianZero Custom T-shirts (7 días TTL)
-                  </button>
-                  
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_custom_serum')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    🧬 Refresh AdrianZero Custom Serum (7 días TTL)
-                  </button>
-                </div>
-                
-                <h3>📋 Ejemplos de URLs Cacheadas</h3>
-                <div className={styles.examples}>
-                  <p><code>/api/render/custom/208?trait=133&trait=245&trait=2</code></p>
-                  <p><code>/api/render/custom/1?trait=7&trait=22</code></p>
-                  <p><code>/api/render/custom/30000?trait=30001&trait=30002</code></p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p>Error loading AdrianZero Custom cache stats</p>
           )}
         </div>
       </main>
