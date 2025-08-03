@@ -13,6 +13,10 @@ export default function Home() {
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
   const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
   const [adrianZeroCustomCacheStats, setAdrianZeroCustomCacheStats] = useState(null);
+  const [tokenSpecificForm, setTokenSpecificForm] = useState({
+    tokenId: '',
+    cacheType: 'all'
+  });
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
@@ -111,6 +115,44 @@ export default function Home() {
     } catch (error) {
       console.error('Error invalidating floppy cache:', error);
       alert('❌ Error invalidando caché');
+    } finally {
+      setFloppyCacheLoading(false);
+    }
+  };
+
+  // Función para invalidar caché de token específico
+  const invalidateTokenSpecificCache = async () => {
+    if (!tokenSpecificForm.tokenId || isNaN(parseInt(tokenSpecificForm.tokenId))) {
+      alert('❌ Por favor ingresa un Token ID válido');
+      return;
+    }
+
+    setFloppyCacheLoading(true);
+    try {
+      const response = await fetch('/api/admin/floppy-cache', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'invalidate_token_specific',
+          tokenId: tokenSpecificForm.tokenId,
+          cacheType: tokenSpecificForm.cacheType
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ ${result.message}`);
+        fetchFloppyCacheStats(); // Refresh stats
+        setTokenSpecificForm({ tokenId: '', cacheType: 'all' }); // Reset form
+      } else {
+        alert(`❌ Error: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error invalidating token cache:', error);
+      alert('❌ Error invalidating token cache');
     } finally {
       setFloppyCacheLoading(false);
     }
@@ -575,6 +617,80 @@ export default function Home() {
           ) : (
             <p>Error loading AdrianZero Custom cache stats</p>
           )}
+        </div>
+
+        {/* Nueva sección para invalidar caché de token específico */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🎯 Invalidar Caché por Token Específico</h2>
+          
+          <div className={styles.cacheStats}>
+            <h3>🗑️ Eliminar Caché de Token</h3>
+            
+            <div className={styles.tokenSpecificForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="tokenId">Token ID:</label>
+                <input
+                  type="number"
+                  id="tokenId"
+                  value={tokenSpecificForm.tokenId}
+                  onChange={(e) => setTokenSpecificForm({
+                    ...tokenSpecificForm,
+                    tokenId: e.target.value
+                  })}
+                  placeholder="Ej: 208, 30000, 262144"
+                  min="1"
+                  className={styles.input}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="cacheType">Tipo de Caché:</label>
+                <select
+                  id="cacheType"
+                  value={tokenSpecificForm.cacheType}
+                  onChange={(e) => setTokenSpecificForm({
+                    ...tokenSpecificForm,
+                    cacheType: e.target.value
+                  })}
+                  className={styles.select}
+                >
+                  <option value="all">🔄 Todos los Cachés</option>
+                  <option value="adrianzero_render">🎨 AdrianZero Render</option>
+                  <option value="adrianzero_custom">🎨 AdrianZero Custom Render</option>
+                  <option value="floppy_render">💾 Floppy Render</option>
+                  <option value="floppy_metadata">📄 Floppy Metadata</option>
+                </select>
+              </div>
+              
+              <button
+                onClick={invalidateTokenSpecificCache}
+                className={styles.actionButton}
+                disabled={floppyCacheLoading || !tokenSpecificForm.tokenId}
+                style={{ marginTop: '10px' }}
+              >
+                {floppyCacheLoading ? '⏳ Procesando...' : '🗑️ Eliminar Caché'}
+              </button>
+            </div>
+            
+            <div className={styles.helpText}>
+              <h4>💡 Cómo usar:</h4>
+              <ul>
+                <li><strong>Token ID:</strong> El número del token que quieres limpiar</li>
+                <li><strong>Todos los Cachés:</strong> Elimina render, custom render, metadata y floppy</li>
+                <li><strong>AdrianZero Render:</strong> Solo el render normal del token</li>
+                <li><strong>AdrianZero Custom:</strong> Solo las combinaciones custom con trait= params</li>
+                <li><strong>Floppy Render:</strong> Solo el render de floppy del token</li>
+                <li><strong>Floppy Metadata:</strong> Solo la metadata de floppy del token</li>
+              </ul>
+              
+              <h4>🎯 Ejemplos de uso:</h4>
+              <ul>
+                <li><code>Token 208 + Custom:</code> Limpia todas las combinaciones de traits del token 208</li>
+                <li><code>Token 30000 + Todos:</code> Limpia todo el caché del token 30000 (T-shirt)</li>
+                <li><code>Token 262144 + Render:</code> Solo limpia el render del Serum</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </main>
 

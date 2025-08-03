@@ -18,7 +18,11 @@ import {
   getAdrianZeroRenderTTL,
   invalidateAdrianZeroCustomRender,
   getAdrianZeroCustomRenderCacheStats,
-  getAdrianZeroCustomRenderTTL
+  getAdrianZeroCustomRenderTTL,
+  invalidateAdrianZeroRender,
+  invalidateFloppyRender,
+  invalidateFloppyMetadata,
+  invalidateAllCachesForToken
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -222,6 +226,47 @@ export default async function handler(req, res) {
           result.message = adrianZeroCustomSerumInvalidated > 0
             ? 'AdrianZero custom render caché de serum (262144) invalidado'
             : 'Serum no estaba en AdrianZero custom render caché';
+          break;
+
+        case 'invalidate_token_specific':
+          const { tokenId, cacheType } = req.body;
+          
+          if (!tokenId || isNaN(parseInt(tokenId))) {
+            return res.status(400).json({ error: 'Invalid tokenId' });
+          }
+          
+          const cleanTokenId = parseInt(tokenId);
+          
+          switch (cacheType) {
+            case 'adrianzero_render':
+              result.invalidated = invalidateAdrianZeroRender(cleanTokenId) ? 1 : 0;
+              result.message = `AdrianZero render caché para token ${cleanTokenId} invalidado`;
+              break;
+              
+            case 'adrianzero_custom':
+              result.invalidated = invalidateAdrianZeroCustomRender(cleanTokenId);
+              result.message = `AdrianZero custom render caché para token ${cleanTokenId} invalidado (${result.invalidated} combinaciones)`;
+              break;
+              
+            case 'floppy_render':
+              result.invalidated = invalidateFloppyRender(cleanTokenId) ? 1 : 0;
+              result.message = `Floppy render caché para token ${cleanTokenId} invalidado`;
+              break;
+              
+            case 'floppy_metadata':
+              result.invalidated = invalidateFloppyMetadata(cleanTokenId) ? 1 : 0;
+              result.message = `Floppy metadata caché para token ${cleanTokenId} invalidado`;
+              break;
+              
+            case 'all':
+              const allResults = invalidateAllCachesForToken(cleanTokenId);
+              result.invalidated = allResults.totalInvalidated;
+              result.message = `Todos los cachés para token ${cleanTokenId} invalidados: ${JSON.stringify(allResults)}`;
+              break;
+              
+            default:
+              return res.status(400).json({ error: 'Invalid cacheType. Use: adrianzero_render, adrianzero_custom, floppy_render, floppy_metadata, or all' });
+          }
           break;
 
         default:
