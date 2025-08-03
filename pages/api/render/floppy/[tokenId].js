@@ -302,12 +302,12 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
-    // Procesar tokens 1-9999 (traits) y 262144 (serum ADRIANGF)
-    if (tokenIdNum >= 1 && tokenIdNum <= 9999 || tokenIdNum === 262144) {
+    // Procesar tokens 1-9999 (traits), 262144 (serum ADRIANGF) y 30000-35000 (T-shirts personalizados)
+    if (tokenIdNum >= 1 && tokenIdNum <= 9999 || tokenIdNum === 262144 || (tokenIdNum >= 30000 && tokenIdNum <= 35000)) {
       console.log(`[floppy-render] Procesando trait ${tokenId} (renderizado PNG)`);
       await handleRenderToken(req, res, tokenId);
     } else {
-      res.status(400).json({ error: 'Este endpoint solo maneja tokens 1-9999 (traits) y 262144 (serums). Para tokens 10000+ usa /api/metadata/floppy/[tokenId]' });
+      res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144 (serums) y 30000-35000 (T-shirts personalizados). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
     console.error('[floppy-render] Error:', error);
