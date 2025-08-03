@@ -19,9 +19,6 @@ import {
   invalidateAdrianZeroCustomRender,
   getAdrianZeroCustomRenderCacheStats,
   getAdrianZeroCustomRenderTTL,
-  invalidateAdrianZeroRender,
-  invalidateFloppyRender,
-  invalidateFloppyMetadata,
   invalidateAllCachesForToken
 } from '../../../lib/cache.js';
 
