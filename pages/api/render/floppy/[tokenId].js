@@ -415,6 +415,11 @@ async function handleRenderToken(req, res, tokenId) {
 
   // Función para obtener tag y color según maxSupply (niveles actualizados)
   function getRarityTagAndColor(maxSupply) {
+    // LÓGICA ESPECIAL: Tokens 30000-35000 tienen tag hardcodeado
+    if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+      return { tag: 'TraitSTUDIO', bg: '#ff6b35' };  // Naranja para T-shirts personalizados
+    }
+    
     if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };        // Rojo
     if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };      // Dorado
     if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };          // Púrpura
