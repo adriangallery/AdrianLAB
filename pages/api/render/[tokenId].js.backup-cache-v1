@@ -4,11 +4,6 @@ import fs from 'fs';
 import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getContracts } from '../../../lib/contracts.js';
-import { 
-  getCachedAdrianZeroRender, 
-  setCachedAdrianZeroRender, 
-  getAdrianZeroRenderTTL 
-} from '../../../lib/cache.js';
 
 // Cache para traits animados
 const animatedTraitsCache = new Map();
@@ -279,24 +274,6 @@ export default async function handler(req, res) {
       console.error(`[render] Token ID inválido: ${cleanTokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
     }
-
-    // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
-    const cachedImage = getCachedAdrianZeroRender(cleanTokenId);
-    
-    if (cachedImage) {
-      console.log(`[render] 🎯 CACHE HIT para token ${cleanTokenId}`);
-      
-      // Configurar headers de caché
-      const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-      res.setHeader('X-Cache', 'HIT');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('Content-Type', 'image/png');
-      res.setHeader('X-Version', 'ADRIANZERO-CACHED');
-      
-      return res.status(200).send(cachedImage);
-    }
-
-    console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
 
     // Conectar con los contratos
     console.log('[render] Conectando con los contratos...');
@@ -895,18 +872,15 @@ export default async function handler(req, res) {
       }
     }
 
-    // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
+    // Enviar imagen
     const buffer = canvas.toBuffer('image/png');
-    setCachedAdrianZeroRender(cleanTokenId, buffer);
-
-    const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-    console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
-
-    // Configurar headers
-    res.setHeader('X-Cache', 'MISS');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-    res.setHeader('X-Version', 'ADRIANZERO-CACHED');
     res.setHeader('Content-Length', buffer.length);
     res.send(buffer);
 

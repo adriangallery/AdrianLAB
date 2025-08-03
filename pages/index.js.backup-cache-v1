@@ -11,7 +11,6 @@ export default function Home() {
   // Estados para el caché de floppy metadata y render
   const [floppyCacheStats, setFloppyCacheStats] = useState(null);
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
-  const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
@@ -74,7 +73,6 @@ export default function Home() {
       const response = await fetch('/api/admin/floppy-cache');
       const data = await response.json();
       setFloppyCacheStats(data);
-      setAdrianZeroCacheStats(data.adrianZero); // NUEVO
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
     } finally {
@@ -434,71 +432,6 @@ export default function Home() {
             </div>
           ) : (
             <p>Error loading floppy cache stats</p>
-          )}
-        </div>
-
-        {/* Nueva sección de administración de caché para AdrianZero render */}
-        <div className={styles.adminSection}>
-          <h2 className={styles.adminTitle}>🎨 AdrianZero Render Cache Management</h2>
-          
-          {floppyCacheLoading ? (
-            <p>Loading cache stats...</p>
-          ) : adrianZeroCacheStats ? (
-            <div className={styles.cacheStats}>
-              <h3>🎨 AdrianZero Render Cache</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <h3>Total AdrianZero</h3>
-                  <p className={styles.statNumber}>{adrianZeroCacheStats.stats.total}</p>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Normal (1-9999)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCacheStats.stats.normal}</p>
-                  <small>{adrianZeroCacheStats.ttlConfig.normal}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>T-shirts (30000+)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCacheStats.stats.tshirts}</p>
-                  <small>{adrianZeroCacheStats.ttlConfig.tshirts}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Serum (262144)</h3>
-                  <p className={styles.statNumber}>{adrianZeroCacheStats.stats.serum}</p>
-                  <small>{adrianZeroCacheStats.ttlConfig.serum}</small>
-                </div>
-              </div>
-              
-              <div className={styles.cacheActions}>
-                <h3>🔄 Quick Actions</h3>
-                <div className={styles.actionButtons}>
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_normal')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    🎨 Refresh AdrianZero Normal (24h TTL)
-                  </button>
-                  
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_tshirts')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    👕 Refresh AdrianZero T-shirts (48h TTL)
-                  </button>
-                  
-                  <button 
-                    onClick={() => invalidateFloppyCache('invalidate_adrianzero_serum')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    🧬 Refresh AdrianZero Serum (48h TTL)
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p>Error loading AdrianZero cache stats</p>
           )}
         </div>
       </main>
