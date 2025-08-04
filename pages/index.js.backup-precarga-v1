@@ -13,7 +13,6 @@ export default function Home() {
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
   const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
   const [adrianZeroCustomCacheStats, setAdrianZeroCustomCacheStats] = useState(null);
-  const [pregenerationStats, setPregenerationStats] = useState(null);
   const [tokenSpecificForm, setTokenSpecificForm] = useState({
     tokenId: '',
     cacheType: 'all'
@@ -82,17 +81,6 @@ export default function Home() {
       setFloppyCacheStats(data);
       setAdrianZeroCacheStats(data.adrianZero); // NUEVO
       setAdrianZeroCustomCacheStats(data.adrianZeroCustom); // NUEVO
-      
-      // Cargar estadísticas de precarga
-      try {
-        const pregenResponse = await fetch('/api/admin/pregenerate');
-        const pregenData = await pregenResponse.json();
-        if (pregenData.success) {
-          setPregenerationStats(pregenData);
-        }
-      } catch (error) {
-        console.error('Error fetching pregeneration stats:', error);
-      }
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
     } finally {
@@ -165,34 +153,6 @@ export default function Home() {
     } catch (error) {
       console.error('Error invalidating token cache:', error);
       alert('❌ Error invalidating token cache');
-    } finally {
-      setFloppyCacheLoading(false);
-    }
-  };
-
-  // Función para precargar tokens
-  const triggerPregeneration = async (action, params = {}) => {
-    setFloppyCacheLoading(true);
-    try {
-      const response = await fetch('/api/admin/pregenerate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action, ...params }),
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        alert(`✅ ${result.message}`);
-        fetchFloppyCacheStats(); // Refresh stats
-      } else {
-        alert(`❌ Error: ${result.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error triggering pregeneration:', error);
-      alert('❌ Error triggering pregeneration');
     } finally {
       setFloppyCacheLoading(false);
     }
@@ -731,90 +691,6 @@ export default function Home() {
               </ul>
             </div>
           </div>
-        </div>
-
-        {/* Nueva sección de administración de precarga */}
-        <div className={styles.adminSection}>
-          <h2 className={styles.adminTitle}>🚀 Sistema de Precarga SVG → PNG</h2>
-          
-          {floppyCacheLoading ? (
-            <p>Loading pregeneration stats...</p>
-          ) : pregenerationStats ? (
-            <div className={styles.cacheStats}>
-              <h3>📊 Estadísticas de Precarga</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <h3>Total Pregenerados</h3>
-                  <p className={styles.statNumber}>{pregenerationStats.stats.total}</p>
-                  <small>{Math.round(pregenerationStats.stats.totalSize / 1024)} KB</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Skins Base</h3>
-                  <p className={styles.statNumber}>{pregenerationStats.stats.skins}</p>
-                  <small>Tokens 1-9999</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Custom Renders</h3>
-                  <p className={styles.statNumber}>{pregenerationStats.stats.custom}</p>
-                  <small>Combinaciones populares</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>T-shirts</h3>
-                  <p className={styles.statNumber}>{pregenerationStats.stats.tshirts}</p>
-                  <small>Tokens 30000+</small>
-                </div>
-              </div>
-              
-              <div className={styles.cacheActions}>
-                <h3>⚡ Quick Actions</h3>
-                <div className={styles.actionButtons}>
-                  <button 
-                    onClick={() => triggerPregeneration('pregenerate_critical')}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    🎯 Precargar Tokens Críticos
-                  </button>
-                  
-                  <button 
-                    onClick={() => triggerPregeneration('pregenerate_range', { startId: 1, endId: 100, priority: 'HIGH' })}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    📦 Precargar Rango 1-100
-                  </button>
-                  
-                  <button 
-                    onClick={() => triggerPregeneration('pregenerate_range', { startId: 30000, endId: 30050, priority: 'HIGH' })}
-                    className={styles.actionButton}
-                    disabled={floppyCacheLoading}
-                  >
-                    👕 Precargar T-shirts 30000-30050
-                  </button>
-                </div>
-                
-                <h3>📋 Tokens Críticos Configurados</h3>
-                <div className={styles.examples}>
-                  <p><strong>Featured:</strong> {pregenerationStats.config.critical.featured.join(', ')}</p>
-                  <p><strong>T-shirts Sample:</strong> 30000-30049 (50 tokens)</p>
-                  <p><strong>Serum:</strong> 262144</p>
-                  <p><strong>Rangos Populares:</strong> 1-100, 1000-1050, 5000-5050</p>
-                </div>
-                
-                <h3>💡 Beneficios de la Precarga</h3>
-                <div className={styles.helpText}>
-                  <ul>
-                    <li><strong>Latencia:</strong> 2-4s → 50-100ms (95% reducción)</li>
-                    <li><strong>CPU:</strong> 100% → 5% (95% reducción)</li>
-                    <li><strong>Memory:</strong> 100% → 2% (98% reducción)</li>
-                    <li><strong>Disponibilidad:</strong> 100% (sin fallos de generación)</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p>Error loading pregeneration stats</p>
-          )}
         </div>
       </main>
 
