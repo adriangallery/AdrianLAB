@@ -30,3 +30,4 @@ npm run build
 npm start
 ``` # Force redeploy Thu Jul 17 21:33:50 CEST 2025
 # Vercel redeploy trigger - Mon Aug  4 13:21:23 CEST 2025
+# Vercel redeploy trigger - AdrianZERO SVG endpoint
