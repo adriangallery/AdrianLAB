@@ -1,9 +1,9 @@
-import { FloppyRenderer } from '../../../../lib/renderers/floppy-renderer.js';
+import { FloppyRenderer } from '../../../../../lib/renderers/floppy-renderer.js';
 import { 
-  getCachedFloppyRender, 
-  setCachedFloppyRender, 
-  getFloppyRenderTTL 
-} from '../../../../lib/cache.js';
+  getCachedFloppySvg, 
+  setCachedFloppySvg, 
+  getFloppySvgTTL 
+} from '../../../../../lib/cache.js';
 
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
@@ -47,8 +47,8 @@ export default async function handler(req, res) {
   try {
     let { tokenId } = req.query;
     
-    if (tokenId && tokenId.endsWith('.png')) {
-      tokenId = tokenId.replace('.png', '');
+    if (tokenId && tokenId.endsWith('.svg')) {
+      tokenId = tokenId.replace('.svg', '');
     }
     
     if (!tokenId || isNaN(parseInt(tokenId))) {
@@ -57,55 +57,55 @@ export default async function handler(req, res) {
 
     const tokenIdNum = parseInt(tokenId);
 
-    // ===== SISTEMA DE CACHÉ PARA FLOPPY RENDER =====
-    const cachedImage = getCachedFloppyRender(tokenIdNum);
+    // ===== SISTEMA DE CACHÉ PARA FLOPPY SVG =====
+    const cachedSvg = getCachedFloppySvg(tokenIdNum);
     
-    if (cachedImage) {
-      console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
+    if (cachedSvg) {
+      console.log(`[floppy-svg] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
       // Configurar headers de caché
-      const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+      const ttlSeconds = Math.floor(getFloppySvgTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('Content-Type', 'image/png');
-      res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.setHeader('X-Version', 'FLOPPY-SVG-OPTIMIZED');
       
-      return res.status(200).send(cachedImage);
+      return res.status(200).send(cachedSvg);
     }
 
-    console.log(`[floppy-render] 💾 CACHE MISS para token ${tokenIdNum} - Generando imagen...`);
-    console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
-    console.log(`[floppy-render] Token ID: ${tokenId}`);
+    console.log(`[floppy-svg] 💾 CACHE MISS para token ${tokenIdNum} - Generando SVG...`);
+    console.log(`[floppy-svg] ===== RENDERIZADO SVG (1-9999) =====`);
+    console.log(`[floppy-svg] Token ID: ${tokenId}`);
 
     // Procesar tokens 1-9999 (traits), 262144 (serum ADRIANGF) y 30000-35000 (T-shirts personalizados)
     if (tokenIdNum >= 1 && tokenIdNum <= 9999 || tokenIdNum === 262144 || (tokenIdNum >= 30000 && tokenIdNum <= 35000)) {
-      console.log(`[floppy-render] Procesando trait ${tokenId} (renderizado PNG)`);
+      console.log(`[floppy-svg] Procesando trait ${tokenId} (renderizado SVG)`);
       
       // Usar la nueva clase FloppyRenderer
       const renderer = new FloppyRenderer();
-      const pngBuffer = await renderer.generatePNG(tokenId);
+      const svgString = await renderer.generateSVG(tokenId);
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-      setCachedFloppyRender(tokenIdNum, pngBuffer);
+      setCachedFloppySvg(tokenIdNum, svgString);
       
-      const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
-      console.log(`[floppy-render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
+      const ttlSeconds = Math.floor(getFloppySvgTTL(tokenIdNum) / 1000);
+      console.log(`[floppy-svg] ✅ SVG cacheado por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
 
       // Configurar headers
       res.setHeader('X-Cache', 'MISS');
-      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Type', 'image/svg+xml');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
+      res.setHeader('X-Version', 'FLOPPY-SVG-OPTIMIZED');
       
-      // Devolver imagen
-      console.log(`[floppy-render] ===== RENDERIZADO SVG COMPLETO FINALIZADO =====`);
-      res.status(200).send(pngBuffer);
+      // Devolver SVG
+      console.log(`[floppy-svg] ===== RENDERIZADO SVG FINALIZADO =====`);
+      res.status(200).send(svgString);
       
     } else {
       res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144 (serums) y 30000-35000 (T-shirts personalizados). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
-    console.error('[floppy-render] Error:', error);
+    console.error('[floppy-svg] Error:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 } 
