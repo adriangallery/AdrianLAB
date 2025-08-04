@@ -4,14 +4,6 @@ import { getContracts } from '../../../../lib/contracts.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
-import { 
-  getCachedAdrianZeroCustomRender, 
-  setCachedAdrianZeroCustomRender, 
-  getAdrianZeroCustomRenderTTL,
-  hasPregeneratedFile,
-  readPregeneratedFile,
-  triggerAsyncPregeneration
-} from '../../../../lib/cache.js';
 
 // Cache para traits animados
 const animatedTraitsCache = new Map();
@@ -402,58 +394,6 @@ export default async function handler(req, res) {
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
       console.error(`[custom-render] Token ID inválido: ${cleanTokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
-    }
-
-    // ===== SISTEMA DE CACHÉ PARA ADRIANZERO CUSTOM RENDER =====
-    // Extraer todos los parámetros trait= de la query
-    const traitParams = [];
-    if (Array.isArray(req.query.trait)) {
-      traitParams.push(...req.query.trait);
-    } else if (req.query.trait) {
-      traitParams.push(req.query.trait);
-    }
-
-    // Solo cachear si hay traits específicos
-    if (traitParams.length > 0) {
-      // 🚀 PASO 1: VERIFICAR ARCHIVO PREGENERADO (ULTRA-RÁPIDO)
-      if (hasPregeneratedFile(cleanTokenId, 'custom', traitParams)) {
-        const pregenImage = readPregeneratedFile(cleanTokenId, 'custom', traitParams);
-        
-        if (pregenImage) {
-          console.log(`[custom-render] 🎯 PREGEN HIT para token ${cleanTokenId} con traits [${traitParams.join(', ')}]`);
-          
-          res.setHeader('X-Cache', 'PREGEN-HIT');
-          res.setHeader('Cache-Control', 'public, max-age=2592000'); // 30 días
-          res.setHeader('Content-Type', 'image/png');
-          res.setHeader('X-Version', 'ADRIANZERO-PREGENERATED');
-          res.setHeader('X-Traits', traitParams.join(','));
-          res.setHeader('X-Source', 'STATIC-FILE');
-          
-          return res.status(200).send(pregenImage);
-        }
-      }
-
-      // 🎯 PASO 2: VERIFICAR CACHÉ IN-MEMORY (RÁPIDO)
-      const cachedImage = getCachedAdrianZeroCustomRender(cleanTokenId, traitParams);
-      
-      if (cachedImage) {
-        console.log(`[custom-render] 💾 CACHE HIT para token ${cleanTokenId} con traits [${traitParams.join(', ')}]`);
-        
-        // Trigger precarga asíncrona para futura optimización
-        triggerAsyncPregeneration(cleanTokenId, traitParams, cachedImage, 'HIGH');
-        
-        const ttlSeconds = Math.floor(getAdrianZeroCustomRenderTTL(cleanTokenId) / 1000);
-        res.setHeader('X-Cache', 'MEMORY-HIT');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`); // 7 días
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-CACHED');
-        res.setHeader('X-Traits', traitParams.join(','));
-        res.setHeader('X-Source', 'MEMORY-CACHE');
-        
-        return res.status(200).send(cachedImage);
-      }
-
-      console.log(`[custom-render] 🔄 GENERATING para token ${cleanTokenId} con traits [${traitParams.join(', ')}] - Generando imagen...`);
     }
 
     // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS
@@ -1160,31 +1100,14 @@ export default async function handler(req, res) {
       }
     }
 
-    // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+    // Configurar headers para evitar cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
+    // Enviar imagen
     const buffer = canvas.toBuffer('image/png');
-
-    // Solo cachear si hay traits específicos
-    if (traitParams.length > 0) {
-      setCachedAdrianZeroCustomRender(cleanTokenId, traitParams, buffer);
-      
-      // 🚀 TRIGGER PRECARGA ASÍNCRONA (no bloquea respuesta)
-      triggerAsyncPregeneration(cleanTokenId, traitParams, buffer, 'HIGH');
-      
-      const ttlSeconds = Math.floor(getAdrianZeroCustomRenderTTL(cleanTokenId) / 1000);
-      console.log(`[custom-render] ✅ Imagen custom cacheada y precarga programada para token ${cleanTokenId} con traits [${traitParams.join(', ')}]`);
-      
-      // Headers con caché largo
-      res.setHeader('X-Cache', 'GENERATED');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`); // 7 días
-      res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-CACHED');
-      res.setHeader('X-Traits', traitParams.join(','));
-      res.setHeader('X-Source', 'DYNAMIC-RENDER');
-    } else {
-      // Sin traits específicos, no cachear
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-NO-CACHE');
-    }
-
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Content-Length', buffer.length);
     res.send(buffer);
