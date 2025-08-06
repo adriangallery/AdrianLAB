@@ -12,6 +12,8 @@ export default function Home() {
   const [floppyCacheStats, setFloppyCacheStats] = useState(null);
   const [floppyCacheLoading, setFloppyCacheLoading] = useState(false);
   const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
+  const [contractCacheStats, setContractCacheStats] = useState(null);
+  const [jsonCacheStats, setJsonCacheStats] = useState(null);
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
@@ -74,7 +76,9 @@ export default function Home() {
       const response = await fetch('/api/admin/floppy-cache');
       const data = await response.json();
       setFloppyCacheStats(data);
-      setAdrianZeroCacheStats(data.adrianZero); // NUEVO
+      setAdrianZeroCacheStats(data.adrianZero);
+      setContractCacheStats(data.contracts);
+      setJsonCacheStats(data.json);
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
     } finally {
@@ -499,6 +503,136 @@ export default function Home() {
             </div>
           ) : (
             <p>Error loading AdrianZero cache stats</p>
+          )}
+        </div>
+
+        {/* Nueva sección de administración de caché para contratos */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🔗 Contract Cache Management</h2>
+          
+          {floppyCacheLoading ? (
+            <p>Loading cache stats...</p>
+          ) : contractCacheStats ? (
+            <div className={styles.cacheStats}>
+              <h3>🔗 Contract Cache</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Entries</h3>
+                  <p className={styles.statNumber}>{contractCacheStats.stats.totalEntries}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Valid Entries</h3>
+                  <p className={styles.statNumber}>{contractCacheStats.stats.validEntries}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Expired Entries</h3>
+                  <p className={styles.statNumber}>{contractCacheStats.stats.expiredEntries}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Memory Usage</h3>
+                  <p className={styles.statNumber}>{contractCacheStats.stats.memoryUsage}</p>
+                  <small>{contractCacheStats.ttlConfig.all}</small>
+                </div>
+              </div>
+              
+              <div className={styles.cacheActions}>
+                <h3>🔄 Quick Actions</h3>
+                <div className={styles.actionButtons}>
+                  <button 
+                    onClick={() => invalidateFloppyCache('clear_contract_cache')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🗑️ Clear All Contract Cache
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('cleanup_expired_contracts')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🧹 Cleanup Expired Contracts
+                  </button>
+                </div>
+                
+                <div className={styles.tokenForm}>
+                  <h4>Clear Cache for Specific Token</h4>
+                  <div className={styles.formRow}>
+                    <input
+                      type="number"
+                      placeholder="Token ID"
+                      value={floppyRefreshForm.tokenId}
+                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, tokenId: e.target.value})}
+                      className={styles.formInput}
+                    />
+                    <button
+                      onClick={() => invalidateFloppyCache('clear_contract_cache_token', { tokenId: parseInt(floppyRefreshForm.tokenId) })}
+                      disabled={!floppyRefreshForm.tokenId || floppyCacheLoading}
+                      className={styles.actionButton}
+                    >
+                      Clear Token Cache
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Error loading contract cache stats</p>
+          )}
+        </div>
+
+        {/* Nueva sección de administración de caché para JSON */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>📄 JSON Cache Management</h2>
+          
+          {floppyCacheLoading ? (
+            <p>Loading cache stats...</p>
+          ) : jsonCacheStats ? (
+            <div className={styles.cacheStats}>
+              <h3>📄 JSON Cache</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Files</h3>
+                  <p className={styles.statNumber}>{jsonCacheStats.stats.totalFiles}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Valid Files</h3>
+                  <p className={styles.statNumber}>{jsonCacheStats.stats.validFiles}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Expired Files</h3>
+                  <p className={styles.statNumber}>{jsonCacheStats.stats.expiredFiles}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Memory Usage</h3>
+                  <p className={styles.statNumber}>{jsonCacheStats.stats.memoryUsage}</p>
+                  <small>{jsonCacheStats.ttlConfig.all}</small>
+                </div>
+              </div>
+              
+              <div className={styles.cacheActions}>
+                <h3>🔄 Quick Actions</h3>
+                <div className={styles.actionButtons}>
+                  <button 
+                    onClick={() => invalidateFloppyCache('clear_json_cache')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🗑️ Clear All JSON Cache
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('cleanup_expired_json')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🧹 Cleanup Expired JSON Files
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Error loading JSON cache stats</p>
           )}
         </div>
       </main>
