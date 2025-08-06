@@ -15,7 +15,11 @@ import {
   invalidateAdrianZeroRender,
   invalidateAdrianZeroRenderRange,
   getAdrianZeroRenderCacheStats,
-  getAdrianZeroRenderTTL
+  getAdrianZeroRenderTTL,
+  getContractCacheStats,
+  clearContractCache,
+  clearContractCacheForToken,
+  cleanupExpiredContractEntries
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -30,6 +34,7 @@ export default async function handler(req, res) {
       const metadataStats = getFloppyMetadataCacheStats();
       const renderStats = getFloppyRenderCacheStats();
       const adrianZeroStats = getAdrianZeroRenderCacheStats();
+      const contractStats = getContractCacheStats();
       
       return res.status(200).json({
         success: true,
@@ -55,6 +60,12 @@ export default async function handler(req, res) {
             normal: `${getAdrianZeroRenderTTL(1) / 3600000}h`,
             tshirts: `${getAdrianZeroRenderTTL(30000) / 3600000}h`,
             serum: `${getAdrianZeroRenderTTL(262144) / 3600000}h`
+          }
+        },
+        contracts: {
+          stats: contractStats,
+          ttlConfig: {
+            all: '24h'
           }
         }
       });
@@ -192,6 +203,24 @@ export default async function handler(req, res) {
           result.message = adrianZeroSerumInvalidated 
             ? 'AdrianZero render caché de serum (262144) invalidado'
             : 'Serum no estaba en AdrianZero render caché';
+          break;
+
+        case 'clear_contract_cache':
+          result.invalidated = clearContractCache();
+          result.message = 'Caché de contratos completamente limpiado';
+          break;
+
+        case 'clear_contract_cache_token':
+          if (!tokenId) {
+            return res.status(400).json({ error: 'tokenId required for contract cache clear' });
+          }
+          result.invalidated = clearContractCacheForToken(tokenId);
+          result.message = `Caché de contratos limpiado para token ${tokenId}`;
+          break;
+
+        case 'cleanup_expired_contracts':
+          result.invalidated = cleanupExpiredContractEntries();
+          result.message = 'Entradas expiradas del caché de contratos limpiadas';
           break;
 
         default:
