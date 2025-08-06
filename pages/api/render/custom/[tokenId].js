@@ -4,92 +4,7 @@ import { getContracts } from '../../../../lib/contracts.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
-
-// Cache para traits animados
-const animatedTraitsCache = new Map();
-
-// Función para detectar si un SVG es animado
-const detectSvgAnimation = (svgContent) => {
-  const animationPatterns = [
-    '<animate', '<animateTransform', '<animateMotion',
-    '@keyframes', 'animation:', 'transition:', 'dur=', 'repeatCount='
-  ];
-  
-  return animationPatterns.some(pattern => svgContent.includes(pattern));
-};
-
-// Función para cargar SVG y detectar animación
-const loadAndDetectAnimation = async (svgFileName) => {
-  try {
-    // Leer directamente del filesystem en lugar de hacer fetch HTTP
-    const svgPath = path.join(process.cwd(), 'public', 'labimages', svgFileName);
-    console.log(`[loadAndDetectAnimation] Ruta SVG: ${svgPath}`);
-    console.log(`[loadAndDetectAnimation] Existe SVG: ${fs.existsSync(svgPath)}`);
-    
-    if (!fs.existsSync(svgPath)) {
-      throw new Error(`SVG no encontrado: ${svgPath}`);
-    }
-    
-    const svgBuffer = fs.readFileSync(svgPath);
-    const svgContent = svgBuffer.toString();
-    const isAnimated = detectSvgAnimation(svgContent);
-    
-    console.log(`[loadAndDetectAnimation] SVG leído, tamaño: ${svgBuffer.length} bytes, animado: ${isAnimated}`);
-    
-    return {
-      content: svgContent,
-      isAnimated: isAnimated
-    };
-  } catch (error) {
-    console.error(`Error cargando SVG ${svgFileName}:`, error.message);
-    return { content: null, isAnimated: false };
-  }
-};
-
-// Función principal de detección híbrida
-const isTraitAnimated = async (traitData, traitPath) => {
-  // Prioridad 1: Metadata en traits.json
-  if (traitData && traitData.animated !== undefined) {
-    return traitData.animated;
-  }
-  
-  // Prioridad 2: Cache
-  if (animatedTraitsCache.has(traitPath)) {
-    return animatedTraitsCache.get(traitPath);
-  }
-  
-  // Prioridad 3: Detección dinámica
-  try {
-    const svgData = await loadAndDetectAnimation(traitPath);
-    animatedTraitsCache.set(traitPath, svgData.isAnimated);
-    return svgData.isAnimated;
-  } catch (error) {
-    console.warn(`No se pudo detectar animación para ${traitPath}:`, error);
-    return false;
-  }
-};
-
-// Función para generar GIF animado (placeholder)
-const generateAnimatedGif = async (finalTraits, baseImagePath, skinTraitPath) => {
-  // Por ahora, generamos un PNG con indicador de animación
-  // En el futuro, aquí iría la lógica de generación de GIF
-  console.log('[custom-render] Generando GIF animado para traits animados');
-  
-  // Crear canvas con fondo blanco
-  const canvas = createCanvas(1000, 1000);
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 1000, 1000);
-  
-  // Añadir indicador de animación
-  ctx.fillStyle = '#ff0000';
-  ctx.font = 'bold 48px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('ANIMATED TRAIT DETECTED', 500, 500);
-  ctx.fillText('GIF generation coming soon', 500, 550);
-  
-  return canvas.toBuffer('image/png');
-};
+import { getCachedJson, setCachedJson } from '../../../../lib/json-cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -190,9 +105,16 @@ const getMetadataFileForToken = (tokenId) => {
 };
 
 // Función para cargar metadata del archivo correcto
-const loadMetadataForToken = (tokenId) => {
+const loadMetadataForToken = async (tokenId) => {
   try {
     const metadataFile = getMetadataFileForToken(tokenId);
+    
+    // Intentar obtener del caché primero
+    const cachedData = await getCachedJson(metadataFile);
+    if (cachedData) {
+      return cachedData;
+    }
+    
     const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', metadataFile);
     
     console.log(`[custom-render] Cargando metadata desde: ${metadataFile} para token ${tokenId}`);
@@ -225,6 +147,9 @@ const loadMetadataForToken = (tokenId) => {
         traitsArray = metadata.traits;
     }
     
+    // Guardar en caché
+    setCachedJson(metadataFile, traitsArray);
+    
     return traitsArray;
   } catch (error) {
     console.error(`[custom-render] Error cargando metadata para token ${tokenId}:`, error.message);
@@ -233,9 +158,9 @@ const loadMetadataForToken = (tokenId) => {
 };
 
 // Función para cargar el mapeo de traits desde el JSON correcto según el token
-const loadTraitsMapping = (tokenId) => {
+const loadTraitsMapping = async (tokenId) => {
   try {
-    const traitsArray = loadMetadataForToken(tokenId);
+    const traitsArray = await loadMetadataForToken(tokenId);
     
     const mapping = {};
     traitsArray.forEach(trait => {
@@ -254,12 +179,12 @@ const loadTraitsMapping = (tokenId) => {
 };
 
 // NUEVA FUNCIÓN: Cargar mapeo combinado de traits (traits.json + studio.json para tokens 30000+)
-const loadCombinedTraitsMapping = (tokenId) => {
+const loadCombinedTraitsMapping = async (tokenId) => {
   try {
     console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Iniciando carga de mapeo combinado para token ${tokenId}`);
     
     // Cargar mapeo base desde traits.json
-    const baseTraitsArray = loadMetadataForToken(tokenId);
+    const baseTraitsArray = await loadMetadataForToken(tokenId);
     const baseMapping = {};
     baseTraitsArray.forEach(trait => {
       baseMapping[trait.tokenId] = {
@@ -273,12 +198,31 @@ const loadCombinedTraitsMapping = (tokenId) => {
     
     // CARGAR SIEMPRE studio.json para traits externos (disponibles para todos los tokens)
     console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Cargando studio.json para traits externos`);
-      try {
+    try {
+      // Intentar obtener del caché primero
+      const cachedStudioData = await getCachedJson('studio.json');
+      if (cachedStudioData) {
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Studio.json cargado desde caché con ${Object.keys(cachedStudioData).length} entries`);
+        
+        // Combinar studio.json con el mapeo base
+        Object.entries(cachedStudioData).forEach(([traitId, trait]) => {
+          baseMapping[traitId] = {
+            category: trait.category.toUpperCase(),
+            name: trait.name,
+            fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
+            external_url: trait.external_url, // Añadir URL externa para referencia
+            isExternal: true // Marcar como trait externo
+          };
+        });
+      } else {
         const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
         const studioBuffer = fs.readFileSync(studioPath);
         const studioData = JSON.parse(studioBuffer.toString());
         
         console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Studio.json cargado con ${Object.keys(studioData).length} entries`);
+        
+        // Guardar en caché
+        setCachedJson('studio.json', studioData);
         
         // Combinar studio.json con el mapeo base
         Object.entries(studioData).forEach(([traitId, trait]) => {
@@ -290,19 +234,20 @@ const loadCombinedTraitsMapping = (tokenId) => {
             isExternal: true // Marcar como trait externo
           };
         });
-        
-        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo combinado completado con ${Object.keys(baseMapping).length} entries totales`);
-        
-        // Debug: Mostrar algunos traits externos cargados
-        const externalTraits = Object.entries(baseMapping).filter(([id, trait]) => trait.isExternal);
-        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Traits externos cargados:`, externalTraits.slice(0, 5).map(([id, trait]) => `${id}: ${trait.name} (${trait.category})`));
-        
-      } catch (error) {
-        console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando studio.json:`, error.message);
-        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Continuando solo con mapeo base`);
       }
-    
-    return baseMapping;
+      
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo combinado completado con ${Object.keys(baseMapping).length} entries totales`);
+      
+      // Debug: Mostrar algunos traits externos cargados
+      const externalTraits = Object.entries(baseMapping).filter(([id, trait]) => trait.isExternal);
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Traits externos cargados:`, externalTraits.slice(0, 5).map(([id, trait]) => `${id}: ${trait.name} (${trait.category})`));
+      
+    } catch (error) {
+      console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando studio.json:`, error.message);
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Continuando solo con mapeo base`);
+    }
+  
+  return baseMapping;
   } catch (error) {
     console.error('[custom-render] 🔄 LÓGICA COMBINADA: Error cargando mapeo combinado:', error);
     return {};
@@ -408,7 +353,7 @@ export default async function handler(req, res) {
     }
 
     // Cargar mapeo de traits (combinado si es necesario)
-    const traitsMapping = loadCombinedTraitsMapping(cleanTokenId);
+    const traitsMapping = await loadCombinedTraitsMapping(cleanTokenId);
     console.log(`[custom-render] Mapeo de traits cargado con ${Object.keys(traitsMapping).length} entries`);
 
     // Obtener parámetros de query para traits personalizados
@@ -574,58 +519,7 @@ export default async function handler(req, res) {
     const finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
 
-    // DETECCIÓN DE ANIMACIONES
-    console.log('[custom-render] Iniciando detección de animaciones...');
-    
-    // Cargar datos de traits.json para verificar metadata
-    const labmetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
-    let labmetadata;
-    try {
-      const labmetadataBuffer = fs.readFileSync(labmetadataPath);
-      labmetadata = JSON.parse(labmetadataBuffer.toString());
-    } catch (error) {
-      console.warn('[custom-render] No se pudo cargar traits.json para detección de animaciones');
-      labmetadata = { traits: [] };
-    }
-
-    // Detectar si hay traits animados
-    const hasAnyAnimation = await Promise.all(
-      Object.entries(finalTraits).map(async ([category, traitId]) => {
-        const traitPath = `${traitId}.svg`; // Usar solo el traitId, no la categoría
-        const traitData = labmetadata.traits.find(t => t.tokenId === parseInt(traitId));
-        const isAnimated = await isTraitAnimated(traitData, traitPath);
-        
-        if (isAnimated) {
-          console.log(`[custom-render] Trait animado detectado: ${category}/${traitId}`);
-        }
-        
-        return isAnimated;
-      })
-    ).then(results => results.some(Boolean));
-
-    console.log(`[custom-render] Animaciones detectadas: ${hasAnyAnimation}`);
-
-    // Si hay animaciones, generar GIF (por ahora PNG con indicador)
-    if (hasAnyAnimation) {
-      console.log('[custom-render] Generando formato animado...');
-      const animatedBuffer = await generateAnimatedGif(finalTraits, baseImagePath, skinTraitPath);
-      
-      // Configurar headers para evitar cache
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('Surrogate-Control', 'no-store');
-      
-      // Enviar imagen animada
-      res.setHeader('Content-Type', 'image/png'); // Por ahora PNG, en el futuro GIF
-      res.setHeader('Content-Length', animatedBuffer.length);
-      res.send(animatedBuffer);
-      
-      console.log('[custom-render] Renderizado animado completado exitosamente');
-      return;
-    }
-
-    // Si no hay animaciones, continuar con renderizado PNG normal
+    // Generar PNG estático (eliminada lógica de animaciones)
     console.log('[custom-render] Generando PNG estático...');
 
     // Crear canvas con fondo blanco

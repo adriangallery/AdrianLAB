@@ -19,7 +19,10 @@ import {
   getContractCacheStats,
   clearContractCache,
   clearContractCacheForToken,
-  cleanupExpiredContractEntries
+  cleanupExpiredContractEntries,
+  getJsonCacheStats,
+  clearJsonCache,
+  cleanupExpiredJsonEntries
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -35,6 +38,7 @@ export default async function handler(req, res) {
       const renderStats = getFloppyRenderCacheStats();
       const adrianZeroStats = getAdrianZeroRenderCacheStats();
       const contractStats = getContractCacheStats();
+      const jsonStats = getJsonCacheStats();
       
       return res.status(200).json({
         success: true,
@@ -66,6 +70,12 @@ export default async function handler(req, res) {
           stats: contractStats,
           ttlConfig: {
             all: '24h'
+          }
+        },
+        json: {
+          stats: jsonStats,
+          ttlConfig: {
+            all: '7 días'
           }
         }
       });
@@ -221,6 +231,16 @@ export default async function handler(req, res) {
         case 'cleanup_expired_contracts':
           result.invalidated = cleanupExpiredContractEntries();
           result.message = 'Entradas expiradas del caché de contratos limpiadas';
+          break;
+
+        case 'clear_json_cache':
+          result.invalidated = clearJsonCache();
+          result.message = 'Caché de archivos JSON completamente limpiado';
+          break;
+
+        case 'cleanup_expired_json':
+          result.invalidated = cleanupExpiredJsonEntries();
+          result.message = 'Archivos JSON expirados limpiados';
           break;
 
         default:
