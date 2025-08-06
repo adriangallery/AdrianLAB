@@ -541,9 +541,9 @@ export default async function handler(req, res) {
       skinName
     });
 
-    // Obtener traits equipados actuales del token base
-    console.log('[custom-render] Obteniendo traits equipados actuales del token base...');
-    const nested = await traitsExtension.getAllEquippedTraits(baseTokenId);
+    // Obtener traits equipados actuales del token original (no del base)
+    console.log('[custom-render] Obteniendo traits equipados actuales del token original...');
+    const nested = await traitsExtension.getAllEquippedTraits(cleanTokenId);
     const categories = nested[0];
     const traitIds = nested[1];
     
