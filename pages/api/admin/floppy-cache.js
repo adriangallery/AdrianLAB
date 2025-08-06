@@ -37,8 +37,8 @@ export default async function handler(req, res) {
       const metadataStats = getFloppyMetadataCacheStats();
       const renderStats = getFloppyRenderCacheStats();
       const adrianZeroStats = getAdrianZeroRenderCacheStats();
-      const contractStats = getContractCacheStats();
-      const jsonStats = getJsonCacheStats();
+      const contractStats = await getContractCacheStats();
+      const jsonStats = await getJsonCacheStats();
       
       return res.status(200).json({
         success: true,
@@ -216,7 +216,7 @@ export default async function handler(req, res) {
           break;
 
         case 'clear_contract_cache':
-          result.invalidated = clearContractCache();
+          result.invalidated = await clearContractCache();
           result.message = 'Caché de contratos completamente limpiado';
           break;
 
@@ -224,22 +224,22 @@ export default async function handler(req, res) {
           if (!tokenId) {
             return res.status(400).json({ error: 'tokenId required for contract cache clear' });
           }
-          result.invalidated = clearContractCacheForToken(tokenId);
+          result.invalidated = await clearContractCacheForToken(tokenId);
           result.message = `Caché de contratos limpiado para token ${tokenId}`;
           break;
 
         case 'cleanup_expired_contracts':
-          result.invalidated = cleanupExpiredContractEntries();
+          result.invalidated = await cleanupExpiredContractEntries();
           result.message = 'Entradas expiradas del caché de contratos limpiadas';
           break;
 
         case 'clear_json_cache':
-          result.invalidated = clearJsonCache();
+          result.invalidated = await clearJsonCache();
           result.message = 'Caché de archivos JSON completamente limpiado';
           break;
 
         case 'cleanup_expired_json':
-          result.invalidated = cleanupExpiredJsonEntries();
+          result.invalidated = await cleanupExpiredJsonEntries();
           result.message = 'Archivos JSON expirados limpiados';
           break;
 
