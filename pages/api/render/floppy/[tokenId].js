@@ -51,6 +51,10 @@ export default async function handler(req, res) {
       tokenId = tokenId.replace('.png', '');
     }
     
+    if (tokenId && tokenId.endsWith('.gif')) {
+      tokenId = tokenId.replace('.gif', '');
+    }
+    
     if (!tokenId || isNaN(parseInt(tokenId))) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
