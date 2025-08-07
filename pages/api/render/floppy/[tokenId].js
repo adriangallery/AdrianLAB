@@ -105,10 +105,10 @@ export default async function handler(req, res) {
       
       // Devolver imagen
       console.log(`[floppy-render] ===== RENDERIZADO SVG COMPLETO FINALIZADO =====`);
-      res.status(200).send(pngBuffer);
+      res.status(200).send(imageBuffer);
       
     } else {
-      res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144 (serums) y 30000-35000 (T-shirts personalizados). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
+      res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144-262147 (serums) y 30000-35000 (T-shirts personalizados). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
     console.error('[floppy-render] Error:', error);
