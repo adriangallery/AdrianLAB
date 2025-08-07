@@ -63,11 +63,14 @@ export default async function handler(req, res) {
     if (cachedImage) {
       console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
+      // Determinar si es un serum (GIF) o trait (PNG)
+      const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Type', isSerum ? 'image/gif' : 'image/png');
       res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
       
       return res.status(200).send(cachedImage);
@@ -77,23 +80,26 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] ===== RENDERIZADO TRAITS (1-9999) =====`);
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
-    // Procesar tokens 1-9999 (traits), 262144 (serum ADRIANGF) y 30000-35000 (T-shirts personalizados)
-    if (tokenIdNum >= 1 && tokenIdNum <= 9999 || tokenIdNum === 262144 || (tokenIdNum >= 30000 && tokenIdNum <= 35000)) {
-      console.log(`[floppy-render] Procesando trait ${tokenId} (renderizado PNG)`);
+    // Procesar tokens 1-9999 (traits), 262144-262147 (serums) y 30000-35000 (T-shirts personalizados)
+    if (tokenIdNum >= 1 && tokenIdNum <= 9999 || (tokenIdNum >= 262144 && tokenIdNum <= 262147) || (tokenIdNum >= 30000 && tokenIdNum <= 35000)) {
+      
+      // Determinar si es un serum (GIF) o trait (PNG)
+      const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      console.log(`[floppy-render] Procesando ${isSerum ? 'serum' : 'trait'} ${tokenId} (renderizado ${isSerum ? 'GIF' : 'PNG'})`);
       
       // Usar la nueva clase FloppyRenderer
       const renderer = new FloppyRenderer();
-      const pngBuffer = await renderer.generatePNG(tokenId);
+      const imageBuffer = await renderer.generatePNG(tokenId);
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-      setCachedFloppyRender(tokenIdNum, pngBuffer);
+      setCachedFloppyRender(tokenIdNum, imageBuffer);
       
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       console.log(`[floppy-render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
 
-      // Configurar headers
+      // Configurar headers según el tipo de imagen
       res.setHeader('X-Cache', 'MISS');
-      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Type', isSerum ? 'image/gif' : 'image/png');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
       
