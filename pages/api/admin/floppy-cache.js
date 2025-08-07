@@ -22,7 +22,13 @@ import {
   cleanupExpiredContractEntries,
   getJsonCacheStats,
   clearJsonCache,
-  cleanupExpiredJsonEntries
+  cleanupExpiredJsonEntries,
+  getSvgPngCacheStats,
+  clearSvgPngCache,
+  cleanupExpiredSvgPngEntries,
+  getComponentCacheStats,
+  clearComponentCache,
+  cleanupExpiredComponentEntries
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -39,6 +45,8 @@ export default async function handler(req, res) {
       const adrianZeroStats = getAdrianZeroRenderCacheStats();
       const contractStats = await getContractCacheStats();
       const jsonStats = await getJsonCacheStats();
+      const svgPngStats = await getSvgPngCacheStats();
+      const componentStats = await getComponentCacheStats();
       
       return res.status(200).json({
         success: true,
@@ -76,6 +84,18 @@ export default async function handler(req, res) {
           stats: jsonStats,
           ttlConfig: {
             all: '7 días'
+          }
+        },
+        svgPng: {
+          stats: svgPngStats,
+          ttlConfig: {
+            all: '24h'
+          }
+        },
+        components: {
+          stats: componentStats,
+          ttlConfig: {
+            all: '24h'
           }
         }
       });
@@ -241,6 +261,26 @@ export default async function handler(req, res) {
         case 'cleanup_expired_json':
           result.invalidated = await cleanupExpiredJsonEntries();
           result.message = 'Archivos JSON expirados limpiados';
+          break;
+
+        case 'clear_svg_png_cache':
+          result.invalidated = await clearSvgPngCache();
+          result.message = 'Caché de conversiones SVG→PNG completamente limpiado';
+          break;
+
+        case 'cleanup_expired_svg_png':
+          result.invalidated = await cleanupExpiredSvgPngEntries();
+          result.message = 'Conversiones SVG→PNG expiradas limpiadas';
+          break;
+
+        case 'clear_component_cache':
+          result.invalidated = await clearComponentCache();
+          result.message = 'Caché de componentes completamente limpiado';
+          break;
+
+        case 'cleanup_expired_components':
+          result.invalidated = await cleanupExpiredComponentEntries();
+          result.message = 'Componentes expirados limpiados';
           break;
 
         default:

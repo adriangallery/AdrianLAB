@@ -14,6 +14,8 @@ export default function Home() {
   const [adrianZeroCacheStats, setAdrianZeroCacheStats] = useState(null);
   const [contractCacheStats, setContractCacheStats] = useState(null);
   const [jsonCacheStats, setJsonCacheStats] = useState(null);
+  const [svgPngCacheStats, setSvgPngCacheStats] = useState(null);
+  const [componentCacheStats, setComponentCacheStats] = useState(null);
   const [floppyRefreshForm, setFloppyRefreshForm] = useState({
     tokenId: '',
     startId: '',
@@ -79,6 +81,8 @@ export default function Home() {
       setAdrianZeroCacheStats(data.adrianZero);
       setContractCacheStats(data.contracts);
       setJsonCacheStats(data.json);
+      setSvgPngCacheStats(data.svgPng);
+      setComponentCacheStats(data.components);
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
     } finally {
@@ -633,6 +637,124 @@ export default function Home() {
             </div>
           ) : (
             <p>Error loading JSON cache stats</p>
+          )}
+        </div>
+
+        {/* Nueva sección de administración de caché para SVG→PNG */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🖼️ SVG→PNG Cache Management</h2>
+          
+          {floppyCacheLoading ? (
+            <p>Loading cache stats...</p>
+          ) : svgPngCacheStats ? (
+            <div className={styles.cacheStats}>
+              <h3>🖼️ SVG→PNG Cache</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Conversions</h3>
+                  <p className={styles.statNumber}>{svgPngCacheStats.stats.totalConversions}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Valid Conversions</h3>
+                  <p className={styles.statNumber}>{svgPngCacheStats.stats.validConversions}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Expired Conversions</h3>
+                  <p className={styles.statNumber}>{svgPngCacheStats.stats.expiredConversions}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Memory Usage</h3>
+                  <p className={styles.statNumber}>{svgPngCacheStats.stats.memoryUsage}</p>
+                  <small>{svgPngCacheStats.ttlConfig.all}</small>
+                </div>
+              </div>
+              
+              <div className={styles.cacheActions}>
+                <h3>🔄 Quick Actions</h3>
+                <div className={styles.actionButtons}>
+                  <button 
+                    onClick={() => invalidateFloppyCache('clear_svg_png_cache')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🗑️ Clear All SVG→PNG Cache
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('cleanup_expired_svg_png')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🧹 Cleanup Expired SVG→PNG
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Error loading SVG→PNG cache stats</p>
+          )}
+        </div>
+
+        {/* Nueva sección de administración de caché para componentes */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🧩 Component Cache Management</h2>
+          
+          {floppyCacheLoading ? (
+            <p>Loading cache stats...</p>
+          ) : componentCacheStats ? (
+            <div className={styles.cacheStats}>
+              <h3>🧩 Component Cache</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <h3>Total Components</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.totalComponents}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Valid Components</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.validComponents}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Background</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.backgroundComponents}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Skin</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.skinComponents}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Traits</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.traitComponents}</p>
+                </div>
+                <div className={styles.statCard}>
+                  <h3>Memory Usage</h3>
+                  <p className={styles.statNumber}>{componentCacheStats.stats.memoryUsage}</p>
+                  <small>{componentCacheStats.ttlConfig.all}</small>
+                </div>
+              </div>
+              
+              <div className={styles.cacheActions}>
+                <h3>🔄 Quick Actions</h3>
+                <div className={styles.actionButtons}>
+                  <button 
+                    onClick={() => invalidateFloppyCache('clear_component_cache')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🗑️ Clear All Component Cache
+                  </button>
+                  
+                  <button 
+                    onClick={() => invalidateFloppyCache('cleanup_expired_components')}
+                    className={styles.actionButton}
+                    disabled={floppyCacheLoading}
+                  >
+                    🧹 Cleanup Expired Components
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Error loading component cache stats</p>
           )}
         </div>
       </main>
