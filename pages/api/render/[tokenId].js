@@ -316,6 +316,8 @@ export default async function handler(req, res) {
           let skinFileName;
           if (skinType === "Albino") {
             skinFileName = `GEN${generation}_Albino.svg`;
+          } else if (skinType === "Alien") {
+            skinFileName = `GF${generation}_Alien.svg`;
           } else {
             // Para otros skins: GF{gen}-{skinType}.svg
             skinFileName = `GF${generation}-${skinType}.svg`;
