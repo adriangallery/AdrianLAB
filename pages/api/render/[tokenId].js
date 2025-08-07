@@ -9,6 +9,8 @@ import {
   setCachedAdrianZeroRender, 
   getAdrianZeroRenderTTL 
 } from '../../../lib/cache.js';
+import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
+import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -262,7 +264,7 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 1000, 1000);
     console.log('[render] Canvas creado con fondo blanco');
 
-    // Función para cargar y renderizar SVG
+    // Función para cargar y renderizar SVG con caché
     const loadAndRenderSvg = async (path) => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
@@ -275,9 +277,16 @@ export default async function handler(req, res) {
         }
         
         const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer);
         
-        // Renderizar SVG a PNG
-        const resvg = new Resvg(Buffer.from(svgBuffer), {
+        // Intentar obtener del caché SVG→PNG primero
+        const cachedPng = getCachedSvgPng(svgContent.toString());
+        if (cachedPng) {
+          return loadImage(cachedPng);
+        }
+        
+        // Si no está en caché, hacer la conversión
+        const resvg = new Resvg(svgContent, {
           fitTo: {
             mode: 'width',
             value: 1000
@@ -285,6 +294,10 @@ export default async function handler(req, res) {
         });
         
         const pngBuffer = resvg.render().asPng();
+        
+        // Guardar en caché SVG→PNG
+        setCachedSvgPng(svgContent.toString(), pngBuffer);
+        
         return loadImage(pngBuffer);
       } catch (error) {
         console.error(`[render] Error cargando SVG ${path}:`, error.message);
@@ -313,7 +326,13 @@ export default async function handler(req, res) {
           
           const svgContent = fs.readFileSync(adrianGfPath, 'utf8');
           
-          // Renderizar SVG a PNG
+          // Intentar obtener del caché SVG→PNG primero
+          const cachedPng = getCachedSvgPng(svgContent);
+          if (cachedPng) {
+            return loadImage(cachedPng);
+          }
+          
+          // Si no está en caché, hacer la conversión
           const resvg = new Resvg(svgContent, {
             fitTo: {
               mode: 'width',
@@ -322,6 +341,10 @@ export default async function handler(req, res) {
           });
           
           const pngBuffer = resvg.render().asPng();
+          
+          // Guardar en caché SVG→PNG
+          setCachedSvgPng(svgContent, pngBuffer);
+          
           return loadImage(pngBuffer);
         } else {
           // Lógica original para otros serums
@@ -331,7 +354,13 @@ export default async function handler(req, res) {
           
           const svgContent = fs.readFileSync(adrianPath, 'utf8');
           
-          // Renderizar SVG a PNG
+          // Intentar obtener del caché SVG→PNG primero
+          const cachedPng = getCachedSvgPng(svgContent);
+          if (cachedPng) {
+            return loadImage(cachedPng);
+          }
+          
+          // Si no está en caché, hacer la conversión
           const resvg = new Resvg(svgContent, {
             fitTo: {
               mode: 'width',
@@ -340,6 +369,10 @@ export default async function handler(req, res) {
           });
           
           const pngBuffer = resvg.render().asPng();
+          
+          // Guardar en caché SVG→PNG
+          setCachedSvgPng(svgContent, pngBuffer);
+          
           return loadImage(pngBuffer);
         }
       } catch (error) {
@@ -361,9 +394,16 @@ export default async function handler(req, res) {
         }
         
         const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer);
         
-        // Renderizar SVG a PNG
-        const resvg = new Resvg(Buffer.from(svgBuffer), {
+        // Intentar obtener del caché SVG→PNG primero
+        const cachedPng = getCachedSvgPng(svgContent.toString());
+        if (cachedPng) {
+          return loadImage(cachedPng);
+        }
+        
+        // Si no está en caché, hacer la conversión
+        const resvg = new Resvg(svgContent, {
           fitTo: {
             mode: 'width',
             value: 1000
@@ -371,6 +411,10 @@ export default async function handler(req, res) {
         });
         
         const pngBuffer = resvg.render().asPng();
+        
+        // Guardar en caché SVG→PNG
+        setCachedSvgPng(svgContent.toString(), pngBuffer);
+        
         return loadImage(pngBuffer);
       } catch (error) {
         console.error(`[render] Error cargando trait ${traitId} desde labimages:`, error.message);

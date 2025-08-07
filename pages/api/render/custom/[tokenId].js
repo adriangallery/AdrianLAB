@@ -5,6 +5,8 @@ import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
 import { getCachedJson, setCachedJson } from '../../../../lib/json-cache.js';
+import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
+import { getCachedComponent, setCachedComponent } from '../../../../lib/component-cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -529,7 +531,7 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 1000, 1000);
     console.log('[custom-render] Canvas creado con fondo blanco');
 
-    // Función para cargar y renderizar SVG
+    // Función para cargar y renderizar SVG con caché
     const loadAndRenderSvg = async (path) => {
       // LÓGICA ESPECIAL: Verificar si el path contiene un traitId en rango externo
       const traitId = extractTraitIdFromPath(path);
@@ -549,9 +551,16 @@ export default async function handler(req, res) {
         }
         
         const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer);
         
-        // Renderizar SVG a PNG
-        const resvg = new Resvg(Buffer.from(svgBuffer), {
+        // Intentar obtener del caché SVG→PNG primero
+        const cachedPng = getCachedSvgPng(svgContent.toString());
+        if (cachedPng) {
+          return loadImage(cachedPng);
+        }
+        
+        // Si no está en caché, hacer la conversión
+        const resvg = new Resvg(svgContent, {
           fitTo: {
             mode: 'width',
             value: 1000
@@ -559,6 +568,10 @@ export default async function handler(req, res) {
         });
         
         const pngBuffer = resvg.render().asPng();
+        
+        // Guardar en caché SVG→PNG
+        setCachedSvgPng(svgContent.toString(), pngBuffer);
+        
         return loadImage(pngBuffer);
       } catch (error) {
         console.error(`[custom-render] Error cargando SVG ${path}:`, error.message);
@@ -566,7 +579,7 @@ export default async function handler(req, res) {
       }
     };
 
-    // Función específica para cargar archivos ADRIAN desde sistema de archivos
+    // Función específica para cargar archivos ADRIAN desde sistema de archivos con caché
     const loadAdrianSvg = async (serumName, generation, skinType) => {
       try {
         // LÓGICA ESPECIAL PARA ADRIANGF: Usar estructura de carpetas específica
@@ -587,7 +600,13 @@ export default async function handler(req, res) {
           
           const svgContent = fs.readFileSync(adrianGfPath, 'utf8');
           
-          // Renderizar SVG a PNG
+          // Intentar obtener del caché SVG→PNG primero
+          const cachedPng = getCachedSvgPng(svgContent);
+          if (cachedPng) {
+            return loadImage(cachedPng);
+          }
+          
+          // Si no está en caché, hacer la conversión
           const resvg = new Resvg(svgContent, {
             fitTo: {
               mode: 'width',
@@ -596,6 +615,10 @@ export default async function handler(req, res) {
           });
           
           const pngBuffer = resvg.render().asPng();
+          
+          // Guardar en caché SVG→PNG
+          setCachedSvgPng(svgContent, pngBuffer);
+          
           return loadImage(pngBuffer);
         } else {
           // Lógica original para otros serums
@@ -605,7 +628,13 @@ export default async function handler(req, res) {
           
           const svgContent = fs.readFileSync(adrianPath, 'utf8');
           
-          // Renderizar SVG a PNG
+          // Intentar obtener del caché SVG→PNG primero
+          const cachedPng = getCachedSvgPng(svgContent);
+          if (cachedPng) {
+            return loadImage(cachedPng);
+          }
+          
+          // Si no está en caché, hacer la conversión
           const resvg = new Resvg(svgContent, {
             fitTo: {
               mode: 'width',
@@ -614,6 +643,10 @@ export default async function handler(req, res) {
           });
           
           const pngBuffer = resvg.render().asPng();
+          
+          // Guardar en caché SVG→PNG
+          setCachedSvgPng(svgContent, pngBuffer);
+          
           return loadImage(pngBuffer);
         }
       } catch (error) {
@@ -668,10 +701,19 @@ export default async function handler(req, res) {
         }
         
         const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer);
         console.log(`[custom-render] 🎨 CARGANDO TRAIT: SVG descargado, tamaño: ${svgBuffer.byteLength} bytes`);
         
-        // Renderizar SVG a PNG
-        const resvg = new Resvg(Buffer.from(svgBuffer), {
+        // Intentar obtener del caché SVG→PNG primero
+        const cachedPng = getCachedSvgPng(svgContent.toString());
+        if (cachedPng) {
+          const image = await loadImage(cachedPng);
+          console.log(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} cargado exitosamente desde caché SVG→PNG`);
+          return image;
+        }
+        
+        // Si no está en caché, hacer la conversión
+        const resvg = new Resvg(svgContent, {
           fitTo: {
             mode: 'width',
             value: 1000
@@ -680,6 +722,9 @@ export default async function handler(req, res) {
         
         const pngBuffer = resvg.render().asPng();
         console.log(`[custom-render] 🎨 CARGANDO TRAIT: PNG generado, tamaño: ${pngBuffer.length} bytes`);
+        
+        // Guardar en caché SVG→PNG
+        setCachedSvgPng(svgContent.toString(), pngBuffer);
         
         const image = await loadImage(pngBuffer);
         console.log(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} cargado exitosamente desde labimages`);
@@ -774,10 +819,28 @@ export default async function handler(req, res) {
       const bgPath = `BACKGROUND/${finalTraits['BACKGROUND']}.svg`;
       console.log(`[custom-render] PASO 1 - Cargando background: ${bgPath}`);
       
-      const bgImage = await loadAndRenderSvg(bgPath);
-      if (bgImage) {
+      // Intentar obtener del caché de componentes primero
+      const cachedBackground = getCachedComponent('background', finalTraits['BACKGROUND']);
+      if (cachedBackground) {
+        const bgImage = await loadImage(cachedBackground);
         ctx.drawImage(bgImage, 0, 0, 1000, 1000);
-        console.log('[custom-render] PASO 1 - Background renderizado correctamente');
+        console.log('[custom-render] PASO 1 - Background renderizado correctamente desde caché de componentes');
+      } else {
+        // Si no está en caché, cargar normalmente
+        const bgImage = await loadAndRenderSvg(bgPath);
+        if (bgImage) {
+          // Convertir la imagen a buffer para guardar en caché
+          const canvas = createCanvas(1000, 1000);
+          const bgCtx = canvas.getContext('2d');
+          bgCtx.drawImage(bgImage, 0, 0, 1000, 1000);
+          const bgBuffer = canvas.toBuffer('image/png');
+          
+          // Guardar en caché de componentes
+          setCachedComponent('background', finalTraits['BACKGROUND'], bgBuffer);
+          
+          ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+          console.log('[custom-render] PASO 1 - Background renderizado correctamente');
+        }
       }
     }
 
@@ -934,18 +997,42 @@ export default async function handler(req, res) {
             console.log(`[custom-render] 🌐 PASO 3 - Renderizando trait externo: ${category} (${traitId}) - ${traitsMapping[traitId].name}`);
           }
           
-          const traitImage = await loadTraitFromLabimages(traitId);
-          if (traitImage) {
+          // Intentar obtener del caché de componentes primero
+          const cachedTrait = getCachedComponent('trait', traitId);
+          if (cachedTrait) {
+            const traitImage = await loadImage(cachedTrait);
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);
             
             // Debug mejorado para traits externos
             if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
-              console.log(`[custom-render] 🌐 PASO 3 - Trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+              console.log(`[custom-render] 🌐 PASO 3 - Trait externo ${category} (${traitId}) renderizado correctamente desde caché de componentes`);
             } else {
-              console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+              console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde caché de componentes correctamente`);
             }
           } else {
-            console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+            // Si no está en caché, cargar normalmente
+            const traitImage = await loadTraitFromLabimages(traitId);
+            if (traitImage) {
+              // Convertir la imagen a buffer para guardar en caché
+              const canvas = createCanvas(1000, 1000);
+              const traitCtx = canvas.getContext('2d');
+              traitCtx.drawImage(traitImage, 0, 0, 1000, 1000);
+              const traitBuffer = canvas.toBuffer('image/png');
+              
+              // Guardar en caché de componentes
+              setCachedComponent('trait', traitId, traitBuffer);
+              
+              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              
+              // Debug mejorado para traits externos
+              if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+                console.log(`[custom-render] 🌐 PASO 3 - Trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+              } else {
+                console.log(`[custom-render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+              }
+            } else {
+              console.error(`[custom-render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
+            }
           }
         }
       }
@@ -966,18 +1053,42 @@ export default async function handler(req, res) {
           console.log(`[custom-render] PASO 4 - Cargando TOP trait: ${traitId}`);
         }
 
-        const traitImage = await loadTraitFromLabimages(traitId);
-        if (traitImage) {
+        // Intentar obtener del caché de componentes primero
+        const cachedTopTrait = getCachedComponent('trait', traitId);
+        if (cachedTopTrait) {
+          const traitImage = await loadImage(cachedTopTrait);
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
           
           // Debug mejorado para traits externos
           if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
-            console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+            console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde caché de componentes`);
           } else {
-            console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+            console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde caché de componentes correctamente`);
           }
         } else {
-          console.error(`[custom-render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+          // Si no está en caché, cargar normalmente
+          const traitImage = await loadTraitFromLabimages(traitId);
+          if (traitImage) {
+            // Convertir la imagen a buffer para guardar en caché
+            const canvas = createCanvas(1000, 1000);
+            const traitCtx = canvas.getContext('2d');
+            traitCtx.drawImage(traitImage, 0, 0, 1000, 1000);
+            const traitBuffer = canvas.toBuffer('image/png');
+            
+            // Guardar en caché de componentes
+            setCachedComponent('trait', traitId, traitBuffer);
+            
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            
+            // Debug mejorado para traits externos
+            if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+              console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+            } else {
+              console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
+            }
+          } else {
+            console.error(`[custom-render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+          }
         }
       }
     }
