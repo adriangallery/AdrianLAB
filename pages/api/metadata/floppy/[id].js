@@ -199,8 +199,8 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] ===== METADATA TRAIT GENERADA EXITOSAMENTE =====`);
       res.status(200).json(metadata);
 
-    } else if (tokenIdNum === 262144) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM ADRIANGF (262144)`);
+    } else if (tokenIdNum >= 262144 && tokenIdNum <= 262147) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM (262144-262147)`);
       
       // Cargar datos de serums.json
       const serumsPath = path.join(process.cwd(), 'public', 'labmetadata', 'serums.json');
@@ -290,7 +290,10 @@ export default async function handler(req, res) {
             trait_type: "Floppy",
             value: tokenData.floppy || "Serum"
           }
-        ],
+        ].concat(tokenData.successRatio ? [{
+          trait_type: "Success Ratio",
+          value: `${tokenData.successRatio}%`
+        }] : []),
         properties: {
           files: [
             {
