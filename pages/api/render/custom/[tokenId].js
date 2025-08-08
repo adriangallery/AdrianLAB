@@ -636,14 +636,8 @@ export default async function handler(req, res) {
         } else if (serumName === "GoldenAdrian") {
           console.log(`[custom-render] 🧬 LÓGICA ESPECIAL: Cargando skin GoldenAdrian para GEN${generation}, skin ${skinType}`);
           
-          // Mapear skinType a formato de archivo para GoldenAdrian
-          let skinFileName;
-          if (skinType === "Golden") {
-            skinFileName = `GEN${generation}-Golden.svg`;
-          } else {
-            // Para otros skins: GEN{gen}-{skinType}.svg
-            skinFileName = `GEN${generation}-${skinType}.svg`;
-          }
+          // Para GoldenAdrian, siempre usar el skin Golden independientemente del skinType original
+          const skinFileName = `GEN${generation}-Golden.svg`;
           
           const goldenAdrianPath = path.join(process.cwd(), 'public', 'traits', 'ADRIAN', skinFileName);
           console.log(`[custom-render] Cargando GoldenAdrian desde sistema de archivos: ${goldenAdrianPath}`);
