@@ -474,10 +474,34 @@ export default async function handler(req, res) {
           }
         }
         
-        if (serumSuccess && serumMutation === "AdrianGF") {
-          appliedSerumForBase = serumMutation;
-          baseTokenId = "146"; // Usar token 146 como base para ADRIANGF
-          console.log(`[custom-render] 🧬 LÓGICA TRAITLAB: Serum ADRIANGF detectado, cambiando token base de ${cleanTokenId} a ${baseTokenId}`);
+        // LÓGICA CORREGIDA: GoldenAdrian prevalece sobre AdrianGF
+        // - Serum exitoso: success = true Y mutation tiene valor
+        // - Serum fallido: success = false (independientemente del valor de mutation)
+        if (serumSuccess) {
+          // Serum exitoso
+          if (serumMutation) {
+            appliedSerumForBase = serumMutation;
+            console.log(`[custom-render] Serum exitoso detectado: ${appliedSerumForBase}`);
+          } else {
+            console.warn(`[custom-render] Serum marcado como exitoso pero sin mutación, esto no debería pasar`);
+          }
+        } else {
+          // Serum fallido (consistente con metadata: "FAILED")
+          serumFailed = true;
+          // Determinar qué serum falló basándose en el historial completo
+          if (serumMutation) {
+            appliedSerumForBase = serumMutation;
+          } else {
+            // Si no hay mutation, buscar en el historial completo
+            for (let i = serumHistory.length - 1; i >= 0; i--) {
+              const serum = serumHistory[i];
+              if (serum[3] && (serum[3] === "AdrianGF" || serum[3] === "GoldenAdrian")) {
+                appliedSerumForBase = serum[3];
+                break;
+              }
+            }
+          }
+          console.log(`[custom-render] Serum fallido detectado: ${appliedSerumForBase || 'desconocido'} (será "FAILED" en metadata)`);
         }
       }
     } catch (error) {
@@ -901,53 +925,14 @@ export default async function handler(req, res) {
     if (appliedSerum) {
       console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}, éxito: ${serumSuccess}`);
       
-      // LÓGICA ESPECIAL PARA ADRIANGF: Manejar éxito y fallo
-      if (appliedSerum === "AdrianGF") {
+      // LÓGICA ESPECIAL: GoldenAdrian prevalece sobre AdrianGF
+      if (appliedSerum === "GoldenAdrian") {
         if (serumSuccess) {
-          // Serum exitoso: usar skin específico según GEN y tipo
+          // GoldenAdrian exitoso: usar skin Golden específico
           const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
           if (serumSkinImage) {
             ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-            console.log(`[custom-render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
-          } else {
-            console.error(`[custom-render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
-            const baseImage = await loadAndRenderSvg(baseImagePath);
-            if (baseImage) {
-              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-              console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
-            }
-          }
-        } else {
-          // Serum fallido: usar GF-Fail.svg
-          console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum ADRIANGF fallido, usando GF-Fail`);
-          const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
-          try {
-            const svgContent = fs.readFileSync(failPath, 'utf8');
-            const resvg = new Resvg(svgContent, {
-              fitTo: {
-                mode: 'width',
-                value: 1000
-              }
-            });
-            const pngBuffer = resvg.render().asPng();
-            const failImage = await loadImage(pngBuffer);
-            ctx.drawImage(failImage, 0, 0, 1000, 1000);
-            console.log('[custom-render] PASO 2 - 🧬 Skin ADRIANGF fallido (GF-Fail) renderizado correctamente');
-          } catch (error) {
-            console.error(`[custom-render] PASO 2 - Error al cargar GF-Fail, usando skin base normal:`, error.message);
-            const baseImage = await loadAndRenderSvg(baseImagePath);
-            if (baseImage) {
-              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-              console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
-            }
-          }
-        }
-      } else if (appliedSerum === "GoldenAdrian") {
-        if (serumSuccess) {
-          const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
-          if (serumSkinImage) {
-            ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-            console.log(`[custom-render] PASO 2 - 🧬 Skin GoldenAdrian exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
+            console.log(`[custom-render] PASO 2 - 🧬 Skin GoldenAdrian exitoso (GEN${gen}, Golden) renderizado correctamente`);
           } else {
             console.error(`[custom-render] PASO 2 - Error al cargar skin GoldenAdrian exitoso, usando skin base normal`);
             const baseImage = await loadAndRenderSvg(baseImagePath);
@@ -957,7 +942,7 @@ export default async function handler(req, res) {
             }
           }
         } else {
-          // Serum fallido: determinar qué archivo de fallo usar
+          // GoldenAdrian fallido: determinar qué archivo de fallo usar
           let failPath;
           if (hasAdrianGFSerum) {
             // Si hay un AdrianGF previo, usar GF-Goldfail.svg
@@ -983,6 +968,46 @@ export default async function handler(req, res) {
             console.log(`[custom-render] PASO 2 - 🧬 Skin GoldenAdrian fallido renderizado correctamente`);
           } catch (error) {
             console.error(`[custom-render] PASO 2 - Error al cargar skin de fallo GoldenAdrian, usando skin base normal:`, error.message);
+            const baseImage = await loadAndRenderSvg(baseImagePath);
+            if (baseImage) {
+              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+              console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+            }
+          }
+        }
+      } else if (appliedSerum === "AdrianGF") {
+        if (serumSuccess) {
+          // AdrianGF exitoso: usar skin específico según GEN y tipo
+          const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+          if (serumSkinImage) {
+            ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+            console.log(`[custom-render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
+          } else {
+            console.error(`[custom-render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
+            const baseImage = await loadAndRenderSvg(baseImagePath);
+            if (baseImage) {
+              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+              console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+            }
+          }
+        } else {
+          // AdrianGF fallido: usar GF-Fail.svg
+          console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Serum ADRIANGF fallido, usando GF-Fail`);
+          const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
+          try {
+            const svgContent = fs.readFileSync(failPath, 'utf8');
+            const resvg = new Resvg(svgContent, {
+              fitTo: {
+                mode: 'width',
+                value: 1000
+              }
+            });
+            const pngBuffer = resvg.render().asPng();
+            const failImage = await loadImage(pngBuffer);
+            ctx.drawImage(failImage, 0, 0, 1000, 1000);
+            console.log('[custom-render] PASO 2 - 🧬 Skin ADRIANGF fallido (GF-Fail) renderizado correctamente');
+          } catch (error) {
+            console.error(`[custom-render] PASO 2 - Error al cargar GF-Fail, usando skin base normal:`, error.message);
             const baseImage = await loadAndRenderSvg(baseImagePath);
             if (baseImage) {
               ctx.drawImage(baseImage, 0, 0, 1000, 1000);
