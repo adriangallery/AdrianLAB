@@ -321,6 +321,79 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] ===== METADATA SERUM GENERADA EXITOSAMENTE =====`);
       res.status(200).json(metadata);
 
+    // ===== NUEVA RAMA: ACTION PACKS (15008-15010) =====
+    } else if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para ACTION PACK`);
+
+      try {
+        const packsPath = path.join(process.cwd(), 'public', 'labmetadata', 'ActionPacks.json');
+        const packsRaw = fs.readFileSync(packsPath, 'utf8');
+        const packsData = JSON.parse(packsRaw);
+        const pack = (packsData.packs || []).find(p => parseInt(p.packId) === tokenIdNum);
+
+        if (!pack) {
+          console.error(`[floppy-metadata] Action Pack ${tokenIdNum} no encontrado en ActionPacks.json`);
+          return res.status(404).json({ error: 'Action Pack not found' });
+        }
+
+        // Resolver imagen por ID con fallbacks si no existe el archivo
+        const imgDir = path.join(process.cwd(), 'public', 'labimages');
+        const idPng = path.join(imgDir, `${tokenIdNum}.png`);
+        let imgFileName = `${tokenIdNum}.png`;
+        if (!fs.existsSync(idPng)) {
+          if (tokenIdNum === 15008 && fs.existsSync(path.join(imgDir, 'ozzy.png'))) {
+            imgFileName = 'ozzy.png';
+          } else if (tokenIdNum === 15009) {
+            if (fs.existsSync(path.join(imgDir, '15009.png'))) {
+              imgFileName = '15009.png';
+            } else if (fs.existsSync(path.join(imgDir, 'hulk.png'))) {
+              imgFileName = 'hulk.png';
+            }
+          } else if (tokenIdNum === 15010 && fs.existsSync(path.join(imgDir, '15010.png'))) {
+            imgFileName = '15010.png';
+          }
+        }
+
+        const imageUrl = `${baseUrl}/labimages/${imgFileName}?v=${version}`;
+
+        const metadata = {
+          name: `${pack.name}`,
+          description: pack.description || 'AdrianLAB Action Pack',
+          image: imageUrl,
+          external_url: imageUrl,
+          attributes: [
+            { trait_type: 'Category', value: 'Action Pack' },
+            { trait_type: 'PackId', value: tokenIdNum },
+            { trait_type: 'TraitsCount', value: (pack.traits ? pack.traits.length : 0) },
+            { trait_type: 'Traits', value: (pack.traits && pack.traits.length > 0) ? pack.traits.join(',') : 'None' }
+          ],
+          properties: {
+            files: [
+              { uri: imageUrl, type: 'image/png' }
+            ],
+            category: 'image',
+            creators: ['Adrian | HalfxTiger']
+          },
+          debug: {
+            source: 'ActionPacks.json',
+            pack
+          }
+        };
+
+        // Cache y headers
+        setCachedFloppyMetadata(tokenIdNum, metadata);
+        const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+
+        console.log(`[floppy-metadata] ===== METADATA ACTION PACK GENERADA EXITOSAMENTE =====`);
+        return res.status(200).json(metadata);
+      } catch (err) {
+        console.error('[floppy-metadata] Error sirviendo Action Pack:', err.message);
+        return res.status(500).json({ error: 'Error loading Action Pack metadata' });
+      }
+
     } else {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS (10000+)`);
       
