@@ -7349,10 +7349,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 577,
+      "name": "Beam",
+      "category": "TOP",
+      "fileName": "Beam",
+      "maxSupply": 25,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 565,
+    "totalTraits": 566,
     "categories": [
       "BACKGROUND",
       "EAR",
