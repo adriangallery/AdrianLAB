@@ -7258,10 +7258,101 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 570,
+      "name": "8008-Visor",
+      "category": "EYES",
+      "fileName": "8008-Visor",
+      "maxSupply": 75,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 571,
+      "name": "Alien-Background",
+      "category": "BACKGROUND",
+      "fileName": "Alien-Background",
+      "maxSupply": 15,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 572,
+      "name": "Alien-Hair-Neon-Yellow",
+      "category": "HAIR",
+      "fileName": "Alien-Hair-Neon-Yellow",
+      "maxSupply": 25,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 573,
+      "name": "Beam",
+      "category": "NOSE",
+      "fileName": "Beam",
+      "maxSupply": 25,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 574,
+      "name": "Lipstick-Neon-Yellow-Kiss",
+      "category": "MOUTH",
+      "fileName": "Lipstick-Neon-Yellow-Kiss",
+      "maxSupply": 88,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 575,
+      "name": "Trikini_Neon-Pink",
+      "category": "SWAG",
+      "fileName": "Trikini_Neon-Pink",
+      "maxSupply": 15,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 576,
+      "name": "Trikini_Neon-Yellow",
+      "category": "SWAG",
+      "fileName": "Trikini_Neon-Yellow",
+      "maxSupply": 15,
+      "floppy": "Alien",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 558,
+    "totalTraits": 565,
     "categories": [
       "BACKGROUND",
       "EAR",
