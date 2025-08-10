@@ -68,6 +68,71 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
+    // ===== LÓGICA ESPECIAL: ACTION PACKS (15008-15010) =====
+    const tokenIdNum = parseInt(tokenId);
+    if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
+      try {
+        const packsPath = path.join(process.cwd(), 'public', 'labmetadata', 'ActionPacks.json');
+        const packsRaw = fs.readFileSync(packsPath, 'utf8');
+        const packsData = JSON.parse(packsRaw);
+        const pack = (packsData.packs || []).find(p => parseInt(p.packId) === tokenIdNum);
+
+        if (!pack) {
+          console.error(`[metadata] Action Pack ${tokenIdNum} no encontrado en ActionPacks.json`);
+          return res.status(404).json({ error: 'Action Pack not found' });
+        }
+
+        // Resolver imagen por ID con fallbacks si no existe el archivo
+        const imgDir = path.join(process.cwd(), 'public', 'labimages');
+        const idPng = path.join(imgDir, `${tokenIdNum}.png`);
+        let imgFileName = `${tokenIdNum}.png`;
+        if (!fs.existsSync(idPng)) {
+          if (tokenIdNum === 15008 && fs.existsSync(path.join(imgDir, 'ozzy.png'))) {
+            imgFileName = 'ozzy.png';
+          } else if (tokenIdNum === 15009) {
+            if (fs.existsSync(path.join(imgDir, '15009.png'))) {
+              imgFileName = '15009.png';
+            } else if (fs.existsSync(path.join(imgDir, 'hulk.png'))) {
+              imgFileName = 'hulk.png';
+            }
+          } else if (tokenIdNum === 15010 && fs.existsSync(path.join(imgDir, '15010.png'))) {
+            imgFileName = '15010.png';
+          }
+        }
+
+        const imageUrl = `${baseUrl}/labimages/${imgFileName}?v=${version}`;
+
+        const packMetadata = {
+          name: `${pack.name}`,
+          description: pack.description || 'AdrianLAB Action Pack',
+          image: imageUrl,
+          external_url: imageUrl,
+          metadata_version: '2',
+          attributes: [
+            { trait_type: 'Type', value: 'Action Pack' },
+            { trait_type: 'PackId', value: tokenIdNum.toString() },
+            { trait_type: 'TraitsCount', value: (pack.traits ? pack.traits.length : 0).toString() },
+            { trait_type: 'Traits', value: (pack.traits && pack.traits.length > 0) ? pack.traits.join(',') : 'None' }
+          ],
+          debug: {
+            source: 'ActionPacks.json',
+            pack
+          }
+        };
+
+        // No cache agresivo para permitir iteración rápida
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+
+        return res.status(200).json(packMetadata);
+      } catch (err) {
+        console.error('[metadata] Error sirviendo Action Pack:', err.message);
+        return res.status(500).json({ error: 'Error loading Action Pack metadata' });
+      }
+    }
+
     // Metadata base que siempre se mostrará
     const baseMetadata = {
       name: `AdrianZero #${tokenId}`,
@@ -98,10 +163,6 @@ export default async function handler(req, res) {
         serumModule: {
           address: serumModule.address,
           functions: Object.keys(serumModule.functions)
-        },
-        adrianNameRegistry: {
-          address: adrianNameRegistry.address,
-          functions: Object.keys(adrianNameRegistry.functions)
         }
       });
 
