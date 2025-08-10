@@ -7128,10 +7128,140 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 560,
+      "name": "Bat",
+      "category": "TOP",
+      "fileName": "Bat",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 561,
+      "name": "Ozzy-Hair",
+      "category": "HAIR",
+      "fileName": "Ozzy-Hair",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 562,
+      "name": "Ozzy-BG",
+      "category": "BACKGROUND",
+      "fileName": "Ozzy-BG",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 563,
+      "name": "Ozzy-shirt",
+      "category": "SWAG",
+      "fileName": "Ozzy-shirt",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 564,
+      "name": "Smol-Shades-Purple",
+      "category": "EYES",
+      "fileName": "Smol-Shades-Purple",
+      "maxSupply": 50,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 565,
+      "name": "Eye-Jacket-Golden",
+      "category": "EYES",
+      "fileName": "Eye-Jacket-Golden",
+      "maxSupply": 67,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 566,
+      "name": "HH_Handlebars",
+      "category": "MOUTH",
+      "fileName": "HH_Handlebars",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 567,
+      "name": "HH-Body",
+      "category": "TOP",
+      "fileName": "HH-Body",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 568,
+      "name": "HH-Hair",
+      "category": "HAIR",
+      "fileName": "HH-Hair",
+      "maxSupply": 1,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 569,
+      "name": "Mercia-Dark",
+      "category": "BACKGROUND",
+      "fileName": "Mercia-Dark",
+      "maxSupply": 10,
+      "floppy": "PACKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 548,
+    "totalTraits": 558,
     "categories": [
       "BACKGROUND",
       "EAR",

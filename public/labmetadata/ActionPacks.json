@@ -1,1 +1,22 @@
- 
+{
+  "packs": [
+    {
+      "packId": 15008,
+      "name": "OZZY pack",
+      "description": "OZZY collection pack",
+      "traits": [560, 561, 562, 563, 564]
+    },
+    {
+      "packId": 15009,
+      "name": "HULK pack",
+      "description": "HULK collection pack",
+      "traits": [565, 566, 567, 568, 569]
+    },
+    {
+      "packId": 15010,
+      "name": "MC pack",
+      "description": "MC collection pack",
+      "traits": []
+    }
+  ]
+} 
