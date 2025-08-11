@@ -847,9 +847,10 @@ export default async function handler(req, res) {
     let serumFailed = false;
     let failedSerumType = null; // Nueva variable para el tipo de serum que falló
     let hasAdrianGFSerum = false;
+    let serumHistory = null;
     try {
       console.log('[custom-render] Verificando si hay serum aplicado...');
-      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
       
       if (serumHistory && serumHistory.length > 0) {
         hasSerumHistory = true;
@@ -973,12 +974,7 @@ export default async function handler(req, res) {
           
           try {
             const svgContent = fs.readFileSync(failPath, 'utf8');
-            const resvg = new Resvg(svgContent, {
-              fitTo: {
-                mode: 'width',
-                value: 1000
-              }
-            });
+            const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
             const pngBuffer = resvg.render().asPng();
             const failImage = await loadImage(pngBuffer);
             ctx.drawImage(failImage, 0, 0, 1000, 1000);
@@ -994,17 +990,56 @@ export default async function handler(req, res) {
         }
       } else if (appliedSerum === "AdrianGF") {
         if (serumSuccess) {
-          // AdrianGF exitoso: usar skin específico según GEN y tipo
-          const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
-          if (serumSkinImage) {
-            ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
-            console.log(`[custom-render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
-          } else {
-            console.error(`[custom-render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
-            const baseImage = await loadAndRenderSvg(baseImagePath);
-            if (baseImage) {
-              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
-              console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+          // AdrianGF exitoso: CONVERSIÓN sobre estado previo (Golden / Goldenfail)
+          let convertedHandled = false;
+          if (hasSerumHistory) {
+            // Buscar el último evento GoldenAdrian antes del éxito de AdrianGF
+            for (let i = serumHistory.length - 2; i >= 0; i--) {
+              const ev = serumHistory[i];
+              const evSuccess = ev[1];
+              const evMutation = ev[3];
+              if (evMutation === 'GoldenAdrian') {
+                if (evSuccess === false) {
+                  // GoldenAdrian fallido previo + AdrianGF exitoso → GF-Goldfail
+                  try {
+                    const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Goldfail.svg');
+                    const svgContent = fs.readFileSync(failPath, 'utf8');
+                    const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+                    const pngBuffer = resvg.render().asPng();
+                    const failImage = await loadImage(pngBuffer);
+                    ctx.drawImage(failImage, 0, 0, 1000, 1000);
+                    console.log('[custom-render] PASO 2 - 🧬 Conversión GF sobre Goldenfail: usando GF-Goldfail');
+                    convertedHandled = true;
+                  } catch (error) {
+                    console.error('[custom-render] Error cargando GF-Goldfail, fallback a GF estándar:', error.message);
+                  }
+                } else if (evSuccess === true) {
+                  // GoldenAdrian exitoso previo + AdrianGF exitoso → GF{gen}-Golden
+                  const serumSkinImage = await loadAdrianSvg('AdrianGF', gen, 'Golden');
+                  if (serumSkinImage) {
+                    ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+                    console.log(`[custom-render] PASO 2 - 🧬 Conversión GF sobre Golden: usando GF${gen}_Golden`);
+                    convertedHandled = true;
+                  }
+                }
+                break; // Considerar solo el último GoldenAdrian previo
+              }
+            }
+          }
+
+          if (!convertedHandled) {
+            // Render GF normal según skinType (Alien, Albino, Medium, etc.)
+            const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
+            if (serumSkinImage) {
+              ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+              console.log(`[custom-render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
+            } else {
+              console.error(`[custom-render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
+              const baseImage = await loadAndRenderSvg(baseImagePath);
+              if (baseImage) {
+                ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+                console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+              }
             }
           }
         } else {
@@ -1013,12 +1048,7 @@ export default async function handler(req, res) {
           const failPath = path.join(process.cwd(), 'public', 'traits', 'ADRIANGF', 'GF-Fail.svg');
           try {
             const svgContent = fs.readFileSync(failPath, 'utf8');
-            const resvg = new Resvg(svgContent, {
-              fitTo: {
-                mode: 'width',
-                value: 1000
-              }
-            });
+            const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
             const pngBuffer = resvg.render().asPng();
             const failImage = await loadImage(pngBuffer);
             ctx.drawImage(failImage, 0, 0, 1000, 1000);
