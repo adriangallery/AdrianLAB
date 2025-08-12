@@ -394,6 +394,72 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Action Pack metadata' });
       }
 
+    } else if (tokenIdNum >= 100001 && tokenIdNum <= 101000) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para OGPUNKS (100001-101000)`);
+      try {
+        const ogpunksPath = path.join(process.cwd(), 'public', 'labmetadata', 'ogpunks.json');
+        const ogpunksRaw = fs.readFileSync(ogpunksPath, 'utf8');
+        const ogpunksData = JSON.parse(ogpunksRaw);
+        const trait = (ogpunksData.traits || []).find(t => parseInt(t.tokenId) === tokenIdNum);
+        if (!trait) {
+          return res.status(404).json({ error: 'OGPUNK trait not found' });
+        }
+
+        // totalMinted desde contrato
+        let totalMinted = 0;
+        try {
+          console.log(`[floppy-metadata] Obteniendo totalMintedPerAsset para ogpunk ${tokenIdNum}...`);
+          const { traitsCore } = await getContracts();
+          const mintedAmount = await traitsCore.totalMintedPerAsset(tokenIdNum);
+          totalMinted = mintedAmount.toNumber();
+          console.log(`[floppy-metadata] Total minted obtenido del contrato: ${totalMinted}`);
+        } catch (error) {
+          console.error(`[floppy-metadata] Error obteniendo totalMintedPerAsset (ogpunks):`, error.message);
+          totalMinted = trait.maxSupply || 1;
+        }
+
+        function getRarityTagAndColor(maxSupply) {
+          if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };
+          if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };
+          if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };
+          if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };
+          return { tag: 'COMMON', bg: '#a9a9a9' };
+        }
+        const rarity = getRarityTagAndColor(trait.maxSupply || 1);
+
+        const metadata = {
+          name: trait.name,
+          description: trait.description || 'BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger',
+          image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+          external_url: trait.external_url || 'https://adrianpunks.com/',
+          attributes: [
+            { trait_type: 'Category', value: trait.category || 'TOP' },
+            { trait_type: 'Rarity', value: rarity.tag },
+            { trait_type: 'Max Supply', value: trait.maxSupply || 1 },
+            { trait_type: 'Total Minted', value: totalMinted },
+            { trait_type: 'Floppy', value: 'OG' }
+          ],
+          properties: {
+            files: [
+              { uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`, type: 'image/png' }
+            ],
+            category: 'image',
+            creators: trait.masterminds || ['Adrian | HalfxTiger']
+          }
+        };
+
+        setCachedFloppyMetadata(tokenIdNum, metadata);
+        const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        console.log(`[floppy-metadata] ===== METADATA OGPUNKS GENERADA EXITOSAMENTE =====`);
+        return res.status(200).json(metadata);
+      } catch (err) {
+        console.error('[floppy-metadata] Error sirviendo OGPUNKS:', err.message);
+        return res.status(500).json({ error: 'Error loading OGPUNKS metadata' });
+      }
+
     } else {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS (10000+)`);
       

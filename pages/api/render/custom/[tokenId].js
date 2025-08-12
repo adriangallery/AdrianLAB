@@ -101,6 +101,8 @@ const getMetadataFileForToken = (tokenId) => {
     return 'serums.json';
   } else if (numTokenId >= 30000 && numTokenId <= 35000) {
     return 'studio.json';
+  } else if (numTokenId >= 100001 && numTokenId <= 101000) {
+    return 'ogpunks.json';
   } else {
     return 'traits.json';
   }
@@ -144,6 +146,9 @@ const loadMetadataForToken = async (tokenId) => {
           name: trait.name,
           fileName: `${tokenId}.svg`
         }));
+        break;
+      case 'ogpunks.json':
+        traitsArray = metadata.traits;
         break;
       default:
         traitsArray = metadata.traits;
@@ -803,6 +808,42 @@ export default async function handler(req, res) {
       }
     };
 
+    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101000
+    const loadOgpunkTrait = async (traitId) => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/ogpunks/${traitId}.svg`;
+        console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: Cargando trait ${traitId} desde ogpunks: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: SVG descargado desde ogpunks, tamaño: ${svgBuffer.byteLength} bytes`);
+        
+        // Renderizar SVG a PNG
+        const resvg = new Resvg(Buffer.from(svgBuffer), {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: PNG generado desde ogpunks, tamaño: ${pngBuffer.length} bytes`);
+        
+        const image = await loadImage(pngBuffer);
+        console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: Trait ${traitId} cargado exitosamente desde ogpunks`);
+        return image;
+      } catch (error) {
+        console.error(`[custom-render] 🎯 LÓGICA OGPUNKS: Error cargando trait ${traitId} desde ogpunks:`, error.message);
+        console.error(`[custom-render] 🎯 LÓGICA OGPUNKS: Stack trace:`, error.stack);
+        return null;
+      }
+    };
+
     // Determinar la imagen base según generación y skin
     const gen = generation.toString();
     let baseImagePath;
@@ -1176,6 +1217,14 @@ export default async function handler(req, res) {
         }
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
         if (category !== 'ADRIAN' && category !== 'ADRIANGF') {
+          // LÓGICA DE EXCLUSIVIDAD: SERUMS solo si NO hay EYES
+          if (category === 'SERUMS') {
+            const eyesTrait = finalTraits['EYES'];
+            if (eyesTrait && eyesTrait !== 'None' && eyesTrait !== '') {
+              console.log(`[custom-render] PASO 3 - 🚫 LÓGICA DE EXCLUSIVIDAD: Saltando SERUMS (${finalTraits[category]}) porque hay EYES (${eyesTrait}) activado`);
+              continue; // Saltar SERUMS si hay EYES activados
+            }
+          }
           const traitId = finalTraits[category];
           
           // Debug mejorado para traits externos
@@ -1232,48 +1281,44 @@ export default async function handler(req, res) {
       if (finalTraits[category]) {
         const traitId = finalTraits[category];
         
-        // Debug mejorado para traits externos
-        if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
-          console.log(`[custom-render] 🌐 PASO 4 - Cargando TOP trait externo: ${traitId} - ${traitsMapping[traitId].name}`);
-        } else {
-          console.log(`[custom-render] PASO 4 - Cargando TOP trait: ${traitId}`);
-        }
-
         // Intentar obtener del caché de componentes primero
         const cachedTopTrait = getCachedComponent('trait', traitId);
         if (cachedTopTrait) {
           const traitImage = await loadImage(cachedTopTrait);
           ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-          
-          // Debug mejorado para traits externos
           if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
             console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde caché de componentes`);
           } else {
             console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde caché de componentes correctamente`);
           }
         } else {
-          // Si no está en caché, cargar normalmente
-          const traitImage = await loadTraitFromLabimages(traitId);
+          let traitImage;
+          if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+            traitImage = await loadExternalTrait(traitId);
+          } else if (traitId >= 100001 && traitId <= 101000) {
+            traitImage = await loadOgpunkTrait(traitId);
+          } else {
+            traitImage = await loadTraitFromLabimages(traitId);
+          }
+
           if (traitImage) {
-            // Convertir la imagen a buffer para guardar en caché
-            const canvas = createCanvas(1000, 1000);
-            const traitCtx = canvas.getContext('2d');
-            traitCtx.drawImage(traitImage, 0, 0, 1000, 1000);
-            const traitBuffer = canvas.toBuffer('image/png');
-            
-            // Guardar en caché de componentes
+            // Cache de componentes
+            const cacheCanvas = createCanvas(1000, 1000);
+            const cacheCtx = cacheCanvas.getContext('2d');
+            cacheCtx.drawImage(traitImage, 0, 0, 1000, 1000);
+            const traitBuffer = cacheCanvas.toBuffer('image/png');
             setCachedComponent('trait', traitId, traitBuffer);
-            
+
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-            
-            // Debug mejorado para traits externos
             if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
               console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
+            } else if (traitId >= 100001 && traitId <= 101000) {
+              console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: TOP trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);
             } else {
               console.log(`[custom-render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
             }
           } else {
-            console.error(`[custom-render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
+            console.error(`[custom-render] PASO 4 - Error al cargar TOP trait ${category} (${traitId})`);
           }
         }
       }

@@ -67,6 +67,8 @@ const getMetadataFileForToken = (tokenId) => {
     return 'serums.json';
   } else if (numTokenId >= 30000 && numTokenId <= 35000) {
     return 'studio.json';
+  } else if (numTokenId >= 100001 && numTokenId <= 101000) {
+    return 'ogpunks.json';
   } else {
     return 'traits.json';
   }
@@ -103,6 +105,9 @@ const loadMetadataForToken = (tokenId) => {
           name: trait.name,
           fileName: `${tokenId}.svg`
         }));
+        break;
+      case 'ogpunks.json':
+        traitsArray = metadata.traits;
         break;
       default:
         traitsArray = metadata.traits;
@@ -489,6 +494,47 @@ export default async function handler(req, res) {
       } catch (error) {
         console.error(`[render] 🌐 LÓGICA EXTERNA: Error cargando trait ${traitId} desde URL externa:`, error.message);
         console.error(`[render] 🌐 LÓGICA EXTERNA: Stack trace:`, error.stack);
+        return null;
+      }
+    };
+
+    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101000
+    const loadOgpunkTrait = async (traitId) => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const imageUrl = `${baseUrl}/labimages/ogpunks/${traitId}.svg`;
+        console.log(`[render] 🎯 LÓGICA OGPUNKS: Cargando trait ${traitId} desde ogpunks: ${imageUrl}`);
+
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer);
+        
+        // Intentar obtener del caché SVG→PNG primero
+        const cachedPng = getCachedSvgPng(svgContent.toString());
+        if (cachedPng) {
+          return loadImage(cachedPng);
+        }
+        
+        // Si no está en caché, hacer la conversión
+        const resvg = new Resvg(svgContent, {
+          fitTo: {
+            mode: 'width',
+            value: 1000
+          }
+        });
+        
+        const pngBuffer = resvg.render().asPng();
+        
+        // Guardar en caché SVG→PNG
+        setCachedSvgPng(svgContent.toString(), pngBuffer);
+        
+        return loadImage(pngBuffer);
+      } catch (error) {
+        console.error(`[render] 🎯 LÓGICA OGPUNKS: Error cargando trait ${traitId} desde ogpunks:`, error.message);
         return null;
       }
     };
@@ -882,6 +928,14 @@ export default async function handler(req, res) {
             } else {
               console.error(`[render] PASO 3 - 🌐 Error al cargar trait ${category} (${traitId}) desde URL externa`);
             }
+          } else if (traitId >= 100001 && traitId <= 101000) {
+            traitImage = await loadOgpunkTrait(traitId);
+            if (traitImage) {
+              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              console.log(`[render] PASO 3 - 🎯 LÓGICA OGPUNKS: Trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);
+            } else {
+              console.error(`[render] PASO 3 - 🎯 LÓGICA OGPUNKS: Error al cargar trait ${category} (${traitId}) desde ogpunks`);
+            }
           } else {
             traitImage = await loadTraitFromLabimages(traitId);
             if (traitImage) {
@@ -913,6 +967,14 @@ export default async function handler(req, res) {
             console.log(`[render] PASO 4 - 🌐 TOP trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
           } else {
             console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
+          }
+        } else if (traitId >= 100001 && traitId <= 101000) {
+          traitImage = await loadOgpunkTrait(traitId);
+          if (traitImage) {
+            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            console.log(`[render] PASO 4 - 🎯 LÓGICA OGPUNKS: TOP trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);
+          } else {
+            console.error(`[render] PASO 4 - 🎯 LÓGICA OGPUNKS: Error al cargar TOP trait ${category} (${traitId}) desde ogpunks`);
           }
         } else {
           traitImage = await loadTraitFromLabimages(traitId);
