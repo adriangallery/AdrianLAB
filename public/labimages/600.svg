@@ -1,0 +1,11 @@
+<svg width="1.025" height="1.025" viewBox="0 0 37 37"
+     xmlns="http://www.w3.org/2000/svg"
+     shape-rendering="crispEdges"
+     style="image-rendering: pixelated">
+  <image id="frame1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAlCAYAAADFniADAAAAU0lEQVR4nO3WsQ0AMQzDQOv331lZIMCzCJAUvFKFwdJpO6/5bgfsGEUZRRlFGUUZRRlFHYlK0pnp34bv+bpARlFGUUZRRlFGUUZRRlFGUUZRRlELFwcKRRx40WMAAAAASUVORK5CYII=" width="37" height="37">
+    <animate attributeName="opacity" values="1;0;1" dur="0.2s" repeatCount="indefinite"/>
+  </image>
+  <image id="frame2" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAlCAYAAADFniADAAAAUElEQVR4nO3WIQ4AIADDQMb//zw8QVSQgOjJqcql7fjNfB1wYhRlFGUUZRRlFGUUdSuqSfa7cdqQeF0goyijKKMooyijKKMooyijKKMoo6gFFu8KRbbVcI4AAAAASUVORK5CYII=" width="37" height="37">
+    <animate attributeName="opacity" values="0;1;0" dur="0.2s" repeatCount="indefinite"/>
+  </image>
+</svg>
