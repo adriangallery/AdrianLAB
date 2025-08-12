@@ -140,12 +140,16 @@ export default async function handler(req, res) {
 
     // SKIN base o mannequin
     if (useMannequin) {
-      const mannequinPath = path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg');
-      const svgContent = fs.readFileSync(mannequinPath, 'utf8');
-      const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
-      const pngBuffer = resvg.render().asPng();
-      const mannequinImage = await loadImage(pngBuffer);
-      adrianCtx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+      const mannequinUrl = `${baseUrl}/labimages/mannequin.svg`;
+      const resp = await fetch(mannequinUrl);
+      if (resp.ok) {
+        const svgContent = await resp.text();
+        const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+        const pngBuffer = resvg.render().asPng();
+        const mannequinImage = await loadImage(pngBuffer);
+        adrianCtx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+      }
     } else {
       const baseImage = await loadAndRenderSvg(baseImagePath);
       if (baseImage) adrianCtx.drawImage(baseImage, 0, 0, 1000, 1000);
@@ -176,8 +180,10 @@ export default async function handler(req, res) {
     ctx.drawImage(adrianBuffer, adrianX, adrianY, ADRIAN_SIZE, ADRIAN_SIZE);
 
     // 4. Renderizar el Lambo como capa superior
-    const lamboSvgPath = path.join(process.cwd(), 'public', 'lamboimages', lamboFile);
-    const lamboSvgContent = fs.readFileSync(lamboSvgPath, 'utf8');
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    const lamboUrl = `${baseUrl}/lamboimages/${lamboFile}`;
+    const lamboResp = await fetch(lamboUrl);
+    const lamboSvgContent = lamboResp.ok ? await lamboResp.text() : '';
     const resvgLambo = new Resvg(lamboSvgContent, { fitTo: { mode: 'width', value: 1000 } }); // Mantener el tamaño original de 1000px
     const lamboPng = resvgLambo.render().asPng();
     const lamboImg = await loadImage(lamboPng);

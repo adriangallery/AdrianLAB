@@ -83,24 +83,32 @@ export default async function handler(req, res) {
         }
 
         // Resolver imagen por ID con fallbacks si no existe el archivo
-        const imgDir = path.join(process.cwd(), 'public', 'labimages');
-        const idPng = path.join(imgDir, `${tokenIdNum}.png`);
-        let imgFileName = `${tokenIdNum}.png`;
-        if (!fs.existsSync(idPng)) {
-          if (tokenIdNum === 15008 && fs.existsSync(path.join(imgDir, 'ozzy.png'))) {
-            imgFileName = 'ozzy.png';
-          } else if (tokenIdNum === 15009) {
-            if (fs.existsSync(path.join(imgDir, '15009.png'))) {
-              imgFileName = '15009.png';
-            } else if (fs.existsSync(path.join(imgDir, 'hulk.png'))) {
-              imgFileName = 'hulk.png';
-            }
-          } else if (tokenIdNum === 15010 && fs.existsSync(path.join(imgDir, '15010.png'))) {
-            imgFileName = '15010.png';
+        const headOk = async (url) => {
+          try {
+            const r = await fetch(url, { method: 'HEAD' });
+            return r.ok;
+          } catch (_) {
+            return false;
           }
+        };
+
+        let candidates = [`${tokenIdNum}.png`];
+        if (tokenIdNum === 15008) {
+          candidates = [`${tokenIdNum}.png`, 'ozzy.png'];
+        } else if (tokenIdNum === 15009) {
+          candidates = ['15009.png', 'hulk.png'];
+        } else if (tokenIdNum === 15010) {
+          candidates = ['15010.png'];
         }
 
-        const imageUrl = `${baseUrl}/labimages/${imgFileName}?v=${version}`;
+        let selected = `${tokenIdNum}.png`;
+        for (const fname of candidates) {
+          const url = `${baseUrl}/labimages/${fname}`;
+          // eslint-disable-next-line no-await-in-loop
+          if (await headOk(url)) { selected = fname; break; }
+        }
+
+        const imageUrl = `${baseUrl}/labimages/${selected}?v=${version}`;
 
         const packMetadata = {
           name: `${pack.name}`,

@@ -6,6 +6,12 @@
   "functions": {
     "pages/api/render/floppy/[tokenId].js": {
       "includeFiles": "fonts/**"
+    },
+    "api/**/*.js": {
+      "excludeFiles": "public/labimages/**"
+    },
+    "pages/api/**/*.js": {
+      "excludeFiles": "public/labimages/**"
     }
   },
   "headers": [

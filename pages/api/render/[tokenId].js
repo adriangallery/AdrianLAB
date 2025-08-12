@@ -840,15 +840,13 @@ export default async function handler(req, res) {
       // Usar skin base normal o mannequin
       if (useMannequin) {
         console.log('[render] PASO 2 - Usando mannequin.svg (skin no asignado)');
-        const mannequinPath = path.join(process.cwd(), 'public', 'labimages', 'mannequin.svg');
         try {
-          const svgContent = fs.readFileSync(mannequinPath, 'utf8');
-          const resvg = new Resvg(svgContent, {
-            fitTo: {
-              mode: 'width',
-              value: 1000
-            }
-          });
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+          const mannequinUrl = `${baseUrl}/labimages/mannequin.svg`;
+          const r = await fetch(mannequinUrl);
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const svgContent = await r.text();
+          const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
           const pngBuffer = resvg.render().asPng();
           const mannequinImage = await loadImage(pngBuffer);
           ctx.drawImage(mannequinImage, 0, 0, 1000, 1000);

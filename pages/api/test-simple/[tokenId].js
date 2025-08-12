@@ -144,10 +144,14 @@ export default async function handler(req, res) {
     ]);
     console.log(`[test-simple] ✅ Trait y mannequin cargados exitosamente usando método personalizado`);
 
-    // Cargar frame mejorado
+    // Cargar frame mejorado vía HTTP
     let frameSvgContent;
     try {
-      frameSvgContent = fs.readFileSync(path.join(process.cwd(), 'public', 'labimages', 'frameimproved.svg'), 'utf8')
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+      const frameUrl = `${baseUrl}/labimages/frameimproved.svg`;
+      const resp = await fetch(frameUrl);
+      frameSvgContent = resp.ok ? (await resp.text()) : '';
+      frameSvgContent = frameSvgContent
         .replace(/<\?xml[^>]*\?>/, '')
         .replace(/<svg[^>]*>/, '')
         .replace(/<\/svg>/, '');
@@ -156,18 +160,20 @@ export default async function handler(req, res) {
       console.error(`[test-simple] Error cargando frame mejorado: ${error.message}`);
       frameSvgContent = '';
     }
-
-    // Cargar 662.gif
-    const gif662Path = path.join(process.cwd(), 'public', 'labimages', '662.gif');
-    console.log(`[test-simple] Verificando 662.gif: ${gif662Path} - Existe: ${fs.existsSync(gif662Path)}`);
-    
+ 
+    // Cargar 662.gif vía HTTP
     let gif662Base64 = '';
-    if (fs.existsSync(gif662Path)) {
-      const gif662Buffer = fs.readFileSync(gif662Path);
-      gif662Base64 = `data:image/gif;base64,${gif662Buffer.toString('base64')}`;
-      console.log(`[test-simple] 662.gif cargado, tamaño: ${gif662Buffer.length} bytes`);
-    } else {
-      console.log(`[test-simple] ⚠️ 662.gif no encontrado, usando placeholder`);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+      const gifUrl = `${baseUrl}/labimages/662.gif`;
+      const r = await fetch(gifUrl);
+      if (r.ok) {
+        const buf = Buffer.from(await r.arrayBuffer());
+        gif662Base64 = `data:image/gif;base64,${buf.toString('base64')}`;
+        console.log(`[test-simple] 662.gif cargado, tamaño: ${buf.length} bytes`);
+      }
+    } catch (err) {
+      console.log(`[test-simple] ⚠️ 662.gif no disponible: ${err.message}`);
     }
 
     // Generar textos usando text-to-svg
