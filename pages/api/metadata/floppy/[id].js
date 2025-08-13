@@ -492,7 +492,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Pagers metadata' });
       }
 
-    } else if (tokenIdNum >= 100001 && tokenIdNum <= 101000) {
+    } else if ((tokenIdNum >= 100001 && tokenIdNum <= 101000) || (tokenIdNum >= 101001 && tokenIdNum <= 101002)) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para OGPUNKS (100001-101000)`);
       try {
         const ogpunksPath = path.join(process.cwd(), 'public', 'labmetadata', 'ogpunks.json');

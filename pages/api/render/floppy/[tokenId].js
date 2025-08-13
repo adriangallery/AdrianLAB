@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       (tokenIdNum >= 1 && tokenIdNum <= 9999) ||
       (tokenIdNum >= 262144 && tokenIdNum <= 262147) ||
       (tokenIdNum >= 30000 && tokenIdNum <= 35000) ||
-      (tokenIdNum >= 100001 && tokenIdNum <= 101000)
+      ((tokenIdNum >= 100001 && tokenIdNum <= 101000) || (tokenIdNum >= 101001 && tokenIdNum <= 101002))
     ) {
       
       // Determinar si es un serum (GIF) o trait (PNG)

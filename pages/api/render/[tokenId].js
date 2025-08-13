@@ -926,7 +926,7 @@ export default async function handler(req, res) {
             } else {
               console.error(`[render] PASO 3 - 🌐 Error al cargar trait ${category} (${traitId}) desde URL externa`);
             }
-          } else if (traitId >= 100001 && traitId <= 101000) {
+          } else if ((traitId >= 100001 && traitId <= 101000) || (traitId >= 101001 && traitId <= 101002)) {
             traitImage = await loadOgpunkTrait(traitId);
             if (traitImage) {
               ctx.drawImage(traitImage, 0, 0, 1000, 1000);
@@ -966,7 +966,7 @@ export default async function handler(req, res) {
           } else {
             console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
           }
-        } else if (traitId >= 100001 && traitId <= 101000) {
+        } else if ((traitId >= 100001 && traitId <= 101000) || (traitId >= 101001 && traitId <= 101002)) {
           traitImage = await loadOgpunkTrait(traitId);
           if (traitImage) {
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);

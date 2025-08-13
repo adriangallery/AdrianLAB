@@ -10999,9 +10999,31 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 101001,
+      "name": "PSYCH DFZ",
+      "category": "TOP",
+      "maxSupply": 1,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 101002,
+      "name": "BETTY DFZ",
+      "category": "TOP",
+      "maxSupply": 1,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1000
+    "totalTraits": 1002
   }
 }

@@ -101,7 +101,7 @@ const getMetadataFileForToken = (tokenId) => {
     return 'serums.json';
   } else if (numTokenId >= 30000 && numTokenId <= 35000) {
     return 'studio.json';
-  } else if (numTokenId >= 100001 && numTokenId <= 101000) {
+  } else if ((numTokenId >= 100001 && numTokenId <= 101000) || (numTokenId >= 101001 && numTokenId <= 101002)) {
     return 'ogpunks.json';
   } else {
     return 'traits.json';
@@ -770,7 +770,7 @@ export default async function handler(req, res) {
       console.log(`[custom-render] 🎨 CARGANDO TRAIT: Iniciando carga de trait ${traitId}`);
       
       // LÓGICA OGPUNKS: Cargar desde carpeta ogpunks cuando el traitId esté en su rango
-      if (parseInt(traitId) >= 100001 && parseInt(traitId) <= 101000) {
+      if ((parseInt(traitId) >= 100001 && parseInt(traitId) <= 101000) || (parseInt(traitId) >= 101001 && parseInt(traitId) <= 101002)) {
         console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: Trait ${traitId} detectado como OGPUNK, usando loader OGPUNKS`);
         return await loadOgpunkTrait(traitId);
       }
