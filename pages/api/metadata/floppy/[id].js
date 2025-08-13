@@ -402,6 +402,96 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Action Pack metadata' });
       }
 
+    } else if (tokenIdNum >= 15000 && tokenIdNum <= 15012) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para PAGERS (15000-15012)`);
+
+      try {
+        const pagersPath = path.join(process.cwd(), 'public', 'labmetadata', 'pagers.json');
+        const pagersRaw = fs.readFileSync(pagersPath, 'utf8');
+        const pagersData = JSON.parse(pagersRaw);
+        const pager = (pagersData.pagers || []).find(p => parseInt(p.tokenId) === tokenIdNum);
+
+        if (!pager) {
+          console.error(`[floppy-metadata] Pager ${tokenIdNum} no encontrado en pagers.json`);
+        }
+
+        // totalMinted desde contrato
+        let totalMinted = 0;
+        try {
+          console.log(`[floppy-metadata] Obteniendo totalMintedPerAsset para pager ${tokenIdNum}...`);
+          const { traitsCore } = await getContracts();
+          const mintedAmount = await traitsCore.totalMintedPerAsset(tokenIdNum);
+          totalMinted = mintedAmount.toNumber();
+          console.log(`[floppy-metadata] Total minted obtenido del contrato: ${totalMinted}`);
+        } catch (error) {
+          console.error(`[floppy-metadata] Error obteniendo totalMintedPerAsset (pagers):`, error.message);
+          totalMinted = pager?.maxSupply || 1;
+        }
+
+        function getRarityTagAndColor(maxSupply) {
+          if (maxSupply === 1) return { tag: 'UNIQUE', bg: '#ff0000' };
+          if (maxSupply <= 6) return { tag: 'LEGENDARY', bg: '#ffd700' };
+          if (maxSupply <= 14) return { tag: 'RARE', bg: '#da70d6' };
+          if (maxSupply <= 40) return { tag: 'UNCOMMON', bg: '#5dade2' };
+          return { tag: 'COMMON', bg: '#a9a9a9' };
+        }
+        const rarity = getRarityTagAndColor(pager?.maxSupply || 1);
+
+        // Resolver imagen por ID con HEAD, priorizando GIF y luego PNG
+        const headOk = async (url) => {
+          try {
+            const r = await fetch(url, { method: 'HEAD' });
+            return r.ok;
+          } catch (_) {
+            return false;
+          }
+        };
+
+        const candidates = [`${tokenIdNum}.gif`, `${tokenIdNum}.png`];
+        let selected = null;
+        for (const fname of candidates) {
+          const url = `${baseUrl}/labimages/${fname}`;
+          // eslint-disable-next-line no-await-in-loop
+          if (await headOk(url)) { selected = fname; break; }
+        }
+        // Fallback a PNG render si no existe archivo estático
+        const imageUrl = selected 
+          ? `${baseUrl}/labimages/${selected}?v=${version}`
+          : `${baseUrl}/api/render/floppy/${tokenIdNum}.png`;
+
+        const metadata = {
+          name: pager?.name || `PAGER #${tokenIdNum}`,
+          description: pager?.description || 'BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger',
+          image: imageUrl,
+          external_url: pager?.external_url || 'https://adrianpunks.com/',
+          attributes: [
+            { trait_type: 'Category', value: pager?.category || 'Pagers' },
+            { trait_type: 'Rarity', value: rarity.tag },
+            { trait_type: 'Max Supply', value: pager?.maxSupply || 1 },
+            { trait_type: 'Total Minted', value: totalMinted },
+            { trait_type: 'Traits Inside', value: pager?.traitsInside || 'IDK' }
+          ],
+          properties: {
+            files: [
+              { uri: imageUrl, type: selected && selected.endsWith('.gif') ? 'image/gif' : 'image/png' }
+            ],
+            category: 'image',
+            creators: pager?.masterminds || ['Adrian | HalfxTiger']
+          }
+        };
+
+        setCachedFloppyMetadata(tokenIdNum, metadata);
+        const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        console.log(`[floppy-metadata] ===== METADATA PAGERS GENERADA EXITOSAMENTE =====`);
+        return res.status(200).json(metadata);
+      } catch (err) {
+        console.error('[floppy-metadata] Error sirviendo Pagers:', err.message);
+        return res.status(500).json({ error: 'Error loading Pagers metadata' });
+      }
+
     } else if (tokenIdNum >= 100001 && tokenIdNum <= 101000) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para OGPUNKS (100001-101000)`);
       try {
