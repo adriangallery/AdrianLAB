@@ -242,7 +242,44 @@ const loadCombinedTraitsMapping = async (tokenId) => {
           };
         });
       }
-      
+ 
+      // CARGAR SIEMPRE ogpunks.json para traits OGPUNKS (100001-101000)
+      console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Cargando ogpunks.json para traits OGPUNKS`);
+      const cachedOgpunks = await getCachedJson('ogpunks.json');
+      if (cachedOgpunks) {
+        console.log(`[custom-render] 🔄 LÓGICA COMBINADA: ogpunks.json cargado desde caché con ${cachedOgpunks.length} entries`);
+        cachedOgpunks.forEach(trait => {
+          const traitId = trait.tokenId;
+          baseMapping[traitId] = {
+            category: (trait.category || 'TOP').toUpperCase(),
+            name: trait.name,
+            fileName: `${traitId}.svg`,
+            isOgpunk: true
+          };
+        });
+      } else {
+        const ogpunksPath = path.join(process.cwd(), 'public', 'labmetadata', 'ogpunks.json');
+        try {
+          const ogpunksBuffer = fs.readFileSync(ogpunksPath);
+          const ogpunksData = JSON.parse(ogpunksBuffer.toString());
+          const ogTraits = ogpunksData.traits || [];
+          console.log(`[custom-render] 🔄 LÓGICA COMBINADA: ogpunks.json cargado con ${ogTraits.length} entries`);
+          // Guardar en caché como array directo para consistencia con getCachedJson
+          setCachedJson('ogpunks.json', ogTraits);
+          ogTraits.forEach(trait => {
+            const traitId = trait.tokenId;
+            baseMapping[traitId] = {
+              category: (trait.category || 'TOP').toUpperCase(),
+              name: trait.name,
+              fileName: `${traitId}.svg`,
+              isOgpunk: true
+            };
+          });
+        } catch (err) {
+          console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando ogpunks.json:`, err.message);
+        }
+      }
+
       console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo combinado completado con ${Object.keys(baseMapping).length} entries totales`);
       
       // Debug: Mostrar algunos traits externos cargados
@@ -732,6 +769,12 @@ export default async function handler(req, res) {
     const loadTraitFromLabimages = async (traitId) => {
       console.log(`[custom-render] 🎨 CARGANDO TRAIT: Iniciando carga de trait ${traitId}`);
       
+      // LÓGICA OGPUNKS: Cargar desde carpeta ogpunks cuando el traitId esté en su rango
+      if (parseInt(traitId) >= 100001 && parseInt(traitId) <= 101000) {
+        console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: Trait ${traitId} detectado como OGPUNK, usando loader OGPUNKS`);
+        return await loadOgpunkTrait(traitId);
+      }
+
       // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
       if (isExternalTrait(traitId)) {
         console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} detectado en rango externo, usando carga externa`);
@@ -757,7 +800,8 @@ export default async function handler(req, res) {
           name: traitsMapping[traitId].name,
           category: traitsMapping[traitId].category,
           fileName: traitsMapping[traitId].fileName,
-          isExternal: traitsMapping[traitId].isExternal || false
+          isExternal: traitsMapping[traitId].isExternal || false,
+          isOgpunk: traitsMapping[traitId].isOgpunk || false
         });
       } else {
         console.warn(`[custom-render] 🎨 CARGANDO TRAIT: Trait ${traitId} no encontrado en mapeo combinado`);
