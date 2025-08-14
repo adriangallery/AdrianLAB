@@ -275,40 +275,53 @@ export default async function handler(req, res) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
         const imageUrl = `${baseUrl}/traits/${path}`;
         console.log(`[render] Cargando imagen: ${imageUrl}`);
-
-        const response = await fetch(imageUrl);
+ 
+        let response = await fetch(imageUrl);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Fallback: si el nombre del archivo es numérico (e.g., BACKGROUND/663.svg), intentar en /labimages/<id>.svg
+          const filename = path.split('/').pop() || '';
+          const numericId = filename.replace(/\.svg$/i, '');
+          if (/^\d+$/.test(numericId)) {
+            const fallbackUrl = `${baseUrl}/labimages/${numericId}.svg`;
+            console.log(`[render] Fallback labimages: ${fallbackUrl}`);
+            const fbResp = await fetch(fallbackUrl);
+            if (!fbResp.ok) {
+              throw new Error(`HTTP error! status: ${response.status} | fallback: ${fbResp.status}`);
+            }
+            response = fbResp;
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
         }
-        
+         
         const svgBuffer = await response.arrayBuffer();
         const svgContent = Buffer.from(svgBuffer);
-        
-        // Intentar obtener del caché SVG→PNG primero
-        const cachedPng = getCachedSvgPng(svgContent.toString());
-        if (cachedPng) {
-          return loadImage(cachedPng);
-        }
-        
-        // Si no está en caché, hacer la conversión
-        const resvg = new Resvg(svgContent, {
-          fitTo: {
-            mode: 'width',
-            value: 1000
-          }
-        });
-        
-        const pngBuffer = resvg.render().asPng();
-        
-        // Guardar en caché SVG→PNG
-        setCachedSvgPng(svgContent.toString(), pngBuffer);
-        
-        return loadImage(pngBuffer);
-      } catch (error) {
-        console.error(`[render] Error cargando SVG ${path}:`, error.message);
-        return null;
-      }
-    };
+         
+         // Intentar obtener del caché SVG→PNG primero
+         const cachedPng = getCachedSvgPng(svgContent.toString());
+         if (cachedPng) {
+           return loadImage(cachedPng);
+         }
+         
+         // Si no está en caché, hacer la conversión
+         const resvg = new Resvg(svgContent, {
+           fitTo: {
+             mode: 'width',
+             value: 1000
+           }
+         });
+         
+         const pngBuffer = resvg.render().asPng();
+         
+         // Guardar en caché SVG→PNG
+         setCachedSvgPng(svgContent.toString(), pngBuffer);
+         
+         return loadImage(pngBuffer);
+       } catch (error) {
+         console.error(`[render] Error cargando SVG ${path}:`, error.message);
+         return null;
+       }
+     };
 
     // Función específica para cargar archivos ADRIAN desde sistema de archivos
     const loadAdrianSvg = async (serumName, generation, skinType) => {

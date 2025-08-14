@@ -620,9 +620,22 @@ export default async function handler(req, res) {
         const imageUrl = `${baseUrl}/traits/${path}`;
         console.log(`[custom-render] Cargando imagen: ${imageUrl}`);
 
-        const response = await fetch(imageUrl);
+        let response = await fetch(imageUrl);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Fallback: si el nombre del archivo es numérico (e.g., BACKGROUND/663.svg), intentar en /labimages/<id>.svg
+          const filename = path.split('/').pop() || '';
+          const numericId = filename.replace(/\.svg$/i, '');
+          if (/^\d+$/.test(numericId)) {
+            const fallbackUrl = `${baseUrl}/labimages/${numericId}.svg`;
+            console.log(`[custom-render] Fallback labimages: ${fallbackUrl}`);
+            const fbResp = await fetch(fallbackUrl);
+            if (!fbResp.ok) {
+              throw new Error(`HTTP error! status: ${response.status} | fallback: ${fbResp.status}`);
+            }
+            response = fbResp;
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
         }
         
         const svgBuffer = await response.arrayBuffer();
