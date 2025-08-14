@@ -7479,10 +7479,49 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 663,
+      "name": "test floppy",
+      "category": "BACKGROUND",
+      "fileName": "663",
+      "maxSupply": 1,
+      "floppy": "TEST",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 664,
+      "name": "test floppy",
+      "category": "BACKGROUND",
+      "fileName": "664",
+      "maxSupply": 1,
+      "floppy": "TEST",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 665,
+      "name": "test floppy",
+      "category": "BACKGROUND",
+      "fileName": "665",
+      "maxSupply": 1,
+      "floppy": "TEST",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 575,
+    "totalTraits": 578,
     "categories": [
       "BACKGROUND",
       "EAR",
