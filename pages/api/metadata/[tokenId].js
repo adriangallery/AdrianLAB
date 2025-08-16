@@ -516,7 +516,15 @@ export default async function handler(req, res) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
-    
+
+    // OVERRIDE ESPECIAL: Token 302 usa GIF pre-generado
+    if (tokenIdNum === 302) {
+      const gifUrl = `${baseUrl}/labimages/specials/302.gif?v=${version}`;
+      baseMetadata.image = gifUrl;
+      baseMetadata.external_url = gifUrl;
+      console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
+    }
+
     return res.status(200).json(baseMetadata);
   } catch (error) {
     console.error('[metadata] Error general:', error);
