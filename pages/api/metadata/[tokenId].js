@@ -292,7 +292,7 @@ export default async function handler(req, res) {
           const topIndex = categories.findIndex(c => c === 'TOP');
           if (topIndex !== -1) {
             const topTraitIdNum = parseInt(traitIds[topIndex].toString());
-            if (!isNaN(topTraitIdNum) && ((topTraitIdNum >= 100001 && topTraitIdNum <= 101000) || (topTraitIdNum >= 101001 && topTraitIdNum <= 101002))) {
+            if (!isNaN(topTraitIdNum) && topTraitIdNum >= 100001 && topTraitIdNum <= 100100) {
               baseMetadata.name = `AdrianPunk #${tokenIdNum}`;
               console.log(`[metadata] Override de nombre por TOP OGPUNK (${topTraitIdNum}) → ${baseMetadata.name}`);
             }
