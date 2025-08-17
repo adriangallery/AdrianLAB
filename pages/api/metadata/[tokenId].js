@@ -286,13 +286,13 @@ export default async function handler(req, res) {
         traitIds: traitIds.map(id => id.toString())
       });
 
-      // LÓGICA ESPECIAL: Si el TOP trait activo es un OGPUNK en rango 100001-100100 → renombrar a AdrianPunk #<tokenId>
+      // LÓGICA ESPECIAL: Si el TOP trait activo es un OGPUNK en rango 100001-101000 → renombrar a AdrianPunk #<tokenId>
       try {
         if (Array.isArray(categories) && Array.isArray(traitIds)) {
           const topIndex = categories.findIndex(c => c === 'TOP');
           if (topIndex !== -1) {
             const topTraitIdNum = parseInt(traitIds[topIndex].toString());
-            if (!isNaN(topTraitIdNum) && topTraitIdNum >= 100001 && topTraitIdNum <= 100100) {
+            if (!isNaN(topTraitIdNum) && topTraitIdNum >= 100001 && topTraitIdNum <= 101000) {
               baseMetadata.name = `AdrianPunk #${tokenIdNum}`;
               console.log(`[metadata] Override de nombre por TOP OGPUNK (${topTraitIdNum}) → ${baseMetadata.name}`);
             }
