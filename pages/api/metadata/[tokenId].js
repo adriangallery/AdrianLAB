@@ -259,6 +259,22 @@ export default async function handler(req, res) {
         baseMetadata.name = `AdrianZero #${tokenId}`;
         console.log(`[metadata] Nombre por defecto aplicado: ${baseMetadata.name}`);
       }
+ 
+      // LÓGICA ESPECIAL: Si el TOP trait activo es un OGPUNK en rango 100001-100100 → renombrar a AdrianPunk #<tokenId>
+      try {
+        if (Array.isArray(categories) && Array.isArray(traitIds)) {
+          const topIndex = categories.findIndex(c => c === 'TOP');
+          if (topIndex !== -1) {
+            const topTraitIdNum = parseInt(traitIds[topIndex].toString());
+            if (!isNaN(topTraitIdNum) && topTraitIdNum >= 100001 && topTraitIdNum <= 100100) {
+              baseMetadata.name = `AdrianPunk #${tokenIdNum}`;
+              console.log(`[metadata] Override de nombre por TOP OGPUNK (${topTraitIdNum}) → ${baseMetadata.name}`);
+            }
+          }
+        }
+      } catch (e) {
+        console.log('[metadata] Aviso: no se pudo evaluar override de AdrianPunk:', e.message);
+      }
 
       // Obtener datos del token
       console.log('[metadata] Llamando a getTokenData...');
