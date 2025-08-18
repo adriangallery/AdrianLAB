@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       (tokenIdNum >= 1 && tokenIdNum <= 9999) ||
       (tokenIdNum >= 262144 && tokenIdNum <= 262147) ||
       (tokenIdNum >= 30000 && tokenIdNum <= 35000) ||
-      ((tokenIdNum >= 100001 && tokenIdNum <= 101000) || (tokenIdNum >= 101001 && tokenIdNum <= 101002))
+      ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 101001 && tokenIdNum <= 101003101001 && tokenIdNum <= 101003 tokenIdNum <= 101003))
     ) {
       
       // Determinar si es un serum (GIF) o trait (PNG)
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
       res.status(200).send(imageBuffer);
       
     } else {
-      res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144-262147 (serums), 30000-35000 (T-shirts) y 100001-101000 (OGPUNKS TOP). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
+      res.status(400).json({ error: 'Este endpoint maneja tokens 1-9999 (traits), 262144-262147 (serums), 30000-35000 (T-shirts) y 100001-101003 (OGPUNKS TOP). Para otros tokens usa /api/metadata/floppy/[tokenId]' });
     }
   } catch (error) {
     console.error('[floppy-render] Error:', error);

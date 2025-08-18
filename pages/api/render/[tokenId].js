@@ -67,7 +67,7 @@ const getMetadataFileForToken = (tokenId) => {
     return 'serums.json';
   } else if (numTokenId >= 30000 && numTokenId <= 35000) {
     return 'studio.json';
-  } else if (numTokenId >= 100001 && numTokenId <= 101000) {
+  } else if (numTokenId >= 100001 && numTokenId <= 101003) {
     return 'ogpunks.json';
   } else {
     return 'traits.json';
@@ -511,7 +511,7 @@ export default async function handler(req, res) {
       }
     };
 
-    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101000
+    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101003
     const loadOgpunkTrait = async (traitId) => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
@@ -939,7 +939,7 @@ export default async function handler(req, res) {
             } else {
               console.error(`[render] PASO 3 - 🌐 Error al cargar trait ${category} (${traitId}) desde URL externa`);
             }
-          } else if ((traitId >= 100001 && traitId <= 101000) || (traitId >= 101001 && traitId <= 101002)) {
+          } else if ((traitId >= 100001 && traitId <= 101003) || (traitId >= 101001 && traitId <= 101003)) {
             traitImage = await loadOgpunkTrait(traitId);
             if (traitImage) {
               ctx.drawImage(traitImage, 0, 0, 1000, 1000);
@@ -978,8 +978,23 @@ export default async function handler(req, res) {
             console.log(`[render] PASO 4 - 🌐 TOP trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
           } else {
             console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
+
+        // LÓGICA ESPECIAL: Si el TOP trait es 101003 CAESAR → responder con GIF
+        if (category === 'TOP' && traitId === 101003) {
+          try {
+            const gifResponse = await fetch('https://adrianlab.vercel.app/labimages/ogpunks/101003.gif');
+            if (gifResponse.ok) {
+              const gifBuffer = await gifResponse.arrayBuffer();
+              res.setHeader('Content-Type', 'image/gif');
+              res.setHeader('Cache-Control', 'public, max-age=3600');
+              res.send(Buffer.from(gifBuffer));
+              return;
+            }
+          } catch (e) {
+            console.log(`[render] Fallback a SVG para CAESAR:`, e.message);
           }
-        } else if ((traitId >= 100001 && traitId <= 101000) || (traitId >= 101001 && traitId <= 101002)) {
+        }          }
+        } else if ((traitId >= 100001 && traitId <= 101003) || (traitId >= 101001 && traitId <= 101003)) {
           traitImage = await loadOgpunkTrait(traitId);
           if (traitImage) {
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);

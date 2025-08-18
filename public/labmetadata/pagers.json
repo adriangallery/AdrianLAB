@@ -65,10 +65,32 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 15011,
+      "name": "PSYCH",
+      "category": "Pagers",
+      "fileName": "PSYCH",
+      "maxSupply": 1,
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 15012,
+      "name": "BETTY",
+      "category": "Pagers",
+      "fileName": "BETTY",
+      "maxSupply": 1,
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalPagers": 6,
+    "totalPagers": 8,
     "description": "Pagers Collection - Base de datos de todos los Pagers disponibles"
   }
 }
