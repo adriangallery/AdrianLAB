@@ -7480,13 +7480,183 @@
       ],
       "external_url": "https://adrianzero.com/"
     },
+    },
+    {
+      "tokenId": 650,
+      "name": "AC-GG_Cap",
+      "category": "HEAD",
+      "fileName": "AC-GG_Cap",
+      "maxSupply": 155,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 651,
+      "name": "B.A.-Chain",
+      "category": "NECK",
+      "fileName": "651",
+      "maxSupply": 75,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 652,
+      "name": "B.A.-Hair",
+      "category": "HAIR",
+      "fileName": "652",
+      "maxSupply": 174,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 653,
+      "name": "B.A.Beard",
+      "category": "BEARD",
+      "fileName": "653",
+      "maxSupply": 112,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 654,
+      "name": "BB_Hip-Bag",
+      "category": "GEAR",
+      "fileName": "654",
+      "maxSupply": 159,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 655,
+      "name": "BB-Cap",
+      "category": "HEAD",
+      "fileName": "655",
+      "maxSupply": 77,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 656,
+      "name": "BB-T-Shirt",
+      "category": "SWAG",
+      "fileName": "656",
+      "maxSupply": 117,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 657,
+      "name": "Bling",
+      "category": "TOP",
+      "fileName": "657",
+      "maxSupply": 97,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 658,
+      "name": "Coins-Background",
+      "category": "BACKGROUND",
+      "fileName": "658",
+      "maxSupply": 124,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 659,
+      "name": "Dom-Magnum-Pop",
+      "category": "GEAR",
+      "fileName": "659",
+      "maxSupply": 108,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 660,
+      "name": "Fort-Knox-Background",
+      "category": "BACKGROUND",
+      "fileName": "660",
+      "maxSupply": 38,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 661,
+      "name": "GG_Hip-Bag",
+      "category": "GEAR",
+      "fileName": "661",
+      "maxSupply": 75,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 662,
+      "name": "GG-Cap",
+      "category": "HEAD",
+      "fileName": "662",
+      "maxSupply": 33,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
     {
       "tokenId": 663,
-      "name": "test floppy",
-      "category": "BACKGROUND",
+      "name": "GG-T-Shirt",
+      "category": "SWAG",
       "fileName": "663",
-      "maxSupply": 1,
-      "floppy": "TEST",
+      "maxSupply": 204,
+      "floppy": "GOLDEN",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7495,11 +7665,11 @@
     },
     {
       "tokenId": 664,
-      "name": "test floppy",
+      "name": "Glitter-Background",
       "category": "BACKGROUND",
       "fileName": "664",
-      "maxSupply": 1,
-      "floppy": "TEST",
+      "maxSupply": 156,
+      "floppy": "GOLDEN",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7508,20 +7678,633 @@
     },
     {
       "tokenId": 665,
-      "name": "test floppy",
+      "name": "Gold-Chesterfield-Background",
       "category": "BACKGROUND",
       "fileName": "665",
-      "maxSupply": 1,
-      "floppy": "TEST",
+      "maxSupply": 45,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 666,
+      "name": "Golden-Adrian-Cap",
+      "category": "HEAD",
+      "fileName": "666",
+      "maxSupply": 146,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 667,
+      "name": "Golden-Bathrope",
+      "category": "SWAG",
+      "fileName": "667",
+      "maxSupply": 127,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 668,
+      "name": "Golden-Beard-Full",
+      "category": "BEARD",
+      "fileName": "668",
+      "maxSupply": 154,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 669,
+      "name": "Golden-Cap",
+      "category": "HEAD",
+      "fileName": "669",
+      "maxSupply": 127,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 670,
+      "name": "Golden-Champagne-Flute",
+      "category": "GEAR",
+      "fileName": "670",
+      "maxSupply": 176,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 671,
+      "name": "Golden-Classic-Shades-Green",
+      "category": "EYES",
+      "fileName": "671",
+      "maxSupply": 84,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 672,
+      "name": "Golden-Classic-Shades",
+      "category": "EYES",
+      "fileName": "672",
+      "maxSupply": 128,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 673,
+      "name": "Golden-Confetti",
+      "category": "TOP",
+      "fileName": "673",
+      "maxSupply": 213,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 674,
+      "name": "Golden-Cross-Chain",
+      "category": "NECK",
+      "fileName": "674",
+      "maxSupply": 182,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 675,
+      "name": "Golden-Eye-Patch",
+      "category": "EYES",
+      "fileName": "675",
+      "maxSupply": 62,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 676,
+      "name": "Golden-Eye-Shadow",
+      "category": "EYES",
+      "fileName": "676",
+      "maxSupply": 154,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 677,
+      "name": "Golden-Eyes",
+      "category": "EYES",
+      "fileName": "677",
+      "maxSupply": 216,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 678,
+      "name": "Golden-Fail-Background",
+      "category": "BACKGROUND",
+      "fileName": "678",
+      "maxSupply": 212,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 679,
+      "name": "Golden-Fes",
+      "category": "HEAD",
+      "fileName": "679",
+      "maxSupply": 45,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 680,
+      "name": "Golden-Glitter",
+      "category": "TOP",
+      "fileName": "680",
+      "maxSupply": 185,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 681,
+      "name": "Golden-Grill",
+      "category": "MOUTH",
+      "fileName": "681",
+      "maxSupply": 82,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 682,
+      "name": "Golden-Handlebars",
+      "category": "BEARD",
+      "fileName": "682",
+      "maxSupply": 46,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 683,
+      "name": "Golden-Hoodie",
+      "category": "SWAG",
+      "fileName": "683",
+      "maxSupply": 113,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 684,
+      "name": "Golden-Joint",
+      "category": "MOUTH",
+      "fileName": "684",
+      "maxSupply": 73,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 685,
+      "name": "Golden-Laurel-Wreath",
+      "category": "HEAD",
+      "fileName": "685",
+      "maxSupply": 83,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 686,
+      "name": "Golden-Lips",
+      "category": "MOUTH",
+      "fileName": "686",
+      "maxSupply": 155,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 687,
+      "name": "Golden-Mutton-Chops",
+      "category": "BEARD",
+      "fileName": "687",
+      "maxSupply": 75,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 688,
+      "name": "Golden-Nose-Ring",
+      "category": "NOSE",
+      "fileName": "688",
+      "maxSupply": 20,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 689,
+      "name": "Golden-Pipe",
+      "category": "MOUTH",
+      "fileName": "689",
+      "maxSupply": 112,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 690,
+      "name": "Golden-Propeller-Cap",
+      "category": "HEAD",
+      "fileName": "690",
+      "maxSupply": 159,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 691,
+      "name": "Golden-Regular-Shades",
+      "category": "EYES",
+      "fileName": "691",
+      "maxSupply": 77,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 692,
+      "name": "Golden-Roman-Armour",
+      "category": "SWAG",
+      "fileName": "692",
+      "maxSupply": 117,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 693,
+      "name": "Golden-Roman-Helmet",
+      "category": "HEAD",
+      "fileName": "693",
+      "maxSupply": 97,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 694,
+      "name": "Golden-Sword",
+      "category": "GEAR",
+      "fileName": "694",
+      "maxSupply": 15,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 695,
+      "name": "Golden-Tiger-Chain",
+      "category": "NECK",
+      "fileName": "695",
+      "maxSupply": 108,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 696,
+      "name": "Golden-Toga",
+      "category": "SWAG",
+      "fileName": "696",
+      "maxSupply": 38,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 697,
+      "name": "Green-Candel",
+      "category": "GEAR",
+      "fileName": "697",
+      "maxSupply": 75,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 698,
+      "name": "Green-Chesterfield-Background",
+      "category": "BACKGROUND",
+      "fileName": "698",
+      "maxSupply": 33,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 699,
+      "name": "Green-Gold-Background",
+      "category": "BACKGROUND",
+      "fileName": "699",
+      "maxSupply": 204,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 700,
+      "name": "HT-Damier-T-Shirt",
+      "category": "SWAG",
+      "fileName": "700",
+      "maxSupply": 156,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 701,
+      "name": "HT-Monogram-Background",
+      "category": "BACKGROUND",
+      "fileName": "701",
+      "maxSupply": 45,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 702,
+      "name": "HT-Monogram-Cap-Sup",
+      "category": "HEAD",
+      "fileName": "702",
+      "maxSupply": 146,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 703,
+      "name": "HT-Monogram-Cap",
+      "category": "HEAD",
+      "fileName": "703",
+      "maxSupply": 127,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 704,
+      "name": "HT-Monogram-Hoodie",
+      "category": "BACKGROUND",
+      "fileName": "704",
+      "maxSupply": 154,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 705,
+      "name": "HT-Monogram-T-Shirt-Sup",
+      "category": "SWAG",
+      "fileName": "705",
+      "maxSupply": 127,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 706,
+      "name": "HT-Monogram-T-Shirt",
+      "category": "SWAG",
+      "fileName": "706",
+      "maxSupply": 176,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 707,
+      "name": "Ibiza-Beard",
+      "category": "BEARD",
+      "fileName": "707",
+      "maxSupply": 84,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 708,
+      "name": "Ibiza-Hair",
+      "category": "HAIR",
+      "fileName": "708",
+      "maxSupply": 128,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 709,
+      "name": "Iced-Out-Grill",
+      "category": "MOUTH",
+      "fileName": "709",
+      "maxSupply": 213,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+      "tokenId": 710,
+      "name": "Monocle-Green",
+      "category": "EYES",
+      "fileName": "710",
+      "maxSupply": 182,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 711,
+      "name": "Red-Chesterfield-Background",
+      "category": "BACKGROUND",
+      "fileName": "711",
+      "maxSupply": 62,
+      "floppy": "GOLDEN",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    }      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 712,
+      "name": "Snot-Bubble",
+      "category": "NECK",
+      "fileName": "712",
+      "maxSupply": 154,
+      "floppy": "GOLDEN",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
     }
+    {
+    }
   ],
   "metadata": {
-    "totalTraits": 578,
+    "totalTraits": 712,
     "categories": [
       "BACKGROUND",
       "EAR",
