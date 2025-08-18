@@ -171,11 +171,21 @@ const loadTraitsMapping = async (tokenId) => {
     
     const mapping = {};
     traitsArray.forEach(trait => {
-      mapping[trait.tokenId] = {
-        category: trait.category.toUpperCase(),
-        name: trait.name,
-        fileName: trait.fileName
-      };
+      // Validar que trait y trait.category existan antes de usar toUpperCase()
+      if (trait && trait.category) {
+        mapping[trait.tokenId] = {
+          category: trait.category.toUpperCase(),
+          name: trait.name || `Trait #${trait.tokenId}`,
+          fileName: trait.fileName || `${trait.tokenId}.svg`
+        };
+      } else {
+        console.warn(`[custom-render] Trait ${trait?.tokenId} sin categoría, asignando 'UNKNOWN'`);
+        mapping[trait.tokenId] = {
+          category: 'UNKNOWN',
+          name: trait?.name || `Trait #${trait.tokenId}`,
+          fileName: trait?.fileName || `${trait.tokenId}.svg`
+        };
+      }
     });
     
     return mapping;
@@ -194,11 +204,21 @@ const loadCombinedTraitsMapping = async (tokenId) => {
     const baseTraitsArray = await loadMetadataForToken(tokenId);
     const baseMapping = {};
     baseTraitsArray.forEach(trait => {
-      baseMapping[trait.tokenId] = {
-        category: trait.category.toUpperCase(),
-        name: trait.name,
-        fileName: trait.fileName
-      };
+      // Validar que trait y trait.category existan antes de usar toUpperCase()
+      if (trait && trait.category) {
+        baseMapping[trait.tokenId] = {
+          category: trait.category.toUpperCase(),
+          name: trait.name || `Trait #${trait.tokenId}`,
+          fileName: trait.fileName || `${trait.tokenId}.svg`
+        };
+      } else {
+        console.warn(`[custom-render] 🔄 LÓGICA COMBINADA: Trait ${trait?.tokenId} sin categoría, asignando 'UNKNOWN'`);
+        baseMapping[trait.tokenId] = {
+          category: 'UNKNOWN',
+          name: trait?.name || `Trait #${trait.tokenId}`,
+          fileName: trait?.fileName || `${trait.tokenId}.svg`
+        };
+      }
     });
     
     console.log(`[custom-render] 🔄 LÓGICA COMBINADA: Mapeo base cargado con ${Object.keys(baseMapping).length} entries`);
@@ -213,13 +233,25 @@ const loadCombinedTraitsMapping = async (tokenId) => {
         
         // Combinar studio.json con el mapeo base
         Object.entries(cachedStudioData).forEach(([traitId, trait]) => {
-          baseMapping[traitId] = {
-            category: trait.category.toUpperCase(),
-            name: trait.name,
-            fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
-            external_url: trait.external_url, // Añadir URL externa para referencia
-            isExternal: true // Marcar como trait externo
-          };
+          // Validar que trait y trait.category existan antes de usar toUpperCase()
+          if (trait && trait.category) {
+            baseMapping[traitId] = {
+              category: trait.category.toUpperCase(),
+              name: trait.name || `Studio Trait #${traitId}`,
+              fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
+              external_url: trait.external_url, // Añadir URL externa para referencia
+              isExternal: true // Marcar como trait externo
+            };
+          } else {
+            console.warn(`[custom-render] 🔄 LÓGICA COMBINADA: Studio trait ${traitId} sin categoría, asignando 'UNKNOWN'`);
+            baseMapping[traitId] = {
+              category: 'UNKNOWN',
+              name: trait?.name || `Studio Trait #${traitId}`,
+              fileName: `${traitId}.svg`,
+              external_url: trait?.external_url,
+              isExternal: true
+            };
+          }
         });
       } else {
         const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
@@ -233,13 +265,25 @@ const loadCombinedTraitsMapping = async (tokenId) => {
         
         // Combinar studio.json con el mapeo base
         Object.entries(studioData).forEach(([traitId, trait]) => {
-          baseMapping[traitId] = {
-            category: trait.category.toUpperCase(),
-            name: trait.name,
-            fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
-            external_url: trait.external_url, // Añadir URL externa para referencia
-            isExternal: true // Marcar como trait externo
-          };
+          // Validar que trait y trait.category existan antes de usar toUpperCase()
+          if (trait && trait.category) {
+            baseMapping[traitId] = {
+              category: trait.category.toUpperCase(),
+              name: trait.name || `Studio Trait #${traitId}`,
+              fileName: `${traitId}.svg`, // Los traits de studio usan su ID como nombre de archivo
+              external_url: trait.external_url, // Añadir URL externa para referencia
+              isExternal: true // Marcar como trait externo
+            };
+          } else {
+            console.warn(`[custom-render] 🔄 LÓGICA COMBINADA: Studio trait ${traitId} sin categoría, asignando 'UNKNOWN'`);
+            baseMapping[traitId] = {
+              category: 'UNKNOWN',
+              name: trait?.name || `Studio Trait #${traitId}`,
+              fileName: `${traitId}.svg`,
+              external_url: trait?.external_url,
+              isExternal: true
+            };
+          }
         });
       }
  
@@ -250,12 +294,23 @@ const loadCombinedTraitsMapping = async (tokenId) => {
         console.log(`[custom-render] 🔄 LÓGICA COMBINADA: ogpunks.json cargado desde caché con ${cachedOgpunks.length} entries`);
         cachedOgpunks.forEach(trait => {
           const traitId = trait.tokenId;
-          baseMapping[traitId] = {
-            category: (trait.category || 'TOP').toUpperCase(),
-            name: trait.name,
-            fileName: `${traitId}.svg`,
-            isOgpunk: true
-          };
+          // Validar que trait y trait.category existan antes de usar toUpperCase()
+          if (trait && trait.category) {
+            baseMapping[traitId] = {
+              category: trait.category.toUpperCase(),
+              name: trait.name || `OGPunk Trait #${traitId}`,
+              fileName: `${traitId}.svg`,
+              isOgpunk: true
+            };
+          } else {
+            console.warn(`[custom-render] 🔄 LÓGICA COMBINADA: OGPunk trait ${traitId} sin categoría, asignando 'TOP'`);
+            baseMapping[traitId] = {
+              category: 'TOP',
+              name: trait?.name || `OGPunk Trait #${traitId}`,
+              fileName: `${traitId}.svg`,
+              isOgpunk: true
+            };
+          }
         });
       } else {
         const ogpunksPath = path.join(process.cwd(), 'public', 'labmetadata', 'ogpunks.json');
@@ -268,12 +323,23 @@ const loadCombinedTraitsMapping = async (tokenId) => {
           setCachedJson('ogpunks.json', ogTraits);
           ogTraits.forEach(trait => {
             const traitId = trait.tokenId;
-            baseMapping[traitId] = {
-              category: (trait.category || 'TOP').toUpperCase(),
-              name: trait.name,
-              fileName: `${traitId}.svg`,
-              isOgpunk: true
-            };
+            // Validar que trait y trait.category existan antes de usar toUpperCase()
+            if (trait && trait.category) {
+              baseMapping[traitId] = {
+                category: trait.category.toUpperCase(),
+                name: trait.name || `OGPunk Trait #${traitId}`,
+                fileName: `${traitId}.svg`,
+                isOgpunk: true
+              };
+            } else {
+              console.warn(`[custom-render] 🔄 LÓGICA COMBINADA: OGPunk trait ${traitId} sin categoría, asignando 'TOP'`);
+              baseMapping[traitId] = {
+                category: 'TOP',
+                name: trait?.name || `OGPunk Trait #${traitId}`,
+                fileName: `${traitId}.svg`,
+                isOgpunk: true
+              };
+            }
           });
         } catch (err) {
           console.error(`[custom-render] 🔄 LÓGICA COMBINADA: Error cargando ogpunks.json:`, err.message);
