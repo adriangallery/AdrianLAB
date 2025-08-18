@@ -7365,9 +7365,9 @@
     },
     {
       "tokenId": 611,
-      "name": "Fl山t-T立p",
+      "name": "Fl\u5c71t-T\u7acbp",
       "category": "HAIR",
-      "fileName": "Fl山t-T立p",
+      "fileName": "Fl\u5c71t-T\u7acbp",
       "maxSupply": 156,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7378,9 +7378,9 @@
     },
     {
       "tokenId": 612,
-      "name": "Sh国rt",
+      "name": "Sh\u56fdrt",
       "category": "HAIR",
-      "fileName": "Sh国rt",
+      "fileName": "Sh\u56fdrt",
       "maxSupply": 113,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7391,9 +7391,9 @@
     },
     {
       "tokenId": 613,
-      "name": "Sp小ke",
+      "name": "Sp\u5c0fke",
       "category": "HAIR",
-      "fileName": "Sp小ke",
+      "fileName": "Sp\u5c0fke",
       "maxSupply": 84,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7404,9 +7404,9 @@
     },
     {
       "tokenId": 614,
-      "name": "To文s国re",
+      "name": "To\u6587s\u56fdre",
       "category": "HAIR",
-      "fileName": "To文s国re",
+      "fileName": "To\u6587s\u56fdre",
       "maxSupply": 38,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7417,9 +7417,9 @@
     },
     {
       "tokenId": 615,
-      "name": "中ild语p汉g",
+      "name": "\u4e2dild\u8bedp\u6c49g",
       "category": "HAIR",
-      "fileName": "中ild语p汉g",
+      "fileName": "\u4e2dild\u8bedp\u6c49g",
       "maxSupply": 33,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7430,9 +7430,9 @@
     },
     {
       "tokenId": 616,
-      "name": "字语ppe中",
+      "name": "\u5b57\u8bedppe\u4e2d",
       "category": "HAIR",
-      "fileName": "字语ppe中",
+      "fileName": "\u5b57\u8bedppe\u4e2d",
       "maxSupply": 114,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7443,9 +7443,9 @@
     },
     {
       "tokenId": 617,
-      "name": "S国i字k",
+      "name": "S\u56fdi\u5b57k",
       "category": "MOUTH",
-      "fileName": "S国i字k",
+      "fileName": "S\u56fdi\u5b57k",
       "maxSupply": 77,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7456,9 +7456,9 @@
     },
     {
       "tokenId": 618,
-      "name": "字ad",
+      "name": "\u5b57ad",
       "category": "MOUTH",
-      "fileName": "字ad",
+      "fileName": "\u5b57ad",
       "maxSupply": 154,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7469,9 +7469,9 @@
     },
     {
       "tokenId": 619,
-      "name": "G字N1",
+      "name": "G\u5b57N1",
       "category": "SKIN",
-      "fileName": "G字N1",
+      "fileName": "G\u5b57N1",
       "maxSupply": 108,
       "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -7480,7 +7480,7 @@
       ],
       "external_url": "https://adrianzero.com/"
     },
-    },
+    {},
     {
       "tokenId": 650,
       "name": "AC-GG_Cap",
@@ -8261,6 +8261,7 @@
       ],
       "external_url": "https://adrianzero.com/"
     },
+    {
       "tokenId": 710,
       "name": "Monocle-Green",
       "category": "EYES",
@@ -8285,7 +8286,6 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
-    }      "external_url": "https://adrianzero.com/"
     },
     {
       "tokenId": 712,
@@ -8299,8 +8299,6 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
-    }
-    {
     }
   ],
   "metadata": {
@@ -8326,6 +8324,6 @@
       "HAT"
     ],
     "floppy": "OG",
-    "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colección OG Floppy"
+    "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colecci\u00f3n OG Floppy"
   }
 }
