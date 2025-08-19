@@ -626,7 +626,7 @@ export default async function handler(req, res) {
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}${tokenData.floppy === 'GF' || tokenData.floppy === 'GOLDEN' ? '.gif' : '.png'}`,
         external_url: tokenData.external_url || "https://adrianpunks.com/",
         attributes: [
           {
@@ -657,8 +657,8 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
-              type: "image/png"
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}${tokenData.floppy === 'GF' || tokenData.floppy === 'GOLDEN' ? '.gif' : '.png'}`,
+              type: tokenData.floppy === 'GF' || tokenData.floppy === 'GOLDEN' ? "image/gif" : "image/png"
             }
           ],
           category: "image",
