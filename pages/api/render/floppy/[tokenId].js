@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       
       // Determinar si es un serum (GIF), floppy específico (GIF) o trait (PNG)
       const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
-      const isSpecificFloppy = tokenIdNum >= 10000 && tokenIdNum <= 10005;
+      const isSpecificFloppy = tokenIdNum >= 10000 && tokenIdNum <= 10100;
       const isGif = isSerum || isSpecificFloppy;
       
       // Configurar headers de caché
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
     ) {
       
       // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir GIF directamente
-      if (tokenIdNum >= 10000 && tokenIdNum <= 10005) {
+      if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo GIF directamente`);
         
         try {
