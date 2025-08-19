@@ -623,11 +623,12 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
       // Generar metadata para floppys
+      // NOTA: Todos los floppys 10000-10100 usan .gif por defecto
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
         image: `${baseUrl}/api/render/floppy/${tokenIdNum}.gif`,
-        external_url: tokenData.external_url || "https://adrianpunks.com/",
+        external_url: tokenData.external_url || "https://adrianzero.com/",
         attributes: [
           {
             trait_type: "Category",
