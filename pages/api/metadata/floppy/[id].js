@@ -624,6 +624,8 @@ export default async function handler(req, res) {
 
       // Generar metadata para floppys
       // NOTA: Todos los floppys 10000-10100 usan .gif por defecto
+      console.log(`[floppy-metadata] 🔍 DEBUG: Generando metadata para floppy ${tokenIdNum} con extensión .gif`);
+      
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
@@ -666,6 +668,11 @@ export default async function handler(req, res) {
           creators: tokenData.masterminds || ["Adrian | HalfxTiger"]
         }
       };
+
+      // Log de debug para verificar la URL generada
+      console.log(`[floppy-metadata] 🔍 DEBUG: URL de imagen generada: ${metadata.image}`);
+      console.log(`[floppy-metadata] 🔍 DEBUG: URI de archivo generado: ${metadata.properties.files[0].uri}`);
+      console.log(`[floppy-metadata] 🔍 DEBUG: Tipo de archivo: ${metadata.properties.files[0].type}`);
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
       setCachedFloppyMetadata(tokenIdNum, metadata);
