@@ -64,10 +64,10 @@
       "tokenId": 10005,
       "name": "GOLDEN Floppy",
       "category": "Floppy discs",
-      "fileName": "GOLDEN-Floppy",
-      "maxSupply": 500,
+      "fileName": "10005.gif",
+      "maxSupply": 200,
       "floppy": "GOLDEN",
-      "traitsInside": 5,
+      "traitsInside": 7,
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
