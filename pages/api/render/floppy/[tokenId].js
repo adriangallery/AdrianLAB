@@ -67,15 +67,17 @@ export default async function handler(req, res) {
     if (cachedImage) {
       console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
-      // Determinar si es un serum (GIF) o trait (PNG)
+      // Determinar si es un serum (GIF), floppy específico (GIF) o trait (PNG)
       const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      const isSpecificFloppy = tokenIdNum >= 10000 && tokenIdNum <= 10005;
+      const isGif = isSerum || isSpecificFloppy;
       
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-      res.setHeader('Content-Type', isSerum ? 'image/gif' : 'image/png');
-      res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
+      res.setHeader('Content-Type', isGif ? 'image/gif' : 'image/png');
+      res.setHeader('X-Version', isSpecificFloppy ? 'FLOPPY-GIF-CACHED' : 'FLOPPY-METODO-PERSONALIZADO');
       
       return res.status(200).send(cachedImage);
     }
@@ -91,6 +93,43 @@ export default async function handler(req, res) {
       (tokenIdNum >= 30000 && tokenIdNum <= 35000) ||
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
+      
+      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir GIF directamente
+      if (tokenIdNum >= 10000 && tokenIdNum <= 10005) {
+        console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo GIF directamente`);
+        
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+          const gifUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
+          console.log(`[floppy-render] Ruta GIF (fetch): ${gifUrl}`);
+          
+          const resp = await fetch(gifUrl);
+          if (!resp.ok) {
+            throw new Error(`GIF no encontrado para floppy ${tokenIdNum}`);
+          }
+          const gifArrayBuf = await resp.arrayBuffer();
+          const gifBuffer = Buffer.from(gifArrayBuf);
+          console.log(`[floppy-render] GIF leído (fetch), tamaño: ${gifBuffer.length} bytes`);
+          
+          // Guardar en caché como GIF
+          setCachedFloppyRender(tokenIdNum, gifBuffer);
+          
+          const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+          console.log(`[floppy-render] ✅ GIF cacheado por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para floppy ${tokenIdNum}`);
+
+          // Configurar headers para GIF
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('Content-Type', 'image/gif');
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+          res.setHeader('X-Version', 'FLOPPY-GIF-DIRECTO');
+          
+          console.log(`[floppy-render] ===== GIF DE FLOPPY ESPECÍFICO SERVIDO DIRECTAMENTE =====`);
+          return res.status(200).send(gifBuffer);
+        } catch (error) {
+          console.error(`[floppy-render] Error sirviendo GIF para floppy ${tokenIdNum}:`, error.message);
+          console.log(`[floppy-render] Fallback a renderizado normal...`);
+        }
+      }
       
       // Determinar si es un serum (GIF) o trait (PNG)
       const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
