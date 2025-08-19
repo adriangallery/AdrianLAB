@@ -59,10 +59,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10005,
+      "name": "GOLDEN Floppy",
+      "category": "Floppy discs",
+      "fileName": "GOLDEN-Floppy",
+      "maxSupply": 500,
+      "floppy": "GOLDEN",
+      "traitsInside": 5,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 5,
+    "totalFloppys": 6,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
