@@ -1,0 +1,63 @@
+{
+  "serums": [
+    {
+      "tokenId": 262144,
+      "name": "AdrianGF",
+      "category": "SERUMS",
+      "fileName": "ADRIANGF",
+      "maxSupply": 1,
+      "floppy": "Serum",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 262145,
+      "name": "GOLD Serum",
+      "category": "SERUMS",
+      "fileName": "GOLD-100",
+      "maxSupply": 27,
+      "successRatio": 100,
+      "floppy": "Serum",
+      "description": "GOLD Serum - Success Ratio 100% | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 262146,
+      "name": "GOLD Serum",
+      "category": "SERUMS",
+      "fileName": "GOLD-66",
+      "maxSupply": 30,
+      "successRatio": 66,
+      "floppy": "Serum",
+      "description": "GOLD Serum - Success Ratio 66% | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 262147,
+      "name": "GOLD Serum",
+      "category": "SERUMS",
+      "fileName": "GOLD-33",
+      "maxSupply": 43,
+      "successRatio": 33,
+      "floppy": "Serum",
+      "description": "GOLD Serum - Success Ratio 33% | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    }
+  ],
+  "metadata": {
+    "totalSerums": 4,
+    "description": "Serums Collection - Base de datos de todos los Serums disponibles"
+  }
+} 

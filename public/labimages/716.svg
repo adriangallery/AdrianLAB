@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Unbenannter_Verlauf);
+      }
+    </style>
+    <linearGradient id="Unbenannter_Verlauf" data-name="Unbenannter Verlauf" x1="427.58" y1="-.42" x2="428.58" y2=".58" gradientTransform="translate(-437844 428) scale(1024)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff008a"/>
+      <stop offset="1" stop-color="#ff6f00"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-1" width="1024" height="1024"/>
+</svg>

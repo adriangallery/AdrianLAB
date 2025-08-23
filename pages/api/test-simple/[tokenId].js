@@ -160,7 +160,7 @@ export default async function handler(req, res) {
       console.error(`[test-simple] Error cargando frame mejorado: ${error.message}`);
       frameSvgContent = '';
     }
- 
+
     // Cargar 662.gif vía HTTP
     let gif662Base64 = '';
     try {

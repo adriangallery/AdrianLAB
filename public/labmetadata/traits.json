@@ -8299,10 +8299,88 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 713,
+      "name": "NEON-Background-1",
+      "category": "BACKGROUND",
+      "fileName": "713",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 714,
+      "name": "NEON-Background-2",
+      "category": "BACKGROUND",
+      "fileName": "714",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 715,
+      "name": "NEON-Background-3",
+      "category": "BACKGROUND",
+      "fileName": "715",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 716,
+      "name": "NEON-Background-4",
+      "category": "BACKGROUND",
+      "fileName": "716",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 717,
+      "name": "NEON-Background-5",
+      "category": "BACKGROUND",
+      "fileName": "717",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 718,
+      "name": "NEON-Background-6",
+      "category": "BACKGROUND",
+      "fileName": "718",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 712,
+    "totalTraits": 718,
     "categories": [
       "BACKGROUND",
       "EAR",

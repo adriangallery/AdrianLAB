@@ -71,10 +71,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10006,
+      "name": "NEON PACK Floppy",
+      "category": "Floppy discs",
+      "fileName": "10006.png",
+      "maxSupply": 300,
+      "floppy": "NEON",
+      "traitsInside": 6,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 6,
+    "totalFloppys": 7,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }

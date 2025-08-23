@@ -95,11 +95,11 @@ export default async function handler(req, res) {
         let candidates = [`${tokenIdNum}.png`];
         if (tokenIdNum === 15008) {
           candidates = [`${tokenIdNum}.png`, 'ozzy.png'];
-        } else if (tokenIdNum === 15009) {
+          } else if (tokenIdNum === 15009) {
           candidates = ['15009.png', 'hulk.png'];
         } else if (tokenIdNum === 15010) {
           candidates = ['15010.png'];
-        }
+            }
 
         let selected = `${tokenIdNum}.png`;
         for (const fname of candidates) {
@@ -260,7 +260,7 @@ export default async function handler(req, res) {
         console.log(`[metadata] Nombre por defecto aplicado: ${baseMetadata.name}`);
       }
  
-      
+
       // Obtener datos del token
       console.log('[metadata] Llamando a getTokenData...');
       const tokenData = await core.getTokenData(tokenId);
@@ -541,7 +541,7 @@ export default async function handler(req, res) {
       baseMetadata.external_url = gifUrl;
       console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
     }
-
+    
     return res.status(200).json(baseMetadata);
   } catch (error) {
     console.error('[metadata] Error general:', error);

@@ -145,10 +145,10 @@ export default async function handler(req, res) {
       const resp = await fetch(mannequinUrl);
       if (resp.ok) {
         const svgContent = await resp.text();
-        const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
-        const pngBuffer = resvg.render().asPng();
-        const mannequinImage = await loadImage(pngBuffer);
-        adrianCtx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+      const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+      const pngBuffer = resvg.render().asPng();
+      const mannequinImage = await loadImage(pngBuffer);
+      adrianCtx.drawImage(mannequinImage, 0, 0, 1000, 1000);
       }
     } else {
       const baseImage = await loadAndRenderSvg(baseImagePath);
