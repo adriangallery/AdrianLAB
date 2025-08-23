@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           
           const resp = await fetch(fileUrl);
           if (!resp.ok) {
-            throw new Error(`${fileExtension.toUpperCase()} no encontrado para floppy ${tokenIdNum}`);
+            throw new Error(`${fileExtension.toUpperCase()} no encontrado para floppy ${tokenIdNum} (${resp.status} ${resp.statusText})`);
           }
           const fileArrayBuf = await resp.arrayBuffer();
           const fileBuffer = Buffer.from(fileArrayBuf);
@@ -134,6 +134,18 @@ export default async function handler(req, res) {
           return res.status(200).send(fileBuffer);
         } catch (error) {
           console.error(`[floppy-render] Error sirviendo ${fileExtension.toUpperCase()} para floppy ${tokenIdNum}:`, error.message);
+          
+          // Para floppys 10000+, no hacer fallback al renderizado normal
+          if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
+            console.error(`[floppy-render] ❌ Error crítico para floppy ${tokenIdNum}, no se puede hacer fallback`);
+            return res.status(500).json({ 
+              error: `Error sirviendo ${fileExtension.toUpperCase()} para floppy ${tokenIdNum}`,
+              details: error.message,
+              tokenId: tokenIdNum,
+              expectedFile: `${tokenIdNum}.${fileExtension}`
+            });
+          }
+          
           console.log(`[floppy-render] Fallback a renderizado normal...`);
         }
       }
