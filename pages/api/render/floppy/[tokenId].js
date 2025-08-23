@@ -97,6 +97,7 @@ export default async function handler(req, res) {
     ) {
       
       // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir archivo directamente
+      // NOTA: Token 10006 usa .png, otros floppys usan .gif
       if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
         // Determinar si es PNG (10006) o GIF (otros)
         const isPng = tokenIdNum === 10006;
