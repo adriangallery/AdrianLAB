@@ -67,17 +67,18 @@ export default async function handler(req, res) {
     if (cachedImage) {
       console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
-      // Determinar si es un serum (GIF), floppy específico (GIF) o trait (PNG)
+      // Determinar si es un serum (GIF), floppy específico (GIF/PNG) o trait (PNG)
       const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
       const isSpecificFloppy = tokenIdNum >= 10000 && tokenIdNum <= 10100;
-      const isGif = isSerum || isSpecificFloppy;
+      const isPngFloppy = tokenIdNum === 10006;
+      const isGif = isSerum || (isSpecificFloppy && !isPngFloppy);
       
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', isGif ? 'image/gif' : 'image/png');
-      res.setHeader('X-Version', isSpecificFloppy ? 'FLOPPY-GIF-CACHED' : 'FLOPPY-METODO-PERSONALIZADO');
+      res.setHeader('X-Version', isSpecificFloppy ? (isPngFloppy ? 'FLOPPY-PNG-CACHED' : 'FLOPPY-GIF-CACHED') : 'FLOPPY-METODO-PERSONALIZADO');
       
       return res.status(200).send(cachedImage);
     }
@@ -95,39 +96,44 @@ export default async function handler(req, res) {
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
       
-      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir GIF directamente
+      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir archivo directamente
       if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
-        console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo GIF directamente`);
+        // Determinar si es PNG (10006) o GIF (otros)
+        const isPng = tokenIdNum === 10006;
+        const fileExtension = isPng ? 'png' : 'gif';
+        const contentType = isPng ? 'image/png' : 'image/gif';
+        
+        console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo ${fileExtension.toUpperCase()} directamente`);
         
         try {
           const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
-          const gifUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
-          console.log(`[floppy-render] Ruta GIF (fetch): ${gifUrl}`);
+          const fileUrl = `${baseUrl}/labimages/${tokenIdNum}.${fileExtension}`;
+          console.log(`[floppy-render] Ruta ${fileExtension.toUpperCase()} (fetch): ${fileUrl}`);
           
-          const resp = await fetch(gifUrl);
+          const resp = await fetch(fileUrl);
           if (!resp.ok) {
-            throw new Error(`GIF no encontrado para floppy ${tokenIdNum}`);
+            throw new Error(`${fileExtension.toUpperCase()} no encontrado para floppy ${tokenIdNum}`);
           }
-          const gifArrayBuf = await resp.arrayBuffer();
-          const gifBuffer = Buffer.from(gifArrayBuf);
-          console.log(`[floppy-render] GIF leído (fetch), tamaño: ${gifBuffer.length} bytes`);
+          const fileArrayBuf = await resp.arrayBuffer();
+          const fileBuffer = Buffer.from(fileArrayBuf);
+          console.log(`[floppy-render] ${fileExtension.toUpperCase()} leído (fetch), tamaño: ${fileBuffer.length} bytes`);
           
-          // Guardar en caché como GIF
-          setCachedFloppyRender(tokenIdNum, gifBuffer);
+          // Guardar en caché
+          setCachedFloppyRender(tokenIdNum, fileBuffer);
           
           const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
-          console.log(`[floppy-render] ✅ GIF cacheado por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para floppy ${tokenIdNum}`);
+          console.log(`[floppy-render] ✅ ${fileExtension.toUpperCase()} cacheado por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para floppy ${tokenIdNum}`);
 
-          // Configurar headers para GIF
+          // Configurar headers
           res.setHeader('X-Cache', 'MISS');
-          res.setHeader('Content-Type', 'image/gif');
+          res.setHeader('Content-Type', contentType);
           res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-          res.setHeader('X-Version', 'FLOPPY-GIF-DIRECTO');
+          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-DIRECTO`);
           
-          console.log(`[floppy-render] ===== GIF DE FLOPPY ESPECÍFICO SERVIDO DIRECTAMENTE =====`);
-          return res.status(200).send(gifBuffer);
+          console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO DIRECTAMENTE =====`);
+          return res.status(200).send(fileBuffer);
         } catch (error) {
-          console.error(`[floppy-render] Error sirviendo GIF para floppy ${tokenIdNum}:`, error.message);
+          console.error(`[floppy-render] Error sirviendo ${fileExtension.toUpperCase()} para floppy ${tokenIdNum}:`, error.message);
           console.log(`[floppy-render] Fallback a renderizado normal...`);
         }
       }

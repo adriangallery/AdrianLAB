@@ -621,13 +621,25 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
       // Generar metadata para floppys
-      // NOTA: Todos los floppys 10000-10100 usan .gif por defecto
-      console.log(`[floppy-metadata] 🔍 DEBUG: Generando metadata para floppy ${tokenIdNum} con extensión .gif`);
+      // NOTA: Todos los floppys 10000-10100 usan .gif por defecto, EXCEPTO 10006 que usa .png
+      console.log(`[floppy-metadata] 🔍 DEBUG: Generando metadata para floppy ${tokenIdNum}`);
+      
+      // Determinar extensión del archivo según el token
+      let fileExtension = 'gif';
+      let fileType = 'image/gif';
+      
+      if (tokenIdNum === 10006) {
+        fileExtension = 'png';
+        fileType = 'image/png';
+        console.log(`[floppy-metadata] 🔍 DEBUG: Token 10006 detectado, usando .png`);
+      } else {
+        console.log(`[floppy-metadata] 🔍 DEBUG: Floppy ${tokenIdNum} usando .gif por defecto`);
+      }
       
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.gif`,
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}`,
         external_url: tokenData.external_url || "https://adrianzero.com/",
         attributes: [
           {
@@ -658,8 +670,8 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.gif`,
-              type: "image/gif"
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}`,
+              type: fileType
             }
           ],
           category: "image",
