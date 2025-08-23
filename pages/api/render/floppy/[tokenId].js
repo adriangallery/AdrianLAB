@@ -98,12 +98,14 @@ export default async function handler(req, res) {
       
       // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir archivo directamente
       // NOTA: Token 10006 usa .png, otros floppys usan .gif
+      // DEBUG: Forzando deploy con cambios significativos
       if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
         // Determinar si es PNG (10006) o GIF (otros)
         const isPng = tokenIdNum === 10006;
         const fileExtension = isPng ? 'png' : 'gif';
         const contentType = isPng ? 'image/png' : 'image/gif';
         
+        console.log(`[floppy-render] 🔍 DEBUG: Token ${tokenIdNum} - isPng: ${isPng}, fileExtension: ${fileExtension}, contentType: ${contentType}`);
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo ${fileExtension.toUpperCase()} directamente`);
         
         try {
