@@ -4,6 +4,8 @@ import {
   setCachedFloppyRender, 
   getFloppyRenderTTL 
 } from '../../../../lib/cache.js';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
@@ -109,17 +111,26 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo ${fileExtension.toUpperCase()} directamente`);
         
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
-          const fileUrl = `${baseUrl}/labimages/${tokenIdNum}.${fileExtension}`;
-          console.log(`[floppy-render] Ruta ${fileExtension.toUpperCase()} (fetch): ${fileUrl}`);
-          
-          const resp = await fetch(fileUrl);
-          if (!resp.ok) {
-            throw new Error(`${fileExtension.toUpperCase()} no encontrado para floppy ${tokenIdNum} (${resp.status} ${resp.statusText})`);
+          let fileBuffer;
+          if (isPng) {
+            // Leer localmente desde public/labimages/10006.png
+            const filePath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.png`);
+            console.log(`[floppy-render] Leyendo PNG local: ${filePath}`);
+            fileBuffer = await fs.promises.readFile(filePath);
+          } else {
+            // Para GIFs, seguir usando fetch desde labimages
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
+            const fileUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
+            console.log(`[floppy-render] Ruta GIF (fetch): ${fileUrl}`);
+            const resp = await fetch(fileUrl);
+            if (!resp.ok) {
+              throw new Error(`GIF no encontrado para floppy ${tokenIdNum} (${resp.status} ${resp.statusText})`);
+            }
+            const fileArrayBuf = await resp.arrayBuffer();
+            fileBuffer = Buffer.from(fileArrayBuf);
           }
-          const fileArrayBuf = await resp.arrayBuffer();
-          const fileBuffer = Buffer.from(fileArrayBuf);
-          console.log(`[floppy-render] ${fileExtension.toUpperCase()} leído (fetch), tamaño: ${fileBuffer.length} bytes`);
+          
+          console.log(`[floppy-render] ${fileExtension.toUpperCase()} obtenido, tamaño: ${fileBuffer.length} bytes`);
           
           // Guardar en caché
           setCachedFloppyRender(tokenIdNum, fileBuffer);
@@ -131,7 +142,7 @@ export default async function handler(req, res) {
           res.setHeader('X-Cache', 'MISS');
           res.setHeader('Content-Type', contentType);
           res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-DIRECTO`);
+          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-DIRECTO-LOCAL${isPng ? '' : '-FETCH'}`);
           
           console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO DIRECTAMENTE =====`);
           return res.status(200).send(fileBuffer);
