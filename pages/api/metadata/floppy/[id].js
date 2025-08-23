@@ -73,10 +73,8 @@ export default async function handler(req, res) {
 
     const version = Date.now();
 
-    // Configurar URL base
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'https://adrianlab.vercel.app';
+    // Obtener URL base
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
 
     // DETERMINAR TIPO DE TOKEN
     if (tokenIdNum >= 1 && tokenIdNum <= 9999) {

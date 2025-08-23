@@ -100,7 +100,7 @@ export default async function handler(req, res) {
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo GIF directamente`);
         
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
           const gifUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
           console.log(`[floppy-render] Ruta GIF (fetch): ${gifUrl}`);
           
