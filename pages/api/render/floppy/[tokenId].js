@@ -8,6 +8,9 @@ import fs from 'fs';
 import path from 'path';
 
 export default async function handler(req, res) {
+  // 🔄 REBUILD FORZADO: ${new Date().toISOString()} - Forzando rebuild completo de Next.js
+  console.log(`[floppy-render] 🔄 REBUILD FORZADO: ${new Date().toISOString()} - Forzando rebuild completo de Next.js`);
+  
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
     'https://adrianzero.com',
@@ -100,7 +103,9 @@ export default async function handler(req, res) {
       
       // LÓGICA ESPECIAL: Si es un floppy específico (10000+), buscar archivo con fallback inteligente
       // ESTRATEGIA: Buscar .gif primero, si no existe, buscar .png como fallback
+      // 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo
       if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
+        console.log(`[floppy-render] 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo`);
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, buscando con fallback inteligente`);
         
         try {
@@ -159,7 +164,7 @@ export default async function handler(req, res) {
           res.setHeader('X-Cache', 'MISS');
           res.setHeader('Content-Type', contentType);
           res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-FALLBACK-INTELIGENTE`);
+          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-FALLBACK-INTELIGENTE-REBUILD-${Date.now()}`);
           
           console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO CON FALLBACK INTELIGENTE =====`);
           return res.status(200).send(fileBuffer);
