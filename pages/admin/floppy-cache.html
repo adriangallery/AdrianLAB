@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Floppy Render Cache</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #666;
+        }
+        input[type="number"], input[type="text"] {
+            width: 200px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.danger {
+            background-color: #dc3545;
+        }
+        button.danger:hover {
+            background-color: #c82333;
+        }
+        button.success {
+            background-color: #28a745;
+        }
+        button.success:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Panel de Administración - Floppy Render Cache</h1>
+        
+        <!-- Ver Estado del Caché -->
+        <div class="section">
+            <h2>📊 Ver Estado del Caché</h2>
+            <div class="form-group">
+                <label for="tokenId">Token ID (opcional):</label>
+                <input type="number" id="tokenId" placeholder="Ej: 10006">
+                <button onclick="getCacheStatus()">Ver Estado</button>
+                <button onclick="getCacheStats()">Ver Estadísticas Generales</button>
+            </div>
+            <div id="cacheStatusResult"></div>
+        </div>
+
+        <!-- Limpiar Caché Individual -->
+        <div class="section">
+            <h2>🧹 Limpiar Caché Individual</h2>
+            <div class="form-group">
+                <label for="clearTokenId">Token ID:</label>
+                <input type="number" id="clearTokenId" placeholder="Ej: 10006" required>
+                <button class="danger" onclick="clearIndividualCache()">Limpiar Caché</button>
+            </div>
+            <div id="clearIndividualResult"></div>
+        </div>
+
+        <!-- Limpiar Todo el Caché -->
+        <div class="section">
+            <h2>💥 Limpiar Todo el Caché</h2>
+            <div class="form-group">
+                <label>⚠️ Esta acción limpiará TODO el caché de floppy render</label>
+                <br>
+                <button class="danger" onclick="clearAllCache()">Limpiar Todo el Caché</button>
+            </div>
+            <div id="clearAllResult"></div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app/api/admin/floppy-cache';
+
+        // Ver estado del caché de un token específico
+        async function getCacheStatus() {
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showResult('cacheStatusResult', 'Por favor, ingresa un Token ID', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}?tokenId=${tokenId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const result = `
+Estado del Caché para Token ${data.tokenId}:
+• Tiene caché: ${data.hasCache ? '✅ Sí' : '❌ No'}
+• Tamaño: ${data.cacheSize} bytes
+• TTL: ${data.ttlFormatted}
+• Timestamp: ${data.timestamp}
+                    `;
+                    showResult('cacheStatusResult', result, 'success');
+                } else {
+                    showResult('cacheStatusResult', `Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('cacheStatusResult', `Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Ver estadísticas generales del caché
+        async function getCacheStats() {
+            try {
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const stats = data.stats;
+                    const result = `
+Estadísticas Generales del Caché:
+• Total de entradas: ${stats.total}
+• Traits (1-9999): ${stats.traits}
+• Floppys (10000-15500): ${stats.floppys}
+• Serums (262144): ${stats.serums}
+• Otros: ${stats.others}
+• Timestamp: ${data.timestamp}
+                    `;
+                    showResult('cacheStatusResult', result, 'info');
+                } else {
+                    showResult('cacheStatusResult', `Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('cacheStatusResult', `Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Limpiar caché individual
+        async function clearIndividualCache() {
+            const tokenId = document.getElementById('clearTokenId').value;
+            if (!tokenId) {
+                showResult('clearIndividualResult', 'Por favor, ingresa un Token ID', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        tokenId: parseInt(tokenId),
+                        action: 'clear'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const result = `
+Caché Limpiado Exitosamente:
+• Token ID: ${data.tokenId}
+• Estado: ${data.status}
+• Tamaño anterior: ${data.previousSize} bytes
+• Mensaje: ${data.message}
+• Timestamp: ${data.timestamp}
+                    `;
+                    showResult('clearIndividualResult', result, 'success');
+                } else {
+                    showResult('clearIndividualResult', `Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('clearIndividualResult', `Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Limpiar todo el caché
+        async function clearAllCache() {
+            if (!confirm('¿Estás seguro de que quieres limpiar TODO el caché de floppy render? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}?confirm=true`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const stats = data.previousStats;
+                    const result = `
+Todo el Caché Ha Sido Limpiado:
+• Estado: ${data.status}
+• Entradas limpiadas: ${stats.total}
+• Traits limpiados: ${stats.traits}
+• Floppys limpiados: ${stats.floppys}
+• Serums limpiados: ${stats.serums}
+• Otros limpiados: ${stats.others}
+• Mensaje: ${data.message}
+• Timestamp: ${data.timestamp}
+                    `;
+                    showResult('clearAllResult', result, 'success');
+                } else {
+                    showResult('clearAllResult', `Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('clearAllResult', `Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Mostrar resultado
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        // Cargar estadísticas al cargar la página
+        window.onload = function() {
+            getCacheStats();
+        };
+    </script>
+</body>
+</html>
