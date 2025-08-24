@@ -98,39 +98,56 @@ export default async function handler(req, res) {
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
       
-      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), servir archivo directamente
-      // NOTA: Token 10006 usa .png, otros floppys usan .gif
-      // DEBUG: Forzando deploy con cambios significativos
+      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), buscar archivo con fallback inteligente
+      // ESTRATEGIA: Buscar .gif primero, si no existe, buscar .png como fallback
       if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
-        // Determinar si es PNG (10006) o GIF (otros)
-        const isPng = tokenIdNum === 10006;
-        const fileExtension = isPng ? 'png' : 'gif';
-        const contentType = isPng ? 'image/png' : 'image/gif';
-        
-        console.log(`[floppy-render] 🔍 DEBUG: Token ${tokenIdNum} - isPng: ${isPng}, fileExtension: ${fileExtension}, contentType: ${contentType}`);
-        console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, sirviendo ${fileExtension.toUpperCase()} directamente`);
+        console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, buscando con fallback inteligente`);
         
         try {
           let fileBuffer;
-          if (isPng) {
-            // Leer localmente desde public/labimages/10006.png
-            const filePath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.png`);
-            console.log(`[floppy-render] Leyendo PNG local: ${filePath}`);
-            fileBuffer = await fs.promises.readFile(filePath);
-          } else {
-            // Para GIFs, seguir usando fetch desde labimages
-            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
-            const fileUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
-            console.log(`[floppy-render] Ruta GIF (fetch): ${fileUrl}`);
-            const resp = await fetch(fileUrl);
-            if (!resp.ok) {
-              throw new Error(`GIF no encontrado para floppy ${tokenIdNum} (${resp.status} ${resp.statusText})`);
-            }
-            const fileArrayBuf = await resp.arrayBuffer();
-            fileBuffer = Buffer.from(fileArrayBuf);
-          }
+          let fileExtension;
+          let contentType;
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
           
-          console.log(`[floppy-render] ${fileExtension.toUpperCase()} obtenido, tamaño: ${fileBuffer.length} bytes`);
+          // PASO 1: Intentar buscar .gif primero (estrategia principal)
+          try {
+            const gifUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
+            console.log(`[floppy-render] 🔍 PASO 1: Buscando GIF: ${gifUrl}`);
+            
+            const gifResp = await fetch(gifUrl);
+            if (gifResp.ok) {
+              const gifArrayBuf = await gifResp.arrayBuffer();
+              fileBuffer = Buffer.from(gifArrayBuf);
+              fileExtension = 'gif';
+              contentType = 'image/gif';
+              
+              console.log(`[floppy-render] ✅ GIF encontrado, tamaño: ${fileBuffer.length} bytes`);
+            } else {
+              throw new Error(`GIF no encontrado (${gifResp.status} ${gifResp.statusText})`);
+            }
+          } catch (gifError) {
+            console.log(`[floppy-render] ⚠️ GIF no encontrado, intentando PNG como fallback...`);
+            
+            // PASO 2: Si .gif falla, buscar .png como fallback
+            try {
+              const pngUrl = `${baseUrl}/labimages/${tokenIdNum}.png`;
+              console.log(`[floppy-render] 🔍 PASO 2: Buscando PNG como fallback: ${pngUrl}`);
+              
+              const pngResp = await fetch(pngUrl);
+              if (pngResp.ok) {
+                const pngArrayBuf = await pngResp.arrayBuffer();
+                fileBuffer = Buffer.from(pngArrayBuf);
+                fileExtension = 'png';
+                contentType = 'image/png';
+                
+                console.log(`[floppy-render] ✅ PNG encontrado como fallback, tamaño: ${fileBuffer.length} bytes`);
+              } else {
+                throw new Error(`PNG tampoco encontrado (${pngResp.status} ${pngResp.statusText})`);
+              }
+            } catch (pngError) {
+              throw new Error(`Ni GIF ni PNG encontrados para floppy ${tokenIdNum}. GIF: ${gifError.message}, PNG: ${pngError.message}`);
+            }
+          }
           
           // Guardar en caché
           setCachedFloppyRender(tokenIdNum, fileBuffer);
@@ -138,29 +155,25 @@ export default async function handler(req, res) {
           const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
           console.log(`[floppy-render] ✅ ${fileExtension.toUpperCase()} cacheado por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para floppy ${tokenIdNum}`);
 
-          // Configurar headers
+          // Configurar headers dinámicamente
           res.setHeader('X-Cache', 'MISS');
           res.setHeader('Content-Type', contentType);
           res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-DIRECTO-LOCAL${isPng ? '' : '-FETCH'}`);
+          res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-FALLBACK-INTELIGENTE`);
           
-          console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO DIRECTAMENTE =====`);
+          console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO CON FALLBACK INTELIGENTE =====`);
           return res.status(200).send(fileBuffer);
         } catch (error) {
-          console.error(`[floppy-render] Error sirviendo ${fileExtension.toUpperCase()} para floppy ${tokenIdNum}:`, error.message);
+          console.error(`[floppy-render] ❌ Error crítico para floppy ${tokenIdNum}:`, error.message);
           
           // Para floppys 10000+, no hacer fallback al renderizado normal
-          if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
-            console.error(`[floppy-render] ❌ Error crítico para floppy ${tokenIdNum}, no se puede hacer fallback`);
-            return res.status(500).json({ 
-              error: `Error sirviendo ${fileExtension.toUpperCase()} para floppy ${tokenIdNum}`,
-              details: error.message,
-              tokenId: tokenIdNum,
-              expectedFile: `${tokenIdNum}.${fileExtension}`
-            });
-          }
-          
-          console.log(`[floppy-render] Fallback a renderizado normal...`);
+          return res.status(500).json({ 
+            error: `No se pudo encontrar archivo para floppy ${tokenIdNum}`,
+            details: error.message,
+            tokenId: tokenIdNum,
+            strategy: "Búsqueda secuencial: .gif → .png",
+            suggestion: "Verificar que exista al menos uno de los archivos en /labimages/"
+          });
         }
       }
       
