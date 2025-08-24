@@ -621,19 +621,45 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
       // Generar metadata para floppys
-      // NOTA: Todos los floppys 10000-10100 usan .gif por defecto, EXCEPTO 10006 que usa .png
+      // ESTRATEGIA: Buscar .gif primero, si no existe, usar .png como fallback
       console.log(`[floppy-metadata] 🔍 DEBUG: Generando metadata para floppy ${tokenIdNum}`);
       
-      // Determinar extensión del archivo según el token
+      // Determinar extensión del archivo con fallback inteligente
       let fileExtension = 'gif';
       let fileType = 'image/gif';
       
-      if (tokenIdNum === 10006) {
-        fileExtension = 'png';
-        fileType = 'image/png';
-        console.log(`[floppy-metadata] 🔍 DEBUG: Token 10006 detectado, usando .png`);
+      // Para floppys 10000-10100, usar lógica de fallback inteligente
+      if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
+        try {
+          // PASO 1: Intentar verificar si existe .gif
+          const gifUrl = `${baseUrl}/labimages/${tokenIdNum}.gif`;
+          console.log(`[floppy-metadata] 🔍 PASO 1: Verificando existencia de GIF: ${gifUrl}`);
+          
+          const gifResp = await fetch(gifUrl, { method: 'HEAD' }); // Solo verificar headers
+          if (gifResp.ok) {
+            fileExtension = 'gif';
+            fileType = 'image/gif';
+            console.log(`[floppy-metadata] ✅ GIF encontrado, usando .gif`);
+          } else {
+            // PASO 2: Si .gif no existe, verificar .png
+            const pngUrl = `${baseUrl}/labimages/${tokenIdNum}.png`;
+            console.log(`[floppy-metadata] 🔍 PASO 2: GIF no encontrado, verificando PNG: ${pngUrl}`);
+            
+            const pngResp = await fetch(pngUrl, { method: 'HEAD' });
+            if (pngResp.ok) {
+              fileExtension = 'png';
+              fileType = 'image/png';
+              console.log(`[floppy-metadata] ✅ PNG encontrado como fallback, usando .png`);
+            } else {
+              // Si ninguno existe, usar .gif por defecto (comportamiento original)
+              console.log(`[floppy-metadata] ⚠️ Ni GIF ni PNG encontrados, usando .gif por defecto`);
+            }
+          }
+        } catch (error) {
+          console.log(`[floppy-metadata] ⚠️ Error verificando archivos, usando .gif por defecto:`, error.message);
+        }
       } else {
-        console.log(`[floppy-metadata] 🔍 DEBUG: Floppy ${tokenIdNum} usando .gif por defecto`);
+        console.log(`[floppy-metadata] 🔍 DEBUG: Floppy ${tokenIdNum} fuera del rango 10000-10100, usando .gif por defecto`);
       }
       
       const metadata = {
