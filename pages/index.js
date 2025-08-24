@@ -77,14 +77,23 @@ export default function Home() {
       setFloppyCacheLoading(true);
       const response = await fetch('/api/admin/floppy-cache');
       const data = await response.json();
-      setFloppyCacheStats(data);
-      setAdrianZeroCacheStats(data.adrianZero);
-      setContractCacheStats(data.contracts);
-      setJsonCacheStats(data.json);
-      setSvgPngCacheStats(data.svgPng);
-      setComponentCacheStats(data.components);
+      
+      // Verificar que la respuesta tenga la estructura esperada
+      if (data && data.action === 'GET_CACHE_STATS' && data.stats) {
+        setFloppyCacheStats(data.stats);
+        // Los otros cachés no están implementados en este endpoint
+        setAdrianZeroCacheStats(null);
+        setContractCacheStats(null);
+        setJsonCacheStats(null);
+        setSvgPngCacheStats(null);
+        setComponentCacheStats(null);
+      } else {
+        console.warn('Respuesta inesperada de la API:', data);
+        setFloppyCacheStats(null);
+      }
     } catch (error) {
       console.error('Error fetching floppy cache stats:', error);
+      setFloppyCacheStats(null);
     } finally {
       setFloppyCacheLoading(false);
     }
@@ -94,22 +103,44 @@ export default function Home() {
   const invalidateFloppyCache = async (action, params = {}) => {
     try {
       setFloppyCacheLoading(true);
+      
+      // Mapear acciones del panel principal a la nueva API
+      let apiAction = 'clear';
+      let apiParams = {};
+      
+      if (action === 'invalidate_token') {
+        apiParams = { tokenId: params.tokenId, action: 'clear' };
+      } else if (action === 'clear_all') {
+        // Para limpiar todo, usar DELETE
+        const response = await fetch('/api/admin/floppy-cache?confirm=true', {
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}\n📊 Entradas limpiadas: ${data.previousStats.total}`);
+          fetchFloppyCacheStats(); // Actualizar estadísticas
+        } else {
+          alert('❌ Error: ' + data.error);
+        }
+        return;
+      } else {
+        alert('❌ Acción no soportada en la nueva API');
+        return;
+      }
+      
       const response = await fetch('/api/admin/floppy-cache', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          action, 
-          ...params,
-          type: floppyRefreshForm.type // Incluir el tipo seleccionado
-        })
+        body: JSON.stringify(apiParams)
       });
       
       const data = await response.json();
       
-      if (data.success) {
-        alert(`✅ ${data.message}\n📊 Entradas invalidadas: ${data.invalidated}`);
+      if (response.ok) {
+        alert(`✅ ${data.message}\n📊 Token ID: ${data.tokenId}`);
         fetchFloppyCacheStats(); // Actualizar estadísticas
       } else {
         alert('❌ Error: ' + data.error);
@@ -254,97 +285,36 @@ export default function Home() {
           )}
         </div>
 
-        {/* Nueva sección de administración de caché para floppy metadata y render */}
+        {/* Nueva sección de administración de caché para floppy render */}
         <div className={styles.adminSection}>
-          <h2 className={styles.adminTitle}>🗄️ Floppy Cache Management (Metadata + Render)</h2>
+          <h2 className={styles.adminTitle}>🗄️ Floppy Render Cache Management</h2>
           
           {floppyCacheLoading ? (
             <p>Loading cache stats...</p>
           ) : floppyCacheStats ? (
             <div className={styles.cacheStats}>
-              {/* Metadata Stats */}
-              <h3>📄 Metadata Cache</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <h3>Total Metadata</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.total}</p>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Traits (1-9999)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.traits}</p>
-                  <small>{floppyCacheStats.metadata.ttlConfig.traits}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Floppys (10000+)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.floppys}</p>
-                  <small>{floppyCacheStats.metadata.ttlConfig.floppys}</small>
-                </div>
-                <div className={styles.statCard}>
-                  <h3>Serum (262144)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.metadata.stats.serums}</p>
-                  <small>{floppyCacheStats.metadata.ttlConfig.serum}</small>
-                </div>
-              </div>
-              
               {/* Render Stats */}
               <h3>🖼️ Render Cache</h3>
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
-                  <h3>Total Renders</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.total}</p>
+                  <h3>Total Entradas</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.total}</p>
                 </div>
                 <div className={styles.statCard}>
                   <h3>Traits (1-9999)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.traits}</p>
-                  <small>{floppyCacheStats.render.ttlConfig.traits}</small>
+                  <p className={styles.statNumber}>{floppyCacheStats.traits}</p>
                 </div>
                 <div className={styles.statCard}>
                   <h3>Floppys (10000+)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.floppys}</p>
-                  <small>{floppyCacheStats.render.ttlConfig.floppys}</small>
+                  <p className={styles.statNumber}>{floppyCacheStats.floppys}</p>
                 </div>
                 <div className={styles.statCard}>
-                  <h3>Serum (262144)</h3>
-                  <p className={styles.statNumber}>{floppyCacheStats.render.stats.serums}</p>
-                  <small>{floppyCacheStats.render.ttlConfig.serum}</small>
+                  <h3>Serums (262144)</h3>
+                  <p className={styles.statNumber}>{floppyCacheStats.serums}</p>
                 </div>
               </div>
               
               <div className={styles.cacheActions}>
-                <h3>🎛️ Cache Type Selector</h3>
-                <div className={styles.typeSelector}>
-                  <label>
-                    <input
-                      type="radio"
-                      name="cacheType"
-                      value="both"
-                      checked={floppyRefreshForm.type === 'both'}
-                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
-                    />
-                    Both (Metadata + Render)
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="cacheType"
-                      value="metadata"
-                      checked={floppyRefreshForm.type === 'metadata'}
-                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
-                    />
-                    Metadata Only
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="cacheType"
-                      value="render"
-                      checked={floppyRefreshForm.type === 'render'}
-                      onChange={(e) => setFloppyRefreshForm({...floppyRefreshForm, type: e.target.value})}
-                    />
-                    Render Only
-                  </label>
-                </div>
-                
                 <h3>🔄 Quick Actions</h3>
                 <div className={styles.actionButtons}>
                   <button 
