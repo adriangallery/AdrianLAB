@@ -82,7 +82,8 @@
       "traitsInside": 6,
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
-      "external_url": "https://adrianzero.com/"
+      "external_url": "https://adrianzero.com/",
+      "image": "https://adrianlab.vercel.app/labimages/10006.png"
     }
   ],
   "metadata": {
