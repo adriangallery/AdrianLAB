@@ -78,8 +78,8 @@ export default async function handler(req, res) {
           let cachedImage = null;
           
           if (currentToken >= 1 && currentToken <= 9999) {
-            // Tokens 1-9999: usar caché de floppy render (traits)
-            cachedImage = getCachedFloppyRender(currentToken);
+            // Tokens 1-9999: usar caché de AdrianZero render (tokens normales)
+            cachedImage = getCachedAdrianZeroRender(currentToken);
           } else if (currentToken >= 10000 && currentToken <= 15500) {
             // Tokens 10000-15500: usar caché de floppy render (floppys)
             cachedImage = getCachedFloppyRender(currentToken);
@@ -101,14 +101,38 @@ export default async function handler(req, res) {
             
             processed++;
           } else {
-            console.warn(`[grid-generator] Token ${currentToken} no encontrado en caché (tipo: ${currentToken >= 1 && currentToken <= 9999 ? 'floppy' : 'adrianzero'})`);
-            // Dibujar placeholder gris
-            ctx.fillStyle = '#cccccc';
-            ctx.fillRect(col * 64, row * 64, 64, 64);
-            ctx.fillStyle = '#666666';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(currentToken.toString(), col * 64 + 32, row * 64 + 32);
+            console.warn(`[grid-generator] Token ${currentToken} no encontrado en caché, renderizando...`);
+            
+            try {
+              // Renderizar el token que no está en caché
+              const renderResponse = await fetch(`https://adrianlab.vercel.app/api/render/${currentToken}`);
+              
+              if (renderResponse.ok) {
+                const imageBuffer = await renderResponse.arrayBuffer();
+                const image = await loadImage(Buffer.from(imageBuffer));
+                
+                // Calcular posición en el grid
+                const x = col * 64;
+                const y = row * 64;
+                
+                // Dibujar imagen redimensionada a 64x64
+                ctx.drawImage(image, x, y, 64, 64);
+                
+                processed++;
+                console.log(`[grid-generator] Token ${currentToken} renderizado exitosamente`);
+              } else {
+                throw new Error(`Error renderizando token ${currentToken}: ${renderResponse.status}`);
+              }
+            } catch (renderError) {
+              console.error(`[grid-generator] Error renderizando token ${currentToken}:`, renderError.message);
+              // Dibujar placeholder de error
+              ctx.fillStyle = '#ffcccc';
+              ctx.fillRect(col * 64, row * 64, 64, 64);
+              ctx.fillStyle = '#cc0000';
+              ctx.font = '10px Arial';
+              ctx.textAlign = 'center';
+              ctx.fillText('ERR', col * 64 + 32, row * 64 + 32);
+            }
           }
         } catch (error) {
           console.error(`[grid-generator] Error procesando token ${currentToken}:`, error.message);
