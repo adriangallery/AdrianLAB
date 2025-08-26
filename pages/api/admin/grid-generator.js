@@ -1,4 +1,4 @@
-import { getCachedAdrianZeroRender } from '../../../lib/cache.js';
+import { getCachedAdrianZeroRender, getCachedFloppyRender } from '../../../lib/cache.js';
 import { createCanvas, loadImage } from 'canvas';
 
 export default async function handler(req, res) {
@@ -74,8 +74,19 @@ export default async function handler(req, res) {
         if (currentToken > end) break;
         
         try {
-          // Obtener imagen del caché
-          const cachedImage = getCachedAdrianZeroRender(currentToken);
+          // Obtener imagen del caché según el tipo de token
+          let cachedImage = null;
+          
+          if (currentToken >= 1 && currentToken <= 9999) {
+            // Tokens 1-9999: usar caché de floppy render (traits)
+            cachedImage = getCachedFloppyRender(currentToken);
+          } else if (currentToken >= 10000 && currentToken <= 15500) {
+            // Tokens 10000-15500: usar caché de floppy render (floppys)
+            cachedImage = getCachedFloppyRender(currentToken);
+          } else {
+            // Otros tokens: usar caché de AdrianZero render
+            cachedImage = getCachedAdrianZeroRender(currentToken);
+          }
           
           if (cachedImage) {
             // Convertir buffer a imagen
@@ -90,7 +101,7 @@ export default async function handler(req, res) {
             
             processed++;
           } else {
-            console.warn(`[grid-generator] Token ${currentToken} no encontrado en caché`);
+            console.warn(`[grid-generator] Token ${currentToken} no encontrado en caché (tipo: ${currentToken >= 1 && currentToken <= 9999 ? 'floppy' : 'adrianzero'})`);
             // Dibujar placeholder gris
             ctx.fillStyle = '#cccccc';
             ctx.fillRect(col * 64, row * 64, 64, 64);
