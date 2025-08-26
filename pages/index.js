@@ -903,7 +903,7 @@ export default function Home() {
                   <div className={styles.statLabel}>Tamaño Final</div>
                 </div>
                 <div className={styles.statCard}>
-                  <div className={styles.statNumber}>64×64</div>
+                  <div className={styles.statNumber}>250×250</div>
                   <div className={styles.statLabel}>Tamaño Individual</div>
                 </div>
                 <div className={styles.statCard}>

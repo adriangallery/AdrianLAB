@@ -47,11 +47,12 @@ export default async function handler(req, res) {
     const totalTokens = end - start + 1;
     const rows = Math.ceil(totalTokens / cols);
     
-    // Tamaño del grid final (aproximadamente 800x800)
-    const gridWidth = cols * 64;
-    const gridHeight = rows * 64;
+    // Tamaño del grid final con 250x250 por imagen (mejor nitidez)
+    const imageSize = 250;
+    const gridWidth = cols * imageSize;
+    const gridHeight = rows * imageSize;
     
-    console.log(`[grid-generator] Generando grid: ${start}-${end}, ${cols} columnas, ${rows} filas, ${gridWidth}x${gridHeight}`);
+    console.log(`[grid-generator] Generando grid: ${start}-${end}, ${cols} columnas, ${rows} filas, ${gridWidth}x${gridHeight} (${imageSize}x${imageSize} por imagen)`);
 
     // Crear canvas para el grid
     const canvas = createCanvas(gridWidth, gridHeight);
@@ -93,11 +94,11 @@ export default async function handler(req, res) {
             const image = await loadImage(cachedImage);
             
             // Calcular posición en el grid
-            const x = col * 64;
-            const y = row * 64;
+            const x = col * imageSize;
+            const y = row * imageSize;
             
-            // Dibujar imagen redimensionada a 64x64
-            ctx.drawImage(image, x, y, 64, 64);
+            // Dibujar imagen redimensionada a 250x250 (mejor nitidez)
+            ctx.drawImage(image, x, y, imageSize, imageSize);
             
             processed++;
           } else {
@@ -112,11 +113,11 @@ export default async function handler(req, res) {
                 const image = await loadImage(Buffer.from(imageBuffer));
                 
                 // Calcular posición en el grid
-                const x = col * 64;
-                const y = row * 64;
+                const x = col * imageSize;
+                const y = row * imageSize;
                 
-                // Dibujar imagen redimensionada a 64x64
-                ctx.drawImage(image, x, y, 64, 64);
+                // Dibujar imagen redimensionada a 250x250 (mejor nitidez)
+                ctx.drawImage(image, x, y, imageSize, imageSize);
                 
                 processed++;
                 console.log(`[grid-generator] Token ${currentToken} renderizado exitosamente`);
@@ -127,22 +128,22 @@ export default async function handler(req, res) {
               console.error(`[grid-generator] Error renderizando token ${currentToken}:`, renderError.message);
               // Dibujar placeholder de error
               ctx.fillStyle = '#ffcccc';
-              ctx.fillRect(col * 64, row * 64, 64, 64);
+              ctx.fillRect(col * imageSize, row * imageSize, imageSize, imageSize);
               ctx.fillStyle = '#cc0000';
-              ctx.font = '10px Arial';
+              ctx.font = '16px Arial';
               ctx.textAlign = 'center';
-              ctx.fillText('ERR', col * 64 + 32, row * 64 + 32);
+              ctx.fillText('ERR', col * imageSize + imageSize/2, row * imageSize + imageSize/2);
             }
           }
         } catch (error) {
           console.error(`[grid-generator] Error procesando token ${currentToken}:`, error.message);
           // Dibujar placeholder de error
           ctx.fillStyle = '#ffcccc';
-          ctx.fillRect(col * 64, row * 64, 64, 64);
+          ctx.fillRect(col * imageSize, row * imageSize, imageSize, imageSize);
           ctx.fillStyle = '#cc0000';
-          ctx.font = '10px Arial';
+          ctx.font = '16px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText('ERR', col * 64 + 32, row * 64 + 32);
+          ctx.fillText('ERR', col * imageSize + imageSize/2, row * imageSize + imageSize/2);
         }
         
         currentToken++;
@@ -153,14 +154,14 @@ export default async function handler(req, res) {
 
     // Convertir a JPEG optimizado
     const jpegBuffer = canvas.toBuffer('image/jpeg', { 
-      quality: 0.85,
+      quality: 0.90, // Calidad aumentada para mejor nitidez
       progressive: true
     });
 
     // Configurar headers de respuesta
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache por 1 hora
-    res.setHeader('X-Grid-Info', `tokens:${start}-${end}, columns:${cols}, size:${gridWidth}x${gridHeight}, processed:${processed}`);
+    res.setHeader('X-Grid-Info', `tokens:${start}-${end}, columns:${cols}, size:${gridWidth}x${gridHeight}, processed:${processed}, imageSize:${imageSize}x${imageSize}`);
     
     // Enviar imagen
     res.status(200).send(jpegBuffer);
