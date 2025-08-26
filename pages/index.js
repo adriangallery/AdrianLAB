@@ -23,6 +23,16 @@ export default function Home() {
     type: 'both' // 'metadata', 'render', 'both'
   });
 
+  // Estados para el generador de grids
+  const [gridForm, setGridForm] = useState({
+    startToken: '1',
+    endToken: '300',
+    tokensPerRow: '10'
+  });
+  const [gridLoading, setGridLoading] = useState(false);
+  const [gridResult, setGridResult] = useState(null);
+  const [gridStats, setGridStats] = useState(null);
+
   useEffect(() => {
     loadTraits();
     fetchFloppyCacheStats();
@@ -69,6 +79,77 @@ export default function Home() {
       console.error('Error loading traits:', error);
     }
     setLoading(false);
+  };
+
+  // Función para generar grids de AdrianZERO
+  const generateGrid = async () => {
+    try {
+      setGridLoading(true);
+      setGridResult(null);
+      setGridStats(null);
+
+      const { startToken, endToken, tokensPerRow } = gridForm;
+      
+      // Validaciones
+      if (!startToken || !endToken || !tokensPerRow) {
+        alert('Por favor, completa todos los campos');
+        return;
+      }
+
+      const start = parseInt(startToken);
+      const end = parseInt(endToken);
+      const cols = parseInt(tokensPerRow);
+
+      if (start < 1 || end < start || cols < 1) {
+        alert('Parámetros inválidos. Verifica que startToken >= 1, endToken >= startToken, tokensPerRow >= 1');
+        return;
+      }
+
+      if (end - start + 1 > 10000) {
+        alert('Rango demasiado grande. Máximo 10,000 tokens por grid');
+        return;
+      }
+
+      // Calcular estadísticas
+      const totalTokens = end - start + 1;
+      const rows = Math.ceil(totalTokens / cols);
+      const gridWidth = cols * 64;
+      const gridHeight = rows * 64;
+
+      setGridStats({ start, end, cols, rows, totalTokens, gridWidth, gridHeight });
+
+      // Generar grid
+      const response = await fetch('/api/admin/grid-generator', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startToken: start,
+          endToken: end,
+          columns: cols
+        })
+      });
+
+      if (response.ok) {
+        // Obtener información del grid
+        const gridInfo = response.headers.get('X-Grid-Info');
+        
+        // Crear blob de la imagen
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+
+        setGridResult({ imageUrl, gridInfo });
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error generando grid:', error);
+      alert(`Error de conexión: ${error.message}`);
+    } finally {
+      setGridLoading(false);
+    }
   };
 
   // Función para obtener estadísticas del caché de floppy
@@ -725,6 +806,133 @@ export default function Home() {
             </div>
           ) : (
             <p>Error loading component cache stats</p>
+          )}
+        </div>
+
+        {/* Nueva sección del generador de grids de AdrianZERO */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🎨 Generador de Grids - AdrianZERO</h2>
+          
+          <div className={styles.infoPanel}>
+            <h3>ℹ️ Información del Tool</h3>
+            <p><strong>Propósito:</strong> Generar grids de AdrianZERO para visualización y análisis</p>
+            <p><strong>Optimizaciones:</strong> Reutiliza imágenes cacheadas, tamaño individual 64x64, formato JPEG comprimido</p>
+            <p><strong>Límites:</strong> Máximo 10,000 tokens por grid, sin límite de tokens por fila</p>
+          </div>
+
+          {/* Formulario de Generación */}
+          <div className={styles.cacheActions}>
+            <h3>⚙️ Configuración del Grid</h3>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Token Inicial:</label>
+                <input
+                  type="number"
+                  placeholder="1"
+                  min="1"
+                  value={gridForm.startToken}
+                  onChange={(e) => setGridForm({...gridForm, startToken: e.target.value})}
+                  className={styles.formInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Token Final:</label>
+                <input
+                  type="number"
+                  placeholder="300"
+                  min="1"
+                  value={gridForm.endToken}
+                  onChange={(e) => setGridForm({...gridForm, endToken: e.target.value})}
+                  className={styles.formInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Tokens por Fila:</label>
+                <input
+                  type="number"
+                  placeholder="10"
+                  min="1"
+                  value={gridForm.tokensPerRow}
+                  onChange={(e) => setGridForm({...gridForm, tokensPerRow: e.target.value})}
+                  className={styles.formInput}
+                />
+              </div>
+            </div>
+            
+            <div className={styles.actionButtons}>
+              <button
+                onClick={generateGrid}
+                className={styles.actionButton}
+                disabled={gridLoading}
+              >
+                {gridLoading ? '⏳ Generando...' : '🚀 Generar Grid'}
+              </button>
+              <button
+                onClick={() => {
+                  setGridForm({ startToken: '1', endToken: '300', tokensPerRow: '10' });
+                  setGridResult(null);
+                  setGridStats(null);
+                }}
+                className={styles.actionButton}
+                disabled={gridLoading}
+              >
+                🔄 Limpiar
+              </button>
+            </div>
+          </div>
+
+          {/* Estadísticas del Grid */}
+          {gridStats && (
+            <div className={styles.cacheStats}>
+              <h3>📊 Estadísticas del Grid</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>{gridStats.totalTokens}</div>
+                  <div className={styles.statLabel}>Total Tokens</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>{gridStats.cols}</div>
+                  <div className={styles.statLabel}>Tokens por Fila</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>{gridStats.rows}</div>
+                  <div className={styles.statLabel}>Filas</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>{gridStats.gridWidth}×{gridStats.gridHeight}</div>
+                  <div className={styles.statLabel}>Tamaño Final</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>64×64</div>
+                  <div className={styles.statLabel}>Tamaño Individual</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statNumber}>{Math.round((gridStats.gridWidth * gridStats.gridHeight * 3) / 1024)} KB</div>
+                  <div className={styles.statLabel}>Tamaño Estimado</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Resultado del Grid */}
+          {gridResult && (
+            <div className={styles.cacheActions}>
+              <h3>🖼️ Grid Generado</h3>
+              <div className={styles.gridPreview}>
+                <img 
+                  src={gridResult.imageUrl} 
+                  alt="Grid generado" 
+                  style={{ maxWidth: '100%', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              {gridResult.gridInfo && (
+                <div className={styles.infoPanel}>
+                  <h4>📋 Información del Grid</h4>
+                  <p><strong>Headers:</strong> {gridResult.gridInfo}</p>
+                  <p><strong>Nota:</strong> Haz clic derecho en la imagen y selecciona "Guardar imagen como..." para descargarla</p>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </main>
