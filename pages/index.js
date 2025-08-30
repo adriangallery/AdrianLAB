@@ -64,8 +64,8 @@ export default function Home() {
         });
       }
       
-      // Pagers (15000-15004)
-      for (let i = 15000; i <= 15004; i++) {
+      // Pagers (15000-15012)
+      for (let i = 15000; i <= 15012; i++) {
         traitsData.push({
           id: i,
           name: `Pager #${i}`,
