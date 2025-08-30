@@ -74,7 +74,7 @@ export default async function handler(req, res) {
     const version = Date.now();
 
     // Obtener URL base
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
 
     // DETERMINAR TIPO DE TOKEN
     if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
@@ -435,25 +435,34 @@ export default async function handler(req, res) {
         }
         const rarity = getRarityTagAndColor(pager?.maxSupply || 1);
 
-        // Resolver imagen por ID con HEAD, priorizando GIF y luego PNG
-        const headOk = async (url) => {
-          try {
-            const r = await fetch(url, { method: 'HEAD' });
-            return r.ok;
-          } catch (_) {
-            return false;
-          }
-        };
+        // Resolver imagen por ID priorizando archivo local (fs) y luego HEAD
+        const localGifPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.gif`);
+        const localPngPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.png`);
 
-        const candidates = [`${tokenIdNum}.gif`, `${tokenIdNum}.png`];
         let selected = null;
-        for (const fname of candidates) {
-          const url = `${baseUrl}/labimages/${fname}`;
-          // eslint-disable-next-line no-await-in-loop
-          if (await headOk(url)) { selected = fname; break; }
+        if (fs.existsSync(localGifPath)) {
+          selected = `${tokenIdNum}.gif`;
+        } else if (fs.existsSync(localPngPath)) {
+          selected = `${tokenIdNum}.png`;
+        } else {
+          const headOk = async (url) => {
+            try {
+              const r = await fetch(url, { method: 'HEAD' });
+              return r.ok;
+            } catch (_) {
+              return false;
+            }
+          };
+          const candidates = [`${tokenIdNum}.gif`, `${tokenIdNum}.png`];
+          for (const fname of candidates) {
+            const url = `${baseUrl}/labimages/${fname}`;
+            // eslint-disable-next-line no-await-in-loop
+            if (await headOk(url)) { selected = fname; break; }
+          }
         }
+
         // Fallback a PNG render si no existe archivo estático
-        const imageUrl = selected 
+        const imageUrl = selected
           ? `${baseUrl}/labimages/${selected}?v=${version}`
           : `${baseUrl}/api/render/floppy/${tokenIdNum}.png`;
 
