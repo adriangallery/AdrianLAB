@@ -8383,7 +8383,7 @@
       "name": "Wizzard-Beard",
       "category": "BEARD",
       "fileName": "Wizzard-Beard",
-      "maxSupply": 1,
+      "maxSupply": 6,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8396,7 +8396,7 @@
       "name": "Wizzard_Background",
       "category": "BACKGROUND",
       "fileName": "Wizzard_Background",
-      "maxSupply": 1,
+      "maxSupply": 45,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8422,7 +8422,7 @@
       "name": "Wizzard_Pipe",
       "category": "MOUTH",
       "fileName": "Wizzard_Pipe",
-      "maxSupply": 1,
+      "maxSupply": 60,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8435,7 +8435,7 @@
       "name": "Wizzard-Robe",
       "category": "SWAG",
       "fileName": "Wizzard-Robe",
-      "maxSupply": 1,
+      "maxSupply": 10,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8448,7 +8448,7 @@
       "name": "Wizzard_Hair",
       "category": "HAIR",
       "fileName": "Wizzard_Hair",
-      "maxSupply": 1,
+      "maxSupply": 38,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8461,7 +8461,7 @@
       "name": "Wizzard-Eyebrows",
       "category": "EYES",
       "fileName": "Wizzard-Eyebrows",
-      "maxSupply": 1,
+      "maxSupply": 25,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
@@ -8487,7 +8487,7 @@
       "name": "Wizzard-Hat",
       "category": "HEAD",
       "fileName": "Wizzard-Hat",
-      "maxSupply": 1,
+      "maxSupply": 15,
       "floppy": "Wizz-Potion",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
