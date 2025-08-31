@@ -3,7 +3,9 @@ import {
   setCachedFloppyRender, 
   getFloppyRenderTTL,
   clearFloppyRenderCache,
-  getFloppyRenderCacheStats
+  getFloppyRenderCacheStats,
+  invalidateFloppyMetadata,
+  invalidateAllFloppyMetadata
 } from '../../../lib/cache.js';
 
 export default async function handler(req, res) {
@@ -87,6 +89,28 @@ export default async function handler(req, res) {
             timestamp: new Date().toISOString()
           });
         }
+      } else if (action === 'clear_metadata') {
+        // Limpiar caché de METADATA para un token específico
+        const tokenIdNum = parseInt(tokenId);
+        const invalidated = invalidateFloppyMetadata(tokenIdNum);
+        return res.status(200).json({
+          action: 'CLEAR_METADATA_CACHE',
+          tokenId: tokenIdNum,
+          status: invalidated ? 'CLEARED' : 'NOT_FOUND',
+          message: invalidated 
+            ? `Metadata caché del token ${tokenIdNum} invalidado`
+            : `No había metadata caché para el token ${tokenIdNum}`,
+          timestamp: new Date().toISOString()
+        });
+      } else if (action === 'clear_all_metadata') {
+        // Limpiar TODO el caché de METADATA
+        const count = invalidateAllFloppyMetadata();
+        return res.status(200).json({
+          action: 'CLEAR_ALL_METADATA_CACHE',
+          invalidated: count,
+          message: `Se invalidaron ${count} entradas de metadata caché`,
+          timestamp: new Date().toISOString()
+        });
       } else {
         return res.status(400).json({ error: 'Acción no válida. Use "clear"' });
       }
