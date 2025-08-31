@@ -8377,10 +8377,127 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 719,
+      "name": "Wizzard-Beard",
+      "category": "BEARD",
+      "fileName": "Wizzard-Beard",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 720,
+      "name": "Wizzard_Background",
+      "category": "BACKGROUND",
+      "fileName": "Wizzard_Background",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 721,
+      "name": "Wizzard-Staff",
+      "category": "GEAR",
+      "fileName": "Wizzard-Staff",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 722,
+      "name": "Wizzard_Pipe",
+      "category": "MOUTH",
+      "fileName": "Wizzard_Pipe",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 723,
+      "name": "Wizzard-Robe",
+      "category": "SWAG",
+      "fileName": "Wizzard-Robe",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 724,
+      "name": "Wizzard_Hair",
+      "category": "HAIR",
+      "fileName": "Wizzard_Hair",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 725,
+      "name": "Wizzard-Eyebrows",
+      "category": "EYES",
+      "fileName": "Wizzard-Eyebrows",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 726,
+      "name": "Magic-Wand",
+      "category": "GEAR",
+      "fileName": "Magic-Wand",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 727,
+      "name": "Wizzard-Hat",
+      "category": "HEAD",
+      "fileName": "Wizzard-Hat",
+      "maxSupply": 1,
+      "floppy": "Wizz-Potion",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 718,
+    "totalTraits": 727,
     "categories": [
       "BACKGROUND",
       "EAR",
