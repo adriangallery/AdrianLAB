@@ -400,8 +400,8 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Action Pack metadata' });
       }
 
-    } else if (tokenIdNum >= 15000 && tokenIdNum <= 15012) {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para PAGERS (15000-15012)`);
+    } else if (tokenIdNum >= 15000 && tokenIdNum <= 15013) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para PAGERS (15000-15013)`);
 
       try {
         const pagersPath = path.join(process.cwd(), 'public', 'labmetadata', 'pagers.json');
