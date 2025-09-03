@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           let fileBuffer;
           let fileExtension;
           let contentType;
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app';
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
           
           // PASO 1: Intentar buscar .gif primero (estrategia principal)
           try {
