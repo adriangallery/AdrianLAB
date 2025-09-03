@@ -8494,10 +8494,88 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 728,
+      "name": "OPTICAL-Background-1",
+      "category": "BACKGROUND",
+      "fileName": "728",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 729,
+      "name": "OPTICAL-Background-2",
+      "category": "BACKGROUND",
+      "fileName": "729",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 730,
+      "name": "OPTICAL-Background-3",
+      "category": "BACKGROUND",
+      "fileName": "730",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 731,
+      "name": "OPTICAL-Background-4",
+      "category": "BACKGROUND",
+      "fileName": "731",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 732,
+      "name": "OPTICAL-Background-5",
+      "category": "BACKGROUND",
+      "fileName": "732",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 733,
+      "name": "OPTICAL-Background-6",
+      "category": "BACKGROUND",
+      "fileName": "733",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 727,
+    "totalTraits": 733,
     "categories": [
       "BACKGROUND",
       "EAR",

@@ -74,7 +74,7 @@
     },
     {
       "tokenId": 10007,
-      "name": "NEON PACK Floppy",
+      "name": "NEON PACK",
       "category": "Floppy discs",
       "fileName": "10007.gif",
       "maxSupply": 300,
@@ -83,10 +83,34 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10008,
+      "name": "OPTICAL PACK",
+      "category": "Floppy discs",
+      "fileName": "10008.gif",
+      "maxSupply": 50,
+      "floppy": "OPTICAL",
+      "traitsInside": 6,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10009,
+      "name": "PUNKS Floppy",
+      "category": "Floppy discs",
+      "fileName": "10009.gif",
+      "maxSupply": 200,
+      "floppy": "PUNKS",
+      "traitsInside": 4,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 7,
+    "totalFloppys": 9,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
