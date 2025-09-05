@@ -8572,10 +8572,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 734,
+      "name": "Adrian-Zero-He-Zero",
+      "category": "TOP",
+      "fileName": "734",
+      "maxSupply": 1,
+      "floppy": "ActionPack",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 735,
+      "name": "Adrian-Zero-Skelepunk",
+      "category": "TOP",
+      "fileName": "735",
+      "maxSupply": 1,
+      "floppy": "ActionPack",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 733,
+    "totalTraits": 735,
     "categories": [
       "BACKGROUND",
       "EAR",
