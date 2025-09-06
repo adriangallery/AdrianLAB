@@ -8598,10 +8598,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 736,
+      "name": "X-Ray",
+      "category": "TOP",
+      "fileName": "736",
+      "maxSupply": 1,
+      "floppy": "Unique",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 735,
+    "totalTraits": 736,
     "categories": [
       "BACKGROUND",
       "EAR",
