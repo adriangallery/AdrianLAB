@@ -107,10 +107,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10010,
+      "name": "Comrades USB",
+      "category": "Floppy discs",
+      "fileName": "10010.gif",
+      "maxSupply": "TBD",
+      "floppy": "USB",
+      "traitsInside": 8,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 9,
+    "totalFloppys": 10,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
