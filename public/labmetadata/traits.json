@@ -9313,10 +9313,751 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 791,
+      "name": "3-Earring",
+      "category": "EAR",
+      "fileName": "791",
+      "maxSupply": 90,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 792,
+      "name": "3-Eyebrow-Piercing",
+      "category": "EYES",
+      "fileName": "792",
+      "maxSupply": 120,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 793,
+      "name": "A-T-Shirt",
+      "category": "SWAG",
+      "fileName": "793",
+      "maxSupply": 190,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 794,
+      "name": "Acid-Black-Green",
+      "category": "BACKGROUND",
+      "fileName": "794",
+      "maxSupply": 250,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 795,
+      "name": "Acid-Pink-Cyan",
+      "category": "BACKGROUND",
+      "fileName": "795",
+      "maxSupply": 250,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 796,
+      "name": "Acid-Pink-Yell-O",
+      "category": "BACKGROUND",
+      "fileName": "796",
+      "maxSupply": 400,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 797,
+      "name": "Acid",
+      "category": "BACKGROUND",
+      "fileName": "797",
+      "maxSupply": 200,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 798,
+      "name": "Anarchie",
+      "category": "BACKGROUND",
+      "fileName": "798",
+      "maxSupply": 300,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 799,
+      "name": "Astra",
+      "category": "GEAR",
+      "fileName": "799",
+      "maxSupply": 75,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 800,
+      "name": "Balaclava-Black",
+      "category": "HEAD",
+      "fileName": "800",
+      "maxSupply": 174,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 801,
+      "name": "Balaclava-Cyan",
+      "category": "HEAD",
+      "fileName": "801",
+      "maxSupply": 112,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 802,
+      "name": "Balaclava-Pink",
+      "category": "HEAD",
+      "fileName": "802",
+      "maxSupply": 159,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 803,
+      "name": "Bear-Can",
+      "category": "GEAR",
+      "fileName": "803",
+      "maxSupply": 77,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 804,
+      "name": "Big-Green-Mohawk",
+      "category": "HAIR",
+      "fileName": "804",
+      "maxSupply": 117,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 805,
+      "name": "Big-Rainbow-Mohawk",
+      "category": "HAIR",
+      "fileName": "805",
+      "maxSupply": 97,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 806,
+      "name": "Big-Yellow-Mohawk",
+      "category": "HAIR",
+      "fileName": "806",
+      "maxSupply": 124,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 807,
+      "name": "Blue-Eye-Shadow",
+      "category": "EYES",
+      "fileName": "807",
+      "maxSupply": 108,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 808,
+      "name": "Brick-In-the-Wall",
+      "category": "BACKGROUND",
+      "fileName": "808",
+      "maxSupply": 300,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 809,
+      "name": "Cut-Off-T-Shirt-Black",
+      "category": "SWAG",
+      "fileName": "809",
+      "maxSupply": 75,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 810,
+      "name": "Eye-Shadow-Black",
+      "category": "EYES",
+      "fileName": "810",
+      "maxSupply": 174,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 811,
+      "name": "Eye-Shadow-Yellow-Running",
+      "category": "EYES",
+      "fileName": "811",
+      "maxSupply": 112,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 812,
+      "name": "Eye-Shadow-Yellow",
+      "category": "EYES",
+      "fileName": "812",
+      "maxSupply": 159,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 813,
+      "name": "Fred-Perry-Suspenders",
+      "category": "SWAG",
+      "fileName": "813",
+      "maxSupply": 77,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 814,
+      "name": "FU",
+      "category": "RANDOMSHIT",
+      "fileName": "814",
+      "maxSupply": 117,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 815,
+      "name": "Full-Brown",
+      "category": "HAIR",
+      "fileName": "815",
+      "maxSupply": 97,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 816,
+      "name": "Full-Red",
+      "category": "HAIR",
+      "fileName": "816",
+      "maxSupply": 124,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 817,
+      "name": "Full-Spikes-Red",
+      "category": "HAIR",
+      "fileName": "817",
+      "maxSupply": 108,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 818,
+      "name": "Green-Spike",
+      "category": "HAIR",
+      "fileName": "818",
+      "maxSupply": 38,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 819,
+      "name": "Jeans-Jacked-Cut-Off",
+      "category": "SWAG",
+      "fileName": "819",
+      "maxSupply": 75,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 820,
+      "name": "Lip-Piercing",
+      "category": "MOUTH",
+      "fileName": "820",
+      "maxSupply": 174,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 821,
+      "name": "Lip-Stick-Black",
+      "category": "MOUTH",
+      "fileName": "821",
+      "maxSupply": 112,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 822,
+      "name": "Lumber-Jack-Punk",
+      "category": "SWAG",
+      "fileName": "822",
+      "maxSupply": 159,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 823,
+      "name": "Pink-Lip-Stick-Off",
+      "category": "MOUTH",
+      "fileName": "823",
+      "maxSupply": 77,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 824,
+      "name": "Punk-Eye-Liner",
+      "category": "EYES",
+      "fileName": "824",
+      "maxSupply": 117,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 825,
+      "name": "Punk-Mullet-Brown",
+      "category": "HAIR",
+      "fileName": "825",
+      "maxSupply": 97,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 826,
+      "name": "Purple-Green-Spikes",
+      "category": "HAIR",
+      "fileName": "826",
+      "maxSupply": 124,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 827,
+      "name": "Rat-Hoodie",
+      "category": "SWAG",
+      "fileName": "827",
+      "maxSupply": 108,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 828,
+      "name": "Red-Eye-Brows-Black",
+      "category": "EYES",
+      "fileName": "828",
+      "maxSupply": 38,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 829,
+      "name": "Red-Eye-Brows",
+      "category": "EYES",
+      "fileName": "829",
+      "maxSupply": 75,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 830,
+      "name": "Ripped-T-Shirt-Black-White",
+      "category": "SWAG",
+      "fileName": "830",
+      "maxSupply": 174,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 831,
+      "name": "Ripped-T-Shirt-Black",
+      "category": "SWAG",
+      "fileName": "831",
+      "maxSupply": 112,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 832,
+      "name": "Roach",
+      "category": "MOUTH",
+      "fileName": "832",
+      "maxSupply": 159,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 833,
+      "name": "Running-Eye-Shadow-Black",
+      "category": "EYES",
+      "fileName": "833",
+      "maxSupply": 77,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 834,
+      "name": "Safety-Pin",
+      "category": "EAR",
+      "fileName": "834",
+      "maxSupply": 117,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 835,
+      "name": "Safty-Pin-Nose",
+      "category": "NOSE",
+      "fileName": "835",
+      "maxSupply": 97,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 836,
+      "name": "Sex-Pistols",
+      "category": "BACKGROUND",
+      "fileName": "836",
+      "maxSupply": 124,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 837,
+      "name": "Shaved-Sides-Spikes",
+      "category": "HAIR",
+      "fileName": "837",
+      "maxSupply": 108,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 838,
+      "name": "Spike-Back-Brown",
+      "category": "HAIR",
+      "fileName": "838",
+      "maxSupply": 38,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 839,
+      "name": "Spike-Back-Purple",
+      "category": "HAIR",
+      "fileName": "839",
+      "maxSupply": 75,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 840,
+      "name": "Spiked-Chocker",
+      "category": "NECK",
+      "fileName": "840",
+      "maxSupply": 174,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 841,
+      "name": "Spiked-Jacked",
+      "category": "SWAG",
+      "fileName": "841",
+      "maxSupply": 112,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 842,
+      "name": "T-Shirt-White-Net",
+      "category": "SWAG",
+      "fileName": "842",
+      "maxSupply": 159,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 843,
+      "name": "Tank-Top-Punk",
+      "category": "SWAG",
+      "fileName": "843",
+      "maxSupply": 77,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 844,
+      "name": "Tank-Top-Savety-Pins",
+      "category": "SWAG",
+      "fileName": "844",
+      "maxSupply": 117,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 845,
+      "name": "Toilett-Wall",
+      "category": "BACKGROUND",
+      "fileName": "845",
+      "maxSupply": 97,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 846,
+      "name": "UK-Tank-Top",
+      "category": "SWAG",
+      "fileName": "846",
+      "maxSupply": 124,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 847,
+      "name": "Union-Jack",
+      "category": "BACKGROUND",
+      "fileName": "847",
+      "maxSupply": 150,
+      "floppy": "PUNKS",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 790,
+    "totalTraits": 847,
     "categories": [
       "BACKGROUND",
       "EAR",
