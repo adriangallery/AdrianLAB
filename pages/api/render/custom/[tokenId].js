@@ -1004,6 +1004,13 @@ export default async function handler(req, res) {
       }
     }
 
+    // LÓGICA ESPECIAL: Verificar si hay SKINTRAIT que prevalezca sobre el skin base
+    let skintraitPath = null;
+    if (finalTraits['SKINTRAIT']) {
+      skintraitPath = `SKINTRAIT/${finalTraits['SKINTRAIT']}.svg`;
+      console.log(`[custom-render] LÓGICA ESPECIAL: SKINTRAIT detectado (${finalTraits['SKINTRAIT']}) - prevalecerá sobre skin base y serums`);
+    }
+
     // LÓGICA ESPECIAL: Detectar serum aplicado y cambiar skin base
     let appliedSerum = null; // Solo para serums exitosos
     let serumSuccess = false;
@@ -1103,8 +1110,24 @@ export default async function handler(req, res) {
     // 2. SEGUNDO: Renderizar el SKIN (Adrian base, excepción o serum)
     console.log('[custom-render] PASO 2 - Iniciando carga del skin');
     
+    // LÓGICA ESPECIAL: SKINTRAIT tiene máxima prioridad sobre todo
+    if (skintraitPath) {
+      console.log(`[custom-render] PASO 2 - 🎨 LÓGICA ESPECIAL: SKINTRAIT prevalece sobre skin base y serums: ${skintraitPath}`);
+      const skintraitImage = await loadAndRenderSvg(skintraitPath);
+      if (skintraitImage) {
+        ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
+        console.log('[custom-render] PASO 2 - 🎨 SKINTRAIT renderizado correctamente (reemplaza skin base)');
+      } else {
+        console.error('[custom-render] PASO 2 - Error al cargar SKINTRAIT, usando skin base normal');
+        const baseImage = await loadAndRenderSvg(baseImagePath);
+        if (baseImage) {
+          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          console.log('[custom-render] PASO 2 - Skin base renderizado correctamente (fallback)');
+        }
+      }
+    }
     // LÓGICA ESPECIAL: Si hay serum aplicado, usar el skin del serum
-    if (appliedSerum) {
+    else if (appliedSerum) {
       console.log(`[custom-render] PASO 2 - 🧬 LÓGICA ESPECIAL: Usando skin de serum aplicado: ${appliedSerum}, éxito: ${serumSuccess}`);
       
       // LÓGICA ESPECIAL: GoldenAdrian prevalece sobre AdrianGF
@@ -1329,7 +1352,7 @@ export default async function handler(req, res) {
     // 3. TERCERO: Renderizar resto de traits
     console.log('[custom-render] PASO 3 - Iniciando renderizado de traits adicionales');
     // Ajuste: HEAD por encima de HAIR
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HEAD', 'HAT', 'SKIN', 'SKINTRAIT', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HEAD', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
