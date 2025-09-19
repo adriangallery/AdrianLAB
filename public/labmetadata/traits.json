@@ -10054,10 +10054,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 848,
+      "name": "AZ-Elliot",
+      "category": "TOP",
+      "fileName": "848",
+      "maxSupply": 1,
+      "floppy": "TraitSHOP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 849,
+      "name": "AZ-Engage",
+      "category": "TOP",
+      "fileName": "849",
+      "maxSupply": 1,
+      "floppy": "TraitSHOP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 847,
+    "totalTraits": 849,
     "categories": [
       "BACKGROUND",
       "EAR",
