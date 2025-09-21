@@ -10080,10 +10080,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 850,
+      "name": "OG-CAP",
+      "category": "HEAD",
+      "fileName": "850",
+      "maxSupply": 1,
+      "floppy": "OGrewards",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 849,
+    "totalTraits": 850,
     "categories": [
       "BACKGROUND",
       "EAR",
