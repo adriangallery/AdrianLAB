@@ -10093,10 +10093,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 851,
+      "name": "Stil-On-Vacation",
+      "category": "BACKGROUND",
+      "fileName": "851",
+      "maxSupply": 1,
+      "floppy": "TraitSHOP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 850,
+    "totalTraits": 851,
     "categories": [
       "BACKGROUND",
       "EAR",
