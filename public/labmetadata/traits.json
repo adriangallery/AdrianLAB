@@ -10106,10 +10106,218 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 852,
+      "name": "ORANGE",
+      "category": "BACKGROUND",
+      "fileName": "852",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 853,
+      "name": "AQUAMARINE",
+      "category": "BACKGROUND",
+      "fileName": "853",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 854,
+      "name": "GREY",
+      "category": "BACKGROUND",
+      "fileName": "854",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 855,
+      "name": "NEW-PUNK-BLUE",
+      "category": "BACKGROUND",
+      "fileName": "855",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 856,
+      "name": "ARMY-GREEN",
+      "category": "BACKGROUND",
+      "fileName": "856",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 857,
+      "name": "PURPLE",
+      "category": "BACKGROUND",
+      "fileName": "857",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 858,
+      "name": "YELLOW",
+      "category": "BACKGROUND",
+      "fileName": "858",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 859,
+      "name": "BLUE",
+      "category": "BACKGROUND",
+      "fileName": "859",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 860,
+      "name": "M-YELLOW",
+      "category": "BACKGROUND",
+      "fileName": "860",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 861,
+      "name": "M-GREY",
+      "category": "BACKGROUND",
+      "fileName": "861",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 862,
+      "name": "M-NEW-PUNK-BLUE",
+      "category": "BACKGROUND",
+      "fileName": "862",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 863,
+      "name": "M-AQUAMARINE",
+      "category": "BACKGROUND",
+      "fileName": "863",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 864,
+      "name": "M-PURPLE",
+      "category": "BACKGROUND",
+      "fileName": "864",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 865,
+      "name": "M-ORANGE",
+      "category": "BACKGROUND",
+      "fileName": "865",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 866,
+      "name": "M-BLUE",
+      "category": "BACKGROUND",
+      "fileName": "866",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 867,
+      "name": "M-ARMY-GREEN",
+      "category": "BACKGROUND",
+      "fileName": "867",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 851,
+    "totalTraits": 867,
     "categories": [
       "BACKGROUND",
       "EAR",

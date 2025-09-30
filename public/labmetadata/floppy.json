@@ -119,10 +119,34 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10011,
+      "name": "BORED Adrian",
+      "category": "Floppy discs",
+      "fileName": "10011.gif",
+      "maxSupply": 50,
+      "floppy": "BORED",
+      "traitsInside": 8,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10012,
+      "name": "MUTANT Adrian",
+      "category": "Floppy discs",
+      "fileName": "10012.gif",
+      "maxSupply": 50,
+      "floppy": "MUTANT",
+      "traitsInside": 8,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 10,
+    "totalFloppys": 12,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
