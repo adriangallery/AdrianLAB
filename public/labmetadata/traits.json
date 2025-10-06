@@ -10314,10 +10314,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 868,
+      "name": "SWAG TEST",
+      "category": "SWAG",
+      "fileName": "868",
+      "maxSupply": 1,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 867,
+    "totalTraits": 868,
     "categories": [
       "BACKGROUND",
       "EAR",
