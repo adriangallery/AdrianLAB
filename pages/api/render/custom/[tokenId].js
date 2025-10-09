@@ -451,15 +451,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS
-    console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Analizando token ${cleanTokenId} para traits externos`);
+    // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS Y SAMURAIZERO
+    console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Analizando token ${cleanTokenId} para traits externos y SamuraiZERO`);
     const numTokenId = parseInt(cleanTokenId);
     const isExternalToken = numTokenId >= 30000 && numTokenId <= 35000;
+    const isSamuraiToken = numTokenId >= 500 && numTokenId <= 1099;
     
-    if (isExternalToken) {
+    if (isSamuraiToken) {
+      console.log(`[custom-render] 🥷 DETECCIÓN TEMPRANA: Token ${cleanTokenId} detectado como SamuraiZERO (500-1099)`);
+    } else if (isExternalToken) {
       console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Token ${cleanTokenId} detectado en rango externo (30000-35000)`);
     } else {
-      console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Token ${cleanTokenId} fuera del rango externo, usando lógica normal`);
+      console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Token ${cleanTokenId} fuera de rangos especiales, usando lógica normal`);
     }
 
     // Cargar mapeo de traits (combinado si es necesario)
@@ -543,6 +546,61 @@ export default async function handler(req, res) {
     }
 
     console.log(`[custom-render] Traits personalizados:`, customTraits);
+
+    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) =====
+    if (isSamuraiToken) {
+      console.log(`[custom-render] 🥷 SAMURAIZERO: Token ${cleanTokenId} - Usando lógica simplificada`);
+      
+      try {
+        // Cargar imagen SVG desde samuraizero
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const samuraiImageUrl = `${baseUrl}/labimages/samuraizero/${cleanTokenId}.svg`;
+        console.log(`[custom-render] 🥷 Cargando imagen SamuraiZERO: ${samuraiImageUrl}`);
+        
+        const response = await fetch(samuraiImageUrl);
+        if (!response.ok) {
+          throw new Error(`SamuraiZERO image not found: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer).toString();
+        
+        // Verificar caché SVG→PNG
+        let pngBuffer = getCachedSvgPng(svgContent);
+        if (!pngBuffer) {
+          console.log(`[custom-render] 🥷 Convirtiendo SVG→PNG para SamuraiZERO ${cleanTokenId}`);
+          const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+          pngBuffer = resvg.render().asPng();
+          setCachedSvgPng(svgContent, pngBuffer);
+        } else {
+          console.log(`[custom-render] 🥷 CACHE HIT SVG→PNG para SamuraiZERO ${cleanTokenId}`);
+        }
+        
+        // Cachear resultado final
+        setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
+        
+        // Configurar headers
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('X-Version', 'SAMURAIZERO-CUSTOM');
+        
+        console.log(`[custom-render] 🥷 SamuraiZERO ${cleanTokenId} renderizado exitosamente (custom)`);
+        return res.status(200).send(pngBuffer);
+        
+      } catch (error) {
+        console.error(`[custom-render] 🥷 Error renderizando SamuraiZERO ${cleanTokenId}:`, error.message);
+        return res.status(404).json({ 
+          error: 'SamuraiZERO image not found', 
+          tokenId: cleanTokenId,
+          details: error.message 
+        });
+      }
+    }
+
+    // ===== LÓGICA NORMAL ADRIANZERO (0-499, 1100+, 30000-35000) =====
+    console.log(`[custom-render] 🎯 ADRIANZERO: Token ${cleanTokenId} - Usando lógica normal`);
 
     // Conectar con los contratos
     console.log('[custom-render] Conectando con los contratos...');

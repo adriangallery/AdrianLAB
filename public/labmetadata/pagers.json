@@ -87,10 +87,21 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 15013,
+      "name": "Wizz-Potion",
+      "category": "Pagers",
+      "fileName": "Wizz-Potion",
+      "maxSupply": 1,
+      "traitsInside": "IDK",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalPagers": 8,
+    "totalPagers": 9,
     "description": "Pagers Collection - Base de datos de todos los Pagers disponibles"
   }
 }

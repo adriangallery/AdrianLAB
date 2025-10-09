@@ -225,6 +225,62 @@ export default async function handler(req, res) {
 
     console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
 
+    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) =====
+    const tokenIdNum = parseInt(cleanTokenId);
+    if (tokenIdNum >= 500 && tokenIdNum <= 1099) {
+      console.log(`[render] 🥷 SAMURAIZERO: Token ${cleanTokenId} detectado - Usando lógica simplificada`);
+      
+      try {
+        // Cargar imagen SVG desde samuraizero
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+        const samuraiImageUrl = `${baseUrl}/labimages/samuraizero/${cleanTokenId}.svg`;
+        console.log(`[render] 🥷 Cargando imagen SamuraiZERO: ${samuraiImageUrl}`);
+        
+        const response = await fetch(samuraiImageUrl);
+        if (!response.ok) {
+          throw new Error(`SamuraiZERO image not found: ${response.status}`);
+        }
+        
+        const svgBuffer = await response.arrayBuffer();
+        const svgContent = Buffer.from(svgBuffer).toString();
+        
+        // Verificar caché SVG→PNG
+        let pngBuffer = getCachedSvgPng(svgContent);
+        if (!pngBuffer) {
+          console.log(`[render] 🥷 Convirtiendo SVG→PNG para SamuraiZERO ${cleanTokenId}`);
+          const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
+          pngBuffer = resvg.render().asPng();
+          setCachedSvgPng(svgContent, pngBuffer);
+        } else {
+          console.log(`[render] 🥷 CACHE HIT SVG→PNG para SamuraiZERO ${cleanTokenId}`);
+        }
+        
+        // Cachear resultado final
+        setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
+        
+        // Configurar headers
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('X-Version', 'SAMURAIZERO');
+        
+        console.log(`[render] 🥷 SamuraiZERO ${cleanTokenId} renderizado exitosamente`);
+        return res.status(200).send(pngBuffer);
+        
+      } catch (error) {
+        console.error(`[render] 🥷 Error renderizando SamuraiZERO ${cleanTokenId}:`, error.message);
+        return res.status(404).json({ 
+          error: 'SamuraiZERO image not found', 
+          tokenId: cleanTokenId,
+          details: error.message 
+        });
+      }
+    }
+
+    // ===== LÓGICA NORMAL ADRIANZERO (0-499, 1100+) =====
+    console.log(`[render] 🎯 ADRIANZERO: Token ${cleanTokenId} - Usando lógica normal`);
+
     // Conectar con los contratos
     console.log('[render] Conectando con los contratos...');
     const { core, traitsExtension, patientZero, serumModule } = await getContracts();

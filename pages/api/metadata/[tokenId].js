@@ -68,8 +68,57 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // ===== LÓGICA ESPECIAL: ACTION PACKS (15008-15010) =====
+    // ===== LÓGICA ESPECIAL: SAMURAIZERO (500-1099) =====
     const tokenIdNum = parseInt(tokenId);
+    if (tokenIdNum >= 500 && tokenIdNum <= 1099) {
+      console.log(`[metadata] 🥷 SAMURAIZERO: Token ${tokenId} detectado - Usando metadata hardcodeado`);
+      
+      try {
+        // Cargar metadata desde samuraimetadata.json
+        const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
+        const samuraiMetadataRaw = fs.readFileSync(samuraiMetadataPath, 'utf8');
+        const samuraiMetadata = JSON.parse(samuraiMetadataRaw);
+        
+        // Buscar token específico en la colección
+        const tokenData = samuraiMetadata.collection.find(item => 
+          item.name.includes(`#${tokenId}`)
+        );
+        
+        if (!tokenData) {
+          console.error(`[metadata] 🥷 SamuraiZERO token ${tokenId} no encontrado en samuraimetadata.json`);
+          return res.status(404).json({ 
+            error: 'SamuraiZERO token not found', 
+            tokenId: tokenId 
+          });
+        }
+        
+        // Actualizar URLs para compatibilidad con OpenSea
+        const updatedTokenData = {
+          ...tokenData,
+          image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
+          external_url: `${baseUrl}/api/render/${tokenId}.png?v=${version}`
+        };
+        
+        console.log(`[metadata] 🥷 SamuraiZERO ${tokenId} metadata cargado exitosamente`);
+        
+        // Configurar headers
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora para metadata estático
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('X-Version', 'SAMURAIZERO');
+        
+        return res.status(200).json(updatedTokenData);
+        
+      } catch (error) {
+        console.error(`[metadata] 🥷 Error cargando SamuraiZERO ${tokenId}:`, error.message);
+        return res.status(500).json({ 
+          error: 'Error loading SamuraiZERO metadata', 
+          tokenId: tokenId,
+          details: error.message 
+        });
+      }
+    }
+
+    // ===== LÓGICA ESPECIAL: ACTION PACKS (15008-15010) =====
     if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
       try {
         const packsPath = path.join(process.cwd(), 'public', 'labmetadata', 'ActionPacks.json');

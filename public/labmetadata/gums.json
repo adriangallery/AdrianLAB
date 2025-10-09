@@ -1,12 +1,9 @@
 {
-  "serums": [
+  "gums": [
     {
-      "tokenId": 262144,
-      "name": "AdrianGF",
-      "category": "SERUMS",
-      "fileName": "ADRIANGF",
-      "maxSupply": 1,
-      "floppy": "Serum",
+      "tokenId": 324,
+      "name": "Gummy",
+      "traits": "[1,23,45,268]",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -14,28 +11,20 @@
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 262145,
-      "name": "GOLD Serum",
-      "category": "SERUMS",
-      "fileName": "GOLD-100",
-      "maxSupply": 27,
-      "successRatio": 100,
-      "floppy": "Serum",
-      "description": "GOLD Serum - Success Ratio 100% | AdrianLAB by HalfxTiger",
+      "tokenId": 325,
+      "name": "Gummy",
+      "traits": "[1,23,45,268]",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 262146,
-      "name": "GOLD Serum",
-      "category": "SERUMS",
-      "fileName": "GOLD-66",
-      "maxSupply": 30,
-      "successRatio": 66,
-      "floppy": "Serum",
-      "description": "GOLD Serum - Success Ratio 66% | AdrianLAB by HalfxTiger",
+      "tokenId": 326,
+      "name": "Gummy",
+      "traits": "[1,23,45,47,520,]",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
