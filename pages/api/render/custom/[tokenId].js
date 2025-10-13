@@ -451,6 +451,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
+    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
+    const isCloseup = req.query.closeup === 'true';
+    const tokenIdNum = parseInt(cleanTokenId);
+    const isCloseupToken = tokenIdNum === 202; // Hardcodeado para token 202
+    
+    if (isCloseup && isCloseupToken) {
+      console.log(`[custom-render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
+    } else if (isCloseup && !isCloseupToken) {
+      console.log(`[custom-render] ⚠️ CLOSEUP: Token ${cleanTokenId} - Closeup no disponible, usando render normal`);
+    }
+
     // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS Y SAMURAIZERO
     console.log(`[custom-render] 🔍 DETECCIÓN TEMPRANA: Analizando token ${cleanTokenId} para traits externos y SamuraiZERO`);
     const numTokenId = parseInt(cleanTokenId);
@@ -1561,11 +1572,38 @@ export default async function handler(req, res) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
     
+    // ===== LÓGICA CLOSEUP PARA TOKEN 202 =====
+    let finalBuffer;
+    
+    if (isCloseup && isCloseupToken) {
+      console.log(`[custom-render] 🔍 Aplicando closeup 640x640 para token ${cleanTokenId}`);
+      
+      // Crear nuevo canvas 640x640 para closeup
+      const closeupCanvas = createCanvas(640, 640);
+      const closeupCtx = closeupCanvas.getContext('2d');
+      
+      // Recortar y escalar: tomar los primeros 640px de altura y escalar a 640x640
+      closeupCtx.drawImage(canvas, 0, 0, 1000, 640, 0, 0, 640, 640);
+      
+      finalBuffer = closeupCanvas.toBuffer('image/png');
+      console.log(`[custom-render] 🔍 Closeup 640x640 generado para token ${cleanTokenId}`);
+    } else {
+      finalBuffer = canvas.toBuffer('image/png');
+    }
+
     // Enviar imagen
-    const buffer = canvas.toBuffer('image/png');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Content-Length', buffer.length);
-    res.send(buffer);
+    res.setHeader('Content-Length', finalBuffer.length);
+    
+    if (isCloseup && isCloseupToken) {
+      res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CUSTOM');
+      res.setHeader('X-Render-Type', 'closeup');
+    } else {
+      res.setHeader('X-Version', 'ADRIANZERO-CUSTOM');
+      res.setHeader('X-Render-Type', 'full');
+    }
+    
+    res.send(finalBuffer);
 
     console.log('[custom-render] Renderizado personalizado completado exitosamente');
 

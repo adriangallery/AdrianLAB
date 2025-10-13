@@ -45,6 +45,16 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
+    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
+    const isCloseup = req.query.closeup === 'true';
+    const isCloseupToken = parseInt(tokenId) === 202; // Hardcodeado para token 202
+    
+    if (isCloseup && isCloseupToken) {
+      console.log(`[metadata] 🔍 CLOSEUP: Token ${tokenId} - Usando metadata con closeup`);
+    } else if (isCloseup && !isCloseupToken) {
+      console.log(`[metadata] ⚠️ CLOSEUP: Token ${tokenId} - Closeup no disponible, usando metadata normal`);
+    }
+    
     // Caso especial para el token 100000
     if (tokenId === '100000' || tokenId === '100000.json') {
       const metadataPath = path.join(process.cwd(), 'public', 'metadata', '100000.json');
@@ -93,10 +103,14 @@ export default async function handler(req, res) {
         }
         
         // Actualizar URLs para compatibilidad con OpenSea
+        const imageUrl = (isCloseup && isCloseupToken) 
+          ? `${baseUrl}/api/render/${tokenId}.png?closeup=true&v=${version}`
+          : `${baseUrl}/api/render/${tokenId}.png?v=${version}`;
+          
         const updatedTokenData = {
           ...tokenData,
-          image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
-          external_url: `${baseUrl}/api/render/${tokenId}.png?v=${version}`
+          image: imageUrl,
+          external_url: imageUrl
         };
         
         console.log(`[metadata] 🥷 SamuraiZERO ${tokenId} metadata cargado exitosamente`);
@@ -191,11 +205,16 @@ export default async function handler(req, res) {
     }
 
     // Metadata base que siempre se mostrará
+    // Construir URL de imagen según tipo de render
+    const imageUrl = (isCloseup && isCloseupToken) 
+      ? `${baseUrl}/api/render/${tokenId}.png?closeup=true&v=${version}`
+      : `${baseUrl}/api/render/${tokenId}.png?v=${version}`;
+    
     const baseMetadata = {
       name: `AdrianZero #${tokenId}`,
       description: `An AdrianZero from the AdrianLAB collection`,
-      image: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
-      external_url: `${baseUrl}/api/render/${tokenId}.png?v=${version}`,
+      image: imageUrl,
+      external_url: imageUrl,
       metadata_version: "2",
       attributes: []
     };
@@ -589,6 +608,15 @@ export default async function handler(req, res) {
       baseMetadata.image = gifUrl;
       baseMetadata.external_url = gifUrl;
       console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
+    }
+    
+    // Configurar headers según tipo de render
+    if (isCloseup && isCloseupToken) {
+      res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-METADATA');
+      res.setHeader('X-Render-Type', 'closeup');
+    } else {
+      res.setHeader('X-Version', 'ADRIANZERO-METADATA');
+      res.setHeader('X-Render-Type', 'full');
     }
     
     return res.status(200).json(baseMetadata);

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="37.925" height="37.925" shape-rendering="crispEdges" style="image-rendering: pixelated;">
+<rect x="19.475" y="19.475" width="1.025" height="1.025" fill="#6e6e6e" />
+<rect x="20.500" y="19.475" width="1.025" height="1.025" fill="#818181" />
+<rect x="21.525" y="19.475" width="1.025" height="1.025" fill="#474747" />
+<rect x="22.550" y="19.475" width="1.025" height="1.025" fill="#474747" />
+<rect x="18.450" y="20.500" width="1.025" height="1.025" fill="#212121" />
+<rect x="23.575" y="20.500" width="1.025" height="1.025" fill="#0f0f0f" />
+<rect x="18.450" y="21.525" width="1.025" height="1.025" fill="#818181" />
+<rect x="19.475" y="21.525" width="1.025" height="1.025" fill="#212121" fill-opacity="0.600" />
+<rect x="22.550" y="21.525" width="1.025" height="1.025" fill="#101010" fill-opacity="0.961" />
+<rect x="23.575" y="21.525" width="1.025" height="1.025" fill="#474747" />
+<rect x="18.450" y="22.550" width="1.025" height="1.025" fill="#818181" />
+<rect x="23.575" y="22.550" width="1.025" height="1.025" fill="#2d2d2d" />
+<rect x="18.450" y="23.575" width="1.025" height="1.025" fill="#090909" />
+<rect x="23.575" y="23.575" width="1.025" height="1.025" fill="#010101" />
+</svg>

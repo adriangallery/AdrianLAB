@@ -7,7 +7,9 @@ import { getContracts } from '../../../lib/contracts.js';
 import { 
   getCachedAdrianZeroRender, 
   setCachedAdrianZeroRender, 
-  getAdrianZeroRenderTTL 
+  getAdrianZeroRenderTTL,
+  getCachedAdrianZeroCloseup,
+  setCachedAdrianZeroCloseup
 } from '../../../lib/cache.js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
@@ -207,18 +209,41 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
+    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
+    const isCloseup = req.query.closeup === 'true';
+    const isCloseupToken = parseInt(cleanTokenId) === 202; // Hardcodeado para token 202
+    
+    if (isCloseup && isCloseupToken) {
+      console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
+    } else if (isCloseup && !isCloseupToken) {
+      console.log(`[render] ⚠️ CLOSEUP: Token ${cleanTokenId} - Closeup no disponible, usando render normal`);
+    }
+
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
-    const cachedImage = getCachedAdrianZeroRender(cleanTokenId);
+    let cachedImage;
+    
+    if (isCloseup && isCloseupToken) {
+      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId);
+    } else {
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId);
+    }
     
     if (cachedImage) {
-      console.log(`[render] 🎯 CACHE HIT para token ${cleanTokenId}`);
+      console.log(`[render] 🎯 CACHE HIT para token ${cleanTokenId}${isCloseup && isCloseupToken ? ' (CLOSEUP)' : ''}`);
       
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/png');
-      res.setHeader('X-Version', 'ADRIANZERO-CACHED');
+      
+      if (isCloseup && isCloseupToken) {
+        res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CACHED');
+        res.setHeader('X-Render-Type', 'closeup');
+      } else {
+        res.setHeader('X-Version', 'ADRIANZERO-CACHED');
+        res.setHeader('X-Render-Type', 'full');
+      }
       
       return res.status(200).send(cachedImage);
     }
@@ -1105,9 +1130,36 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== LÓGICA CLOSEUP PARA TOKEN 202 =====
+    let finalBuffer;
+    let finalCanvas = canvas;
+    let finalCtx = ctx;
+    
+    if (isCloseup && isCloseupToken) {
+      console.log(`[render] 🔍 Aplicando closeup 640x640 para token ${cleanTokenId}`);
+      
+      // Crear nuevo canvas 640x640 para closeup
+      const closeupCanvas = createCanvas(640, 640);
+      const closeupCtx = closeupCanvas.getContext('2d');
+      
+      // Recortar y escalar: tomar los primeros 640px de altura y escalar a 640x640
+      closeupCtx.drawImage(canvas, 0, 0, 1000, 640, 0, 0, 640, 640);
+      
+      finalCanvas = closeupCanvas;
+      finalCtx = closeupCtx;
+      finalBuffer = closeupCanvas.toBuffer('image/png');
+      
+      console.log(`[render] 🔍 Closeup 640x640 generado para token ${cleanTokenId}`);
+    } else {
+      finalBuffer = canvas.toBuffer('image/png');
+    }
+
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-    const buffer = canvas.toBuffer('image/png');
-    setCachedAdrianZeroRender(cleanTokenId, buffer);
+    if (isCloseup && isCloseupToken) {
+      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer);
+    } else {
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer);
+    }
 
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
     console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
@@ -1116,9 +1168,17 @@ export default async function handler(req, res) {
     res.setHeader('X-Cache', 'MISS');
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-    res.setHeader('X-Version', 'ADRIANZERO-CACHED');
-    res.setHeader('Content-Length', buffer.length);
-    res.send(buffer);
+    
+    if (isCloseup && isCloseupToken) {
+      res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP');
+      res.setHeader('X-Render-Type', 'closeup');
+    } else {
+      res.setHeader('X-Version', 'ADRIANZERO-FULL');
+      res.setHeader('X-Render-Type', 'full');
+    }
+    
+    res.setHeader('Content-Length', finalBuffer.length);
+    res.send(finalBuffer);
 
     console.log('[render] Renderizado completado exitosamente');
 
