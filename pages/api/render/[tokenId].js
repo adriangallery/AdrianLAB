@@ -1145,13 +1145,17 @@ export default async function handler(req, res) {
       // Recortar y escalar correctamente:
       // 1. La imagen original es 1000x1000 (cuadrada)
       // 2. Para closeup 640x640 (cuadrada), recortar área cuadrada de 640x640
-      // 3. Tomar desde la esquina superior izquierda: x=0, y=0, w=640, h=640
+      // 3. Posición del recorte: x=150 (derecha), y=50 (abajo)
       // 4. Escalar directamente a 640x640 (factor 1:1)
+      
+      const cropX = 150;  // Desplazamiento a la derecha
+      const cropY = 50;   // Desplazamiento hacia abajo
+      const cropSize = 640; // Tamaño del recorte
       
       closeupCtx.drawImage(
         canvas, 
-        0, 0, 640, 640,   // Fuente: x=0, y=0, w=640, h=640 (recorte cuadrado)
-        0, 0, 640, 640    // Destino: x=0, y=0, w=640, h=640 (sin escalado)
+        cropX, cropY, cropSize, cropSize,  // Fuente: x=150, y=50, w=640, h=640
+        0, 0, 640, 640                     // Destino: x=0, y=0, w=640, h=640
       );
       
       finalCanvas = closeupCanvas;
