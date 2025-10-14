@@ -209,27 +209,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP (PARÁMETRO) =====
     const isCloseup = req.query.closeup === 'true';
-    const isCloseupToken = parseInt(cleanTokenId) === 202; // Hardcodeado para token 202
+    const isCloseupToken = isCloseup; // Cualquier token con ?closeup=true
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
-    } else if (isCloseup && !isCloseupToken) {
-      console.log(`[render] ⚠️ CLOSEUP: Token ${cleanTokenId} - Closeup no disponible, usando render normal`);
     }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
     let cachedImage;
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       cachedImage = getCachedAdrianZeroCloseup(cleanTokenId);
     } else {
       cachedImage = getCachedAdrianZeroRender(cleanTokenId);
     }
     
     if (cachedImage) {
-      console.log(`[render] 🎯 CACHE HIT para token ${cleanTokenId}${isCloseup && isCloseupToken ? ' (CLOSEUP)' : ''}`);
+      console.log(`[render] 🎯 CACHE HIT para token ${cleanTokenId}${isCloseup ? ' (CLOSEUP)' : ''}`);
       
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -237,7 +235,7 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/png');
       
-      if (isCloseup && isCloseupToken) {
+      if (isCloseup) {
         res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CACHED');
         res.setHeader('X-Render-Type', 'closeup');
       } else {
@@ -1168,7 +1166,7 @@ export default async function handler(req, res) {
     }
 
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer);
     } else {
       setCachedAdrianZeroRender(cleanTokenId, finalBuffer);
@@ -1182,7 +1180,7 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP');
       res.setHeader('X-Render-Type', 'closeup');
     } else {

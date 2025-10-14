@@ -451,15 +451,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP (PARÁMETRO) =====
     const isCloseup = req.query.closeup === 'true';
-    const tokenIdNum = parseInt(cleanTokenId);
-    const isCloseupToken = tokenIdNum === 202; // Hardcodeado para token 202
+    const isCloseupToken = isCloseup; // Cualquier token con ?closeup=true
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       console.log(`[custom-render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
-    } else if (isCloseup && !isCloseupToken) {
-      console.log(`[custom-render] ⚠️ CLOSEUP: Token ${cleanTokenId} - Closeup no disponible, usando render normal`);
     }
 
     // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS Y SAMURAIZERO
@@ -1575,7 +1572,7 @@ export default async function handler(req, res) {
     // ===== LÓGICA CLOSEUP PARA TOKEN 202 =====
     let finalBuffer;
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       console.log(`[custom-render] 🔍 Aplicando closeup 640x640 para token ${cleanTokenId}`);
       
       // Crear nuevo canvas 640x640 para closeup
@@ -1608,7 +1605,7 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Content-Length', finalBuffer.length);
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CUSTOM');
       res.setHeader('X-Render-Type', 'closeup');
     } else {
