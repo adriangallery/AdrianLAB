@@ -1148,13 +1148,13 @@ export default async function handler(req, res) {
       // 3. Posición del recorte: x=150 (derecha), y=50 (abajo)
       // 4. Escalar directamente a 640x640 (factor 1:1)
       
-      const cropX = 50;   // Desplazamiento a la derecha
+      const cropX = 200;  // Desplazamiento a la derecha
       const cropY = 50;   // Desplazamiento hacia abajo
       const cropSize = 640; // Tamaño del recorte
       
       closeupCtx.drawImage(
         canvas, 
-        cropX, cropY, cropSize, cropSize,  // Fuente: x=50, y=50, w=640, h=640
+        cropX, cropY, cropSize, cropSize,  // Fuente: x=200, y=50, w=640, h=640
         0, 0, 640, 640                     // Destino: x=0, y=0, w=640, h=640
       );
       
