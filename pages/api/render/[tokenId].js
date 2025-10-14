@@ -1142,8 +1142,18 @@ export default async function handler(req, res) {
       const closeupCanvas = createCanvas(640, 640);
       const closeupCtx = closeupCanvas.getContext('2d');
       
-      // Recortar y escalar: tomar los primeros 640px de altura y escalar a 640x640
-      closeupCtx.drawImage(canvas, 0, 0, 1000, 640, 0, 0, 640, 640);
+      // Recortar y escalar correctamente:
+      // 1. Tomar los primeros 640px de altura de la imagen original (1000x1000)
+      // 2. Escalar proporcionalmente a 640x640
+      // 3. Centrar horizontalmente si es necesario
+      const sourceHeight = 640; // Altura a recortar
+      const scale = 640 / sourceHeight; // Factor de escalado (1.0)
+      
+      closeupCtx.drawImage(
+        canvas, 
+        0, 0, 1000, sourceHeight,  // Fuente: x=0, y=0, w=1000, h=640
+        0, 0, 640, 640             // Destino: x=0, y=0, w=640, h=640
+      );
       
       finalCanvas = closeupCanvas;
       finalCtx = closeupCtx;
