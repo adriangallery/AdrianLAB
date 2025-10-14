@@ -605,6 +605,14 @@ export default async function handler(req, res) {
       console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
     }
     
+    // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas
+    if (tokenIdNum === 202) {
+      const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
+      baseMetadata.image = closeupUrl;
+      baseMetadata.external_url = closeupUrl;
+      console.log('[metadata] Override especial aplicado para token 202 (closeup) →', closeupUrl);
+    }
+    
     // Configurar headers
     res.setHeader('X-Version', 'ADRIANZERO-METADATA');
     res.setHeader('X-Render-Type', isCloseupToken ? 'closeup' : 'full');
