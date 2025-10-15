@@ -1586,7 +1586,7 @@ export default async function handler(req, res) {
       // 4. Escalar directamente a 640x640 (factor 1:1)
       
       const cropX = 200;  // Desplazamiento a la derecha
-      const cropY = 50;   // Desplazamiento hacia abajo
+      const cropY = 85;   // Desplazamiento hacia abajo
       const cropSize = 640; // Tamaño del recorte
       
       closeupCtx.drawImage(
