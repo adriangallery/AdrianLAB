@@ -1,0 +1,27 @@
+[
+  {
+    "inputs": [],
+    "name": "getAllActiveToggles",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toggleId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ZoomInZEROS.TokenToggle[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

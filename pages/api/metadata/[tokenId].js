@@ -1,4 +1,5 @@
 import { getContracts } from '../../../lib/contracts.js';
+import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -45,9 +46,26 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP (TOKEN 202) =====
-    // El closeup solo afecta la URL de la imagen, no el metadata completo
-    const isCloseupToken = parseInt(tokenId) === 202; // Hardcodeado para token 202
+    // ===== LÓGICA ESPECIAL CLOSEUP (SISTEMA DE TOGGLES) =====
+    // El closeup se determina por el estado del toggle en el contrato
+    let isCloseupToken = false;
+    
+    try {
+      // Actualizar toggles si es necesario (automático cada 24h)
+      const { zoomInZeros } = await getContracts();
+      await updateTogglesIfNeeded(zoomInZeros);
+      
+      // Verificar si el token tiene toggle de closeup activo
+      isCloseupToken = hasToggleActive(tokenId, "1"); // toggleId "1" = closeup
+      
+      if (isCloseupToken) {
+        console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
+      }
+    } catch (error) {
+      console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
+      // En caso de error, no aplicar closeup (fallback seguro)
+      isCloseupToken = false;
+    }
     
     // Caso especial para el token 100000
     if (tokenId === '100000' || tokenId === '100000.json') {
@@ -605,12 +623,12 @@ export default async function handler(req, res) {
       console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
     }
     
-    // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas
+    // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas (TEMPORAL - ELIMINAR CUANDO TOGGLES ESTÉN ACTIVOS)
     if (tokenIdNum === 202) {
       const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
       baseMetadata.image = closeupUrl;
       baseMetadata.external_url = closeupUrl;
-      console.log('[metadata] Override especial aplicado para token 202 (closeup) →', closeupUrl);
+      console.log('[metadata] Override temporal aplicado para token 202 (closeup) →', closeupUrl);
     }
     
     // Configurar headers
