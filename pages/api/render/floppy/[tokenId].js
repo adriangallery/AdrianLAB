@@ -4,6 +4,7 @@ import {
   setCachedFloppyRender, 
   getFloppyRenderTTL 
 } from '../../../../lib/cache.js';
+import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
 
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
 
   try {
     let { tokenId } = req.query;
+    const isSimple = req.query.simple === 'true';
     
     if (tokenId && tokenId.endsWith('.png')) {
       tokenId = tokenId.replace('.png', '');
@@ -65,6 +67,33 @@ export default async function handler(req, res) {
     }
 
     const tokenIdNum = parseInt(tokenId);
+
+    // ===== LÓGICA ESPECIAL SIMPLE RENDER =====
+    if (isSimple) {
+      console.log(`[floppy-render] 🔍 SIMPLE RENDER: Token ${tokenIdNum} - Generando versión simplificada`);
+      
+      const floppyRenderer = new FloppyRenderer();
+      const simpleSvg = await floppyRenderer.generateSimpleSVG(tokenIdNum);
+      
+      // Convertir SVG a PNG
+      const resvg = new Resvg(simpleSvg, {
+        fitTo: {
+          mode: 'width',
+          value: 600
+        }
+      });
+      
+      const pngBuffer = resvg.render().asPng();
+      
+      // Configurar headers
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('X-Version', 'FLOPPY-SIMPLE');
+      res.setHeader('X-Render-Type', 'simple');
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora de cache
+      
+      console.log(`[floppy-render] 🔍 Simple render completado para token ${tokenIdNum}`);
+      return res.status(200).send(pngBuffer);
+    }
 
     // ===== SISTEMA DE CACHÉ PARA FLOPPY RENDER =====
     const cachedImage = getCachedFloppyRender(tokenIdNum);
