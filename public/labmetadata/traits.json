@@ -10327,10 +10327,1248 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 869,
+      "name": "Breast-Plate-Black",
+      "category": "ARMOUR",
+      "fileName": "Breast-Plate-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 870,
+      "name": "Samurai-Armour-Red",
+      "category": "ARMOUR",
+      "fileName": "Samurai-Armour-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 871,
+      "name": "Breast-Plate-Red",
+      "category": "ARMOUR",
+      "fileName": "Breast-Plate-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 872,
+      "name": "Samurai-Armour-Black",
+      "category": "ARMOUR",
+      "fileName": "Samurai-Armour-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 873,
+      "name": "Samurai-Armour-Gold",
+      "category": "ARMOUR",
+      "fileName": "Samurai-Armour-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 874,
+      "name": "Breast-Plate-White",
+      "category": "ARMOUR",
+      "fileName": "Breast-Plate-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 875,
+      "name": "Samurai-Armour-White",
+      "category": "ARMOUR",
+      "fileName": "Samurai-Armour-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 876,
+      "name": "Breast-Plate-Gold",
+      "category": "ARMOUR",
+      "fileName": "Breast-Plate-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 877,
+      "name": "Samurai-Armour-Pink",
+      "category": "ARMOUR",
+      "fileName": "Samurai-Armour-Pink",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 878,
+      "name": "Mouthguard-Red",
+      "category": "MASK",
+      "fileName": "Mouthguard-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 879,
+      "name": "Samurai-Mask-Red",
+      "category": "MASK",
+      "fileName": "Samurai-Mask-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 880,
+      "name": "Samurai-Mask-White",
+      "category": "MASK",
+      "fileName": "Samurai-Mask-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 881,
+      "name": "Oni-Mask-Green",
+      "category": "MASK",
+      "fileName": "Oni-Mask-Green",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 882,
+      "name": "Hannya-Mask-Red",
+      "category": "MASK",
+      "fileName": "Hannya-Mask-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 883,
+      "name": "Panda-Mask",
+      "category": "MASK",
+      "fileName": "Panda-Mask",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 884,
+      "name": "Tengu-Mask-Black",
+      "category": "MASK",
+      "fileName": "Tengu-Mask-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 885,
+      "name": "Tengu-Mask-Red",
+      "category": "MASK",
+      "fileName": "Tengu-Mask-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 886,
+      "name": "Mouthguard-Silver",
+      "category": "MASK",
+      "fileName": "Mouthguard-Silver",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 887,
+      "name": "Kizune-Mask",
+      "category": "MASK",
+      "fileName": "Kizune-Mask",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 888,
+      "name": "Mouthguard-Gold",
+      "category": "MASK",
+      "fileName": "Mouthguard-Gold",
+      "maxSupply": 88,
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 889,
+      "name": "Samurai-Mask-Gold",
+      "category": "MASK",
+      "fileName": "Samurai-Mask-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 890,
+      "name": "Oni-Mask-Red",
+      "category": "MASK",
+      "fileName": "Oni-Mask-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 891,
+      "name": "Samurai-Mask-Black",
+      "category": "MASK",
+      "fileName": "Samurai-Mask-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 892,
+      "name": "Hannya-Mask-Gold",
+      "category": "MASK",
+      "fileName": "Hannya-Mask-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 893,
+      "name": "Tiger-Mask",
+      "category": "MASK",
+      "fileName": "Tiger-Mask",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 894,
+      "name": "Oni-Mask-Pink",
+      "category": "MASK",
+      "fileName": "Oni-Mask-Pink",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 895,
+      "name": "Tengu-Mask-White",
+      "category": "MASK",
+      "fileName": "Tengu-Mask-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 896,
+      "name": "Hannya-Mask-Black",
+      "category": "MASK",
+      "fileName": "Hannya-Mask-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 897,
+      "name": "White-Tiger-Mask",
+      "category": "MASK",
+      "fileName": "White-Tiger-Mask",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 898,
+      "name": "Chonmage-Down-White",
+      "category": "HEAD",
+      "fileName": "Chonmage-Down-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 899,
+      "name": "Master-White",
+      "category": "HEAD",
+      "fileName": "Master-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 900,
+      "name": "Chonmage-White",
+      "category": "HEAD",
+      "fileName": "Chonmage-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 901,
+      "name": "Chonmage-Up",
+      "category": "HEAD",
+      "fileName": "Chonmage-Up",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 902,
+      "name": "Samurai-Helmet-Wide-Black",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Wide-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 903,
+      "name": "Headband-Red",
+      "category": "HEAD",
+      "fileName": "Headband-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 904,
+      "name": "Samurai-Shaved-Top",
+      "category": "HEAD",
+      "fileName": "Samurai-Shaved-Top",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 905,
+      "name": "Samurai-Helmet-Red",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 906,
+      "name": "Samurai-Helmet-White",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 907,
+      "name": "Chonmage-Down",
+      "category": "HEAD",
+      "fileName": "Chonmage-Down",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 908,
+      "name": "Samurai-Helmet-Wide-Red",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Wide-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 909,
+      "name": "Headband-Black",
+      "category": "HEAD",
+      "fileName": "Headband-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 910,
+      "name": "Head-Slice",
+      "category": "HEAD",
+      "fileName": "Head-Slice",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 911,
+      "name": "Samurai-Top-Knot",
+      "category": "HEAD",
+      "fileName": "Samurai-Top-Knot",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 912,
+      "name": "Long-Hair-White",
+      "category": "HEAD",
+      "fileName": "Long-Hair-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 913,
+      "name": "Straw-Hat-Big",
+      "category": "HEAD",
+      "fileName": "Straw-Hat-Big",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 914,
+      "name": "Samurai-Helmet-Wide-Gold",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Wide-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 915,
+      "name": "Nippon-Headband",
+      "category": "HEAD",
+      "fileName": "Nippon-Headband",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 916,
+      "name": "Decapitation",
+      "category": "HEAD",
+      "fileName": "Decapitation",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 917,
+      "name": "Headband-Gold",
+      "category": "HEAD",
+      "fileName": "Headband-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 918,
+      "name": "Master",
+      "category": "HEAD",
+      "fileName": "Master",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 919,
+      "name": "Samurai-Helmet-Black",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 920,
+      "name": "Samurai-Helmet-Wiide-White",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Wiide-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 921,
+      "name": "Samurai-Wip",
+      "category": "HEAD",
+      "fileName": "Samurai-Wip",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 922,
+      "name": "Samurai-Helmet-Pink",
+      "category": "HEAD",
+      "fileName": "Samurai-Helmet-Pink",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 923,
+      "name": "Ninja-Headband",
+      "category": "HEAD",
+      "fileName": "Ninja-Headband",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 924,
+      "name": "Chonmage",
+      "category": "HEAD",
+      "fileName": "Chonmage",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 925,
+      "name": "Chonmage-Up-White",
+      "category": "HEAD",
+      "fileName": "Chonmage-Up-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 926,
+      "name": "Straw-Hat-Down",
+      "category": "HEAD",
+      "fileName": "Straw-Hat-Down",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 927,
+      "name": "Headband-White",
+      "category": "HEAD",
+      "fileName": "Headband-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 928,
+      "name": "Samurai-Shaved-Top-White",
+      "category": "HEAD",
+      "fileName": "Samurai-Shaved-Top-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 929,
+      "name": "Straw-Hat",
+      "category": "HEAD",
+      "fileName": "Straw-Hat",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 930,
+      "name": "Eyebrow-White",
+      "category": "BEARD",
+      "fileName": "Eyebrow-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 931,
+      "name": "Whiskers-White",
+      "category": "BEARD",
+      "fileName": "Whiskers-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 932,
+      "name": "Goat-Beard-Long-White",
+      "category": "BEARD",
+      "fileName": "Goat-Beard-Long-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 933,
+      "name": "Goat-Beard-Long",
+      "category": "BEARD",
+      "fileName": "Goat-Beard-Long",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 934,
+      "name": "Whiskers-Black",
+      "category": "BEARD",
+      "fileName": "Whiskers-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 935,
+      "name": "Whiskers-White-Long",
+      "category": "BEARD",
+      "fileName": "Whiskers-White-Long",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 936,
+      "name": "Serious",
+      "category": "MOUTH",
+      "fileName": "Serious",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 937,
+      "name": "Sad",
+      "category": "MOUTH",
+      "fileName": "Sad",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 938,
+      "name": "Teeth",
+      "category": "MOUTH",
+      "fileName": "Teeth",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 939,
+      "name": "Kiay",
+      "category": "MOUTH",
+      "fileName": "Kiay",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 940,
+      "name": "Kimono-White",
+      "category": "KIMONO",
+      "fileName": "Kimono-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 941,
+      "name": "Kimono-Red",
+      "category": "KIMONO",
+      "fileName": "Kimono-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 942,
+      "name": "Kimono-Gold",
+      "category": "KIMONO",
+      "fileName": "Kimono-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 943,
+      "name": "Kimono-Black",
+      "category": "KIMONO",
+      "fileName": "Kimono-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 944,
+      "name": "GI-Gold",
+      "category": "GI",
+      "fileName": "GI-Gold",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 945,
+      "name": "GI-White",
+      "category": "GI",
+      "fileName": "GI-White",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 946,
+      "name": "GI-Denim",
+      "category": "GI",
+      "fileName": "GI-Denim",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 947,
+      "name": "GI-Red",
+      "category": "GI",
+      "fileName": "GI-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 948,
+      "name": "Monk-Rope",
+      "category": "GI",
+      "fileName": "Monk-Rope",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 949,
+      "name": "GI-Black",
+      "category": "GI",
+      "fileName": "GI-Black",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 950,
+      "name": "Ninja-Nunchaku",
+      "category": "WEAPON",
+      "fileName": "Ninja-Nunchaku",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 951,
+      "name": "Fan-Stick_Nippon",
+      "category": "WEAPON",
+      "fileName": "Fan-Stick_Nippon",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 952,
+      "name": "Tanto",
+      "category": "WEAPON",
+      "fileName": "Tanto",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 953,
+      "name": "Sai",
+      "category": "WEAPON",
+      "fileName": "Sai",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 954,
+      "name": "Shuriken-Left",
+      "category": "WEAPON",
+      "fileName": "Shuriken-Left",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 955,
+      "name": "Ninja-Smoke",
+      "category": "WEAPON",
+      "fileName": "Ninja-Smoke",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 956,
+      "name": "Nunchaku",
+      "category": "WEAPON",
+      "fileName": "Nunchaku",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 957,
+      "name": "Wakizashi-Kopie",
+      "category": "WEAPON",
+      "fileName": "Wakizashi-Kopie",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 958,
+      "name": "Shuriken_Right",
+      "category": "WEAPON",
+      "fileName": "Shuriken_Right",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 959,
+      "name": "Shuriken_Body",
+      "category": "WEAPON",
+      "fileName": "Shuriken_Body",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 960,
+      "name": "Shuriken_Head",
+      "category": "WEAPON",
+      "fileName": "Shuriken_Head",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 961,
+      "name": "Double-Slash",
+      "category": "WEAPON",
+      "fileName": "Double-Slash",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 962,
+      "name": "Fan-Nippon",
+      "category": "WEAPON",
+      "fileName": "Fan-Nippon",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 963,
+      "name": "Katana",
+      "category": "WEAPON",
+      "fileName": "Katana",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 964,
+      "name": "Ninja-Wakizashi",
+      "category": "WEAPON",
+      "fileName": "Ninja-Wakizashi",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 965,
+      "name": "Fan-Red",
+      "category": "WEAPON",
+      "fileName": "Fan-Red",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 966,
+      "name": "Bo",
+      "category": "WEAPON",
+      "fileName": "Bo",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 967,
+      "name": "Slash",
+      "category": "WEAPON",
+      "fileName": "Slash",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 968,
+      "name": "Ninja-Kama",
+      "category": "WEAPON",
+      "fileName": "Ninja-Kama",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 969,
+      "name": "Kama",
+      "category": "WEAPON",
+      "fileName": "Kama",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 970,
+      "name": "Ninja-Sai",
+      "category": "WEAPON",
+      "fileName": "Ninja-Sai",
+      "floppy": "SAMURAI",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 971,
+      "name": "Red-Candle",
+      "category": "GEAR",
+      "fileName": "Red-Candle",
+      "maxSupply": 1000,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 868,
+    "totalTraits": 971,
     "categories": [
       "BACKGROUND",
       "EAR",
@@ -10350,7 +11588,12 @@
       "PAGERS",
       "ACTION PACKS",
       "HAIR",
-      "HAT"
+      "HAT",
+      "ARMOUR",
+      "MASK",
+      "KIMONO",
+      "GI",
+      "WEAPON"
     ],
     "floppy": "OG",
     "description": "OG Floppy Traits Collection - Base de datos de todos los traits disponibles en la colecci\u00f3n OG Floppy"
