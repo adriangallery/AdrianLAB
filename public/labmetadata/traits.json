@@ -11565,10 +11565,660 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 972,
+      "name": "48",
+      "category": "HAT",
+      "fileName": "48",
+      "maxSupply": 159,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 973,
+      "name": "Acid",
+      "category": "BACKGROUND",
+      "fileName": "Acid",
+      "maxSupply": 77,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 974,
+      "name": "Adrian-Zero-Mask",
+      "category": "HEAD",
+      "fileName": "Adrian-Zero-Mask",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 975,
+      "name": "Asylum",
+      "category": "BACKGROUND",
+      "fileName": "Asylum",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 976,
+      "name": "Black-Cat",
+      "category": "GEAR",
+      "fileName": "Black-Cat",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 977,
+      "name": "Blood-Graveyard",
+      "category": "BACKGROUND",
+      "fileName": "Blood-Graveyard",
+      "maxSupply": 108,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 978,
+      "name": "Bloody-Knife",
+      "category": "GEAR",
+      "fileName": "Bloody-Knife",
+      "maxSupply": 300,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 979,
+      "name": "Brain-Snot",
+      "category": "NOSE",
+      "fileName": "Brain-Snot",
+      "maxSupply": 75,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 980,
+      "name": "Brain-Worms",
+      "category": "NOSE",
+      "fileName": "Brain-Worms",
+      "maxSupply": 174,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 981,
+      "name": "Broom",
+      "category": "GEAR",
+      "fileName": "Broom",
+      "maxSupply": 112,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 982,
+      "name": "Candy-Corn",
+      "category": "TOP",
+      "fileName": "Candy-Corn",
+      "maxSupply": 159,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 983,
+      "name": "Chainsaw-On",
+      "category": "GEAR",
+      "fileName": "Chainsaw-On",
+      "maxSupply": 77,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 984,
+      "name": "Chainsaw",
+      "category": "GEAR",
+      "fileName": "Chainsaw",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 985,
+      "name": "Chito-Mask",
+      "category": "HEAD",
+      "fileName": "Chito-Mask",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 986,
+      "name": "Dark-Graveyard",
+      "category": "BACKGROUND",
+      "fileName": "Dark-Graveyard",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 987,
+      "name": "Frankenstein-Mask",
+      "category": "HEAD",
+      "fileName": "Frankenstein-Mask",
+      "maxSupply": 50,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 988,
+      "name": "Freddy-Kruger",
+      "category": "TOP",
+      "fileName": "Freddy-Kruger",
+      "maxSupply": 1,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 989,
+      "name": "Ghooost",
+      "category": "TOP",
+      "fileName": "Ghooost",
+      "maxSupply": 10,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 990,
+      "name": "Goo",
+      "category": "BACKGROUND",
+      "fileName": "Goo",
+      "maxSupply": 112,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 991,
+      "name": "Hag-Coat",
+      "category": "SWAG",
+      "fileName": "Hag-Coat",
+      "maxSupply": 159,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 992,
+      "name": "Hag-Hat",
+      "category": "HAT",
+      "fileName": "Hag-Hat",
+      "maxSupply": 77,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 993,
+      "name": "Hag-Mask",
+      "category": "HEAD",
+      "fileName": "Hag-Mask",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 994,
+      "name": "Hanibal-Mask",
+      "category": "HEAD",
+      "fileName": "Hanibal-Mask",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 995,
+      "name": "Jason-Mask",
+      "category": "HEAD",
+      "fileName": "Jason-Mask",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 996,
+      "name": "Knife",
+      "category": "HEAD",
+      "fileName": "Knife",
+      "maxSupply": 60,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 997,
+      "name": "Let-Me-Cook",
+      "category": "GEAR",
+      "fileName": "Let-Me-Cook",
+      "maxSupply": 80,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 998,
+      "name": "Mummy",
+      "category": "TOP",
+      "fileName": "Mummy",
+      "maxSupply": 5,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 999,
+      "name": "Popping-Eyeball",
+      "category": "EYES",
+      "fileName": "Popping-Eyeball",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1000,
+      "name": "Presidential-Comb-Over",
+      "category": "HAIR",
+      "fileName": "Presidential-Comb-Over",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1001,
+      "name": "Presidential-Suit",
+      "category": "SWAG",
+      "fileName": "Presidential-Suit",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1002,
+      "name": "Prison-Suit",
+      "category": "SWAG",
+      "fileName": "Prison-Suit",
+      "maxSupply": 50,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1003,
+      "name": "Pump-King-Hat",
+      "category": "HAT",
+      "fileName": "Pump-King-Hat",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1004,
+      "name": "Pump-King",
+      "category": "BACKGROUND",
+      "fileName": "Pump-King",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1005,
+      "name": "Pumpkin",
+      "category": "GEAR",
+      "fileName": "Pumpkin",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1006,
+      "name": "REDRUM-Hair",
+      "category": "HAIR",
+      "fileName": "REDRUM-Hair",
+      "maxSupply": 50,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1007,
+      "name": "REDRUM-Shades",
+      "category": "EYES",
+      "fileName": "REDRUM-Shades",
+      "maxSupply": 78,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1008,
+      "name": "REDRUM",
+      "category": "SKINTRAIT",
+      "fileName": "REDRUM",
+      "maxSupply": 10,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1009,
+      "name": "Scream-Mask",
+      "category": "HEAD",
+      "fileName": "Scream-Mask",
+      "maxSupply": 90,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1010,
+      "name": "Skeleton-Suit",
+      "category": "SKINTRAIT",
+      "fileName": "Skeleton-Suit",
+      "maxSupply": 10,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1011,
+      "name": "Snot-Bat",
+      "category": "GEAR",
+      "fileName": "Snot-Bat",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1012,
+      "name": "Snot",
+      "category": "BACKGROUND",
+      "fileName": "Snot",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1013,
+      "name": "Spider-Web3",
+      "category": "GEAR",
+      "fileName": "Spider-Web3",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1014,
+      "name": "Spider",
+      "category": "GEAR",
+      "fileName": "Spider",
+      "maxSupply": 50,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1015,
+      "name": "Spray-Snot",
+      "category": "TOP",
+      "fileName": "Spray-Snot",
+      "maxSupply": 117,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1016,
+      "name": "Strait-Jacked",
+      "category": "SWAG",
+      "fileName": "Strait-Jacked",
+      "maxSupply": 97,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1017,
+      "name": "TONS-Hair",
+      "category": "HAIR",
+      "fileName": "TONS-Hair",
+      "maxSupply": 124,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1018,
+      "name": "TONS-Shades",
+      "category": "EYES",
+      "fileName": "TONS-Shades",
+      "maxSupply": 50,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1019,
+      "name": "TONS",
+      "category": "SKINTRAIT",
+      "fileName": "TONS",
+      "maxSupply": 10,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1020,
+      "name": "Trick-Or-Treat",
+      "category": "HEAD",
+      "fileName": "Trick-Or-Treat",
+      "maxSupply": 75,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1021,
+      "name": "Ultra-Violent",
+      "category": "BACKGROUND",
+      "fileName": "Ultra-Violent",
+      "maxSupply": 88,
+      "floppy": "Hello-WEN 25",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 971,
+    "totalTraits": 1021,
     "categories": [
       "BACKGROUND",
       "EAR",
