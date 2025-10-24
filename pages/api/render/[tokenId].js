@@ -1010,7 +1010,7 @@ export default async function handler(req, res) {
     // 3. TERCERO: Renderizar resto de traits
     console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
     // Ajuste: HEAD por encima de HAIR
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HEAD', 'HAT', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'HAT', 'SWAG', 'HAIR', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
