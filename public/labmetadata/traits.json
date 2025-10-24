@@ -11660,7 +11660,7 @@
     {
       "tokenId": 979,
       "name": "Brain-Snot",
-      "category": "NOSE",
+      "category": "HEAD",
       "fileName": "Brain-Snot",
       "maxSupply": 75,
       "floppy": "Hello-WEN 25",
@@ -11673,7 +11673,7 @@
     {
       "tokenId": 980,
       "name": "Brain-Worms",
-      "category": "NOSE",
+      "category": "HEAD",
       "fileName": "Brain-Worms",
       "maxSupply": 174,
       "floppy": "Hello-WEN 25",
