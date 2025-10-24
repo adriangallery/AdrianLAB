@@ -143,10 +143,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10013,
+      "name": "Hello-WEN 25",
+      "category": "Floppy discs",
+      "fileName": "10013.gif",
+      "maxSupply": "TBD",
+      "floppy": "Hello-WEN 25",
+      "traitsInside": 6,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 12,
+    "totalFloppys": 13,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
