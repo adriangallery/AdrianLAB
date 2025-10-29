@@ -12215,10 +12215,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1023,
+      "name": "NEO-ZERO",
+      "category": "SKINTRAIT",
+      "fileName": "1023",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1021,
+    "totalTraits": 1022,
     "categories": [
       "BACKGROUND",
       "EAR",
