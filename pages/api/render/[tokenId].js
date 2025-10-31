@@ -217,6 +217,13 @@ export default async function handler(req, res) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
     }
 
+    // ===== LÓGICA ESPECIAL SHADOW (PARÁMETRO) =====
+    const isShadow = req.query.shadow === 'true';
+    
+    if (isShadow) {
+      console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
+    }
+
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
     let cachedImage;
     
@@ -347,6 +354,18 @@ export default async function handler(req, res) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, 1000, 1000);
     console.log('[render] Canvas creado con fondo blanco');
+
+    // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow está activo)
+    let contentCanvas = null;
+    let contentCtx = null;
+    if (isShadow) {
+      contentCanvas = createCanvas(1000, 1000);
+      contentCtx = contentCanvas.getContext('2d');
+      console.log('[render] Canvas de contenido (sin background) creado para sombra');
+    }
+
+    // Función auxiliar para obtener el contexto correcto según shadow
+    const getDrawContext = () => isShadow ? contentCtx : ctx;
 
     // Función para cargar y renderizar SVG con caché
     const loadAndRenderSvg = async (path) => {
@@ -800,13 +819,13 @@ export default async function handler(req, res) {
       console.log(`[render] PASO 2 - 🎨 LÓGICA ESPECIAL: SKINTRAIT prevalece sobre skin base y serums: ${skintraitPath}`);
       const skintraitImage = await loadAndRenderSvg(skintraitPath);
       if (skintraitImage) {
-        ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
+        getDrawContext().drawImage(skintraitImage, 0, 0, 1000, 1000);
         console.log('[render] PASO 2 - 🎨 SKINTRAIT renderizado correctamente (reemplaza skin base)');
       } else {
         console.error('[render] PASO 2 - Error al cargar SKINTRAIT, usando skin base normal');
         const baseImage = await loadAndRenderSvg(baseImagePath);
         if (baseImage) {
-          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
           console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
         }
       }
@@ -820,13 +839,13 @@ export default async function handler(req, res) {
         // GoldenAdrian exitoso: usar skin Golden específico
         const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
         if (serumSkinImage) {
-          ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(serumSkinImage, 0, 0, 1000, 1000);
           console.log(`[render] PASO 2 - 🧬 Skin GoldenAdrian exitoso (GEN${gen}, Golden) renderizado correctamente`);
         } else {
           console.error(`[render] PASO 2 - Error al cargar skin GoldenAdrian exitoso, usando skin base normal`);
           const baseImage = await loadAndRenderSvg(baseImagePath);
           if (baseImage) {
-            ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
             console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
           }
         }
@@ -850,7 +869,7 @@ export default async function handler(req, res) {
                   });
                   const pngBuffer = resvg.render().asPng();
                   const failImage = await loadImage(pngBuffer);
-                  ctx.drawImage(failImage, 0, 0, 1000, 1000);
+                  getDrawContext().drawImage(failImage, 0, 0, 1000, 1000);
                   console.log('[render] PASO 2 - 🧬 Conversión GF sobre Goldenfail: usando GF-Goldfail');
                   convertedHandled = true;
                 } catch (error) {
@@ -861,7 +880,7 @@ export default async function handler(req, res) {
                 const overrideSkinType = 'Golden';
                 const serumSkinImage = await loadAdrianSvg('AdrianGF', gen, overrideSkinType);
                 if (serumSkinImage) {
-                  ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+                  getDrawContext().drawImage(serumSkinImage, 0, 0, 1000, 1000);
                   console.log(`[render] PASO 2 - 🧬 Conversión GF sobre Golden: usando GF${gen}_Golden`);
                   convertedHandled = true;
                 }
@@ -875,13 +894,13 @@ export default async function handler(req, res) {
           // Render GF normal según skinType (Alien, Albino, Medium, etc.)
           const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
           if (serumSkinImage) {
-            ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(serumSkinImage, 0, 0, 1000, 1000);
             console.log(`[render] PASO 2 - 🧬 Skin ADRIANGF exitoso (GEN${gen}, ${skinType}) renderizado correctamente`);
           } else {
             console.error(`[render] PASO 2 - Error al cargar skin ADRIANGF exitoso, usando skin base normal`);
             const baseImage = await loadAndRenderSvg(baseImagePath);
             if (baseImage) {
-              ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+              getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
               console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
             }
           }
@@ -890,13 +909,13 @@ export default async function handler(req, res) {
         // Otros serums: lógica original
         const serumSkinImage = await loadAdrianSvg(appliedSerum, gen, skinType);
         if (serumSkinImage) {
-          ctx.drawImage(serumSkinImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(serumSkinImage, 0, 0, 1000, 1000);
           console.log(`[render] PASO 2 - 🧬 Skin de serum ${appliedSerum} renderizado correctamente`);
         } else {
           console.error(`[render] PASO 2 - Error al cargar skin de serum, usando skin base normal`);
           const baseImage = await loadAndRenderSvg(baseImagePath);
           if (baseImage) {
-            ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
             console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
           }
         }
@@ -932,13 +951,13 @@ export default async function handler(req, res) {
         });
         const pngBuffer = resvg.render().asPng();
         const failImage = await loadImage(pngBuffer);
-        ctx.drawImage(failImage, 0, 0, 1000, 1000);
+        getDrawContext().drawImage(failImage, 0, 0, 1000, 1000);
         console.log(`[render] PASO 2 - 🧬 Skin ${failedSerumType || 'serum'} fallido renderizado correctamente`);
       } catch (error) {
         console.error(`[render] PASO 2 - Error al cargar skin de fallo, usando skin base normal:`, error.message);
         const baseImage = await loadAndRenderSvg(baseImagePath);
         if (baseImage) {
-          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
           console.log('[render] PASO 2 - Skin base renderizado correctamente (fallback)');
         }
       }
@@ -948,7 +967,7 @@ export default async function handler(req, res) {
       console.log(`[render] PASO 2 - Usando skin excepcional: ${skinTraitPath}`);
       const skinImage = await loadAndRenderSvg(skinTraitPath);
       if (skinImage) {
-        ctx.drawImage(skinImage, 0, 0, 1000, 1000);
+        getDrawContext().drawImage(skinImage, 0, 0, 1000, 1000);
         console.log('[render] PASO 2 - Skin excepcional renderizado correctamente');
       }
     } else {
@@ -964,14 +983,14 @@ export default async function handler(req, res) {
           const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
           const pngBuffer = resvg.render().asPng();
           const mannequinImage = await loadImage(pngBuffer);
-          ctx.drawImage(mannequinImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(mannequinImage, 0, 0, 1000, 1000);
           console.log('[render] PASO 2 - Mannequin renderizado correctamente');
         } catch (error) {
           console.error('[render] PASO 2 - Error al cargar mannequin, intentando fallback:', error.message);
           const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
           const fallbackImage = await loadAndRenderSvg(fallbackPath);
           if (fallbackImage) {
-            ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(fallbackImage, 0, 0, 1000, 1000);
             console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
           }
         }
@@ -979,14 +998,14 @@ export default async function handler(req, res) {
         console.log('[render] PASO 2 - Usando skin base normal');
         const baseImage = await loadAndRenderSvg(baseImagePath);
         if (baseImage) {
-          ctx.drawImage(baseImage, 0, 0, 1000, 1000);
+          getDrawContext().drawImage(baseImage, 0, 0, 1000, 1000);
           console.log('[render] PASO 2 - Skin base renderizado correctamente');
         } else {
           console.error('[render] PASO 2 - Error al cargar el skin, intentando fallback');
           const fallbackPath = `ADRIAN/GEN${gen}-Medium.svg`;
           const fallbackImage = await loadAndRenderSvg(fallbackPath);
           if (fallbackImage) {
-            ctx.drawImage(fallbackImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(fallbackImage, 0, 0, 1000, 1000);
             console.log('[render] PASO 2 - Skin fallback renderizado correctamente');
           }
         }
@@ -1002,7 +1021,7 @@ export default async function handler(req, res) {
       
       const skinTraitImage = await loadAndRenderSvg(skinTraitPath);
       if (skinTraitImage) {
-        ctx.drawImage(skinTraitImage, 0, 0, 1000, 1000);
+        getDrawContext().drawImage(skinTraitImage, 0, 0, 1000, 1000);
         console.log(`[render] PASO 2.5 - Skin trait especial ${skinTraitId} renderizado correctamente`);
       }
     }
@@ -1036,7 +1055,7 @@ export default async function handler(req, res) {
           if (traitId >= 30000 && traitId <= 35000) {
             traitImage = await loadExternalTrait(traitId);
             if (traitImage) {
-              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
               console.log(`[render] PASO 3 - 🌐 Trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
             } else {
               console.error(`[render] PASO 3 - 🌐 Error al cargar trait ${category} (${traitId}) desde URL externa`);
@@ -1044,7 +1063,7 @@ export default async function handler(req, res) {
           } else if ((traitId >= 100001 && traitId <= 101003) || (traitId >= 101001 && traitId <= 101003)) {
             traitImage = await loadOgpunkTrait(traitId);
             if (traitImage) {
-              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
               console.log(`[render] PASO 3 - 🎯 LÓGICA OGPUNKS: Trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);
             } else {
               console.error(`[render] PASO 3 - 🎯 LÓGICA OGPUNKS: Error al cargar trait ${category} (${traitId}) desde ogpunks`);
@@ -1052,7 +1071,7 @@ export default async function handler(req, res) {
           } else {
             traitImage = await loadTraitFromLabimages(traitId);
             if (traitImage) {
-              ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+              getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
               console.log(`[render] PASO 3 - Trait ${category} (${traitId}) renderizado desde labimages correctamente`);
             } else {
               console.error(`[render] PASO 3 - Error al cargar trait ${category} (${traitId}) desde labimages`);
@@ -1076,7 +1095,7 @@ export default async function handler(req, res) {
         if (traitId >= 30000 && traitId <= 35000) {
           traitImage = await loadExternalTrait(traitId);
           if (traitImage) {
-            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
             console.log(`[render] PASO 4 - 🌐 TOP trait ${category} (${traitId}) renderizado desde URL externa correctamente`);
           } else {
             console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
@@ -1099,7 +1118,7 @@ export default async function handler(req, res) {
         } else if ((traitId >= 100001 && traitId <= 101003) || (traitId >= 101001 && traitId <= 101003)) {
           traitImage = await loadOgpunkTrait(traitId);
           if (traitImage) {
-            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
             console.log(`[render] PASO 4 - 🎯 LÓGICA OGPUNKS: TOP trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);
           } else {
             console.error(`[render] PASO 4 - 🎯 LÓGICA OGPUNKS: Error al cargar TOP trait ${category} (${traitId}) desde ogpunks`);
@@ -1107,7 +1126,7 @@ export default async function handler(req, res) {
         } else {
           traitImage = await loadTraitFromLabimages(traitId);
           if (traitImage) {
-            ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+            getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
             console.log(`[render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);
           } else {
             console.error(`[render] PASO 4 - Error al cargar TOP trait ${category} (${traitId}) desde labimages`);
@@ -1123,8 +1142,43 @@ export default async function handler(req, res) {
 
       const specialTraitImage = await loadAndRenderSvg(specialTraitPath);
       if (specialTraitImage) {
-        ctx.drawImage(specialTraitImage, 0, 0, 1000, 1000);
+        getDrawContext().drawImage(specialTraitImage, 0, 0, 1000, 1000);
         console.log(`[render] PASO 4 - 🎯 Token 48 renderizado correctamente en TOP`);
+      }
+    }
+
+    // ===== PASO SHADOW: generar sombra del contenido (sin background) =====
+    if (isShadow && contentCanvas) {
+      try {
+        console.log('[render] PASO SHADOW - Generando sombra del contenido');
+        const shadowCanvas = createCanvas(1000, 1000);
+        const shadowCtx = shadowCanvas.getContext('2d');
+        shadowCtx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+
+        const imgData = shadowCtx.getImageData(0, 0, 1000, 1000);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const a = data[i + 3];
+          if (a !== 0) {
+            data[i] = 0;
+            data[i + 1] = 0;
+            data[i + 2] = 0;
+            data[i + 3] = Math.round(a * 0.3);
+          }
+        }
+        shadowCtx.putImageData(imgData, 0, 0);
+
+        // Dibujar sombra desplazada a la izquierda 40px y hacia abajo 2px
+        ctx.drawImage(shadowCanvas, -40, 2, 1000, 1000);
+        console.log('[render] PASO SHADOW - Sombra aplicada (-40px izquierda, +2px abajo)');
+
+        // Dibujar contenido original encima
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        console.log('[render] PASO SHADOW - Contenido original dibujado');
+      } catch (e) {
+        console.warn('[render] PASO SHADOW - Falló la generación de sombra, continuando sin sombra:', e.message);
+        // Fallback: dibujar contenido sin sombra
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
       }
     }
 
@@ -1181,11 +1235,15 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
     if (isCloseup) {
-      res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP');
+      res.setHeader('X-Version', isShadow ? 'ADRIANZERO-CLOSEUP-SHADOW' : 'ADRIANZERO-CLOSEUP');
       res.setHeader('X-Render-Type', 'closeup');
     } else {
-      res.setHeader('X-Version', 'ADRIANZERO-FULL');
+      res.setHeader('X-Version', isShadow ? 'ADRIANZERO-FULL-SHADOW' : 'ADRIANZERO-FULL');
       res.setHeader('X-Render-Type', 'full');
+    }
+    
+    if (isShadow) {
+      res.setHeader('X-Shadow', 'enabled');
     }
     
     res.setHeader('Content-Length', finalBuffer.length);
