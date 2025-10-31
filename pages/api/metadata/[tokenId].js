@@ -46,9 +46,10 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP (SISTEMA DE TOGGLES) =====
-    // El closeup se determina por el estado del toggle en el contrato
+    // ===== LÓGICA ESPECIAL CLOSEUP Y SHADOW (SISTEMA DE TOGGLES) =====
+    // Los toggles se determinan por el estado del contrato
     let isCloseupToken = false;
+    let isShadowToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -58,13 +59,21 @@ export default async function handler(req, res) {
       // Verificar si el token tiene toggle de closeup activo
       isCloseupToken = hasToggleActive(tokenId, "1"); // toggleId "1" = closeup
       
+      // Verificar si el token tiene toggle de shadow activo
+      isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
+      
       if (isCloseupToken) {
         console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
       }
+      
+      if (isShadowToken) {
+        console.log(`[metadata] 🌑 TOGGLE: Token ${tokenId} tiene shadow activo`);
+      }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
-      // En caso de error, no aplicar closeup (fallback seguro)
+      // En caso de error, no aplicar toggles (fallback seguro)
       isCloseupToken = false;
+      isShadowToken = false;
     }
     
     // Caso especial para el token 100000
@@ -115,10 +124,12 @@ export default async function handler(req, res) {
         }
         
         // Actualizar URLs para compatibilidad con OpenSea
-        // Para SamuraiZERO, usar closeup si es token 202
-        const imageUrl = isCloseupToken 
-          ? `${baseUrl}/api/render/${tokenId}.png?closeup=true&v=${version}`
-          : `${baseUrl}/api/render/${tokenId}.png?v=${version}`;
+        // Construir URL con parámetros según toggles activos
+        const urlParams = [];
+        if (isCloseupToken) urlParams.push('closeup=true');
+        if (isShadowToken) urlParams.push('shadow=true');
+        const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
+        const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
           
         const updatedTokenData = {
           ...tokenData,
@@ -218,10 +229,12 @@ export default async function handler(req, res) {
     }
 
     // Metadata base que siempre se mostrará
-    // Construir URL de imagen - usar closeup para token 202
-    const imageUrl = isCloseupToken 
-      ? `${baseUrl}/api/render/${tokenId}.png?closeup=true&v=${version}`
-      : `${baseUrl}/api/render/${tokenId}.png?v=${version}`;
+    // Construir URL de imagen con parámetros según toggles activos
+    const urlParams = [];
+    if (isCloseupToken) urlParams.push('closeup=true');
+    if (isShadowToken) urlParams.push('shadow=true');
+    const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
+    const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
     const baseMetadata = {
       name: `AdrianZero #${tokenId}`,
@@ -624,7 +637,8 @@ export default async function handler(req, res) {
     }
     
     // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas (TEMPORAL - ELIMINAR CUANDO TOGGLES ESTÉN ACTIVOS)
-    if (tokenIdNum === 202) {
+    // Nota: Este override se aplica antes de los toggles, mantener solo para compatibilidad
+    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken) {
       const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
       baseMetadata.image = closeupUrl;
       baseMetadata.external_url = closeupUrl;
@@ -633,7 +647,17 @@ export default async function handler(req, res) {
     
     // Configurar headers
     res.setHeader('X-Version', 'ADRIANZERO-METADATA');
-    res.setHeader('X-Render-Type', isCloseupToken ? 'closeup' : 'full');
+    
+    // Construir header X-Render-Type con información de toggles
+    const renderTypeParts = [];
+    if (isCloseupToken) renderTypeParts.push('closeup');
+    if (isShadowToken) renderTypeParts.push('shadow');
+    const renderType = renderTypeParts.length > 0 ? renderTypeParts.join('+') : 'full';
+    res.setHeader('X-Render-Type', renderType);
+    
+    if (isShadowToken) {
+      res.setHeader('X-Shadow', 'enabled');
+    }
     
     return res.status(200).json(baseMetadata);
   } catch (error) {
