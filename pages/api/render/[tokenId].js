@@ -243,11 +243,15 @@ export default async function handler(req, res) {
       res.setHeader('Content-Type', 'image/png');
       
       if (isCloseup) {
-        res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CACHED');
+        res.setHeader('X-Version', isShadow ? 'ADRIANZERO-CLOSEUP-SHADOW-CACHED' : 'ADRIANZERO-CLOSEUP-CACHED');
         res.setHeader('X-Render-Type', 'closeup');
       } else {
-        res.setHeader('X-Version', 'ADRIANZERO-CACHED');
+        res.setHeader('X-Version', isShadow ? 'ADRIANZERO-SHADOW-CACHED' : 'ADRIANZERO-CACHED');
         res.setHeader('X-Render-Type', 'full');
+      }
+      
+      if (isShadow) {
+        res.setHeader('X-Shadow', 'enabled');
       }
       
       return res.status(200).send(cachedImage);
