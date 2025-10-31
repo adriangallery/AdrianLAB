@@ -1172,9 +1172,9 @@ export default async function handler(req, res) {
         }
         shadowCtx.putImageData(imgData, 0, 0);
 
-        // Dibujar sombra desplazada a la izquierda 40px y hacia abajo 2px
-        ctx.drawImage(shadowCanvas, -40, 2, 1000, 1000);
-        console.log('[render] PASO SHADOW - Sombra aplicada (-40px izquierda, +2px abajo)');
+        // Dibujar sombra desplazada a la izquierda 40px y hacia abajo 8px
+        ctx.drawImage(shadowCanvas, -40, 8, 1000, 1000);
+        console.log('[render] PASO SHADOW - Sombra aplicada (-40px izquierda, +8px abajo)');
 
         // Dibujar contenido original encima
         ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
