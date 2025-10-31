@@ -3,6 +3,23 @@ import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cach
 import fs from 'fs';
 import path from 'path';
 
+// ===== TOKENS ESPECIALES CON IMAGEN Y/O NOMBRE ESPECÍFICO =====
+// Objeto constante en memoria para máximo rendimiento (lookup O(1))
+const SPECIAL_TOKENS = {
+  302: {
+    image: '/labimages/specials/302.gif',
+    name: null // null = usar nombre por defecto desde contratos
+  },
+  441: {
+    image: '/labimages/specials/441.gif',
+    name: 'DRACULA' // Hello-WEN '25 first prize
+  },
+  442: {
+    image: '/labimages/specials/442.gif',
+    name: 'NEO-ZERO' // DropShit #1 first prize
+  }
+};
+
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
   const allowedOrigins = [
@@ -628,17 +645,28 @@ export default async function handler(req, res) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
 
-    // OVERRIDE ESPECIAL: Token 302 usa GIF pre-generado
-    if (tokenIdNum === 302) {
-      const gifUrl = `${baseUrl}/labimages/specials/302.gif?v=${version}`;
-      baseMetadata.image = gifUrl;
-      baseMetadata.external_url = gifUrl;
-      console.log('[metadata] Override especial aplicado para token 302 →', gifUrl);
+    // ===== TOKENS ESPECIALES CON IMAGEN Y/O NOMBRE ESPECÍFICO =====
+    if (SPECIAL_TOKENS[tokenIdNum]) {
+      const special = SPECIAL_TOKENS[tokenIdNum];
+      
+      // Aplicar imagen especial si existe
+      if (special.image) {
+        const specialImageUrl = `${baseUrl}${special.image}?v=${version}`;
+        baseMetadata.image = specialImageUrl;
+        baseMetadata.external_url = specialImageUrl;
+        console.log(`[metadata] 🎨 Token especial ${tokenIdNum}: imagen aplicada → ${specialImageUrl}`);
+      }
+      
+      // Aplicar nombre especial si existe (sobrescribe nombres de contratos)
+      if (special.name) {
+        baseMetadata.name = `${special.name} #${tokenIdNum}`;
+        console.log(`[metadata] 🎨 Token especial ${tokenIdNum}: nombre aplicado → ${baseMetadata.name}`);
+      }
     }
     
     // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas (TEMPORAL - ELIMINAR CUANDO TOGGLES ESTÉN ACTIVOS)
-    // Nota: Este override se aplica antes de los toggles, mantener solo para compatibilidad
-    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken) {
+    // Nota: Este override se aplica después de SPECIAL_TOKENS, solo si no hay toggle activo
+    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken && !SPECIAL_TOKENS[tokenIdNum]) {
       const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
       baseMetadata.image = closeupUrl;
       baseMetadata.external_url = closeupUrl;
