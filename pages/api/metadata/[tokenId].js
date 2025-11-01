@@ -65,6 +65,17 @@ export default async function handler(req, res) {
     
     // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW Y BN (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
+    // IDs de toggles:
+    // "1" = closeup solo
+    // "2" = shadow solo
+    // "3" = glow solo
+    // "4" = bn solo
+    // "5" = bn+shadow
+    // "6" = bn+shadow+closeup
+    // "7" = shadow+closeup
+    // "8" = glow+closeup
+    // "9" = glow+bn
+    // "10" = glow+bn+closeup
     let isCloseupToken = false;
     let isShadowToken = false;
     let isGlowToken = false;
@@ -75,32 +86,79 @@ export default async function handler(req, res) {
       const { zoomInZeros } = await getContracts();
       await updateTogglesIfNeeded(zoomInZeros);
       
-      // Verificar si el token tiene toggle de closeup activo
-      isCloseupToken = hasToggleActive(tokenId, "1"); // toggleId "1" = closeup
+      // Verificar toggles combinados primero (tienen prioridad)
+      const hasToggle5 = hasToggleActive(tokenId, "5"); // bn+shadow
+      const hasToggle6 = hasToggleActive(tokenId, "6"); // bn+shadow+closeup
+      const hasToggle7 = hasToggleActive(tokenId, "7"); // shadow+closeup
+      const hasToggle8 = hasToggleActive(tokenId, "8"); // glow+closeup
+      const hasToggle9 = hasToggleActive(tokenId, "9"); // glow+bn
+      const hasToggle10 = hasToggleActive(tokenId, "10"); // glow+bn+closeup
       
-      // Verificar si el token tiene toggle de shadow activo
-      isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
-      
-      // Verificar si el token tiene toggle de glow activo
-      isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
-      
-      // Verificar si el token tiene toggle de BN activo
-      isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
-      
-      if (isCloseupToken) {
-        console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
-      }
-      
-      if (isShadowToken) {
-        console.log(`[metadata] 🌑 TOGGLE: Token ${tokenId} tiene shadow activo`);
-      }
-      
-      if (isGlowToken) {
-        console.log(`[metadata] ✨ TOGGLE: Token ${tokenId} tiene glow activo`);
-      }
-      
-      if (isBnToken) {
-        console.log(`[metadata] ⚫ TOGGLE: Token ${tokenId} tiene BN (blanco y negro) activo`);
+      // Si hay toggle combinado activo, aplicar esa combinación
+      if (hasToggle10) {
+        // ID 10: glow+bn+closeup
+        isCloseupToken = true;
+        isGlowToken = true;
+        isBnToken = true;
+        isShadowToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 10: Token ${tokenId} tiene glow+bn+closeup activo`);
+      } else if (hasToggle9) {
+        // ID 9: glow+bn
+        isCloseupToken = false;
+        isGlowToken = true;
+        isBnToken = true;
+        isShadowToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 9: Token ${tokenId} tiene glow+bn activo`);
+      } else if (hasToggle8) {
+        // ID 8: glow+closeup
+        isCloseupToken = true;
+        isGlowToken = true;
+        isBnToken = false;
+        isShadowToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 8: Token ${tokenId} tiene glow+closeup activo`);
+      } else if (hasToggle7) {
+        // ID 7: shadow+closeup
+        isCloseupToken = true;
+        isShadowToken = true;
+        isGlowToken = false;
+        isBnToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 7: Token ${tokenId} tiene shadow+closeup activo`);
+      } else if (hasToggle6) {
+        // ID 6: bn+shadow+closeup
+        isCloseupToken = true;
+        isShadowToken = true;
+        isBnToken = true;
+        isGlowToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 6: Token ${tokenId} tiene bn+shadow+closeup activo`);
+      } else if (hasToggle5) {
+        // ID 5: bn+shadow
+        isCloseupToken = false;
+        isShadowToken = true;
+        isBnToken = true;
+        isGlowToken = false;
+        console.log(`[metadata] 🎨 TOGGLE 5: Token ${tokenId} tiene bn+shadow activo`);
+      } else {
+        // Verificar toggles individuales (solo si no hay toggle combinado)
+        isCloseupToken = hasToggleActive(tokenId, "1"); // toggleId "1" = closeup
+        isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
+        isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
+        isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
+        
+        if (isCloseupToken) {
+          console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
+        }
+        
+        if (isShadowToken) {
+          console.log(`[metadata] 🌑 TOGGLE: Token ${tokenId} tiene shadow activo`);
+        }
+        
+        if (isGlowToken) {
+          console.log(`[metadata] ✨ TOGGLE: Token ${tokenId} tiene glow activo`);
+        }
+        
+        if (isBnToken) {
+          console.log(`[metadata] ⚫ TOGGLE: Token ${tokenId} tiene BN (blanco y negro) activo`);
+        }
       }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
