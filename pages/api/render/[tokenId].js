@@ -1180,7 +1180,8 @@ export default async function handler(req, res) {
     }
 
     // ===== PASO SHADOW: generar sombra del contenido (sin background) =====
-    if (isShadow && contentCanvas) {
+    // NOTA: Shadow solo se aplica si NO hay glow activo (para evitar conflictos)
+    if (isShadow && !isGlow && contentCanvas) {
       try {
         console.log('[render] PASO SHADOW - Generando sombra del contenido');
         const shadowCanvas = createCanvas(1000, 1000);
@@ -1215,6 +1216,7 @@ export default async function handler(req, res) {
     }
 
     // ===== PASO GLOW: generar efecto glow con arcoíris/ripples alrededor =====
+    // NOTA: Glow tiene prioridad sobre shadow si ambos están activos
     if (isGlow && contentCanvas) {
       try {
         console.log('[render] PASO GLOW - Generando glow arcoíris alrededor del contenido');
