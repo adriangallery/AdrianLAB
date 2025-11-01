@@ -383,16 +383,8 @@ export default async function handler(req, res) {
       console.log(`[render] Canvas de contenido (sin background) creado para ${isShadow ? 'sombra' : 'glow'}`);
     }
 
-    // Canvas más grande para GLOW (1400x1400 para permitir glow alrededor)
-    let glowCanvas = null;
-    let glowCtx = null;
-    if (isGlow) {
-      glowCanvas = createCanvas(1400, 1400);
-      glowCtx = glowCanvas.getContext('2d');
-      // Fondo transparente para el canvas de glow
-      glowCtx.clearRect(0, 0, 1400, 1400);
-      console.log('[render] Canvas de glow (1400x1400) creado');
-    }
+    // Nota: GLOW se dibuja directamente en el canvas principal (1000x1000)
+    // Las capas de glow se extienden más allá del borde pero se recortan automáticamente
 
     // Función auxiliar para obtener el contexto correcto según shadow o glow
     const getDrawContext = () => (isShadow || isGlow) ? contentCtx : ctx;
@@ -1213,50 +1205,49 @@ export default async function handler(req, res) {
     }
 
     // ===== PASO GLOW: generar efecto glow con arcoíris/ripples alrededor =====
-    if (isGlow && contentCanvas && glowCanvas) {
+    if (isGlow && contentCanvas) {
       try {
         console.log('[render] PASO GLOW - Generando glow arcoíris alrededor del contenido');
         
-        // Centrar el contenido en el canvas más grande (offset de 200px)
-        const glowOffset = 200;
-        const centerX = 700; // centro del canvas 1400x1400
-        const centerY = 700;
-        
         // Crear múltiples capas de glow con gradiente arcoíris
-        // Cada capa es más grande y más transparente que la anterior
+        // Cada capa es más grande que el original pero se dibuja directamente en el canvas de 1000x1000
+        // El contenido original mantiene su tamaño (1000x1000)
         const glowLayers = [
-          { size: 1050, opacity: 0.6, blur: 10 },
-          { size: 1100, opacity: 0.4, blur: 20 },
-          { size: 1150, opacity: 0.3, blur: 30 },
-          { size: 1200, opacity: 0.2, blur: 40 },
-          { size: 1250, opacity: 0.15, blur: 50 }
+          { scale: 1.05, opacity: 0.6 }, // 1050px
+          { scale: 1.10, opacity: 0.4 }, // 1100px
+          { scale: 1.15, opacity: 0.3 }, // 1150px
+          { scale: 1.20, opacity: 0.2 }, // 1200px
+          { scale: 1.25, opacity: 0.15 } // 1250px
         ];
         
-        // Dibujar cada capa de glow
+        // Dibujar cada capa de glow directamente en el canvas principal
+        // Las capas se extienden más allá del borde pero el canvas las recorta a 1000x1000
         for (let layerIdx = 0; layerIdx < glowLayers.length; layerIdx++) {
           const layer = glowLayers[layerIdx];
+          const layerSize = Math.round(1000 * layer.scale);
+          const layerOffset = (1000 - layerSize) / 2; // Negativo para centrar la capa más grande
           
           // Crear canvas temporal para esta capa
-          const layerCanvas = createCanvas(layer.size, layer.size);
+          const layerCanvas = createCanvas(layerSize, layerSize);
           const layerCtx = layerCanvas.getContext('2d');
           
           // Copiar contenido original escalado
-          layerCtx.drawImage(contentCanvas, 0, 0, layer.size, layer.size);
+          layerCtx.drawImage(contentCanvas, 0, 0, layerSize, layerSize);
           
           // Aplicar efecto de glow con colores arcoíris
-          const layerImgData = layerCtx.getImageData(0, 0, layer.size, layer.size);
+          const layerImgData = layerCtx.getImageData(0, 0, layerSize, layerSize);
           const layerData = layerImgData.data;
           
           for (let i = 0; i < layerData.length; i += 4) {
             const a = layerData[i + 3];
             if (a !== 0) {
               // Calcular posición para el gradiente arcoíris
-              const x = (i / 4) % layer.size;
-              const y = Math.floor((i / 4) / layer.size);
-              const dx = x - layer.size / 2;
-              const dy = y - layer.size / 2;
+              const x = (i / 4) % layerSize;
+              const y = Math.floor((i / 4) / layerSize);
+              const dx = x - layerSize / 2;
+              const dy = y - layerSize / 2;
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const maxDist = layer.size / 2;
+              const maxDist = layerSize / 2;
               const angle = (Math.atan2(dy, dx) + Math.PI) / (2 * Math.PI); // 0-1
               
               // Generar color arcoíris basado en ángulo y distancia
@@ -1297,21 +1288,14 @@ export default async function handler(req, res) {
           
           layerCtx.putImageData(layerImgData, 0, 0);
           
-          // Dibujar esta capa en el canvas de glow, centrada
-          const layerOffset = (1400 - layer.size) / 2;
-          glowCtx.drawImage(layerCanvas, layerOffset, layerOffset);
+          // Dibujar esta capa en el canvas principal (las partes que se salen se recortan automáticamente)
+          ctx.drawImage(layerCanvas, layerOffset, layerOffset);
         }
         
-        // Dibujar el contenido original centrado encima del glow
-        glowCtx.drawImage(contentCanvas, glowOffset, glowOffset, 1000, 1000);
+        // Dibujar el contenido original encima del glow (tamaño original 1000x1000)
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
         
-        // Copiar el canvas de glow al canvas principal, escalando si es necesario
-        // NO limpiar el canvas principal porque el background ya está dibujado ahí
-        // Simplemente dibujar el glow (que tiene fondo transparente excepto el efecto) encima del background
-        // Si el canvas final debe ser 1000x1000, escalamos el glow
-        ctx.drawImage(glowCanvas, 0, 0, 1400, 1400, 0, 0, 1000, 1000);
-        
-        console.log('[render] PASO GLOW - Glow arcoíris aplicado alrededor del contenido');
+        console.log('[render] PASO GLOW - Glow arcoíris aplicado alrededor del contenido (tamaño original preservado)');
       } catch (e) {
         console.warn('[render] PASO GLOW - Falló la generación de glow, continuando sin glow:', e.message);
         // Fallback: dibujar contenido sin glow
