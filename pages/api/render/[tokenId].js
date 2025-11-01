@@ -235,12 +235,13 @@ export default async function handler(req, res) {
     }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
+    // El caché debe diferenciar según los efectos (shadow, glow, bn)
     let cachedImage;
     
     if (isCloseup) {
-      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId);
+      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn);
     } else {
-      cachedImage = getCachedAdrianZeroRender(cleanTokenId);
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn);
     }
     
     if (cachedImage) {
@@ -1353,10 +1354,11 @@ export default async function handler(req, res) {
     }
 
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+    // Guardar en caché incluyendo información de efectos para diferenciación
     if (isCloseup) {
-      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer);
+      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn);
     } else {
-      setCachedAdrianZeroRender(cleanTokenId, finalBuffer);
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn);
     }
 
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
