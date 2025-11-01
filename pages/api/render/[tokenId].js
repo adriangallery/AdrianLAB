@@ -1306,7 +1306,8 @@ export default async function handler(req, res) {
         glowCtx.drawImage(contentCanvas, glowOffset, glowOffset, 1000, 1000);
         
         // Copiar el canvas de glow al canvas principal, escalando si es necesario
-        ctx.clearRect(0, 0, 1000, 1000);
+        // NO limpiar el canvas principal porque el background ya está dibujado ahí
+        // Simplemente dibujar el glow (que tiene fondo transparente excepto el efecto) encima del background
         // Si el canvas final debe ser 1000x1000, escalamos el glow
         ctx.drawImage(glowCanvas, 0, 0, 1400, 1400, 0, 0, 1000, 1000);
         
