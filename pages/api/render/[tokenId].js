@@ -217,9 +217,10 @@ export default async function handler(req, res) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
     }
 
-    // ===== LÓGICA ESPECIAL SHADOW Y GLOW (PARÁMETRO) =====
+    // ===== LÓGICA ESPECIAL SHADOW, GLOW Y BN (PARÁMETRO) =====
     const isShadow = req.query.shadow === 'true';
     const isGlow = req.query.glow === 'true';
+    const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
     
     if (isShadow) {
       console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
@@ -227,6 +228,10 @@ export default async function handler(req, res) {
     
     if (isGlow) {
       console.log(`[render] ✨ GLOW: Token ${cleanTokenId} - Renderizando con glow`);
+    }
+    
+    if (isBn) {
+      console.log(`[render] ⚫ BN: Token ${cleanTokenId} - Renderizando en blanco y negro`);
     }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
@@ -251,6 +256,7 @@ export default async function handler(req, res) {
       if (isCloseup) versionParts.push('CLOSEUP');
       if (isShadow) versionParts.push('SHADOW');
       if (isGlow) versionParts.push('GLOW');
+      if (isBn) versionParts.push('BN');
       const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
       
       if (isCloseup) {
@@ -267,6 +273,10 @@ export default async function handler(req, res) {
       
       if (isGlow) {
         res.setHeader('X-Glow', 'enabled');
+      }
+      
+      if (isBn) {
+        res.setHeader('X-BN', 'enabled');
       }
       
       return res.status(200).send(cachedImage);
@@ -1355,10 +1365,63 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
+    // ===== PASO BN: convertir a escala de grises (DEBE SER DESPUÉS DE TODOS LOS EFECTOS) =====
+    if (isBn) {
+      try {
+        console.log('[render] PASO BN - Convirtiendo imagen a blanco y negro');
+        
+        // Obtener el canvas final (puede ser closeupCanvas o canvas normal)
+        const sourceCanvas = finalCanvas || canvas;
+        const sourceCtx = sourceCanvas.getContext('2d');
+        
+        // Obtener los datos de imagen del canvas
+        const imgData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const data = imgData.data;
+        
+        // Convertir cada píxel a escala de grises
+        for (let i = 0; i < data.length; i += 4) {
+          // Preservar transparencia (alpha channel)
+          const alpha = data[i + 3];
+          if (alpha !== 0) {
+            // Calcular luminancia (fórmula estándar para conversión RGB a gris)
+            // Usamos pesos estándar: 0.299*R + 0.587*G + 0.114*B
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+            
+            // Aplicar el valor de gris a todos los canales RGB
+            data[i] = gray;     // Red
+            data[i + 1] = gray; // Green
+            data[i + 2] = gray; // Blue
+            // Alpha se mantiene igual (data[i + 3])
+          }
+        }
+        
+        // Aplicar los cambios al canvas
+        sourceCtx.putImageData(imgData, 0, 0);
+        
+        // Regenerar el buffer final si es necesario
+        if (finalCanvas) {
+          finalBuffer = finalCanvas.toBuffer('image/png');
+        }
+        
+        console.log('[render] PASO BN - Conversión a blanco y negro completada');
+      } catch (e) {
+        console.warn('[render] PASO BN - Falló la conversión a BN, continuando sin BN:', e.message);
+      }
+    }
+
+    // Si no se generó finalBuffer aún, generarlo ahora
+    if (!finalBuffer) {
+      finalBuffer = (finalCanvas || canvas).toBuffer('image/png');
+    }
+
     const versionParts = [];
     if (isCloseup) versionParts.push('CLOSEUP');
     if (isShadow) versionParts.push('SHADOW');
     if (isGlow) versionParts.push('GLOW');
+    if (isBn) versionParts.push('BN');
     const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
     
     if (isCloseup) {
@@ -1375,6 +1438,10 @@ export default async function handler(req, res) {
     
     if (isGlow) {
       res.setHeader('X-Glow', 'enabled');
+    }
+    
+    if (isBn) {
+      res.setHeader('X-BN', 'enabled');
     }
     
     res.setHeader('Content-Length', finalBuffer.length);

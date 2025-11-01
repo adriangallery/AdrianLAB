@@ -63,11 +63,12 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW Y GLOW (SISTEMA DE TOGGLES) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW Y BN (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
     let isCloseupToken = false;
     let isShadowToken = false;
     let isGlowToken = false;
+    let isBnToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -83,6 +84,9 @@ export default async function handler(req, res) {
       // Verificar si el token tiene toggle de glow activo
       isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
       
+      // Verificar si el token tiene toggle de BN activo
+      isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
+      
       if (isCloseupToken) {
         console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
       }
@@ -94,12 +98,17 @@ export default async function handler(req, res) {
       if (isGlowToken) {
         console.log(`[metadata] ✨ TOGGLE: Token ${tokenId} tiene glow activo`);
       }
+      
+      if (isBnToken) {
+        console.log(`[metadata] ⚫ TOGGLE: Token ${tokenId} tiene BN (blanco y negro) activo`);
+      }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
       // En caso de error, no aplicar toggles (fallback seguro)
       isCloseupToken = false;
       isShadowToken = false;
       isGlowToken = false;
+      isBnToken = false;
     }
     
     // Caso especial para el token 100000
@@ -155,6 +164,7 @@ export default async function handler(req, res) {
         if (isCloseupToken) urlParams.push('closeup=true');
         if (isShadowToken) urlParams.push('shadow=true');
         if (isGlowToken) urlParams.push('glow=true');
+        if (isBnToken) urlParams.push('bn=true');
         const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
         const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
           
@@ -261,6 +271,7 @@ export default async function handler(req, res) {
     if (isCloseupToken) urlParams.push('closeup=true');
     if (isShadowToken) urlParams.push('shadow=true');
     if (isGlowToken) urlParams.push('glow=true');
+    if (isBnToken) urlParams.push('bn=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
@@ -677,7 +688,7 @@ export default async function handler(req, res) {
     
     // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas (TEMPORAL - ELIMINAR CUANDO TOGGLES ESTÉN ACTIVOS)
     // Nota: Este override se aplica después de SPECIAL_TOKENS, solo si no hay toggle activo
-    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken && !isGlowToken && !SPECIAL_TOKENS[tokenIdNum]) {
+    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken && !isGlowToken && !isBnToken && !SPECIAL_TOKENS[tokenIdNum]) {
       const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
       baseMetadata.image = closeupUrl;
       baseMetadata.external_url = closeupUrl;
@@ -692,6 +703,7 @@ export default async function handler(req, res) {
     if (isCloseupToken) renderTypeParts.push('closeup');
     if (isShadowToken) renderTypeParts.push('shadow');
     if (isGlowToken) renderTypeParts.push('glow');
+    if (isBnToken) renderTypeParts.push('bn');
     const renderType = renderTypeParts.length > 0 ? renderTypeParts.join('+') : 'full';
     res.setHeader('X-Render-Type', renderType);
     
@@ -701,6 +713,10 @@ export default async function handler(req, res) {
     
     if (isGlowToken) {
       res.setHeader('X-Glow', 'enabled');
+    }
+    
+    if (isBnToken) {
+      res.setHeader('X-BN', 'enabled');
     }
     
     return res.status(200).json(baseMetadata);
