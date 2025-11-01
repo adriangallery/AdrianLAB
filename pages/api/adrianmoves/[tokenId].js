@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { createCanvas, loadImage } from 'canvas';
 import { Gif, GifFrame, BitmapImage, GifUtil } from 'gifwrap';
+import Jimp from 'jimp';
 
 export default async function handler(req, res) {
   // Configurar CORS
@@ -148,19 +149,14 @@ export default async function handler(req, res) {
       ctx.drawImage(frameImage, x, y, scaledWidth, scaledHeight);
 
       // Convertir canvas combinado a bitmap para el nuevo GIF
-      // Obtener ImageData del canvas combinado
-      const combinedImageData = ctx.getImageData(0, 0, 1000, 1000);
-      const pixelData = combinedImageData.data;
+      // Convertir canvas a buffer PNG y luego a Jimp para crear BitmapImage
+      const combinedBuffer = combinedCanvas.toBuffer('image/png');
       
-      // Crear bitmap compatible con gifwrap directamente desde ImageData
-      // BitmapImage espera un objeto con: width, height, data (Buffer en formato RGBA)
-      // ImageData.data es Uint8ClampedArray, necesitamos convertirlo a Buffer
-      const bitmapData = Buffer.from(pixelData);
-      const combinedBitmap = new BitmapImage({
-        width: 1000,
-        height: 1000,
-        data: bitmapData
-      });
+      // Cargar el buffer PNG en Jimp
+      const jimpImage = await Jimp.read(combinedBuffer);
+      
+      // Crear BitmapImage desde el bitmap de Jimp (esto es lo que gifwrap espera)
+      const combinedBitmap = new BitmapImage(jimpImage.bitmap);
       
       // Crear nuevo frame con el delay original
       const delayCentisecs = frame.delayCentisecs || 10;
