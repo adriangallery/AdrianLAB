@@ -30,13 +30,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extraer tokenId, eliminando la extensión .gif si está presente en la URL
-    let { tokenId } = req.query;
-    const cleanTokenId = tokenId ? tokenId.toString().replace(/\.gif$/, '') : '';
+    // Extraer tokenId de la ruta, eliminando .gif si existe
+    const { tokenId } = req.query;
+    
+    if (!tokenId) {
+      return res.status(400).json({ error: 'Token ID requerido' });
+    }
+    
+    const cleanTokenId = tokenId.toString().replace(/\.gif$/, '');
     
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
       return res.status(400).json({ error: 'Token ID inválido' });
     }
+    
+    console.log(`[adrianmoves] 📥 Request recibido - tokenId original: ${tokenId}, limpio: ${cleanTokenId}`);
     
     console.log(`[adrianmoves] 🎬 Iniciando generación de GIF animado para token ${cleanTokenId}`);
 
