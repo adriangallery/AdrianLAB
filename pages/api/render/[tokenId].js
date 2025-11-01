@@ -217,11 +217,16 @@ export default async function handler(req, res) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
     }
 
-    // ===== LÓGICA ESPECIAL SHADOW (PARÁMETRO) =====
+    // ===== LÓGICA ESPECIAL SHADOW Y GLOW (PARÁMETRO) =====
     const isShadow = req.query.shadow === 'true';
+    const isGlow = req.query.glow === 'true';
     
     if (isShadow) {
       console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
+    }
+    
+    if (isGlow) {
+      console.log(`[render] ✨ GLOW: Token ${cleanTokenId} - Renderizando con glow`);
     }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
@@ -242,16 +247,26 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/png');
       
+      const versionParts = [];
+      if (isCloseup) versionParts.push('CLOSEUP');
+      if (isShadow) versionParts.push('SHADOW');
+      if (isGlow) versionParts.push('GLOW');
+      const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
+      
       if (isCloseup) {
-        res.setHeader('X-Version', isShadow ? 'ADRIANZERO-CLOSEUP-SHADOW-CACHED' : 'ADRIANZERO-CLOSEUP-CACHED');
+        res.setHeader('X-Version', `ADRIANZERO-CLOSEUP${versionSuffix}-CACHED`);
         res.setHeader('X-Render-Type', 'closeup');
       } else {
-        res.setHeader('X-Version', isShadow ? 'ADRIANZERO-SHADOW-CACHED' : 'ADRIANZERO-CACHED');
+        res.setHeader('X-Version', `ADRIANZERO${versionSuffix}-CACHED`);
         res.setHeader('X-Render-Type', 'full');
       }
       
       if (isShadow) {
         res.setHeader('X-Shadow', 'enabled');
+      }
+      
+      if (isGlow) {
+        res.setHeader('X-Glow', 'enabled');
       }
       
       return res.status(200).send(cachedImage);
@@ -359,17 +374,28 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 1000, 1000);
     console.log('[render] Canvas creado con fondo blanco');
 
-    // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow está activo)
+    // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow o glow está activo)
     let contentCanvas = null;
     let contentCtx = null;
-    if (isShadow) {
+    if (isShadow || isGlow) {
       contentCanvas = createCanvas(1000, 1000);
       contentCtx = contentCanvas.getContext('2d');
-      console.log('[render] Canvas de contenido (sin background) creado para sombra');
+      console.log(`[render] Canvas de contenido (sin background) creado para ${isShadow ? 'sombra' : 'glow'}`);
     }
 
-    // Función auxiliar para obtener el contexto correcto según shadow
-    const getDrawContext = () => isShadow ? contentCtx : ctx;
+    // Canvas más grande para GLOW (1400x1400 para permitir glow alrededor)
+    let glowCanvas = null;
+    let glowCtx = null;
+    if (isGlow) {
+      glowCanvas = createCanvas(1400, 1400);
+      glowCtx = glowCanvas.getContext('2d');
+      // Fondo transparente para el canvas de glow
+      glowCtx.clearRect(0, 0, 1400, 1400);
+      console.log('[render] Canvas de glow (1400x1400) creado');
+    }
+
+    // Función auxiliar para obtener el contexto correcto según shadow o glow
+    const getDrawContext = () => (isShadow || isGlow) ? contentCtx : ctx;
 
     // Función para cargar y renderizar SVG con caché
     const loadAndRenderSvg = async (path) => {
@@ -1186,6 +1212,112 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== PASO GLOW: generar efecto glow con arcoíris/ripples alrededor =====
+    if (isGlow && contentCanvas && glowCanvas) {
+      try {
+        console.log('[render] PASO GLOW - Generando glow arcoíris alrededor del contenido');
+        
+        // Centrar el contenido en el canvas más grande (offset de 200px)
+        const glowOffset = 200;
+        const centerX = 700; // centro del canvas 1400x1400
+        const centerY = 700;
+        
+        // Crear múltiples capas de glow con gradiente arcoíris
+        // Cada capa es más grande y más transparente que la anterior
+        const glowLayers = [
+          { size: 1050, opacity: 0.6, blur: 10 },
+          { size: 1100, opacity: 0.4, blur: 20 },
+          { size: 1150, opacity: 0.3, blur: 30 },
+          { size: 1200, opacity: 0.2, blur: 40 },
+          { size: 1250, opacity: 0.15, blur: 50 }
+        ];
+        
+        // Dibujar cada capa de glow
+        for (let layerIdx = 0; layerIdx < glowLayers.length; layerIdx++) {
+          const layer = glowLayers[layerIdx];
+          
+          // Crear canvas temporal para esta capa
+          const layerCanvas = createCanvas(layer.size, layer.size);
+          const layerCtx = layerCanvas.getContext('2d');
+          
+          // Copiar contenido original escalado
+          layerCtx.drawImage(contentCanvas, 0, 0, layer.size, layer.size);
+          
+          // Aplicar efecto de glow con colores arcoíris
+          const layerImgData = layerCtx.getImageData(0, 0, layer.size, layer.size);
+          const layerData = layerImgData.data;
+          
+          for (let i = 0; i < layerData.length; i += 4) {
+            const a = layerData[i + 3];
+            if (a !== 0) {
+              // Calcular posición para el gradiente arcoíris
+              const x = (i / 4) % layer.size;
+              const y = Math.floor((i / 4) / layer.size);
+              const dx = x - layer.size / 2;
+              const dy = y - layer.size / 2;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const maxDist = layer.size / 2;
+              const angle = (Math.atan2(dy, dx) + Math.PI) / (2 * Math.PI); // 0-1
+              
+              // Generar color arcoíris basado en ángulo y distancia
+              const hue = (angle * 360 + distance * 0.1) % 360;
+              const saturation = 100;
+              const lightness = 50 + (distance / maxDist) * 30;
+              
+              // Convertir HSL a RGB
+              const h = hue / 360;
+              const s = saturation / 100;
+              const l = lightness / 100;
+              
+              let r, g, b;
+              if (s === 0) {
+                r = g = b = l;
+              } else {
+                const hue2rgb = (p, q, t) => {
+                  if (t < 0) t += 1;
+                  if (t > 1) t -= 1;
+                  if (t < 1/6) return p + (q - p) * 6 * t;
+                  if (t < 1/2) return q;
+                  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                  return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+              }
+              
+              layerData[i] = Math.round(r * 255);
+              layerData[i + 1] = Math.round(g * 255);
+              layerData[i + 2] = Math.round(b * 255);
+              layerData[i + 3] = Math.round(a * layer.opacity);
+            }
+          }
+          
+          layerCtx.putImageData(layerImgData, 0, 0);
+          
+          // Dibujar esta capa en el canvas de glow, centrada
+          const layerOffset = (1400 - layer.size) / 2;
+          glowCtx.drawImage(layerCanvas, layerOffset, layerOffset);
+        }
+        
+        // Dibujar el contenido original centrado encima del glow
+        glowCtx.drawImage(contentCanvas, glowOffset, glowOffset, 1000, 1000);
+        
+        // Copiar el canvas de glow al canvas principal, escalando si es necesario
+        ctx.clearRect(0, 0, 1000, 1000);
+        // Si el canvas final debe ser 1000x1000, escalamos el glow
+        ctx.drawImage(glowCanvas, 0, 0, 1400, 1400, 0, 0, 1000, 1000);
+        
+        console.log('[render] PASO GLOW - Glow arcoíris aplicado alrededor del contenido');
+      } catch (e) {
+        console.warn('[render] PASO GLOW - Falló la generación de glow, continuando sin glow:', e.message);
+        // Fallback: dibujar contenido sin glow
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+      }
+    }
+
     // ===== LÓGICA CLOSEUP PARA TOKEN 202 =====
     let finalBuffer;
     let finalCanvas = canvas;
@@ -1238,16 +1370,26 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
+    const versionParts = [];
+    if (isCloseup) versionParts.push('CLOSEUP');
+    if (isShadow) versionParts.push('SHADOW');
+    if (isGlow) versionParts.push('GLOW');
+    const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
+    
     if (isCloseup) {
-      res.setHeader('X-Version', isShadow ? 'ADRIANZERO-CLOSEUP-SHADOW' : 'ADRIANZERO-CLOSEUP');
+      res.setHeader('X-Version', `ADRIANZERO-CLOSEUP${versionSuffix}`);
       res.setHeader('X-Render-Type', 'closeup');
     } else {
-      res.setHeader('X-Version', isShadow ? 'ADRIANZERO-FULL-SHADOW' : 'ADRIANZERO-FULL');
+      res.setHeader('X-Version', `ADRIANZERO-FULL${versionSuffix}`);
       res.setHeader('X-Render-Type', 'full');
     }
     
     if (isShadow) {
       res.setHeader('X-Shadow', 'enabled');
+    }
+    
+    if (isGlow) {
+      res.setHeader('X-Glow', 'enabled');
     }
     
     res.setHeader('Content-Length', finalBuffer.length);

@@ -63,10 +63,11 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP Y SHADOW (SISTEMA DE TOGGLES) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW Y GLOW (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
     let isCloseupToken = false;
     let isShadowToken = false;
+    let isGlowToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -79,6 +80,9 @@ export default async function handler(req, res) {
       // Verificar si el token tiene toggle de shadow activo
       isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
       
+      // Verificar si el token tiene toggle de glow activo
+      isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
+      
       if (isCloseupToken) {
         console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
       }
@@ -86,11 +90,16 @@ export default async function handler(req, res) {
       if (isShadowToken) {
         console.log(`[metadata] 🌑 TOGGLE: Token ${tokenId} tiene shadow activo`);
       }
+      
+      if (isGlowToken) {
+        console.log(`[metadata] ✨ TOGGLE: Token ${tokenId} tiene glow activo`);
+      }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
       // En caso de error, no aplicar toggles (fallback seguro)
       isCloseupToken = false;
       isShadowToken = false;
+      isGlowToken = false;
     }
     
     // Caso especial para el token 100000
@@ -145,6 +154,7 @@ export default async function handler(req, res) {
         const urlParams = [];
         if (isCloseupToken) urlParams.push('closeup=true');
         if (isShadowToken) urlParams.push('shadow=true');
+        if (isGlowToken) urlParams.push('glow=true');
         const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
         const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
           
@@ -250,6 +260,7 @@ export default async function handler(req, res) {
     const urlParams = [];
     if (isCloseupToken) urlParams.push('closeup=true');
     if (isShadowToken) urlParams.push('shadow=true');
+    if (isGlowToken) urlParams.push('glow=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
@@ -666,7 +677,7 @@ export default async function handler(req, res) {
     
     // OVERRIDE ESPECIAL: Token 202 usa closeup para pruebas (TEMPORAL - ELIMINAR CUANDO TOGGLES ESTÉN ACTIVOS)
     // Nota: Este override se aplica después de SPECIAL_TOKENS, solo si no hay toggle activo
-    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken && !SPECIAL_TOKENS[tokenIdNum]) {
+    if (tokenIdNum === 202 && !isCloseupToken && !isShadowToken && !isGlowToken && !SPECIAL_TOKENS[tokenIdNum]) {
       const closeupUrl = `${baseUrl}/api/render/202.png?closeup=true&v=${version}`;
       baseMetadata.image = closeupUrl;
       baseMetadata.external_url = closeupUrl;
@@ -680,11 +691,16 @@ export default async function handler(req, res) {
     const renderTypeParts = [];
     if (isCloseupToken) renderTypeParts.push('closeup');
     if (isShadowToken) renderTypeParts.push('shadow');
+    if (isGlowToken) renderTypeParts.push('glow');
     const renderType = renderTypeParts.length > 0 ? renderTypeParts.join('+') : 'full';
     res.setHeader('X-Render-Type', renderType);
     
     if (isShadowToken) {
       res.setHeader('X-Shadow', 'enabled');
+    }
+    
+    if (isGlowToken) {
+      res.setHeader('X-Glow', 'enabled');
     }
     
     return res.status(200).json(baseMetadata);
