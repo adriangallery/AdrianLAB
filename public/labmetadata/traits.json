@@ -7793,25 +7793,12 @@
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 611,
-      "name": "Bob-OG",
-      "category": "HAIR",
-      "fileName": "611",
-      "maxSupply": 15,
-      "floppy": "OG2",
-      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-      "masterminds": [
-        "Adrian | HalfxTiger"
-      ],
-      "external_url": "https://adrianzero.com/"
-    },
-    {
       "tokenId": 612,
-      "name": "Buzz-OG",
+      "name": "Sh\u56fdrt",
       "category": "HAIR",
-      "fileName": "612",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "fileName": "Sh\u56fdrt",
+      "maxSupply": 113,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7820,11 +7807,11 @@
     },
     {
       "tokenId": 613,
-      "name": "Crazy-3d-OG",
+      "name": "Sp\u5c0fke",
       "category": "HAIR",
-      "fileName": "613",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "fileName": "Sp\u5c0fke",
+      "maxSupply": 84,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7833,11 +7820,11 @@
     },
     {
       "tokenId": 614,
-      "name": "Crazy-Hair-Blue-OG",
+      "name": "To\u6587s\u56fdre",
       "category": "HAIR",
-      "fileName": "614",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "fileName": "To\u6587s\u56fdre",
+      "maxSupply": 38,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7846,11 +7833,11 @@
     },
     {
       "tokenId": 615,
-      "name": "Crazy-Hair-OG",
+      "name": "\u4e2dild\u8bedp\u6c49g",
       "category": "HAIR",
-      "fileName": "615",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "fileName": "\u4e2dild\u8bedp\u6c49g",
+      "maxSupply": 33,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7859,11 +7846,11 @@
     },
     {
       "tokenId": 616,
-      "name": "Flat-Top-OG",
+      "name": "\u5b57\u8bedppe\u4e2d",
       "category": "HAIR",
-      "fileName": "616",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "fileName": "\u5b57\u8bedppe\u4e2d",
+      "maxSupply": 114,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7872,11 +7859,11 @@
     },
     {
       "tokenId": 617,
-      "name": "Long-Hair-OG",
-      "category": "HAIR",
-      "fileName": "617",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "name": "S\u56fdi\u5b57k",
+      "category": "MOUTH",
+      "fileName": "S\u56fdi\u5b57k",
+      "maxSupply": 77,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7885,11 +7872,11 @@
     },
     {
       "tokenId": 618,
-      "name": "Longer-Hair-OG",
-      "category": "HAIR",
-      "fileName": "618",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "name": "\u5b57ad",
+      "category": "MOUTH",
+      "fileName": "\u5b57ad",
+      "maxSupply": 154,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -7898,11 +7885,11 @@
     },
     {
       "tokenId": 619,
-      "name": "Mid-OG",
-      "category": "HAIR",
-      "fileName": "619",
-      "maxSupply": 15,
-      "floppy": "OG2",
+      "name": "G\u5b57N1",
+      "category": "SKIN",
+      "fileName": "G\u5b57N1",
+      "maxSupply": 108,
+      "floppy": "GLITCH",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -13020,10 +13007,127 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1024,
+      "name": "Bob-OG",
+      "category": "HAIR",
+      "fileName": "1024",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1025,
+      "name": "Buzz-OG",
+      "category": "HAIR",
+      "fileName": "1025",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1026,
+      "name": "Crazy-3d-OG",
+      "category": "HAIR",
+      "fileName": "1026",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1027,
+      "name": "Crazy-Hair-Blue-OG",
+      "category": "HAIR",
+      "fileName": "1027",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1028,
+      "name": "Crazy-Hair-OG",
+      "category": "HAIR",
+      "fileName": "1028",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1029,
+      "name": "Flat-Top-OG",
+      "category": "HAIR",
+      "fileName": "1029",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1030,
+      "name": "Long-Hair-OG",
+      "category": "HAIR",
+      "fileName": "1030",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1031,
+      "name": "Longer-Hair-OG",
+      "category": "HAIR",
+      "fileName": "1031",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1032,
+      "name": "Mid-OG",
+      "category": "HAIR",
+      "fileName": "1032",
+      "maxSupply": 15,
+      "floppy": "OGcover",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1092,
+    "totalTraits": 1101,
     "categories": [
       "BACKGROUND",
       "EAR",
