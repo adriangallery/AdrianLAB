@@ -13124,10 +13124,140 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1033,
+      "name": "MCD-Be-Real-Background_2",
+      "category": "BACKGROUND",
+      "fileName": "1033",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1034,
+      "name": "MCD-Be-Real-Background",
+      "category": "BACKGROUND",
+      "fileName": "1034",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1035,
+      "name": "MCD-Big-Mac",
+      "category": "GEAR",
+      "fileName": "1035",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1036,
+      "name": "MCD-Cap",
+      "category": "HEAD",
+      "fileName": "1036",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1037,
+      "name": "MCD-Crew-Visor",
+      "category": "HEAD",
+      "fileName": "1037",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1038,
+      "name": "MCD-Ronald-McDonald-Face",
+      "category": "NECK",
+      "fileName": "1038",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1039,
+      "name": "MCD-Ronald-McDonald-Shirt",
+      "category": "SWAG",
+      "fileName": "1039",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1040,
+      "name": "MCD-Ronald-McDonald",
+      "category": "HAIR",
+      "fileName": "1040",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1041,
+      "name": "MCD-Shake&Fies",
+      "category": "GEAR",
+      "fileName": "1041",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1042,
+      "name": "MCD-Uniform",
+      "category": "SWAG",
+      "fileName": "1042",
+      "maxSupply": 30,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1101,
+    "totalTraits": 1111,
     "categories": [
       "BACKGROUND",
       "EAR",
