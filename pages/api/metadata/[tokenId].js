@@ -17,6 +17,10 @@ const SPECIAL_TOKENS = {
   442: {
     image: '/labimages/specials/442.gif',
     name: 'NEO-ZERO' // DropShit #1 first prize
+  },
+  445: {
+    image: '/labimages/specials/445.gif',
+    name: 'THE MANAGER'
   }
 };
 
