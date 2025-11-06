@@ -21,6 +21,10 @@ const SPECIAL_TOKENS = {
   445: {
     image: '/labimages/specials/445.gif',
     name: 'THE MANAGER'
+  },
+  454: {
+    image: '/labimages/specials/454.gif',
+    name: 'Adrian McOrder Dash'
   }
 };
 
