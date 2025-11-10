@@ -13267,10 +13267,49 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1044,
+      "name": "MCD-Shake-S",
+      "category": "GEAR",
+      "fileName": "1044",
+      "maxSupply": 100,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1045,
+      "name": "MCD-Shake-M",
+      "category": "GEAR",
+      "fileName": "1045",
+      "maxSupply": 100,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1046,
+      "name": "MCD-Shake-L",
+      "category": "GEAR",
+      "fileName": "1046",
+      "maxSupply": 100,
+      "floppy": "MCD",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1112,
+    "totalTraits": 1115,
     "categories": [
       "BACKGROUND",
       "EAR",
