@@ -1061,14 +1061,31 @@ export default async function handler(req, res) {
 
     // 3. TERCERO: Renderizar resto de traits
     console.log('[render] PASO 3 - Iniciando renderizado de traits adicionales');
-    // Ajuste: HEAD por encima de HAIR
-    const traitOrder = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    
+    // LÓGICA ESPECIAL: Renderizar GEAR 721 y 726 ANTES de SWAG (excepciones)
+    if (equippedTraits['GEAR'] === '721' || equippedTraits['GEAR'] === '726') {
+      const gearTraitId = equippedTraits['GEAR'];
+      console.log(`[render] PASO 3 - 🎯 LÓGICA ESPECIAL: Renderizando GEAR ${gearTraitId} ANTES de SWAG`);
+      const gearTraitImage = await loadTraitFromLabimages(gearTraitId);
+      if (gearTraitImage) {
+        getDrawContext().drawImage(gearTraitImage, 0, 0, 1000, 1000);
+        console.log(`[render] PASO 3 - GEAR ${gearTraitId} renderizado antes de SWAG correctamente`);
+      }
+    }
+    
+    // Ajuste: HEAD por encima de HAIR, GEAR después de SWAG (excepto 721 y 726 que ya se renderizaron)
+    const traitOrder = ['BEARD', 'EAR', 'RANDOMSHIT', 'SWAG', 'GEAR', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
 
     for (const category of traitOrder) {
       if (equippedTraits[category]) {
         // LÓGICA ESPECIAL: No renderizar HAIR 21 si HEAD 209 está activo
         if (category === 'HAIR' && equippedTraits['HAIR'] === '21' && equippedTraits['HEAD'] === '209') {
           console.log('[render] LÓGICA ESPECIAL: No renderizar HAIR 21 porque HEAD 209 está activo');
+          continue;
+        }
+        // LÓGICA ESPECIAL: Saltar GEAR 721 y 726 si ya se renderizaron antes de SWAG
+        if (category === 'GEAR' && (equippedTraits['GEAR'] === '721' || equippedTraits['GEAR'] === '726')) {
+          console.log(`[render] PASO 3 - 🎯 LÓGICA ESPECIAL: Saltando GEAR ${equippedTraits['GEAR']} porque ya se renderizó antes de SWAG`);
           continue;
         }
         // Solo para traits visuales normales (no ADRIAN ni ADRIANGF)
