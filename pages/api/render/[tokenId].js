@@ -221,7 +221,7 @@ export default async function handler(req, res) {
     const isShadow = req.query.shadow === 'true';
     const isGlow = req.query.glow === 'true';
     const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
-    const isUv = req.query.uv === 'true';
+    const isUv = req.query.uv === 'true' || req.query.UV === 'true'; // uv o UV (case-insensitive)
     
     if (isShadow) {
       console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
