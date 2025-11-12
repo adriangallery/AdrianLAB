@@ -71,7 +71,7 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW Y BN (SISTEMA DE TOGGLES) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN Y UV (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
     // IDs de toggles:
     // "1" = closeup solo
@@ -84,10 +84,12 @@ export default async function handler(req, res) {
     // "8" = glow+closeup
     // "9" = glow+bn
     // "10" = glow+bn+closeup
+    // "11" = uv solo
     let isCloseupToken = false;
     let isShadowToken = false;
     let isGlowToken = false;
     let isBnToken = false;
+    let isUvToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -151,6 +153,7 @@ export default async function handler(req, res) {
         isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
         isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
         isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
+        isUvToken = hasToggleActive(tokenId, "11"); // toggleId "11" = uv
         
         if (isCloseupToken) {
           console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
@@ -167,6 +170,10 @@ export default async function handler(req, res) {
         if (isBnToken) {
           console.log(`[metadata] ⚫ TOGGLE: Token ${tokenId} tiene BN (blanco y negro) activo`);
         }
+        
+        if (isUvToken) {
+          console.log(`[metadata] 💜 TOGGLE: Token ${tokenId} tiene UV activo`);
+        }
       }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
@@ -175,6 +182,7 @@ export default async function handler(req, res) {
       isShadowToken = false;
       isGlowToken = false;
       isBnToken = false;
+      isUvToken = false;
     }
     
     // Caso especial para el token 100000
@@ -338,6 +346,7 @@ export default async function handler(req, res) {
     if (isShadowToken) urlParams.push('shadow=true');
     if (isGlowToken) urlParams.push('glow=true');
     if (isBnToken) urlParams.push('bn=true');
+    if (isUvToken) urlParams.push('uv=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
@@ -770,6 +779,7 @@ export default async function handler(req, res) {
     if (isShadowToken) renderTypeParts.push('shadow');
     if (isGlowToken) renderTypeParts.push('glow');
     if (isBnToken) renderTypeParts.push('bn');
+    if (isUvToken) renderTypeParts.push('uv');
     const renderType = renderTypeParts.length > 0 ? renderTypeParts.join('+') : 'full';
     res.setHeader('X-Render-Type', renderType);
     
@@ -783,6 +793,10 @@ export default async function handler(req, res) {
     
     if (isBnToken) {
       res.setHeader('X-BN', 'enabled');
+    }
+    
+    if (isUvToken) {
+      res.setHeader('X-UV', 'enabled');
     }
     
     return res.status(200).json(baseMetadata);

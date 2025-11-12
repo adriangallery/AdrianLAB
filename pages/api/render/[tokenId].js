@@ -217,10 +217,11 @@ export default async function handler(req, res) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
     }
 
-    // ===== LÓGICA ESPECIAL SHADOW, GLOW Y BN (PARÁMETRO) =====
+    // ===== LÓGICA ESPECIAL SHADOW, GLOW, BN Y UV (PARÁMETRO) =====
     const isShadow = req.query.shadow === 'true';
     const isGlow = req.query.glow === 'true';
     const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
+    const isUv = req.query.uv === 'true';
     
     if (isShadow) {
       console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
@@ -233,15 +234,19 @@ export default async function handler(req, res) {
     if (isBn) {
       console.log(`[render] ⚫ BN: Token ${cleanTokenId} - Renderizando en blanco y negro`);
     }
+    
+    if (isUv) {
+      console.log(`[render] 💜 UV: Token ${cleanTokenId} - Renderizando con efecto UV/Blacklight`);
+    }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
-    // El caché debe diferenciar según los efectos (shadow, glow, bn)
+    // El caché debe diferenciar según los efectos (shadow, glow, bn, uv)
     let cachedImage;
     
     if (isCloseup) {
-      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn);
+      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn, isUv);
     } else {
-      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn);
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn, isUv);
     }
     
     if (cachedImage) {
@@ -258,6 +263,7 @@ export default async function handler(req, res) {
       if (isShadow) versionParts.push('SHADOW');
       if (isGlow) versionParts.push('GLOW');
       if (isBn) versionParts.push('BN');
+      if (isUv) versionParts.push('UV');
       const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
       
       if (isCloseup) {
@@ -278,6 +284,10 @@ export default async function handler(req, res) {
       
       if (isBn) {
         res.setHeader('X-BN', 'enabled');
+      }
+      
+      if (isUv) {
+        res.setHeader('X-UV', 'enabled');
       }
       
       return res.status(200).send(cachedImage);
@@ -1373,9 +1383,9 @@ export default async function handler(req, res) {
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
     // Guardar en caché incluyendo información de efectos para diferenciación
     if (isCloseup) {
-      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn);
+      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
     } else {
-      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn);
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
     }
 
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1433,6 +1443,118 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== PASO UV: aplicar efecto UV/Blacklight (DEBE SER DESPUÉS DE TODOS LOS EFECTOS) =====
+    if (isUv) {
+      try {
+        console.log('[render] PASO UV - Aplicando efecto UV/Blacklight');
+        
+        // Obtener el canvas final (puede ser closeupCanvas o canvas normal)
+        const sourceCanvas = finalCanvas || canvas;
+        const sourceCtx = sourceCanvas.getContext('2d');
+        
+        // Función de interpolación de colores Blacklight
+        function interpolateColor(value) {
+          const colors = [
+            [255, 0, 255],   // Magenta
+            [0, 255, 255],   // Cyan
+            [0, 250, 154],   // Medium Spring Green
+            [173, 255, 47],  // Green Yellow
+            [0, 0, 0]        // Black
+          ];
+          const steps = colors.length - 1;
+          const step = 255 / steps;
+          let index = Math.floor(value / step);
+          if (index >= steps) index = steps - 1;
+          const t = (value - step * index) / step;
+          const [r1, g1, b1] = colors[index];
+          const [r2, g2, b2] = colors[index + 1];
+          return [
+            Math.round(r1 + (r2 - r1) * t),
+            Math.round(g1 + (g2 - g1) * t),
+            Math.round(b1 + (b2 - b1) * t)
+          ];
+        }
+        
+        // Crear canvas para el efecto UV
+        const uvCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
+        const uvCtx = uvCanvas.getContext('2d');
+        
+        // Obtener datos de la imagen original
+        const imgData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const data = imgData.data;
+        
+        // Crear datos para el efecto UV
+        const uvData = uvCtx.createImageData(sourceCanvas.width, sourceCanvas.height);
+        
+        // Aplicar interpolación de colores basada en luminosidad
+        for (let i = 0; i < data.length; i += 4) {
+          const alpha = data[i + 3];
+          if (alpha !== 0) {
+            // Calcular escala de grises (luminosidad)
+            const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+            const [r, g, b] = interpolateColor(gray);
+            uvData.data[i] = r;
+            uvData.data[i + 1] = g;
+            uvData.data[i + 2] = b;
+            uvData.data[i + 3] = 150; // Alpha para overlay
+          } else {
+            uvData.data[i] = 0;
+            uvData.data[i + 1] = 0;
+            uvData.data[i + 2] = 0;
+            uvData.data[i + 3] = 0;
+          }
+        }
+        
+        uvCtx.putImageData(uvData, 0, 0);
+        
+        // Aplicar blur al efecto UV (simulado con múltiples pasadas)
+        // Nota: canvas no soporta filter directamente, así que aplicamos un blur manual simple
+        // Para un blur más suave, podríamos usar una librería externa, pero por ahora usamos un enfoque simple
+        const blurCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
+        const blurCtx = blurCanvas.getContext('2d');
+        blurCtx.drawImage(uvCanvas, 0, 0);
+        
+        // Aplicar blur simple (promedio de píxeles vecinos)
+        const blurData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const blurRadius = 2;
+        for (let y = blurRadius; y < sourceCanvas.height - blurRadius; y++) {
+          for (let x = blurRadius; x < sourceCanvas.width - blurRadius; x++) {
+            let r = 0, g = 0, b = 0, a = 0, count = 0;
+            for (let dy = -blurRadius; dy <= blurRadius; dy++) {
+              for (let dx = -blurRadius; dx <= blurRadius; dx++) {
+                const idx = ((y + dy) * sourceCanvas.width + (x + dx)) * 4;
+                r += uvData.data[idx];
+                g += uvData.data[idx + 1];
+                b += uvData.data[idx + 2];
+                a += uvData.data[idx + 3];
+                count++;
+              }
+            }
+            const idx = (y * sourceCanvas.width + x) * 4;
+            blurData.data[idx] = Math.round(r / count);
+            blurData.data[idx + 1] = Math.round(g / count);
+            blurData.data[idx + 2] = Math.round(b / count);
+            blurData.data[idx + 3] = Math.round(a / count);
+          }
+        }
+        blurCtx.putImageData(blurData, 0, 0);
+        
+        // Superponer el efecto UV sobre la imagen original
+        sourceCtx.drawImage(blurCanvas, 0, 0);
+        
+        // Regenerar el buffer final
+        if (finalCanvas) {
+          finalBuffer = finalCanvas.toBuffer('image/png');
+        } else {
+          finalBuffer = canvas.toBuffer('image/png');
+        }
+        
+        console.log('[render] PASO UV - Efecto UV/Blacklight aplicado');
+      } catch (e) {
+        console.warn('[render] PASO UV - Falló la aplicación de UV, continuando sin UV:', e.message);
+      }
+    }
+
     // Si no se generó finalBuffer aún, generarlo ahora
     if (!finalBuffer) {
       finalBuffer = (finalCanvas || canvas).toBuffer('image/png');
@@ -1443,6 +1565,7 @@ export default async function handler(req, res) {
     if (isShadow) versionParts.push('SHADOW');
     if (isGlow) versionParts.push('GLOW');
     if (isBn) versionParts.push('BN');
+    if (isUv) versionParts.push('UV');
     const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
     
     if (isCloseup) {
@@ -1463,6 +1586,10 @@ export default async function handler(req, res) {
     
     if (isBn) {
       res.setHeader('X-BN', 'enabled');
+    }
+    
+    if (isUv) {
+      res.setHeader('X-UV', 'enabled');
     }
     
     res.setHeader('Content-Length', finalBuffer.length);
