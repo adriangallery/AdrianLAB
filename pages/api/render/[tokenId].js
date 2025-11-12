@@ -1477,10 +1477,54 @@ export default async function handler(req, res) {
             // Calcular escala de grises (luminosidad)
             const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
             const [r, g, b] = interpolateColor(gray);
-            uvData.data[i] = r;
-            uvData.data[i + 1] = g;
-            uvData.data[i + 2] = b;
-            uvData.data[i + 3] = 180; // Alpha para overlay (actualizado de 150 a 180)
+            // Aumentar saturación y brillo para efecto neon más intenso
+            // Normalizar y aumentar saturación
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let saturation = max === 0 ? 0 : (max - min) / max;
+            
+            // Boost de saturación para efecto neon (1.5x)
+            saturation = Math.min(1.0, saturation * 1.5);
+            
+            // Aplicar saturación aumentada
+            if (max > 0) {
+              const delta = (max - min) * saturation;
+              const lightness = max;
+              const c = delta;
+              const x = c * (1 - Math.abs((lightness / 255) * 2 - 1));
+              const m = lightness - c / 2;
+              
+              let rNew, gNew, bNew;
+              if (lightness < 128) {
+                const h = (max === r) ? ((g - b) / delta) % 6 : 
+                          (max === g) ? ((b - r) / delta) + 2 : 
+                          ((r - g) / delta) + 4;
+                const hNorm = h / 6;
+                if (hNorm < 1/6) { rNew = c; gNew = x; bNew = 0; }
+                else if (hNorm < 2/6) { rNew = x; gNew = c; bNew = 0; }
+                else if (hNorm < 3/6) { rNew = 0; gNew = c; bNew = x; }
+                else if (hNorm < 4/6) { rNew = 0; gNew = x; bNew = c; }
+                else if (hNorm < 5/6) { rNew = x; gNew = 0; bNew = c; }
+                else { rNew = c; gNew = 0; bNew = x; }
+                rNew = Math.round((rNew + m) * 1.2); // Boost adicional de brillo
+                gNew = Math.round((gNew + m) * 1.2);
+                bNew = Math.round((bNew + m) * 1.2);
+              } else {
+                // Simplificar: aumentar brillo directamente
+                rNew = Math.min(255, Math.round(r * 1.3));
+                gNew = Math.min(255, Math.round(g * 1.3));
+                bNew = Math.min(255, Math.round(b * 1.3));
+              }
+              
+              uvData.data[i] = Math.min(255, rNew);
+              uvData.data[i + 1] = Math.min(255, gNew);
+              uvData.data[i + 2] = Math.min(255, bNew);
+            } else {
+              uvData.data[i] = r;
+              uvData.data[i + 1] = g;
+              uvData.data[i + 2] = b;
+            }
+            uvData.data[i + 3] = 220; // Alpha aumentado para overlay más visible (neon)
           } else {
             uvData.data[i] = 0;
             uvData.data[i + 1] = 0;
@@ -1526,20 +1570,25 @@ export default async function handler(req, res) {
         }
         blurCtx.putImageData(blurData, 0, 0);
         
-        // Boost de contraste y saturación para colores más vivos (1.15x)
+        // Boost de contraste y brillo para efecto neon más intenso (1.4x)
         const boostedData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
         const boosted = boostedData.data;
         for (let i = 0; i < boosted.length; i += 4) {
-          // Boost contrast (solo RGB, no alpha)
-          boosted[i] = Math.min(255, Math.round(boosted[i] * 1.15));     // R
-          boosted[i + 1] = Math.min(255, Math.round(boosted[i + 1] * 1.15)); // G
-          boosted[i + 2] = Math.min(255, Math.round(boosted[i + 2] * 1.15)); // B
-          // Alpha se mantiene igual
+          // Boost contrast y brillo para efecto neon (solo RGB, no alpha)
+          const alpha = boosted[i + 3];
+          if (alpha > 0) {
+            // Aumentar contraste y brillo más agresivamente para efecto neon
+            boosted[i] = Math.min(255, Math.round(boosted[i] * 1.4));     // R
+            boosted[i + 1] = Math.min(255, Math.round(boosted[i + 1] * 1.4)); // G
+            boosted[i + 2] = Math.min(255, Math.round(boosted[i + 2] * 1.4)); // B
+            // Aumentar alpha también para efecto más visible
+            boosted[i + 3] = Math.min(255, Math.round(alpha * 1.1));
+          }
         }
         blurCtx.putImageData(boostedData, 0, 0);
         
-        // Superponer el efecto UV sobre la imagen original con globalAlpha 0.9
-        sourceCtx.globalAlpha = 0.9; // Overlay ligeramente más fuerte
+        // Superponer el efecto UV sobre la imagen original con globalAlpha más fuerte para efecto neon
+        sourceCtx.globalAlpha = 1.0; // Overlay completo para efecto neon más intenso
         sourceCtx.drawImage(blurCanvas, 0, 0);
         sourceCtx.globalAlpha = 1.0; // Restaurar alpha
         
