@@ -1476,54 +1476,29 @@ export default async function handler(req, res) {
           if (alpha !== 0) {
             // Calcular escala de grises (luminosidad)
             const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
-            const [r, g, b] = interpolateColor(gray);
-            // Aumentar saturación y brillo para efecto neon más intenso
-            // Normalizar y aumentar saturación
+            let [r, g, b] = interpolateColor(gray);
+            
+            // Boost de brillo y saturación para efecto neon más intenso
+            // Aumentar brillo directamente (1.4x) para colores más luminosos
+            r = Math.min(255, Math.round(r * 1.4));
+            g = Math.min(255, Math.round(g * 1.4));
+            b = Math.min(255, Math.round(b * 1.4));
+            
+            // Aumentar saturación: empujar colores hacia los extremos
             const max = Math.max(r, g, b);
             const min = Math.min(r, g, b);
-            let saturation = max === 0 ? 0 : (max - min) / max;
-            
-            // Boost de saturación para efecto neon (1.5x)
-            saturation = Math.min(1.0, saturation * 1.5);
-            
-            // Aplicar saturación aumentada
             if (max > 0) {
-              const delta = (max - min) * saturation;
-              const lightness = max;
-              const c = delta;
-              const x = c * (1 - Math.abs((lightness / 255) * 2 - 1));
-              const m = lightness - c / 2;
-              
-              let rNew, gNew, bNew;
-              if (lightness < 128) {
-                const h = (max === r) ? ((g - b) / delta) % 6 : 
-                          (max === g) ? ((b - r) / delta) + 2 : 
-                          ((r - g) / delta) + 4;
-                const hNorm = h / 6;
-                if (hNorm < 1/6) { rNew = c; gNew = x; bNew = 0; }
-                else if (hNorm < 2/6) { rNew = x; gNew = c; bNew = 0; }
-                else if (hNorm < 3/6) { rNew = 0; gNew = c; bNew = x; }
-                else if (hNorm < 4/6) { rNew = 0; gNew = x; bNew = c; }
-                else if (hNorm < 5/6) { rNew = x; gNew = 0; bNew = c; }
-                else { rNew = c; gNew = 0; bNew = x; }
-                rNew = Math.round((rNew + m) * 1.2); // Boost adicional de brillo
-                gNew = Math.round((gNew + m) * 1.2);
-                bNew = Math.round((bNew + m) * 1.2);
-              } else {
-                // Simplificar: aumentar brillo directamente
-                rNew = Math.min(255, Math.round(r * 1.3));
-                gNew = Math.min(255, Math.round(g * 1.3));
-                bNew = Math.min(255, Math.round(b * 1.3));
-              }
-              
-              uvData.data[i] = Math.min(255, rNew);
-              uvData.data[i + 1] = Math.min(255, gNew);
-              uvData.data[i + 2] = Math.min(255, bNew);
-            } else {
-              uvData.data[i] = r;
-              uvData.data[i + 1] = g;
-              uvData.data[i + 2] = b;
+              // Aumentar la diferencia entre max y min para más saturación
+              const avg = (r + g + b) / 3;
+              const factor = 1.3; // Factor de saturación neon
+              r = Math.min(255, Math.max(0, Math.round(avg + (r - avg) * factor)));
+              g = Math.min(255, Math.max(0, Math.round(avg + (g - avg) * factor)));
+              b = Math.min(255, Math.max(0, Math.round(avg + (b - avg) * factor)));
             }
+            
+            uvData.data[i] = r;
+            uvData.data[i + 1] = g;
+            uvData.data[i + 2] = b;
             uvData.data[i + 3] = 220; // Alpha aumentado para overlay más visible (neon)
           } else {
             uvData.data[i] = 0;
