@@ -1497,8 +1497,12 @@ export default async function handler(req, res) {
         const blurCtx = blurCanvas.getContext('2d');
         blurCtx.drawImage(uvCanvas, 0, 0);
         
+        // Obtener los datos del canvas después de dibujar (no del ImageData original)
+        const canvasData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const canvasDataArray = canvasData.data;
+        
         // Aplicar blur simple (promedio de píxeles vecinos) - blurRadius = 2 para blur suave
-        const blurData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const blurData = blurCtx.createImageData(sourceCanvas.width, sourceCanvas.height);
         const blurRadius = 2;
         for (let y = blurRadius; y < sourceCanvas.height - blurRadius; y++) {
           for (let x = blurRadius; x < sourceCanvas.width - blurRadius; x++) {
@@ -1506,10 +1510,10 @@ export default async function handler(req, res) {
             for (let dy = -blurRadius; dy <= blurRadius; dy++) {
               for (let dx = -blurRadius; dx <= blurRadius; dx++) {
                 const idx = ((y + dy) * sourceCanvas.width + (x + dx)) * 4;
-                r += uvData.data[idx];
-                g += uvData.data[idx + 1];
-                b += uvData.data[idx + 2];
-                a += uvData.data[idx + 3];
+                r += canvasDataArray[idx];
+                g += canvasDataArray[idx + 1];
+                b += canvasDataArray[idx + 2];
+                a += canvasDataArray[idx + 3];
                 count++;
               }
             }
