@@ -1480,7 +1480,7 @@ export default async function handler(req, res) {
             uvData.data[i] = r;
             uvData.data[i + 1] = g;
             uvData.data[i + 2] = b;
-            uvData.data[i + 3] = 150; // Alpha para overlay
+            uvData.data[i + 3] = 180; // Alpha para overlay (actualizado de 150 a 180)
           } else {
             uvData.data[i] = 0;
             uvData.data[i + 1] = 0;
@@ -1491,14 +1491,13 @@ export default async function handler(req, res) {
         
         uvCtx.putImageData(uvData, 0, 0);
         
-        // Aplicar blur al efecto UV (simulado con múltiples pasadas)
+        // Aplicar blur suave al efecto UV (2px - más suave que antes)
         // Nota: canvas no soporta filter directamente, así que aplicamos un blur manual simple
-        // Para un blur más suave, podríamos usar una librería externa, pero por ahora usamos un enfoque simple
         const blurCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
         const blurCtx = blurCanvas.getContext('2d');
         blurCtx.drawImage(uvCanvas, 0, 0);
         
-        // Aplicar blur simple (promedio de píxeles vecinos)
+        // Aplicar blur simple (promedio de píxeles vecinos) - blurRadius = 2 para blur suave
         const blurData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
         const blurRadius = 2;
         for (let y = blurRadius; y < sourceCanvas.height - blurRadius; y++) {
@@ -1523,8 +1522,22 @@ export default async function handler(req, res) {
         }
         blurCtx.putImageData(blurData, 0, 0);
         
-        // Superponer el efecto UV sobre la imagen original
+        // Boost de contraste y saturación para colores más vivos (1.15x)
+        const boostedData = blurCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+        const boosted = boostedData.data;
+        for (let i = 0; i < boosted.length; i += 4) {
+          // Boost contrast (solo RGB, no alpha)
+          boosted[i] = Math.min(255, Math.round(boosted[i] * 1.15));     // R
+          boosted[i + 1] = Math.min(255, Math.round(boosted[i + 1] * 1.15)); // G
+          boosted[i + 2] = Math.min(255, Math.round(boosted[i + 2] * 1.15)); // B
+          // Alpha se mantiene igual
+        }
+        blurCtx.putImageData(boostedData, 0, 0);
+        
+        // Superponer el efecto UV sobre la imagen original con globalAlpha 0.9
+        sourceCtx.globalAlpha = 0.9; // Overlay ligeramente más fuerte
         sourceCtx.drawImage(blurCanvas, 0, 0);
+        sourceCtx.globalAlpha = 1.0; // Restaurar alpha
         
         // Regenerar el buffer final
         if (finalCanvas) {
