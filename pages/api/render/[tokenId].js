@@ -1380,22 +1380,6 @@ export default async function handler(req, res) {
       finalBuffer = canvas.toBuffer('image/png');
     }
 
-    // ===== GUARDAR EN CACHÉ Y RETORNAR =====
-    // Guardar en caché incluyendo información de efectos para diferenciación
-    if (isCloseup) {
-      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
-    } else {
-      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
-    }
-
-    const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-    console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
-
-    // Configurar headers
-    res.setHeader('X-Cache', 'MISS');
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-    
     // ===== PASO BN: convertir a escala de grises (DEBE SER DESPUÉS DE TODOS LOS EFECTOS) =====
     if (isBn) {
       try {
@@ -1560,6 +1544,22 @@ export default async function handler(req, res) {
       finalBuffer = (finalCanvas || canvas).toBuffer('image/png');
     }
 
+    // ===== GUARDAR EN CACHÉ Y RETORNAR =====
+    // Guardar en caché incluyendo información de efectos para diferenciación (DESPUÉS de todos los efectos)
+    if (isCloseup) {
+      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
+    } else {
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
+    }
+
+    const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+    console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
+
+    // Configurar headers
+    res.setHeader('X-Cache', 'MISS');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+    
     const versionParts = [];
     if (isCloseup) versionParts.push('CLOSEUP');
     if (isShadow) versionParts.push('SHADOW');
