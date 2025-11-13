@@ -14190,10 +14190,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1115,
+      "name": "BL-Spray-BG",
+      "category": "GEAR",
+      "fileName": "1115",
+      "maxSupply": 80,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1116,
+      "name": "BL-Black-BG",
+      "category": "BACKGROUND",
+      "fileName": "1116",
+      "maxSupply": 100,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1183,
+    "totalTraits": 1185,
     "categories": [
       "BACKGROUND",
       "EAR",
