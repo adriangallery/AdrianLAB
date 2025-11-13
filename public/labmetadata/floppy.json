@@ -155,10 +155,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 10014,
+      "name": "Blacklight Floppy",
+      "category": "Floppy discs",
+      "fileName": "10014.gif",
+      "maxSupply": 100,
+      "floppy": "Blacklight",
+      "traitsInside": 6,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 13,
+    "totalFloppys": 14,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
