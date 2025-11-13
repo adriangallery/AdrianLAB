@@ -13306,10 +13306,894 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1047,
+      "name": "Bare_Adrians",
+      "category": "EYES",
+      "fileName": "1047",
+      "maxSupply": 97,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1048,
+      "name": "BL-A-Cap",
+      "category": "HEAD",
+      "fileName": "1048",
+      "maxSupply": 124,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1049,
+      "name": "BL-AZ",
+      "category": "TOP",
+      "fileName": "1049",
+      "maxSupply": 108,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1050,
+      "name": "BL-Bandana",
+      "category": "HEAD",
+      "fileName": "1050",
+      "maxSupply": 38,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1051,
+      "name": "BL-Beanie",
+      "category": "HEAD",
+      "fileName": "1051",
+      "maxSupply": 75,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1052,
+      "name": "BL-Beard-Full",
+      "category": "BEARD",
+      "fileName": "1052",
+      "maxSupply": 33,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1053,
+      "name": "BL-Bikini-2-GF",
+      "category": "SWAG",
+      "fileName": "1053",
+      "maxSupply": 204,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1054,
+      "name": "BL-Bikini-GF",
+      "category": "SWAG",
+      "fileName": "1054",
+      "maxSupply": 156,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1055,
+      "name": "BL-Blade-Dark",
+      "category": "EYES",
+      "fileName": "1055",
+      "maxSupply": 45,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1056,
+      "name": "BL-Blade",
+      "category": "EYES",
+      "fileName": "1056",
+      "maxSupply": 146,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1057,
+      "name": "BL-Bubble-Gum-GF",
+      "category": "MOUTH",
+      "fileName": "1057",
+      "maxSupply": 127,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1058,
+      "name": "BL-Bunny-Suit",
+      "category": "SWAG",
+      "fileName": "1058",
+      "maxSupply": 154,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1059,
+      "name": "BL-Camouflage-Shirt",
+      "category": "SWAG",
+      "fileName": "1059",
+      "maxSupply": 127,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1060,
+      "name": "BL-Cap-Backward",
+      "category": "HEAD",
+      "fileName": "1060",
+      "maxSupply": 176,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1061,
+      "name": "BL-Cap-Forward",
+      "category": "HEAD",
+      "fileName": "1061",
+      "maxSupply": 84,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1062,
+      "name": "BL-Cigarett",
+      "category": "MOUTH",
+      "fileName": "1062",
+      "maxSupply": 128,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1063,
+      "name": "BL-Classic-Shades",
+      "category": "EYES",
+      "fileName": "1063",
+      "maxSupply": 213,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1064,
+      "name": "BL-Crazy-Hair",
+      "category": "HAIR",
+      "fileName": "1064",
+      "maxSupply": 182,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1065,
+      "name": "BL-Dad-Cap",
+      "category": "HEAD",
+      "fileName": "1065",
+      "maxSupply": 62,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1066,
+      "name": "BL-Dreadloocks-Blue-GF",
+      "category": "HAIR",
+      "fileName": "1066",
+      "maxSupply": 154,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1067,
+      "name": "BL-Dreadloocks-GF",
+      "category": "HAIR",
+      "fileName": "1067",
+      "maxSupply": 97,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1068,
+      "name": "BL-Drill-Sergeant",
+      "category": "HEAD",
+      "fileName": "1068",
+      "maxSupply": 124,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1069,
+      "name": "BL-Eye-Brows-GF",
+      "category": "EYES",
+      "fileName": "1069",
+      "maxSupply": 108,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1070,
+      "name": "BL-Face-Shild-GF",
+      "category": "EYES",
+      "fileName": "1070",
+      "maxSupply": 38,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1071,
+      "name": "BL-Faux-Fur-GF",
+      "category": "SWAG",
+      "fileName": "1071",
+      "maxSupply": 75,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1072,
+      "name": "BL-French-Bob-GF",
+      "category": "HAIR",
+      "fileName": "1072",
+      "maxSupply": 33,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1073,
+      "name": "BL-Gas-Mask",
+      "category": "HEAD",
+      "fileName": "1073",
+      "maxSupply": 204,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1074,
+      "name": "BL-Gimp-Mask",
+      "category": "HEAD",
+      "fileName": "1074",
+      "maxSupply": 156,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1075,
+      "name": "BL-Goat-Beard",
+      "category": "BEARD",
+      "fileName": "1075",
+      "maxSupply": 45,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1076,
+      "name": "BL-Goggles",
+      "category": "EYES",
+      "fileName": "1076",
+      "maxSupply": 146,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1077,
+      "name": "BL-Handlebars",
+      "category": "BEARD",
+      "fileName": "1077",
+      "maxSupply": 127,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1078,
+      "name": "BL-Head-Band",
+      "category": "HEAD",
+      "fileName": "1078",
+      "maxSupply": 154,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1079,
+      "name": "BL-Headphones",
+      "category": "HEAD",
+      "fileName": "1079",
+      "maxSupply": 127,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1080,
+      "name": "BL-Hoodie-Down-Black",
+      "category": "SWAG",
+      "fileName": "1080",
+      "maxSupply": 176,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1081,
+      "name": "BL-Joint",
+      "category": "MOUTH",
+      "fileName": "1081",
+      "maxSupply": 84,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1082,
+      "name": "BL-Lipstick-GF",
+      "category": "MOUTH",
+      "fileName": "1082",
+      "maxSupply": 128,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1083,
+      "name": "BL-Lob-GF",
+      "category": "HAIR",
+      "fileName": "1083",
+      "maxSupply": 213,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1084,
+      "name": "BL-Long-Braid-GF",
+      "category": "HAIR",
+      "fileName": "1084",
+      "maxSupply": 182,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1085,
+      "name": "BL-Mash-Cap-HT",
+      "category": "HEAD",
+      "fileName": "1085",
+      "maxSupply": 62,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1086,
+      "name": "BL-Mask",
+      "category": "HEAD",
+      "fileName": "1086",
+      "maxSupply": 154,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1087,
+      "name": "BL-Microkini-GF",
+      "category": "SWAG",
+      "fileName": "1087",
+      "maxSupply": 97,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1088,
+      "name": "BL-Mohawk",
+      "category": "HAIR",
+      "fileName": "1088",
+      "maxSupply": 124,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1089,
+      "name": "BL-Mullet",
+      "category": "HAIR",
+      "fileName": "1089",
+      "maxSupply": 108,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1090,
+      "name": "BL-Pixi-Cut--GF",
+      "category": "HAIR",
+      "fileName": "1090",
+      "maxSupply": 38,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1091,
+      "name": "BL-Popper",
+      "category": "HAIR",
+      "fileName": "1091",
+      "maxSupply": 75,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1092,
+      "name": "BL-Propeller-Cap",
+      "category": "HEAD",
+      "fileName": "1092",
+      "maxSupply": 33,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1093,
+      "name": "BL-Raimbow-Vomit-GF",
+      "category": "MOUTH",
+      "fileName": "1093",
+      "maxSupply": 204,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1094,
+      "name": "BL-Ridiculous-Big-Glasses-GF",
+      "category": "EYES",
+      "fileName": "1094",
+      "maxSupply": 156,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1095,
+      "name": "BL-Short-Sleave-Shirt",
+      "category": "SWAG",
+      "fileName": "1095",
+      "maxSupply": 45,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1096,
+      "name": "BL-Skin-1",
+      "category": "SKINTRAIT",
+      "fileName": "1096",
+      "maxSupply": 10,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1097,
+      "name": "BL-Skin-2-GF",
+      "category": "SKINTRAIT",
+      "fileName": "1097",
+      "maxSupply": 8,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1098,
+      "name": "BL-Skin-2",
+      "category": "SKINTRAIT",
+      "fileName": "1098",
+      "maxSupply": 15,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1099,
+      "name": "BL-Skin-3-GF",
+      "category": "SKINTRAIT",
+      "fileName": "1099",
+      "maxSupply": 8,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1100,
+      "name": "BL-Skin-3",
+      "category": "SKINTRAIT",
+      "fileName": "1100",
+      "maxSupply": 15,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1101,
+      "name": "BL-Skin-4-GF",
+      "category": "SKINTRAIT",
+      "fileName": "1101",
+      "maxSupply": 8,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1102,
+      "name": "BL-Skin-4",
+      "category": "SKINTRAIT",
+      "fileName": "1102",
+      "maxSupply": 15,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1103,
+      "name": "BL-Skin-DED",
+      "category": "SKINTRAIT",
+      "fileName": "1103",
+      "maxSupply": 8,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1104,
+      "name": "BL-Smoke-1",
+      "category": "TOP",
+      "fileName": "1104",
+      "maxSupply": 20,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1105,
+      "name": "BL-Smoke-2",
+      "category": "TOP",
+      "fileName": "1105",
+      "maxSupply": 20,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1106,
+      "name": "BL-Smoke-3",
+      "category": "TOP",
+      "fileName": "1106",
+      "maxSupply": 20,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1107,
+      "name": "BL-Snot",
+      "category": "NOSE",
+      "fileName": "1107",
+      "maxSupply": 128,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1108,
+      "name": "BL-Suit",
+      "category": "SWAG",
+      "fileName": "1108",
+      "maxSupply": 213,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1109,
+      "name": "BL-T-Shirt",
+      "category": "SWAG",
+      "fileName": "1109",
+      "maxSupply": 182,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1110,
+      "name": "BL-Tank-Top-Black",
+      "category": "SWAG",
+      "fileName": "1110",
+      "maxSupply": 62,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1111,
+      "name": "BL-Tank-Top-Blak",
+      "category": "SWAG",
+      "fileName": "1111",
+      "maxSupply": 154,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1112,
+      "name": "BL-Tank-Top-GF",
+      "category": "SWAG",
+      "fileName": "1112",
+      "maxSupply": 97,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1113,
+      "name": "BL-Tank-Top",
+      "category": "SWAG",
+      "fileName": "1113",
+      "maxSupply": 124,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1114,
+      "name": "BL-Wild-Green",
+      "category": "HAIR",
+      "fileName": "1114",
+      "maxSupply": 58,
+      "floppy": "Blacklight",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1115,
+    "totalTraits": 1183,
     "categories": [
       "BACKGROUND",
       "EAR",
