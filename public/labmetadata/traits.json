@@ -14216,10 +14216,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1117,
+      "name": "Academy-Hat",
+      "category": "HEAD",
+      "fileName": "1117",
+      "maxSupply": 35,
+      "floppy": "Custom",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1185,
+    "totalTraits": 1186,
     "categories": [
       "BACKGROUND",
       "EAR",
