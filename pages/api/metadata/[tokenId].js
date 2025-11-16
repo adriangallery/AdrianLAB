@@ -90,6 +90,7 @@ export default async function handler(req, res) {
     let isGlowToken = false;
     let isBnToken = false;
     let isUvToken = false;
+    let isBlackoutToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -154,6 +155,7 @@ export default async function handler(req, res) {
         isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
         isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
         isUvToken = hasToggleActive(tokenId, "11"); // toggleId "11" = uv
+        isBlackoutToken = hasToggleActive(tokenId, "12"); // toggleId "12" = blackout
         
         if (isCloseupToken) {
           console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
@@ -174,6 +176,10 @@ export default async function handler(req, res) {
         if (isUvToken) {
           console.log(`[metadata] 💜 TOGGLE: Token ${tokenId} tiene UV activo`);
         }
+        
+        if (isBlackoutToken) {
+          console.log(`[metadata] ⬛ TOGGLE: Token ${tokenId} tiene BLACKOUT activo`);
+        }
       }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
@@ -183,6 +189,7 @@ export default async function handler(req, res) {
       isGlowToken = false;
       isBnToken = false;
       isUvToken = false;
+      isBlackoutToken = false;
     }
     
     // Caso especial para el token 100000
@@ -239,6 +246,7 @@ export default async function handler(req, res) {
         if (isShadowToken) urlParams.push('shadow=true');
         if (isGlowToken) urlParams.push('glow=true');
         if (isBnToken) urlParams.push('bn=true');
+        if (isBlackoutToken) urlParams.push('blackout=true');
         const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
         const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
           
@@ -347,6 +355,7 @@ export default async function handler(req, res) {
     if (isGlowToken) urlParams.push('glow=true');
     if (isBnToken) urlParams.push('bn=true');
     if (isUvToken) urlParams.push('uv=true');
+    if (isBlackoutToken) urlParams.push('blackout=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
@@ -797,6 +806,10 @@ export default async function handler(req, res) {
     
     if (isUvToken) {
       res.setHeader('X-UV', 'enabled');
+    }
+    
+    if (isBlackoutToken) {
+      res.setHeader('X-Blackout', 'enabled');
     }
     
     return res.status(200).json(baseMetadata);

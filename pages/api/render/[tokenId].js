@@ -217,11 +217,12 @@ export default async function handler(req, res) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
     }
 
-    // ===== LÓGICA ESPECIAL SHADOW, GLOW, BN Y UV (PARÁMETRO) =====
+    // ===== LÓGICA ESPECIAL SHADOW, GLOW, BN, UV Y BLACKOUT (PARÁMETRO) =====
     const isShadow = req.query.shadow === 'true';
     const isGlow = req.query.glow === 'true';
     const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
     const isUv = req.query.uv === 'true' || req.query.UV === 'true'; // uv o UV (case-insensitive)
+    const isBlackout = req.query.blackout === 'true';
     
     if (isShadow) {
       console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
@@ -238,15 +239,19 @@ export default async function handler(req, res) {
     if (isUv) {
       console.log(`[render] 💜 UV: Token ${cleanTokenId} - Renderizando con efecto UV/Blacklight`);
     }
+    
+    if (isBlackout) {
+      console.log(`[render] ⬛ BLACKOUT: Token ${cleanTokenId} - Renderizando con blackout (negro completo)`);
+    }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
-    // El caché debe diferenciar según los efectos (shadow, glow, bn, uv)
+    // El caché debe diferenciar según los efectos (shadow, glow, bn, uv, blackout)
     let cachedImage;
     
     if (isCloseup) {
-      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn, isUv);
+      cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn, isUv, isBlackout);
     } else {
-      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn, isUv);
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn, isUv, isBlackout);
     }
     
     if (cachedImage) {
@@ -264,6 +269,7 @@ export default async function handler(req, res) {
       if (isGlow) versionParts.push('GLOW');
       if (isBn) versionParts.push('BN');
       if (isUv) versionParts.push('UV');
+      if (isBlackout) versionParts.push('BLACKOUT');
       const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
       
       if (isCloseup) {
@@ -288,6 +294,10 @@ export default async function handler(req, res) {
       
       if (isUv) {
         res.setHeader('X-UV', 'enabled');
+      }
+      
+      if (isBlackout) {
+        res.setHeader('X-Blackout', 'enabled');
       }
       
       return res.status(200).send(cachedImage);
@@ -395,20 +405,21 @@ export default async function handler(req, res) {
     ctx.fillRect(0, 0, 1000, 1000);
     console.log('[render] Canvas creado con fondo blanco');
 
-    // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow o glow está activo)
+    // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow, glow o blackout está activo)
     let contentCanvas = null;
     let contentCtx = null;
-    if (isShadow || isGlow) {
+    if (isShadow || isGlow || isBlackout) {
       contentCanvas = createCanvas(1000, 1000);
       contentCtx = contentCanvas.getContext('2d');
-      console.log(`[render] Canvas de contenido (sin background) creado para ${isShadow ? 'sombra' : 'glow'}`);
+      const effectName = isShadow ? 'sombra' : (isGlow ? 'glow' : 'blackout');
+      console.log(`[render] Canvas de contenido (sin background) creado para ${effectName}`);
     }
 
     // Nota: GLOW se dibuja directamente en el canvas principal (1000x1000)
     // Las capas de glow se extienden más allá del borde pero se recortan automáticamente
 
-    // Función auxiliar para obtener el contexto correcto según shadow o glow
-    const getDrawContext = () => (isShadow || isGlow) ? contentCtx : ctx;
+    // Función auxiliar para obtener el contexto correcto según shadow, glow o blackout
+    const getDrawContext = () => (isShadow || isGlow || isBlackout) ? contentCtx : ctx;
 
     // Función para cargar y renderizar SVG con caché
     const loadAndRenderSvg = async (path) => {
@@ -1243,6 +1254,44 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== PASO BLACKOUT: generar AdrianZERO completamente negro sobre fondo original =====
+    // NOTA: Blackout solo se aplica si NO hay shadow ni glow activo (para evitar conflictos)
+    if (isBlackout && !isShadow && !isGlow && contentCanvas) {
+      try {
+        console.log('[render] PASO BLACKOUT - Generando AdrianZERO completamente negro');
+        const blackoutCanvas = createCanvas(1000, 1000);
+        const blackoutCtx = blackoutCanvas.getContext('2d');
+        blackoutCtx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+
+        const imgData = blackoutCtx.getImageData(0, 0, 1000, 1000);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const a = data[i + 3];
+          if (a !== 0) {
+            // Convertir a negro manteniendo la opacidad original (sin reducir)
+            data[i] = 0;
+            data[i + 1] = 0;
+            data[i + 2] = 0;
+            // Mantener alpha completo (no reducir como en shadow)
+            data[i + 3] = a;
+          }
+        }
+        blackoutCtx.putImageData(imgData, 0, 0);
+
+        // Dibujar blackout en la posición original (sin desplazar)
+        ctx.drawImage(blackoutCanvas, 0, 0, 1000, 1000);
+        console.log('[render] PASO BLACKOUT - AdrianZERO negro aplicado en posición original');
+      } catch (e) {
+        console.warn('[render] PASO BLACKOUT - Falló la generación de blackout, continuando sin blackout:', e.message);
+        // Fallback: dibujar contenido sin blackout
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+      }
+    } else if (isBlackout && contentCanvas) {
+      // Si blackout está activo pero shadow o glow también, dibujar contenido normal
+      ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+      console.log('[render] PASO BLACKOUT - Blackout deshabilitado por conflicto con shadow/glow');
+    }
+
     // ===== PASO GLOW: generar efecto glow con arcoíris/ripples alrededor =====
     // NOTA: Glow tiene prioridad sobre shadow si ambos están activos
     if (isGlow && contentCanvas) {
@@ -1588,9 +1637,9 @@ export default async function handler(req, res) {
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
     // Guardar en caché incluyendo información de efectos para diferenciación (DESPUÉS de todos los efectos)
     if (isCloseup) {
-      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
+      setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv, isBlackout);
     } else {
-      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv);
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv, isBlackout);
     }
 
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1607,6 +1656,7 @@ export default async function handler(req, res) {
     if (isGlow) versionParts.push('GLOW');
     if (isBn) versionParts.push('BN');
     if (isUv) versionParts.push('UV');
+    if (isBlackout) versionParts.push('BLACKOUT');
     const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
     
     if (isCloseup) {
@@ -1631,6 +1681,10 @@ export default async function handler(req, res) {
     
     if (isUv) {
       res.setHeader('X-UV', 'enabled');
+    }
+    
+    if (isBlackout) {
+      res.setHeader('X-Blackout', 'enabled');
     }
     
     res.setHeader('Content-Length', finalBuffer.length);
