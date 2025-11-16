@@ -1,0 +1,8 @@
+# .railwayignore
+# Ignorar archivos del proyecto raíz al construir external-render
+package-lock.json
+node_modules/
+.next/
+.git/
+.vercel/
+
