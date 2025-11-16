@@ -6,7 +6,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "build": "echo 'Build complete - no build step needed'",
+    "postinstall": "echo 'Dependencies installed'"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
