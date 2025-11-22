@@ -9,6 +9,19 @@ El servicio de Railway fue eliminado por error. La URL anterior era:
 
 ### 1. Crear Nuevo Servicio en Railway
 
+**✅ Puedes añadirlo a tu proyecto existente** - En Railway, un proyecto puede tener múltiples servicios.
+
+**Opción A: Añadir a un Proyecto Existente (Recomendado si ya tienes uno)**
+1. Ve a [Railway Dashboard](https://railway.app)
+2. Abre tu proyecto existente (el que ya usas para otra cosa)
+3. Haz clic en **"New"** → **"GitHub Repo"**
+4. Selecciona tu repositorio `AdrianLAB`
+5. **IMPORTANTE**: En la configuración del servicio, establece:
+   - **Root Directory**: `external-render/`
+   - Railway detectará automáticamente Node.js
+6. Dale un nombre al servicio (ej: `external-render` o `adrianlab-render`)
+
+**Opción B: Crear un Proyecto Nuevo**
 1. Ve a [Railway Dashboard](https://railway.app)
 2. Haz clic en **"New Project"**
 3. Selecciona **"Deploy from GitHub repo"**
