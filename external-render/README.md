@@ -21,7 +21,25 @@ npm run dev
 
 El servicio estará disponible en `http://localhost:3000`
 
-## Deployment en Railway
+## Deployment
+
+### Opción 1: Render.com (Recomendado - Free Tier)
+
+1. Conectar el repositorio de GitHub a Render.com
+2. Crear un nuevo **Web Service**
+3. Configurar:
+   - **Root Directory**: `external-render`
+   - **Build Command**: `npm install` (o dejar vacío)
+   - **Start Command**: `npm start` (o dejar vacío)
+   - **Plan**: Free (750 horas/mes)
+4. Configurar variables de entorno:
+   - `NODE_ENV=production`
+   - `BASE_URL=https://adrianlab.vercel.app`
+5. Render asignará automáticamente el puerto y la URL pública
+
+**Nota**: Ver guía completa en `DEPLOY_RENDER.md` en la raíz del proyecto.
+
+### Opción 2: Railway
 
 1. Conectar el repositorio de GitHub a Railway
 2. Seleccionar el directorio `external-render/` como raíz del proyecto
@@ -75,7 +93,7 @@ Renderiza una imagen AdrianZERO.
 
 ## Variables de Entorno
 
-- `PORT`: Puerto del servicio (Railway lo asigna automáticamente)
+- `PORT`: Puerto del servicio (Render/Railway lo asignan automáticamente)
 - `BASE_URL`: URL base de AdrianLAB (default: `https://adrianlab.vercel.app`)
 - `NODE_ENV`: Entorno (production/development)
 
@@ -84,7 +102,11 @@ Renderiza una imagen AdrianZERO.
 El endpoint `/api/render/custom-external/[tokenId]` intenta usar este servicio primero. Si falla, hace fallback al renderizado local.
 
 Configurar en Vercel:
-- `EXTERNAL_RENDER_URL`: URL del servicio Railway
+- `EXTERNAL_RENDER_URL`: URL del servicio externo (Render o Railway)
 - `EXTERNAL_RENDER_ENABLED`: `true` (default)
 - `EXTERNAL_RENDER_TIMEOUT`: `30000` (30 segundos)
+
+**Ejemplo de URL**:
+- Render: `https://adrianlab-external-render.onrender.com`
+- Railway: `https://adrianlab-production.up.railway.app`
 
