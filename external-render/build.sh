@@ -22,5 +22,8 @@ fi
 echo "📦 Instalando dependencias con npm install..."
 npm install --no-package-lock=false
 
+echo "📦 Instalando dependencias opcionales para @resvg/resvg-js..."
+npm install --no-save --legacy-peer-deps @resvg/resvg-js-linux-x64-gnu || echo "⚠️  No se pudo instalar dependencia opcional (puede ser normal si no es Linux x64)"
+
 echo "✅ Build completado"
 
