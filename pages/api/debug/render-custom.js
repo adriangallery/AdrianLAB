@@ -539,7 +539,7 @@ export default async function handler(req, res) {
   <script>
     function copyLogs() {
       const logsText = ${JSON.stringify(logs.map(l => 
-        \`[\${l.timestamp}] [\${l.level.toUpperCase()}] \${l.message}\`
+        '[' + l.timestamp + '] [' + l.level.toUpperCase() + '] ' + l.message
       ).join('\\n'))};
       
       navigator.clipboard.writeText(logsText).then(() => {
