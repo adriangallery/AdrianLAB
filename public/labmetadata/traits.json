@@ -14248,8 +14248,8 @@
       "name": "Censor-Ban-Eyes",
       "category": "EYES",
       "fileName": "1119",
-      "maxSupply": 100,
-      "floppy": "Special",
+      "maxSupply": 300,
+      "floppy": "CensorPack",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -14261,8 +14261,34 @@
       "name": "Pixelate",
       "category": "HEAD",
       "fileName": "1120",
-      "maxSupply": 100,
-      "floppy": "Special",
+      "maxSupply": 300,
+      "floppy": "CensorPack",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1121,
+      "name": "Censor-Bar_Breast",
+      "category": "SWAG",
+      "fileName": "1121",
+      "maxSupply": 300,
+      "floppy": "CensorPack",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1122,
+      "name": "Censor-Bar_Cock",
+      "category": "SWAG",
+      "fileName": "1122",
+      "maxSupply": 300,
+      "floppy": "CensorPack",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
@@ -14271,7 +14297,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 1188,
+    "totalTraits": 1190,
     "categories": [
       "BACKGROUND",
       "EAR",
