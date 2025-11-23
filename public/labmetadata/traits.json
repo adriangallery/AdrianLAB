@@ -14242,10 +14242,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1119,
+      "name": "Censor-Ban-Eyes",
+      "category": "EYES",
+      "fileName": "1119",
+      "maxSupply": 100,
+      "floppy": "Special",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1120,
+      "name": "Pixelate",
+      "category": "HEAD",
+      "fileName": "1120",
+      "maxSupply": 100,
+      "floppy": "Special",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1186,
+    "totalTraits": 1188,
     "categories": [
       "BACKGROUND",
       "EAR",
