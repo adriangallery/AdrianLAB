@@ -4,14 +4,20 @@ import { Resvg } from '@resvg/resvg-js';
 // Función para cargar SVG desde URL y convertirlo a imagen
 async function loadSvgAsImage(url) {
   try {
+    console.log(`[renderer] 📥 Iniciando carga de SVG desde: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
+    console.log(`[renderer] 📥 SVG descargado, convirtiendo a buffer...`);
     const svgBuffer = await response.arrayBuffer();
+    const svgSize = svgBuffer.byteLength;
+    console.log(`[renderer] 📥 Tamaño del SVG: ${(svgSize / 1024 / 1024).toFixed(2)} MB`);
+    
     const svgContent = Buffer.from(svgBuffer);
     
+    console.log(`[renderer] 📥 Iniciando conversión SVG→PNG con Resvg...`);
     // Convertir SVG a PNG
     const resvg = new Resvg(svgContent, {
       fitTo: {
@@ -20,10 +26,19 @@ async function loadSvgAsImage(url) {
       }
     });
     
+    console.log(`[renderer] 📥 Renderizando PNG...`);
     const pngBuffer = resvg.render().asPng();
-    return await loadImage(pngBuffer);
+    console.log(`[renderer] 📥 PNG renderizado, tamaño: ${(pngBuffer.length / 1024).toFixed(2)} KB`);
+    
+    console.log(`[renderer] 📥 Cargando imagen en canvas...`);
+    const image = await loadImage(pngBuffer);
+    console.log(`[renderer] ✅ Imagen cargada exitosamente desde ${url}`);
+    return image;
   } catch (error) {
-    console.error(`[renderer] Error cargando SVG desde ${url}:`, error.message);
+    console.error(`[renderer] ❌ Error cargando SVG desde ${url}:`, error.message);
+    if (error.stack) {
+      console.error(`[renderer] Stack:`, error.stack);
+    }
     return null;
   }
 }
@@ -88,22 +103,32 @@ export async function renderImage(payload, baseUrl) {
     const bgTraitId = finalTraits['BACKGROUND'];
     console.log(`[renderer] PASO 1 - Cargando background con traitId: ${bgTraitId}`);
     
-    // Los backgrounds están en labimages/{traitId}.svg, no en traits/BACKGROUND/
-    // Intentar primero desde labimages (ubicación real)
-    let bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl);
-    
-    // Fallback: si no se encuentra en labimages, intentar en traits/BACKGROUND
-    if (!bgImage) {
-      const bgPath = `BACKGROUND/${bgTraitId}.svg`;
-      console.log(`[renderer] ⚠️  Background no encontrado en labimages, intentando fallback en traits/${bgPath}`);
-      bgImage = await loadFromTraitsPath(bgPath, baseUrl);
-    }
-    
-    if (bgImage) {
-      ctx.drawImage(bgImage, 0, 0, 1000, 1000);
-      console.log('[renderer] PASO 1 - Background renderizado');
-    } else {
-      console.error(`[renderer] ❌ ERROR: No se pudo cargar el background desde labimages/${bgTraitId}.svg ni desde traits/BACKGROUND/${bgTraitId}.svg`);
+    try {
+      // Los backgrounds están en labimages/{traitId}.svg, no en traits/BACKGROUND/
+      // Intentar primero desde labimages (ubicación real)
+      console.log(`[renderer] PASO 1 - Intentando cargar desde labimages/${bgTraitId}.svg...`);
+      let bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl);
+      
+      // Fallback: si no se encuentra en labimages, intentar en traits/BACKGROUND
+      if (!bgImage) {
+        const bgPath = `BACKGROUND/${bgTraitId}.svg`;
+        console.log(`[renderer] ⚠️  Background no encontrado en labimages, intentando fallback en traits/${bgPath}`);
+        bgImage = await loadFromTraitsPath(bgPath, baseUrl);
+      }
+      
+      if (bgImage) {
+        console.log(`[renderer] PASO 1 - Dibujando background en canvas...`);
+        ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+        console.log('[renderer] ✅ PASO 1 - Background renderizado exitosamente');
+      } else {
+        console.error(`[renderer] ❌ ERROR: No se pudo cargar el background desde labimages/${bgTraitId}.svg ni desde traits/BACKGROUND/${bgTraitId}.svg`);
+      }
+    } catch (error) {
+      console.error(`[renderer] ❌ ERROR CRÍTICO cargando background:`, error.message);
+      if (error.stack) {
+        console.error(`[renderer] Stack:`, error.stack);
+      }
+      // Continuar sin background en lugar de fallar completamente
     }
   } else {
     console.log(`[renderer] ⚠️  No hay BACKGROUND en finalTraits o finalTraits es null/undefined`);
