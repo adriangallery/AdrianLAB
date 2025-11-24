@@ -1194,6 +1194,8 @@ export default async function handler(req, res) {
 
     // ===== INTENTAR RENDERIZADO EXTERNO =====
     console.log('[custom-external] 🚀 Intentando renderizado externo...');
+    console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
+    console.log('[custom-external] 📋 BACKGROUND en finalTraits:', finalTraits['BACKGROUND'] || 'NO HAY');
     
     // Preparar datos para el servicio externo
     const renderData = prepareRenderData({
@@ -1212,6 +1214,8 @@ export default async function handler(req, res) {
       isCloseup,
       traitsMapping
     });
+    
+    console.log('[custom-external] 📦 renderData preparado, finalTraits en renderData:', JSON.stringify(renderData.finalTraits, null, 2));
 
     // Intentar renderizado externo
     let externalRenderBuffer = null;

@@ -72,6 +72,8 @@ export async function renderImage(payload, baseUrl) {
   } = payload;
 
   console.log(`[renderer] 🎨 Iniciando renderizado para token ${tokenId}`);
+  console.log(`[renderer] 📋 finalTraits recibidos:`, JSON.stringify(finalTraits, null, 2));
+  console.log(`[renderer] 📋 BACKGROUND en finalTraits:`, finalTraits && finalTraits['BACKGROUND'] ? finalTraits['BACKGROUND'] : 'NO HAY');
 
   // Crear canvas con fondo blanco
   const canvas = createCanvas(1000, 1000);
@@ -89,7 +91,11 @@ export async function renderImage(payload, baseUrl) {
     if (bgImage) {
       ctx.drawImage(bgImage, 0, 0, 1000, 1000);
       console.log('[renderer] PASO 1 - Background renderizado');
+    } else {
+      console.error(`[renderer] ❌ ERROR: No se pudo cargar el background desde ${bgPath}`);
     }
+  } else {
+    console.log(`[renderer] ⚠️  No hay BACKGROUND en finalTraits o finalTraits es null/undefined`);
   }
 
   // 2. Renderizar SKIN
