@@ -1,8 +1,43 @@
 import { createCanvas, loadImage } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
+import crypto from 'crypto';
+
+// Caché en memoria para PNGs renderizados (evita reprocesar SVGs grandes)
+const pngCache = new Map();
+const MAX_CACHE_SIZE = 50; // Máximo 50 imágenes en caché
+const MAX_SVG_SIZE_MB = 100; // Límite de 100MB para SVGs
+
+// Función para generar hash de URL para usar como clave de caché
+function getCacheKey(url) {
+  return crypto.createHash('md5').update(url).digest('hex');
+}
+
+// Función para limpiar caché si está lleno (FIFO)
+function cleanupCache() {
+  if (pngCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = pngCache.keys().next().value;
+    pngCache.delete(firstKey);
+    console.log(`[renderer] 🗑️  Limpiando caché (eliminado: ${firstKey.substring(0, 8)}...)`);
+  }
+}
 
 // Función para cargar SVG desde URL y convertirlo a imagen
 async function loadSvgAsImage(url) {
+  const cacheKey = getCacheKey(url);
+  
+  // Verificar caché primero
+  if (pngCache.has(cacheKey)) {
+    console.log(`[renderer] 💾 Usando imagen desde caché para: ${url.substring(url.length - 30)}`);
+    const cachedPng = pngCache.get(cacheKey);
+    try {
+      const image = await loadImage(cachedPng);
+      return image;
+    } catch (error) {
+      console.error(`[renderer] ⚠️  Error cargando imagen desde caché, regenerando...`, error.message);
+      pngCache.delete(cacheKey);
+    }
+  }
+  
   try {
     console.log(`[renderer] 📥 Iniciando carga de SVG desde: ${url}`);
     const response = await fetch(url);
@@ -10,25 +45,49 @@ async function loadSvgAsImage(url) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
+    // Verificar tamaño del contenido antes de descargar completamente
+    const contentLength = response.headers.get('content-length');
+    if (contentLength) {
+      const sizeMB = parseInt(contentLength) / 1024 / 1024;
+      if (sizeMB > MAX_SVG_SIZE_MB) {
+        throw new Error(`SVG demasiado grande: ${sizeMB.toFixed(2)} MB (límite: ${MAX_SVG_SIZE_MB} MB)`);
+      }
+      console.log(`[renderer] 📥 Tamaño esperado del SVG: ${sizeMB.toFixed(2)} MB`);
+    }
+    
     console.log(`[renderer] 📥 SVG descargado, convirtiendo a buffer...`);
     const svgBuffer = await response.arrayBuffer();
     const svgSize = svgBuffer.byteLength;
-    console.log(`[renderer] 📥 Tamaño del SVG: ${(svgSize / 1024 / 1024).toFixed(2)} MB`);
+    const svgSizeMB = svgSize / 1024 / 1024;
+    console.log(`[renderer] 📥 Tamaño real del SVG: ${svgSizeMB.toFixed(2)} MB`);
+    
+    if (svgSizeMB > MAX_SVG_SIZE_MB) {
+      throw new Error(`SVG demasiado grande: ${svgSizeMB.toFixed(2)} MB (límite: ${MAX_SVG_SIZE_MB} MB)`);
+    }
     
     const svgContent = Buffer.from(svgBuffer);
     
     console.log(`[renderer] 📥 Iniciando conversión SVG→PNG con Resvg...`);
-    // Convertir SVG a PNG
+    // Convertir SVG a PNG con configuración optimizada
     const resvg = new Resvg(svgContent, {
       fitTo: {
         mode: 'width',
         value: 1000
+      },
+      // Optimizaciones para archivos grandes
+      font: {
+        loadSystemFonts: false // No cargar fuentes del sistema para ahorrar memoria
       }
     });
     
     console.log(`[renderer] 📥 Renderizando PNG...`);
     const pngBuffer = resvg.render().asPng();
     console.log(`[renderer] 📥 PNG renderizado, tamaño: ${(pngBuffer.length / 1024).toFixed(2)} KB`);
+    
+    // Guardar en caché antes de cargar la imagen
+    cleanupCache();
+    pngCache.set(cacheKey, pngBuffer);
+    console.log(`[renderer] 💾 PNG guardado en caché (${pngCache.size}/${MAX_CACHE_SIZE})`);
     
     console.log(`[renderer] 📥 Cargando imagen en canvas...`);
     const image = await loadImage(pngBuffer);
