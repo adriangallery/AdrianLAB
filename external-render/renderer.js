@@ -86,23 +86,24 @@ export async function renderImage(payload, baseUrl) {
   // 1. Renderizar BACKGROUND si existe
   if (finalTraits && finalTraits['BACKGROUND']) {
     const bgTraitId = finalTraits['BACKGROUND'];
-    const bgPath = `BACKGROUND/${bgTraitId}.svg`;
-    console.log(`[renderer] PASO 1 - Cargando background: ${bgPath}`);
+    console.log(`[renderer] PASO 1 - Cargando background con traitId: ${bgTraitId}`);
     
-    // Intentar cargar desde traits/BACKGROUND primero
-    let bgImage = await loadFromTraitsPath(bgPath, baseUrl);
+    // Los backgrounds están en labimages/{traitId}.svg, no en traits/BACKGROUND/
+    // Intentar primero desde labimages (ubicación real)
+    let bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl);
     
-    // Fallback: si no se encuentra en traits/BACKGROUND, intentar en labimages por tokenId
+    // Fallback: si no se encuentra en labimages, intentar en traits/BACKGROUND
     if (!bgImage) {
-      console.log(`[renderer] ⚠️  Background no encontrado en traits/BACKGROUND, intentando fallback en labimages/${bgTraitId}.svg`);
-      bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl);
+      const bgPath = `BACKGROUND/${bgTraitId}.svg`;
+      console.log(`[renderer] ⚠️  Background no encontrado en labimages, intentando fallback en traits/${bgPath}`);
+      bgImage = await loadFromTraitsPath(bgPath, baseUrl);
     }
     
     if (bgImage) {
       ctx.drawImage(bgImage, 0, 0, 1000, 1000);
       console.log('[renderer] PASO 1 - Background renderizado');
     } else {
-      console.error(`[renderer] ❌ ERROR: No se pudo cargar el background desde ${bgPath} ni desde labimages/${bgTraitId}.svg`);
+      console.error(`[renderer] ❌ ERROR: No se pudo cargar el background desde labimages/${bgTraitId}.svg ni desde traits/BACKGROUND/${bgTraitId}.svg`);
     }
   } else {
     console.log(`[renderer] ⚠️  No hay BACKGROUND en finalTraits o finalTraits es null/undefined`);
