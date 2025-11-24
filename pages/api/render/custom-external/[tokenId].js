@@ -8,7 +8,7 @@ import { getCachedJson, setCachedJson } from '../../../../lib/json-cache.js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../../lib/component-cache.js';
 import { renderViaExternalService, prepareRenderData, checkExternalServiceHealth } from '../../../../lib/external-render-client.js';
-import { getCachedAdrianZeroRender, setCachedAdrianZeroRender, getAdrianZeroRenderTTL } from '../../../../lib/cache.js';
+import { getCachedAdrianZeroRender, setCachedAdrianZeroRender, getAdrianZeroRenderTTL, getCachedAdrianZeroCustomRender, setCachedAdrianZeroCustomRender } from '../../../../lib/cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -587,7 +587,12 @@ export default async function handler(req, res) {
         }
         
         // Cachear resultado final
-        setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
+        // Cachear resultado - usar cache específico si hay traits personalizados
+        if (hasCustomTraits) {
+          setCachedAdrianZeroCustomRender(cleanTokenId, finalTraits, pngBuffer, isCloseup);
+        } else {
+          setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
+        }
         
         // Configurar headers
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -729,6 +734,9 @@ export default async function handler(req, res) {
     
     const finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
+
+    // Detectar si hay traits personalizados comparando finalTraits con currentTraits
+    const hasCustomTraits = JSON.stringify(finalTraits) !== JSON.stringify(currentTraits);
 
     // Generar PNG estático (eliminada lógica de animaciones)
     console.log('[custom-render] Generando PNG estático...');
@@ -1146,9 +1154,26 @@ export default async function handler(req, res) {
     }
 
     // ===== VERIFICAR CACHÉ PRIMERO =====
-    const cachedImage = getCachedAdrianZeroRender(cleanTokenId);
+    let cachedImage = null;
+    if (hasCustomTraits) {
+      // Si hay traits personalizados, usar cache específico que incluye los traits
+      cachedImage = getCachedAdrianZeroCustomRender(cleanTokenId, finalTraits, isCloseup);
+      if (cachedImage) {
+        console.log(`[custom-external] 🎯 CACHE HIT para token ${cleanTokenId} con traits personalizados:`, finalTraits);
+      } else {
+        console.log(`[custom-external] 💾 CACHE MISS para token ${cleanTokenId} con traits personalizados:`, finalTraits);
+      }
+    } else {
+      // Si no hay traits personalizados, usar cache normal
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId);
+      if (cachedImage) {
+        console.log(`[custom-external] 🎯 CACHE HIT para token ${cleanTokenId} (sin traits personalizados)`);
+      } else {
+        console.log(`[custom-external] 💾 CACHE MISS para token ${cleanTokenId} (sin traits personalizados)`);
+      }
+    }
+    
     if (cachedImage) {
-      console.log(`[custom-external] 🎯 CACHE HIT para token ${cleanTokenId}`);
       const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
       res.setHeader('X-Cache', 'HIT');
       res.setHeader('X-Render-Source', 'cached');
@@ -1166,8 +1191,6 @@ export default async function handler(req, res) {
       
       return res.status(200).send(cachedImage);
     }
-
-    console.log(`[custom-external] 💾 CACHE MISS para token ${cleanTokenId}`);
 
     // ===== INTENTAR RENDERIZADO EXTERNO =====
     console.log('[custom-external] 🚀 Intentando renderizado externo...');
@@ -1198,8 +1221,12 @@ export default async function handler(req, res) {
       if (externalRenderBuffer) {
         console.log('[custom-external] ✅ Renderizado externo exitoso');
         
-        // Cachear resultado
-        setCachedAdrianZeroRender(cleanTokenId, externalRenderBuffer);
+        // Cachear resultado - usar cache específico si hay traits personalizados
+        if (hasCustomTraits) {
+          setCachedAdrianZeroCustomRender(cleanTokenId, finalTraits, externalRenderBuffer, isCloseup);
+        } else {
+          setCachedAdrianZeroRender(cleanTokenId, externalRenderBuffer);
+        }
         
         // Configurar headers
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
