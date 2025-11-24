@@ -1,0 +1,81 @@
+{
+  "process": {
+    "name": "Optimización de SVG pixelado a SVG con PNG embebido",
+    "description": "Convierte SVGs pixelados (con un rect por píxel) a SVGs optimizados que embeben un PNG como base64",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Crear backup del SVG original",
+        "description": "Guardar el SVG original como {traitId}.svg.backup antes de modificarlo",
+        "file_pattern": "{traitId}.svg.backup"
+      },
+      {
+        "step": 2,
+        "action": "Leer y convertir SVG a PNG",
+        "description": "Convertir el SVG pixelado a PNG de 1000x1000px. Primero intenta con Resvg, si falla (por límite de nodos) usa canvas como fallback",
+        "tools": [
+          {
+            "primary": "Resvg",
+            "description": "Más rápido para archivos pequeños/medianos",
+            "fallback": "Canvas (loadImage)",
+            "fallback_reason": "Resvg tiene límite de nodos (~1M), canvas maneja mejor archivos muy grandes"
+          }
+        ],
+        "output": "{traitId}.png"
+      },
+      {
+        "step": 3,
+        "action": "Crear SVG optimizado",
+        "description": "Generar un nuevo SVG que embebe el PNG como base64 en una etiqueta <image>",
+        "structure": {
+          "width": "1000",
+          "height": "1000",
+          "viewBox": "0 0 1000 1000",
+          "shape-rendering": "crispEdges",
+          "style": "image-rendering: pixelated",
+          "content": "<image href=\"data:image/png;base64,{base64Png}\" width=\"1000\" height=\"1000\"/>"
+        }
+      },
+      {
+        "step": 4,
+        "action": "Reemplazar SVG original",
+        "description": "Sobrescribir el SVG original con el SVG optimizado"
+      },
+      {
+        "step": 5,
+        "action": "Limpiar archivos temporales",
+        "description": "Eliminar el backup (.svg.backup) y el PNG generado después de la optimización exitosa",
+        "files_to_delete": [
+          "{traitId}.svg.backup",
+          "{traitId}.png"
+        ]
+      }
+    ],
+    "requirements": {
+      "dependencies": [
+        "@resvg/resvg-js",
+        "canvas",
+        "fs",
+        "path"
+      ],
+      "node_version": ">=18"
+    },
+    "usage": {
+      "command": "node scripts/optimize-svg.js {traitId}",
+      "example": "node scripts/optimize-svg.js 1123",
+      "description": "Optimiza el archivo public/labimages/{traitId}.svg"
+    },
+    "output": {
+      "reduction_expected": ">95%",
+      "format": "SVG con PNG embebido como base64",
+      "compatibility": "Compatible con todos los renderers existentes"
+    },
+    "notes": [
+      "El proceso mantiene la compatibilidad con los renderers existentes",
+      "El SVG optimizado es mucho más pequeño pero visualmente idéntico",
+      "Los archivos temporales (backup y PNG) se eliminan automáticamente después de la optimización"
+    ]
+  }
+}
+
