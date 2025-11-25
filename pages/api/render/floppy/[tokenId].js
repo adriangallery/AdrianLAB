@@ -127,6 +127,7 @@ export default async function handler(req, res) {
       (tokenIdNum >= 262144 && tokenIdNum <= 262147) ||
       (tokenIdNum >= 30000 && tokenIdNum <= 35000) ||
       (tokenIdNum >= 10000 && tokenIdNum <= 10100) ||
+      tokenIdNum === 1123 ||
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
       
