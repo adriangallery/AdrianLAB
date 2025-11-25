@@ -566,8 +566,8 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading OGPUNKS metadata' });
       }
 
-    } else {
-      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS (10000+)`);
+    } else if (tokenIdNum === 1123 || tokenIdNum >= 10000) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS/PACKS (1123 o 10000+)`);
       
       // Cargar datos de floppy.json
       const floppyPath = path.join(process.cwd(), 'public', 'labmetadata', 'floppy.json');
