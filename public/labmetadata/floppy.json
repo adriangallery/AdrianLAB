@@ -167,10 +167,22 @@
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": ["Adrian | HalfxTiger"],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1123,
+      "name": "CensorPack",
+      "category": "PACK",
+      "fileName": "1123.png",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "traitsInside": 4,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalFloppys": 14,
+    "totalFloppys": 15,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
