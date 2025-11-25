@@ -130,10 +130,10 @@ export default async function handler(req, res) {
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
       
-      // LÓGICA ESPECIAL: Si es un floppy específico (10000+), buscar archivo con fallback inteligente
+      // LÓGICA ESPECIAL: Si es un floppy específico (10000+ o 1123), buscar archivo con fallback inteligente
       // ESTRATEGIA: Buscar .gif primero, si no existe, buscar .png como fallback
       // 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo
-      if (tokenIdNum >= 10000 && tokenIdNum <= 10100) {
+      if ((tokenIdNum >= 10000 && tokenIdNum <= 10100) || tokenIdNum === 1123) {
         console.log(`[floppy-render] 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo`);
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, buscando con fallback inteligente`);
         
