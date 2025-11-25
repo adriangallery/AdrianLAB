@@ -77,7 +77,8 @@ export default async function handler(req, res) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
 
     // DETERMINAR TIPO DE TOKEN
-    if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
+    // LÓGICA ESPECIAL: 1123 es un pack, debe tratarse como floppy
+    if ((tokenIdNum >= 1 && tokenIdNum <= 9999) && tokenIdNum !== 1123) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para TRAITS (1-9999)`);
       
       // Cargar datos de labmetadata
