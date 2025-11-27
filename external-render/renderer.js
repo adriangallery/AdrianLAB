@@ -197,11 +197,21 @@ export async function renderImage(payload, baseUrl) {
   console.log('[renderer] PASO 2 - Iniciando carga del skin');
   
   // SKINTRAIT tiene máxima prioridad
-  if (skintraitPath) {
-    console.log(`[renderer] PASO 2 - SKINTRAIT: ${skintraitPath}`);
-    const skintraitImage = await loadFromTraitsPath(skintraitPath, baseUrl);
+  // Construir skintraitPath si no está presente pero hay SKINTRAIT en finalTraits
+  let effectiveSkintraitPath = skintraitPath;
+  if (!effectiveSkintraitPath && finalTraits && finalTraits['SKINTRAIT']) {
+    effectiveSkintraitPath = `SKINTRAIT/${finalTraits['SKINTRAIT']}.svg`;
+    console.log(`[renderer] PASO 2 - Construyendo skintraitPath desde finalTraits['SKINTRAIT']: ${effectiveSkintraitPath}`);
+  }
+  
+  if (effectiveSkintraitPath) {
+    console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT: ${effectiveSkintraitPath}`);
+    const skintraitImage = await loadFromTraitsPath(effectiveSkintraitPath, baseUrl);
     if (skintraitImage) {
       ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
+      console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT renderizado correctamente`);
+    } else {
+      console.error(`[renderer] PASO 2 - ❌ Error al cargar SKINTRAIT desde ${effectiveSkintraitPath}`);
     }
   }
   // Serum aplicado
