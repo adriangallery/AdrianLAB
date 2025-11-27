@@ -1293,14 +1293,21 @@ export default async function handler(req, res) {
     console.log('[custom-render] PASO 2 - Iniciando carga del skin');
     
     // LÓGICA ESPECIAL: SKINTRAIT tiene máxima prioridad sobre todo
-    if (skintraitPath) {
-      console.log(`[custom-render] PASO 2 - 🎨 LÓGICA ESPECIAL: SKINTRAIT prevalece sobre skin base y serums: ${skintraitPath}`);
-      const skintraitImage = await loadAndRenderSvg(skintraitPath);
+    // Los SKINTRAIT están en labimages/ como el resto de traits, no en traits/SKINTRAIT/
+    let skintraitTraitId = null;
+    if (finalTraits && finalTraits['SKINTRAIT']) {
+      skintraitTraitId = finalTraits['SKINTRAIT'];
+      console.log(`[custom-render] PASO 2 - 🎨 LÓGICA ESPECIAL: SKINTRAIT detectado (traitId: ${skintraitTraitId}) - prevalecerá sobre skin base y serums`);
+    }
+    
+    if (skintraitTraitId) {
+      console.log(`[custom-render] PASO 2 - 🎨 Cargando SKINTRAIT desde labimages/${skintraitTraitId}.svg`);
+      const skintraitImage = await loadTraitFromLabimages(skintraitTraitId);
       if (skintraitImage) {
         ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
         console.log('[custom-render] PASO 2 - 🎨 SKINTRAIT renderizado correctamente (reemplaza skin base)');
       } else {
-        console.error('[custom-render] PASO 2 - Error al cargar SKINTRAIT, usando skin base normal');
+        console.error(`[custom-render] PASO 2 - Error al cargar SKINTRAIT desde labimages/${skintraitTraitId}.svg, usando skin base normal`);
         const baseImage = await loadAndRenderSvg(baseImagePath);
         if (baseImage) {
           ctx.drawImage(baseImage, 0, 0, 1000, 1000);

@@ -197,21 +197,21 @@ export async function renderImage(payload, baseUrl) {
   console.log('[renderer] PASO 2 - Iniciando carga del skin');
   
   // SKINTRAIT tiene máxima prioridad
-  // Construir skintraitPath si no está presente pero hay SKINTRAIT en finalTraits
-  let effectiveSkintraitPath = skintraitPath;
-  if (!effectiveSkintraitPath && finalTraits && finalTraits['SKINTRAIT']) {
-    effectiveSkintraitPath = `SKINTRAIT/${finalTraits['SKINTRAIT']}.svg`;
-    console.log(`[renderer] PASO 2 - Construyendo skintraitPath desde finalTraits['SKINTRAIT']: ${effectiveSkintraitPath}`);
+  // Los SKINTRAIT están en labimages/ como el resto de traits, no en traits/SKINTRAIT/
+  let skintraitTraitId = null;
+  if (finalTraits && finalTraits['SKINTRAIT']) {
+    skintraitTraitId = finalTraits['SKINTRAIT'];
+    console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT detectado (traitId: ${skintraitTraitId}) - cargando desde labimages/`);
   }
   
-  if (effectiveSkintraitPath) {
-    console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT: ${effectiveSkintraitPath}`);
-    const skintraitImage = await loadFromTraitsPath(effectiveSkintraitPath, baseUrl);
+  if (skintraitTraitId) {
+    console.log(`[renderer] PASO 2 - 🎨 Cargando SKINTRAIT desde labimages/${skintraitTraitId}.svg`);
+    const skintraitImage = await loadTraitFromLabimages(skintraitTraitId, baseUrl);
     if (skintraitImage) {
       ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
-      console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT renderizado correctamente`);
+      console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT renderizado correctamente (reemplaza skin base)`);
     } else {
-      console.error(`[renderer] PASO 2 - ❌ Error al cargar SKINTRAIT desde ${effectiveSkintraitPath}`);
+      console.error(`[renderer] PASO 2 - ❌ Error al cargar SKINTRAIT desde labimages/${skintraitTraitId}.svg`);
     }
   }
   // Serum aplicado
