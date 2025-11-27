@@ -33,6 +33,10 @@ export default function Home() {
   const [gridResult, setGridResult] = useState(null);
   const [gridStats, setGridStats] = useState(null);
 
+  // Estados para el panel de endpoints de render
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [endpointSearch, setEndpointSearch] = useState('');
+
   useEffect(() => {
     loadTraits();
     fetchFloppyCacheStats();
@@ -934,6 +938,193 @@ export default function Home() {
               )}
             </div>
           )}
+        </div>
+
+        {/* Nueva sección de Render Endpoints */}
+        <div className={styles.adminSection}>
+          <h2 className={styles.adminTitle}>🔗 Render Endpoints - Quick Access</h2>
+          
+          {/* Tags Toggle */}
+          <div className={styles.tagsContainer}>
+            <h3>🏷️ Filtrar por Tags:</h3>
+            <div className={styles.tagsGrid}>
+              {['adrianzero', 'custom', 'external', 'lambo', 'floppy', 'svg', 'test', 'metadata', 'traits'].map(tag => (
+                <button
+                  key={tag}
+                  className={`${styles.tagButton} ${selectedTags.includes(tag) ? styles.tagActive : ''}`}
+                  onClick={() => {
+                    if (selectedTags.includes(tag)) {
+                      setSelectedTags(selectedTags.filter(t => t !== tag));
+                    } else {
+                      setSelectedTags([...selectedTags, tag]);
+                    }
+                  }}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            {selectedTags.length > 0 && (
+              <button
+                className={styles.clearTagsButton}
+                onClick={() => setSelectedTags([])}
+              >
+                ✕ Limpiar filtros
+              </button>
+            )}
+          </div>
+
+          {/* Buscador */}
+          <div className={styles.searchContainer}>
+            <input
+              type="text"
+              placeholder="🔍 Buscar endpoint..."
+              value={endpointSearch}
+              onChange={(e) => setEndpointSearch(e.target.value)}
+              className={styles.searchInput}
+            />
+          </div>
+
+          {/* Lista de Endpoints */}
+          <div className={styles.endpointsGrid}>
+            {[
+              {
+                name: 'AdrianZERO Render',
+                url: '/api/render/1',
+                description: 'Render estándar de token AdrianZERO',
+                tags: ['adrianzero', 'render'],
+                example: '/api/render/1'
+              },
+              {
+                name: 'AdrianZERO SVG',
+                url: '/api/render/1.svg',
+                description: 'Render SVG de token AdrianZERO',
+                tags: ['adrianzero', 'svg', 'render'],
+                example: '/api/render/1.svg'
+              },
+              {
+                name: 'Custom Render',
+                url: '/api/render/custom/1?eyes=7&mouth=22',
+                description: 'Preview con traits modificados',
+                tags: ['custom', 'render', 'adrianzero'],
+                example: '/api/render/custom/1?eyes=7&mouth=22'
+              },
+              {
+                name: 'Custom External Render',
+                url: '/api/render/custom-external/1?eyes=7&mouth=22',
+                description: 'Custom render usando servicio externo',
+                tags: ['custom', 'external', 'render'],
+                example: '/api/render/custom-external/1?eyes=7&mouth=22'
+              },
+              {
+                name: 'Test External Render',
+                url: '/api/render/test-external/1',
+                description: 'Endpoint de prueba para render externo',
+                tags: ['test', 'external', 'render'],
+                example: '/api/render/test-external/1'
+              },
+              {
+                name: 'Lambo Render',
+                url: '/api/render/lambo/1?lambo=Lambo_Variant_Red',
+                description: 'Render de AdrianZERO sobre Lambo',
+                tags: ['lambo', 'render', 'adrianzero'],
+                example: '/api/render/lambo/1?lambo=Lambo_Variant_Red'
+              },
+              {
+                name: 'Floppy Render',
+                url: '/api/render/floppy/18.png',
+                description: 'Render de traits Floppy',
+                tags: ['floppy', 'render', 'traits'],
+                example: '/api/render/floppy/18.png'
+              },
+              {
+                name: 'Floppy SVG',
+                url: '/api/render/floppy/18.svg',
+                description: 'Render SVG de traits Floppy',
+                tags: ['floppy', 'svg', 'render', 'traits'],
+                example: '/api/render/floppy/18.svg'
+              },
+              {
+                name: 'AdrianZERO Metadata',
+                url: '/api/metadata/1',
+                description: 'Metadata de token AdrianZERO',
+                tags: ['metadata', 'adrianzero'],
+                example: '/api/metadata/1'
+              },
+              {
+                name: 'Floppy Metadata',
+                url: '/api/metadata/floppy/18.json',
+                description: 'Metadata de traits Floppy',
+                tags: ['metadata', 'floppy', 'traits'],
+                example: '/api/metadata/floppy/18.json'
+              },
+              {
+                name: 'Floppy Pack Metadata',
+                url: '/api/metadata/floppy/10000',
+                description: 'Metadata de pack Floppy',
+                tags: ['metadata', 'floppy'],
+                example: '/api/metadata/floppy/10000'
+              },
+              {
+                name: 'Trait Render',
+                url: '/api/trait/18',
+                description: 'Render simplificado de trait individual',
+                tags: ['traits', 'render'],
+                example: '/api/trait/18'
+              },
+              {
+                name: 'Trait Metadata',
+                url: '/api/trait/metadata/18',
+                description: 'Metadata simplificada de trait',
+                tags: ['traits', 'metadata'],
+                example: '/api/trait/metadata/18'
+              },
+              {
+                name: 'Test Simple',
+                url: '/api/test-simple/18',
+                description: 'Endpoint de prueba simplificado',
+                tags: ['test', 'traits'],
+                example: '/api/test-simple/18'
+              }
+            ]
+            .filter(endpoint => {
+              // Filtrar por tags
+              if (selectedTags.length > 0) {
+                const hasAnyTag = selectedTags.some(tag => endpoint.tags.includes(tag));
+                if (!hasAnyTag) return false;
+              }
+              // Filtrar por búsqueda
+              if (endpointSearch) {
+                const searchLower = endpointSearch.toLowerCase();
+                return endpoint.name.toLowerCase().includes(searchLower) ||
+                       endpoint.description.toLowerCase().includes(searchLower) ||
+                       endpoint.example.toLowerCase().includes(searchLower);
+              }
+              return true;
+            })
+            .map((endpoint, index) => (
+              <div key={index} className={styles.endpointCard}>
+                <h3>{endpoint.name}</h3>
+                <p className={styles.endpointDescription}>{endpoint.description}</p>
+                <div className={styles.endpointTags}>
+                  {endpoint.tags.map(tag => (
+                    <span key={tag} className={styles.endpointTag}>{tag}</span>
+                  ))}
+                </div>
+                <div className={styles.endpointExample}>
+                  <code>{endpoint.example}</code>
+                </div>
+                <a 
+                  href={endpoint.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.endpointLink}
+                >
+                  🔗 Abrir endpoint
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
 

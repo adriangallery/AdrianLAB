@@ -354,6 +354,206 @@
   text-align: center;
 }
 
+/* Estilos para Tags y Filtros */
+.tagsContainer {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.tagsContainer h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.tagsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tagButton {
+  padding: 0.5rem 1rem;
+  border: 2px solid #0070f3;
+  background: white;
+  color: #0070f3;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tagButton:hover {
+  background: #e6f2ff;
+}
+
+.tagActive {
+  background: #0070f3 !important;
+  color: white !important;
+}
+
+.clearTagsButton {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #dc3545;
+  background: white;
+  color: #dc3545;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.clearTagsButton:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Estilos para Buscador */
+.searchContainer {
+  margin-bottom: 2rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+/* Estilos para Grid de Endpoints */
+.endpointsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.endpointCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.endpointCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: #0070f3;
+}
+
+.endpointCard h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.endpointDescription {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.endpointTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0;
+}
+
+.endpointTag {
+  padding: 0.25rem 0.6rem;
+  background: #e6f2ff;
+  color: #0070f3;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.endpointExample {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border-left: 3px solid #0070f3;
+}
+
+.endpointExample code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #333;
+  word-break: break-all;
+}
+
+.endpointLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #0070f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.endpointLink:hover {
+  background: #0051a2;
+}
+
+/* Estilos adicionales para formularios */
+.formRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.formRow .formGroup {
+  flex: 1;
+  min-width: 150px;
+}
+
+.infoPanel {
+  background: #e6f2ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #0070f3;
+  margin-bottom: 1.5rem;
+}
+
+.infoPanel h3,
+.infoPanel h4 {
+  margin-top: 0;
+  color: #333;
+}
+
+.infoPanel p {
+  margin: 0.5rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.gridPreview {
+  margin: 1rem 0;
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;
@@ -372,5 +572,13 @@
   
   .pageInfo {
     text-align: center;
+  }
+
+  .endpointsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tagsGrid {
+    justify-content: center;
   }
 } 
