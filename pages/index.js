@@ -386,6 +386,13 @@ export default function Home() {
                 example: '/api/render/floppy/18.svg'
               },
               {
+                name: 'Floppy Simple Render',
+                url: '/api/render/floppy/18?simple=true',
+                description: 'Render simplificado de trait individual',
+                tags: ['floppy', 'render', 'traits', 'simple'],
+                example: '/api/render/floppy/18?simple=true'
+              },
+              {
                 name: 'AdrianZERO Metadata',
                 url: '/api/metadata/1',
                 description: 'Metadata de token AdrianZERO',
