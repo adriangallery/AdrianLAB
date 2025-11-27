@@ -352,10 +352,10 @@ export default function Home() {
               },
               {
                 name: 'Custom External Render',
-                url: '/api/render/custom-external/1?eyes=7&mouth=22',
-                description: 'Custom render usando servicio externo',
+                url: '/api/render/custom-external/1?trait=7&trait=22',
+                description: 'Custom render usando servicio externo (solo números, sin especificar categoría)',
                 tags: ['custom', 'external', 'render'],
-                example: '/api/render/custom-external/1?eyes=7&mouth=22'
+                example: '/api/render/custom-external/1?trait=7&trait=22'
               },
               {
                 name: 'Test External Render',
