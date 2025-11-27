@@ -22,48 +22,6 @@ export default function Home() {
     // Component mounted
   }, []);
 
-  const loadTraits = async () => {
-    setLoading(true);
-    try {
-      // Cargar traits del 1 al 557 (traits normales)
-      const traitsData = [];
-      
-      // Traits normales (1-557)
-      for (let i = 1; i <= 557; i++) {
-        traitsData.push({
-          id: i,
-          name: `Trait #${i}`,
-          imageUrl: `/api/render/floppy/${i}.png?v=${Date.now()}`,
-          type: 'trait'
-        });
-      }
-      
-      // Floppy discs (10000-10002)
-      for (let i = 10000; i <= 10002; i++) {
-        traitsData.push({
-          id: i,
-          name: `Floppy #${i}`,
-          imageUrl: `/labimages/${i}.gif?v=${Date.now()}`,
-          type: 'floppy'
-        });
-      }
-      
-      // Pagers (15000-15013)
-      for (let i = 15000; i <= 15013; i++) {
-        traitsData.push({
-          id: i,
-          name: `Pager #${i}`,
-          imageUrl: `/labimages/${i}.gif?v=${Date.now()}`,
-          type: 'pager'
-        });
-      }
-      
-      setTraits(traitsData);
-    } catch (error) {
-      console.error('Error loading traits:', error);
-    }
-    setLoading(false);
-  };
 
   // Función para generar grids de AdrianZERO
   const generateGrid = async () => {
