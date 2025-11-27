@@ -14294,10 +14294,36 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1124,
+      "name": "SubZERO",
+      "category": "HEAD",
+      "fileName": "Blue-Check-Mark",
+      "maxSupply": 1000,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1125,
+      "name": "SubZERO",
+      "category": "SKINTRAIT",
+      "fileName": "Sub-Zero",
+      "maxSupply": 1000,
+      "floppy": "OG",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1190,
+    "totalTraits": 1192,
     "categories": [
       "BACKGROUND",
       "EAR",
