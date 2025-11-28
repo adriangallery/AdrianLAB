@@ -359,8 +359,19 @@ export default async function handler(req, res) {
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
+    // Verificar tag del token ANTES de crear baseMetadata para poder sobreescribir el nombre
+    const { getTokenTagInfo } = await import('../../../lib/tag-logic.js');
+    const tagInfo = await getTokenTagInfo(tokenId);
+    
+    // Determinar el nombre base según el tag
+    let tokenName = `AdrianZero #${tokenId}`;
+    if (tagInfo.tag === 'SubZERO') {
+      tokenName = 'SubZERO';
+      console.log(`[metadata] Token ${tokenId} tiene tag SubZERO, sobreescribiendo nombre a "SubZERO"`);
+    }
+    
     const baseMetadata = {
-      name: `AdrianZero #${tokenId}`,
+      name: tokenName,
       description: `An AdrianZero from the AdrianLAB collection`,
       image: imageUrl,
       external_url: imageUrl,
@@ -463,10 +474,15 @@ export default async function handler(req, res) {
       }
 
       // LÓGICA DE PRIORIDAD PARA EL NOMBRE:
-      // 1. profileName (PatientZERO) tiene prioridad máxima
+      // 0. SubZERO tag tiene prioridad ABSOLUTA (ya establecido arriba)
+      // 1. profileName (PatientZERO) tiene prioridad alta
       // 2. customName (AdrianNameRegistry) tiene prioridad media
       // 3. "AdrianZero" es el fallback por defecto
-      if (profileName) {
+      // Si el token tiene tag SubZERO, el nombre ya fue establecido arriba, no sobrescribir
+      if (tagInfo.tag === 'SubZERO') {
+        // El nombre ya fue establecido como "SubZERO" arriba, mantenerlo
+        console.log(`[metadata] Nombre SubZERO mantenido (prioridad máxima): ${baseMetadata.name}`);
+      } else if (profileName) {
         baseMetadata.name = `${profileName} #${tokenId}`;
         console.log(`[metadata] Nombre de perfil aplicado (prioridad alta): ${baseMetadata.name}`);
       } else if (customName) {
@@ -623,10 +639,21 @@ export default async function handler(req, res) {
       }
 
       // Añadir atributos base
+      let generationValue = tokenData[0].toString();
+      
+      // Si el token tiene tag SubZERO, sobreescribir Generation
+      if (tagInfo.tag === 'SubZERO') {
+        const config = (await import('../../../lib/tag-logic.js')).TAG_CONFIGS.SubZERO;
+        if (config && config.metadataGenOverride) {
+          generationValue = config.metadataGenOverride;
+          console.log(`[metadata] Token ${tokenId} tiene tag SubZERO, sobreescribiendo Generation a "${generationValue}"`);
+        }
+      }
+      
       baseMetadata.attributes.push(
         {
           trait_type: "Generation",
-          value: tokenData[0].toString()
+          value: generationValue
         }
       );
 

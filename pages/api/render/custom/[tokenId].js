@@ -555,57 +555,11 @@ export default async function handler(req, res) {
 
     console.log(`[custom-render] Traits personalizados:`, customTraits);
 
-    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) =====
-    if (isSamuraiToken) {
-      console.log(`[custom-render] 🥷 SAMURAIZERO: Token ${cleanTokenId} - Usando lógica simplificada`);
-      
-      try {
-        // Cargar imagen SVG desde samuraizero
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-        const samuraiImageUrl = `${baseUrl}/labimages/samuraizero/${cleanTokenId}.svg`;
-        console.log(`[custom-render] 🥷 Cargando imagen SamuraiZERO: ${samuraiImageUrl}`);
-        
-        const response = await fetch(samuraiImageUrl);
-        if (!response.ok) {
-          throw new Error(`SamuraiZERO image not found: ${response.status}`);
-        }
-        
-        const svgBuffer = await response.arrayBuffer();
-        const svgContent = Buffer.from(svgBuffer).toString();
-        
-        // Verificar caché SVG→PNG
-        let pngBuffer = getCachedSvgPng(svgContent);
-        if (!pngBuffer) {
-          console.log(`[custom-render] 🥷 Convirtiendo SVG→PNG para SamuraiZERO ${cleanTokenId}`);
-          const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
-          pngBuffer = resvg.render().asPng();
-          setCachedSvgPng(svgContent, pngBuffer);
-        } else {
-          console.log(`[custom-render] 🥷 CACHE HIT SVG→PNG para SamuraiZERO ${cleanTokenId}`);
-        }
-        
-        // Cachear resultado final
-        setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
-        
-        // Configurar headers
-        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-        res.setHeader('X-Cache', 'MISS');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('X-Version', 'SAMURAIZERO-CUSTOM');
-        
-        console.log(`[custom-render] 🥷 SamuraiZERO ${cleanTokenId} renderizado exitosamente (custom)`);
-        return res.status(200).send(pngBuffer);
-        
-      } catch (error) {
-        console.error(`[custom-render] 🥷 Error renderizando SamuraiZERO ${cleanTokenId}:`, error.message);
-        return res.status(404).json({ 
-          error: 'SamuraiZERO image not found', 
-          tokenId: cleanTokenId,
-          details: error.message 
-        });
-      }
-    }
+    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) - PAUSADA =====
+    // if (isSamuraiToken) {
+    //   console.log(`[custom-render] 🥷 SAMURAIZERO: Token ${cleanTokenId} - Usando lógica simplificada`);
+    //   ... (lógica pausada)
+    // }
 
     // ===== LÓGICA NORMAL ADRIANZERO (0-499, 1100+, 30000-35000) =====
     console.log(`[custom-render] 🎯 ADRIANZERO: Token ${cleanTokenId} - Usando lógica normal`);
@@ -725,8 +679,25 @@ export default async function handler(req, res) {
       normalizedCustomTraits[normalizeCategory(category)] = traitId;
     });
     
-    const finalTraits = { ...currentTraits, ...normalizedCustomTraits };
+    let finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
+
+    // ===== LÓGICA DE TAGS (SubZERO, etc.) - ANTES de cualquier lógica de skin =====
+    const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag } = await import('../../../../lib/tag-logic.js');
+    const tagInfo = await getTokenTagInfo(cleanTokenId);
+    
+    if (tagInfo.tag === 'SubZERO') {
+      console.log(`[custom-render] 🏷️ Token ${cleanTokenId} tiene tag SubZERO - Aplicando lógica especial`);
+      
+      // Filtrar EYES (solo permitir 1124)
+      finalTraits = filterEyesForTag(finalTraits, tagInfo.tag);
+      
+      // Forzar SKINTRAIT 1125 con prioridad absoluta
+      finalTraits = forceSkinTraitForTag(finalTraits, tagInfo.tag);
+      
+      console.log(`[custom-render] 🏷️ SubZERO: EYES filtrado, SKINTRAIT 1125 forzado con prioridad absoluta`);
+      console.log('[custom-render] Traits finales (después de lógica SubZERO):', finalTraits);
+    }
 
     // Generar PNG estático (eliminada lógica de animaciones)
     console.log('[custom-render] Generando PNG estático...');

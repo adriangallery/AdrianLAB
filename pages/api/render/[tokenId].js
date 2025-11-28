@@ -305,58 +305,12 @@ export default async function handler(req, res) {
 
     console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
 
-    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) =====
-    const tokenIdNum = parseInt(cleanTokenId);
-    if (tokenIdNum >= 500 && tokenIdNum <= 1099) {
-      console.log(`[render] 🥷 SAMURAIZERO: Token ${cleanTokenId} detectado - Usando lógica simplificada`);
-      
-      try {
-        // Cargar imagen SVG desde samuraizero
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-        const samuraiImageUrl = `${baseUrl}/labimages/samuraizero/${cleanTokenId}.svg`;
-        console.log(`[render] 🥷 Cargando imagen SamuraiZERO: ${samuraiImageUrl}`);
-        
-        const response = await fetch(samuraiImageUrl);
-        if (!response.ok) {
-          throw new Error(`SamuraiZERO image not found: ${response.status}`);
-        }
-        
-        const svgBuffer = await response.arrayBuffer();
-        const svgContent = Buffer.from(svgBuffer).toString();
-        
-        // Verificar caché SVG→PNG
-        let pngBuffer = getCachedSvgPng(svgContent);
-        if (!pngBuffer) {
-          console.log(`[render] 🥷 Convirtiendo SVG→PNG para SamuraiZERO ${cleanTokenId}`);
-          const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1000 } });
-          pngBuffer = resvg.render().asPng();
-          setCachedSvgPng(svgContent, pngBuffer);
-        } else {
-          console.log(`[render] 🥷 CACHE HIT SVG→PNG para SamuraiZERO ${cleanTokenId}`);
-        }
-        
-        // Cachear resultado final
-        setCachedAdrianZeroRender(cleanTokenId, pngBuffer);
-        
-        // Configurar headers
-        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-        res.setHeader('X-Cache', 'MISS');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('X-Version', 'SAMURAIZERO');
-        
-        console.log(`[render] 🥷 SamuraiZERO ${cleanTokenId} renderizado exitosamente`);
-        return res.status(200).send(pngBuffer);
-        
-      } catch (error) {
-        console.error(`[render] 🥷 Error renderizando SamuraiZERO ${cleanTokenId}:`, error.message);
-        return res.status(404).json({ 
-          error: 'SamuraiZERO image not found', 
-          tokenId: cleanTokenId,
-          details: error.message 
-        });
-      }
-    }
+    // ===== LÓGICA ESPECIAL SAMURAIZERO (500-1099) - PAUSADA =====
+    // const tokenIdNum = parseInt(cleanTokenId);
+    // if (tokenIdNum >= 500 && tokenIdNum <= 1099) {
+    //   console.log(`[render] 🥷 SAMURAIZERO: Token ${cleanTokenId} detectado - Usando lógica simplificada`);
+    //   ... (lógica pausada)
+    // }
 
     // ===== LÓGICA NORMAL ADRIANZERO (0-499, 1100+) =====
     console.log(`[render] 🎯 ADRIANZERO: Token ${cleanTokenId} - Usando lógica normal`);
@@ -769,6 +723,26 @@ export default async function handler(req, res) {
         equippedTraits[normalizedCategory] = traitId;
       }
     });
+
+    // ===== LÓGICA DE TAGS (SubZERO, etc.) - ANTES de cualquier lógica de skin =====
+    const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag } = await import('../../../lib/tag-logic.js');
+    const tagInfo = await getTokenTagInfo(cleanTokenId);
+    
+    if (tagInfo.tag === 'SubZERO') {
+      console.log(`[render] 🏷️ Token ${cleanTokenId} tiene tag SubZERO - Aplicando lógica especial`);
+      
+      // Filtrar EYES (solo permitir 1124)
+      const filteredTraits = filterEyesForTag(equippedTraits, tagInfo.tag);
+      Object.keys(equippedTraits).forEach(key => delete equippedTraits[key]);
+      Object.assign(equippedTraits, filteredTraits);
+      
+      // Forzar SKINTRAIT 1125 con prioridad absoluta
+      const forcedTraits = forceSkinTraitForTag(equippedTraits, tagInfo.tag);
+      Object.keys(equippedTraits).forEach(key => delete equippedTraits[key]);
+      Object.assign(equippedTraits, forcedTraits);
+      
+      console.log(`[render] 🏷️ SubZERO: EYES filtrado, SKINTRAIT 1125 forzado con prioridad absoluta`);
+    }
 
     // Verificar si hay un trait de skin excepcional
     let skinTraitPath = null;
