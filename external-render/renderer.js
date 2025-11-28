@@ -132,7 +132,7 @@ export async function renderImage(payload, baseUrl) {
     tokenId,
     generation,
     skinType,
-    finalTraits,
+    finalTraits: originalFinalTraits,
     appliedSerum,
     serumSuccess,
     hasAdrianGFSerum,
@@ -142,12 +142,49 @@ export async function renderImage(payload, baseUrl) {
     skintraitPath,
     skinTraitPath,
     isCloseup,
-    traitsMapping
+    traitsMapping,
+    tagInfo
   } = payload;
 
   console.log(`[renderer] 🎨 Iniciando renderizado para token ${tokenId}`);
-  console.log(`[renderer] 📋 finalTraits recibidos:`, JSON.stringify(finalTraits, null, 2));
-  console.log(`[renderer] 📋 BACKGROUND en finalTraits:`, finalTraits && finalTraits['BACKGROUND'] ? finalTraits['BACKGROUND'] : 'NO HAY');
+  console.log(`[renderer] 📋 finalTraits recibidos:`, JSON.stringify(originalFinalTraits, null, 2));
+  console.log(`[renderer] 📋 BACKGROUND en finalTraits:`, originalFinalTraits && originalFinalTraits['BACKGROUND'] ? originalFinalTraits['BACKGROUND'] : 'NO HAY');
+  console.log(`[renderer] 📋 tagInfo recibido:`, tagInfo ? JSON.stringify(tagInfo, null, 2) : 'NO HAY');
+  
+  // ===== LÓGICA DE TAGS (SubZERO, etc.) - Aplicar en el servicio externo =====
+  // Asegurar que finalTraits no sea null/undefined
+  let finalTraits = originalFinalTraits ? { ...originalFinalTraits } : {};
+  
+  if (tagInfo && tagInfo.tag === 'SubZERO') {
+    console.log(`[renderer] 🏷️ Token ${tokenId} tiene tag SubZERO - Aplicando lógica especial en servicio externo`);
+    
+    // Importar funciones de tag-logic (usando import dinámico ya que estamos en un módulo separado)
+    try {
+      // Nota: El servicio externo no tiene acceso directo a lib/tag-logic.js
+      // Aplicar lógica directamente aquí basándose en tagInfo
+      const TAG_CONFIGS = {
+        SubZERO: {
+          allowedEyesTraits: [1124],
+          forcedSkinTrait: 1125
+        }
+      };
+      
+      const config = TAG_CONFIGS.SubZERO;
+      
+      // Filtrar EYES (solo permitir 1124)
+      if (finalTraits['EYES'] && !config.allowedEyesTraits.includes(parseInt(finalTraits['EYES']))) {
+        console.log(`[renderer] 🏷️ EYES ${finalTraits['EYES']} filtrado para SubZERO, solo se permite ${config.allowedEyesTraits.join(', ')}`);
+        delete finalTraits['EYES'];
+      }
+      
+      // Forzar SKINTRAIT 1125 con prioridad absoluta (incluso si finalTraits estaba vacío)
+      finalTraits['SKINTRAIT'] = config.forcedSkinTrait.toString();
+      console.log(`[renderer] 🏷️ SKINTRAIT ${config.forcedSkinTrait} forzado para SubZERO con prioridad absoluta`);
+      console.log(`[renderer] 🏷️ finalTraits después de lógica SubZERO:`, JSON.stringify(finalTraits, null, 2));
+    } catch (error) {
+      console.error(`[renderer] ❌ Error aplicando lógica SubZERO:`, error.message);
+    }
+  }
 
   // Crear canvas con fondo blanco
   const canvas = createCanvas(1000, 1000);

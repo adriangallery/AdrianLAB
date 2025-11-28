@@ -1178,7 +1178,8 @@ export default async function handler(req, res) {
       skintraitPath,
       skinTraitPath,
       isCloseup,
-      traitsMapping
+      traitsMapping,
+      tagInfo // Pasar tagInfo para que el servicio externo pueda aplicar lógica de tags
     });
     
     console.log('[custom-external] 📦 renderData preparado, finalTraits en renderData:', JSON.stringify(renderData.finalTraits, null, 2));
