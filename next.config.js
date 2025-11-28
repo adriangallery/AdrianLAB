@@ -17,6 +17,11 @@ const nextConfig = {
       test: /\.(ttf|otf|woff|woff2)$/,
       type: 'asset/resource'
     });
+    // Asegurar que los archivos JSON se resuelvan correctamente
+    config.resolve.extensionAlias = {
+      '.js': ['.js', '.ts', '.tsx'],
+      '.json': ['.json']
+    };
     return config;
   }
 }
