@@ -235,7 +235,7 @@ export async function renderImage(payload, baseUrl) {
       // Los backgrounds están en labimages/{traitId}.svg, no en traits/BACKGROUND/
       // Intentar primero desde labimages (ubicación real)
       console.log(`[renderer] PASO 1 - Intentando cargar desde labimages/${bgTraitId}.svg...`);
-      let bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl);
+      let bgImage = await loadTraitFromLabimages(bgTraitId, baseUrl, tagInfo);
       
       // Fallback: si no se encuentra en labimages, intentar en traits/BACKGROUND
       if (!bgImage) {
@@ -275,7 +275,7 @@ export async function renderImage(payload, baseUrl) {
   
   if (skintraitTraitId) {
     console.log(`[renderer] PASO 2 - 🎨 Cargando SKINTRAIT desde labimages/${skintraitTraitId}.svg`);
-    const skintraitImage = await loadTraitFromLabimages(skintraitTraitId, baseUrl);
+    const skintraitImage = await loadTraitFromLabimages(skintraitTraitId, baseUrl, tagInfo);
     if (skintraitImage) {
       ctx.drawImage(skintraitImage, 0, 0, 1000, 1000);
       console.log(`[renderer] PASO 2 - 🎨 SKINTRAIT renderizado correctamente (reemplaza skin base)`);
@@ -411,7 +411,7 @@ export async function renderImage(payload, baseUrl) {
   // GEAR 721 y 726 antes de SWAG
   if (finalTraits && (finalTraits['GEAR'] === '721' || finalTraits['GEAR'] === '726')) {
     const gearTraitId = finalTraits['GEAR'];
-    let gearImage = await loadTraitFromLabimages(gearTraitId, baseUrl);
+    let gearImage = await loadTraitFromLabimages(gearTraitId, baseUrl, tagInfo);
     if (gearImage) {
       ctx.drawImage(gearImage, 0, 0, 1000, 1000);
     }
