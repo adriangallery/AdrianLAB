@@ -143,7 +143,8 @@ export async function renderImage(payload, baseUrl) {
     skinTraitPath,
     isCloseup,
     traitsMapping,
-    tagInfo
+    tagInfo,
+    samuraiImageIndex
   } = payload;
 
   console.log(`[renderer] 🎨 Iniciando renderizado para token ${tokenId}`);
@@ -151,7 +152,7 @@ export async function renderImage(payload, baseUrl) {
   console.log(`[renderer] 📋 BACKGROUND en finalTraits:`, originalFinalTraits && originalFinalTraits['BACKGROUND'] ? originalFinalTraits['BACKGROUND'] : 'NO HAY');
   console.log(`[renderer] 📋 tagInfo recibido:`, tagInfo ? JSON.stringify(tagInfo, null, 2) : 'NO HAY');
   
-  // ===== LÓGICA DE TAGS (SubZERO, etc.) - Aplicar en el servicio externo =====
+  // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - Aplicar en el servicio externo =====
   // Asegurar que finalTraits no sea null/undefined
   let finalTraits = originalFinalTraits ? { ...originalFinalTraits } : {};
   
@@ -183,6 +184,30 @@ export async function renderImage(payload, baseUrl) {
       console.log(`[renderer] 🏷️ finalTraits después de lógica SubZERO:`, JSON.stringify(finalTraits, null, 2));
     } catch (error) {
       console.error(`[renderer] ❌ Error aplicando lógica SubZERO:`, error.message);
+    }
+  }
+  
+  // ===== LÓGICA ESPECIAL SAMURAIZERO =====
+  if (tagInfo && tagInfo.tag === 'SamuraiZERO') {
+    console.log(`[renderer] 🥷 Token ${tokenId} tiene tag SamuraiZERO - Aplicando lógica especial en servicio externo`);
+    
+    try {
+      // El samuraiImageIndex viene en el payload (calculado en custom-external)
+      const { samuraiImageIndex } = payload;
+      
+      if (samuraiImageIndex && samuraiImageIndex >= 500 && samuraiImageIndex <= 1099) {
+        console.log(`[renderer] 🥷 SamuraiZERO token ${tokenId} usando imagen ${samuraiImageIndex}.svg como TOP`);
+        
+        // Forzar trait TOP con la imagen de SamuraiZERO
+        finalTraits['TOP'] = samuraiImageIndex.toString();
+        
+        console.log(`[renderer] 🥷 SamuraiZERO: TOP ${samuraiImageIndex} forzado, se renderizará sobre todo lo demás`);
+        console.log(`[renderer] 🥷 finalTraits después de lógica SamuraiZERO:`, JSON.stringify(finalTraits, null, 2));
+      } else {
+        console.error(`[renderer] 🥷 SamuraiZERO token ${tokenId} tiene samuraiImageIndex inválido: ${samuraiImageIndex}`);
+      }
+    } catch (error) {
+      console.error(`[renderer] ❌ Error aplicando lógica SamuraiZERO:`, error.message);
     }
   }
 

@@ -682,8 +682,8 @@ export default async function handler(req, res) {
     let finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
 
-    // ===== LÓGICA DE TAGS (SubZERO, etc.) - ANTES de cualquier lógica de skin =====
-    const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag } = await import('../../../../lib/tag-logic.js');
+    // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
+    const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag, getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../../lib/tag-logic.js');
     const tagInfo = await getTokenTagInfo(cleanTokenId);
     
     if (tagInfo.tag === 'SubZERO') {
@@ -697,6 +697,26 @@ export default async function handler(req, res) {
       
       console.log(`[custom-render] 🏷️ SubZERO: EYES filtrado, SKINTRAIT 1125 forzado con prioridad absoluta`);
       console.log('[custom-render] Traits finales (después de lógica SubZERO):', finalTraits);
+    }
+    
+    // ===== LÓGICA ESPECIAL SAMURAIZERO =====
+    if (tagInfo.tag === 'SamuraiZERO') {
+      console.log(`[custom-render] 🥷 Token ${cleanTokenId} tiene tag SamuraiZERO - Aplicando lógica especial`);
+      
+      const samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
+      
+      if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
+        const imageIndex = TAG_CONFIGS.SamuraiZERO.imageBaseIndex + samuraiIndex;
+        console.log(`[custom-render] 🥷 SamuraiZERO token ${cleanTokenId} tiene índice ${samuraiIndex}, usando imagen ${imageIndex}.svg como TOP`);
+        
+        // Forzar trait TOP con la imagen de SamuraiZERO (ignorar cualquier TOP personalizado)
+        finalTraits['TOP'] = imageIndex.toString();
+        
+        console.log(`[custom-render] 🥷 SamuraiZERO: TOP ${imageIndex} forzado, se renderizará sobre todo lo demás`);
+        console.log('[custom-render] Traits finales (después de lógica SamuraiZERO):', finalTraits);
+      } else {
+        console.error(`[custom-render] 🥷 SamuraiZERO token ${cleanTokenId} tiene índice inválido: ${samuraiIndex}`);
+      }
     }
 
     // Generar PNG estático (eliminada lógica de animaciones)

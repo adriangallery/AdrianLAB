@@ -215,65 +215,9 @@ export default async function handler(req, res) {
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
 
-    // ===== LÓGICA ESPECIAL: SAMURAIZERO (500-1099) =====
-    const tokenIdNum = parseInt(tokenId);
-    if (tokenIdNum >= 500 && tokenIdNum <= 1099) {
-      console.log(`[metadata] 🥷 SAMURAIZERO: Token ${tokenId} detectado - Usando metadata hardcodeado`);
-      
-      try {
-        // Cargar metadata desde samuraimetadata.json
-        const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
-        const samuraiMetadataRaw = fs.readFileSync(samuraiMetadataPath, 'utf8');
-        const samuraiMetadata = JSON.parse(samuraiMetadataRaw);
-        
-        // Buscar token específico en la colección
-        const tokenData = samuraiMetadata.collection.find(item => 
-          item.name.includes(`#${tokenId}`)
-        );
-        
-        if (!tokenData) {
-          console.error(`[metadata] 🥷 SamuraiZERO token ${tokenId} no encontrado en samuraimetadata.json`);
-          return res.status(404).json({ 
-            error: 'SamuraiZERO token not found', 
-            tokenId: tokenId 
-          });
-        }
-        
-        // Actualizar URLs para compatibilidad con OpenSea
-        // Construir URL con parámetros según toggles activos
-        const urlParams = [];
-        if (isCloseupToken) urlParams.push('closeup=true');
-        if (isShadowToken) urlParams.push('shadow=true');
-        if (isGlowToken) urlParams.push('glow=true');
-        if (isBnToken) urlParams.push('bn=true');
-        if (isBlackoutToken) urlParams.push('blackout=true');
-        const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
-        const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
-          
-        const updatedTokenData = {
-          ...tokenData,
-          image: imageUrl,
-          external_url: imageUrl
-        };
-        
-        console.log(`[metadata] 🥷 SamuraiZERO ${tokenId} metadata cargado exitosamente`);
-        
-        // Configurar headers
-        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora para metadata estático
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('X-Version', 'SAMURAIZERO');
-        
-        return res.status(200).json(updatedTokenData);
-        
-      } catch (error) {
-        console.error(`[metadata] 🥷 Error cargando SamuraiZERO ${tokenId}:`, error.message);
-        return res.status(500).json({ 
-          error: 'Error loading SamuraiZERO metadata', 
-          tokenId: tokenId,
-          details: error.message 
-        });
-      }
-    }
+    // ===== LÓGICA ESPECIAL: SAMURAIZERO (500-1099) - REEMPLAZADA POR LÓGICA BASADA EN TAGS =====
+    // El código antiguo basado en rango ha sido reemplazado por lógica basada en tags del contrato
+    // Ver lógica de SamuraiZERO más abajo (después de obtener tagInfo)
 
     // ===== LÓGICA ESPECIAL: ACTION PACKS (15008-15010) =====
     if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
@@ -368,6 +312,69 @@ export default async function handler(req, res) {
     if (tagInfo.tag === 'SubZERO') {
       tokenName = 'SubZERO';
       console.log(`[metadata] Token ${tokenId} tiene tag SubZERO, sobreescribiendo nombre a "SubZERO"`);
+    }
+    
+    // ===== LÓGICA ESPECIAL SAMURAIZERO =====
+    if (tagInfo.tag === 'SamuraiZERO') {
+      try {
+        const { getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../lib/tag-logic.js');
+        const samuraiIndex = await getSamuraiZEROIndex(tokenId);
+        
+        if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
+          console.log(`[metadata] 🥷 Token ${tokenId} es SamuraiZERO con índice ${samuraiIndex}`);
+          
+          // Cargar samuraimetadata.json
+          const fs = await import('fs');
+          const path = await import('path');
+          const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
+          const samuraiMetadataContent = fs.readFileSync(samuraiMetadataPath, 'utf8');
+          const samuraiMetadata = JSON.parse(samuraiMetadataContent);
+          
+          // Obtener la entrada correspondiente
+          const samuraiEntry = samuraiMetadata.collection[samuraiIndex];
+          
+          if (samuraiEntry) {
+            // Extraer nombre base y reemplazar número con tokenId real
+            const nameMatch = samuraiEntry.name.match(/^(.+?)\s*#\d+$/);
+            const baseName = nameMatch ? nameMatch[1] : samuraiEntry.name.split('#')[0].trim();
+            const finalName = `${baseName} #${tokenId}`;
+            
+            // Construir metadata completo
+            const samuraiMetadataResult = {
+              name: finalName,
+              description: samuraiEntry.description || `SamuraiZERO by HalfxTiger`,
+              image: imageUrl, // Usar endpoint de renderizado normal
+              external_url: samuraiEntry.external_url || imageUrl,
+              metadata_version: "2",
+              attributes: [
+                {
+                  trait_type: "Generation",
+                  value: TAG_CONFIGS.SamuraiZERO.metadataGenOverride
+                },
+                ...(samuraiEntry.attributes || [])
+              ]
+            };
+            
+            // Añadir masterminds si existen
+            if (samuraiEntry.masterminds) {
+              samuraiMetadataResult.masterminds = samuraiEntry.masterminds;
+            }
+            
+            console.log(`[metadata] 🥷 SamuraiZERO metadata generado: ${finalName}`);
+            
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('X-Version', 'SAMURAIZERO');
+            return res.status(200).json(samuraiMetadataResult);
+          } else {
+            console.error(`[metadata] 🥷 SamuraiZERO índice ${samuraiIndex} no encontrado en JSON`);
+          }
+        } else {
+          console.error(`[metadata] 🥷 SamuraiZERO token ${tokenId} tiene índice inválido: ${samuraiIndex}`);
+        }
+      } catch (error) {
+        console.error(`[metadata] 🥷 Error procesando SamuraiZERO ${tokenId}:`, error.message);
+        // Continuar con lógica normal si hay error
+      }
     }
     
     const baseMetadata = {
