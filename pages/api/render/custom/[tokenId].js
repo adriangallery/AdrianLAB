@@ -1528,7 +1528,46 @@ export default async function handler(req, res) {
         }          }
         } else {
           let traitImage;
-          if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+          // LÓGICA ESPECIAL: SamuraiZERO traits (500-1099) se cargan desde samuraizero/
+          if (traitId >= 500 && traitId <= 1099) {
+            // Es un SamuraiZERO, cargar desde samuraizero/
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+            const imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
+            console.log(`[custom-render] 🥷 Cargando SamuraiZERO trait desde: ${imageUrl}`);
+            
+            try {
+              const response = await fetch(imageUrl);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
+              const svgBuffer = await response.arrayBuffer();
+              const svgContent = Buffer.from(svgBuffer);
+              
+              // Intentar obtener del caché SVG→PNG primero
+              const cachedPng = getCachedSvgPng(svgContent.toString());
+              if (cachedPng) {
+                traitImage = await loadImage(cachedPng);
+              } else {
+                // Si no está en caché, hacer la conversión
+                const resvg = new Resvg(svgContent, {
+                  fitTo: {
+                    mode: 'width',
+                    value: 1000
+                  }
+                });
+                
+                const pngBuffer = resvg.render().asPng();
+                
+                // Guardar en caché SVG→PNG
+                setCachedSvgPng(svgContent.toString(), pngBuffer);
+                
+                traitImage = await loadImage(pngBuffer);
+              }
+            } catch (error) {
+              console.error(`[custom-render] 🥷 Error al cargar SamuraiZERO trait ${traitId}:`, error.message);
+            }
+          } else if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
             traitImage = await loadExternalTrait(traitId);
           } else if (traitId >= 100001 && traitId <= 101003) {
             traitImage = await loadOgpunkTrait(traitId);
@@ -1545,7 +1584,9 @@ export default async function handler(req, res) {
             setCachedComponent('trait', traitId, traitBuffer);
 
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-            if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
+            if (traitId >= 500 && traitId <= 1099) {
+              console.log(`[custom-render] 🥷 PASO 4 - TOP trait SamuraiZERO ${category} (${traitId}) renderizado desde samuraizero/ correctamente`);
+            } else if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
               console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);
             } else if (traitId >= 100001 && traitId <= 101003) {
               console.log(`[custom-render] 🎯 LÓGICA OGPUNKS: TOP trait ${category} (${traitId}) renderizado desde ogpunks correctamente`);

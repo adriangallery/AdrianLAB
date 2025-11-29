@@ -104,7 +104,14 @@ async function loadSvgAsImage(url) {
 
 // Función para cargar trait desde labimages
 async function loadTraitFromLabimages(traitId, baseUrl) {
-  const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+  // LÓGICA ESPECIAL: SamuraiZERO traits (500-1099) se cargan desde samuraizero/
+  let imageUrl;
+  if (traitId >= 500 && traitId <= 1099) {
+    imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
+    console.log(`[renderer] 🥷 Cargando SamuraiZERO trait desde: ${imageUrl}`);
+  } else {
+    imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
+  }
   return await loadSvgAsImage(imageUrl);
 }
 
@@ -460,11 +467,19 @@ export async function renderImage(payload, baseUrl) {
     } else if (traitId >= 100001 && traitId <= 101003) {
       traitImage = await loadOgpunkTrait(traitId, baseUrl);
     } else {
+      // loadTraitFromLabimages ya maneja SamuraiZERO (500-1099) automáticamente
       traitImage = await loadTraitFromLabimages(traitId, baseUrl);
     }
     
     if (traitImage) {
       ctx.drawImage(traitImage, 0, 0, 1000, 1000);
+      if (traitId >= 500 && traitId <= 1099) {
+        console.log(`[renderer] 🥷 PASO 4 - TOP trait SamuraiZERO (${traitId}) renderizado desde samuraizero/ correctamente`);
+      } else {
+        console.log(`[renderer] PASO 4 - TOP trait (${traitId}) renderizado correctamente`);
+      }
+    } else {
+      console.error(`[renderer] PASO 4 - Error al cargar TOP trait (${traitId})`);
     }
   }
 
