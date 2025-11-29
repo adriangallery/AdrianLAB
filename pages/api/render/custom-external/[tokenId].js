@@ -1658,8 +1658,8 @@ export default async function handler(req, res) {
         }          }
         } else {
           let traitImage;
-          // LÓGICA ESPECIAL: SamuraiZERO traits (500-1099) se cargan desde samuraizero/
-          if (traitId >= 500 && traitId <= 1099) {
+          // LÓGICA ESPECIAL: SamuraiZERO traits SOLO si el token tiene tag SamuraiZERO
+          if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
             // Es un SamuraiZERO, cargar desde samuraizero/
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
             const imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
@@ -1714,7 +1714,7 @@ export default async function handler(req, res) {
             setCachedComponent('trait', traitId, traitBuffer);
 
             ctx.drawImage(traitImage, 0, 0, 1000, 1000);
-            if (traitId >= 500 && traitId <= 1099) {
+            if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
               console.log(`[custom-render] 🥷 PASO 4 - TOP trait SamuraiZERO ${category} (${traitId}) renderizado desde samuraizero/ correctamente`);
             } else if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
               console.log(`[custom-render] 🌐 PASO 4 - TOP trait externo ${category} (${traitId}) renderizado correctamente desde URL externa`);

@@ -1188,10 +1188,10 @@ export default async function handler(req, res) {
             console.error(`[render] PASO 4 - 🎯 LÓGICA OGPUNKS: Error al cargar TOP trait ${category} (${traitId}) desde ogpunks`);
           }
         } else {
-          // LÓGICA ESPECIAL: SamuraiZERO traits (500-1099) se cargan desde samuraizero/
+          // LÓGICA ESPECIAL: SamuraiZERO traits SOLO si el token tiene tag SamuraiZERO
           let traitImage;
-          if (traitId >= 500 && traitId <= 1099) {
-            // Es un SamuraiZERO, cargar desde samuraizero/
+          if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
+            // Es un SamuraiZERO con trait TOP válido, cargar desde samuraizero/
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
             const imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
             console.log(`[render] 🥷 Cargando SamuraiZERO trait desde: ${imageUrl}`);
@@ -1235,7 +1235,7 @@ export default async function handler(req, res) {
           
           if (traitImage) {
             getDrawContext().drawImage(traitImage, 0, 0, 1000, 1000);
-            if (traitId >= 500 && traitId <= 1099) {
+            if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
               console.log(`[render] 🥷 PASO 4 - TOP trait SamuraiZERO ${category} (${traitId}) renderizado desde samuraizero/ correctamente`);
             } else {
               console.log(`[render] PASO 4 - TOP trait ${category} (${traitId}) renderizado desde labimages correctamente`);

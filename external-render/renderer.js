@@ -103,10 +103,10 @@ async function loadSvgAsImage(url) {
 }
 
 // Función para cargar trait desde labimages
-async function loadTraitFromLabimages(traitId, baseUrl) {
-  // LÓGICA ESPECIAL: SamuraiZERO traits (500-1099) se cargan desde samuraizero/
+async function loadTraitFromLabimages(traitId, baseUrl, tagInfo = null) {
+  // LÓGICA ESPECIAL: SamuraiZERO traits SOLO si el token tiene tag SamuraiZERO
   let imageUrl;
-  if (traitId >= 500 && traitId <= 1099) {
+  if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
     imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
     console.log(`[renderer] 🥷 Cargando SamuraiZERO trait desde: ${imageUrl}`);
   } else {
@@ -446,7 +446,7 @@ export async function renderImage(payload, baseUrl) {
       } else if (traitId >= 100001 && traitId <= 101003) {
         traitImage = await loadOgpunkTrait(traitId, baseUrl);
       } else {
-        traitImage = await loadTraitFromLabimages(traitId, baseUrl);
+        traitImage = await loadTraitFromLabimages(traitId, baseUrl, tagInfo);
       }
       
       if (traitImage) {
@@ -467,8 +467,8 @@ export async function renderImage(payload, baseUrl) {
     } else if (traitId >= 100001 && traitId <= 101003) {
       traitImage = await loadOgpunkTrait(traitId, baseUrl);
     } else {
-      // loadTraitFromLabimages ya maneja SamuraiZERO (500-1099) automáticamente
-      traitImage = await loadTraitFromLabimages(traitId, baseUrl);
+      // loadTraitFromLabimages necesita tagInfo para determinar si es SamuraiZERO
+      traitImage = await loadTraitFromLabimages(traitId, baseUrl, tagInfo);
     }
     
     if (traitImage) {
