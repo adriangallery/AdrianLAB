@@ -211,6 +211,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
+    // Convert tokenId to number for comparisons
+    const tokenIdNum = parseInt(tokenId);
+
     // Build base URL for images
     const baseUrl = 'https://adrianlab.vercel.app';
     const version = Date.now();
@@ -324,8 +327,6 @@ export default async function handler(req, res) {
           console.log(`[metadata] 🥷 Token ${tokenId} es SamuraiZERO con índice ${samuraiIndex}`);
           
           // Cargar samuraimetadata.json
-          const fs = await import('fs');
-          const path = await import('path');
           const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
           const samuraiMetadataContent = fs.readFileSync(samuraiMetadataPath, 'utf8');
           const samuraiMetadata = JSON.parse(samuraiMetadataContent);
@@ -339,12 +340,23 @@ export default async function handler(req, res) {
             const baseName = nameMatch ? nameMatch[1] : samuraiEntry.name.split('#')[0].trim();
             const finalName = `${baseName} #${tokenId}`;
             
+            // Construir URL de imagen (usar endpoint de renderizado normal)
+            const urlParams = [];
+            if (isCloseupToken) urlParams.push('closeup=true');
+            if (isShadowToken) urlParams.push('shadow=true');
+            if (isGlowToken) urlParams.push('glow=true');
+            if (isBnToken) urlParams.push('bn=true');
+            if (isUvToken) urlParams.push('uv=true');
+            if (isBlackoutToken) urlParams.push('blackout=true');
+            const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
+            const samuraiImageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
+            
             // Construir metadata completo
             const samuraiMetadataResult = {
               name: finalName,
               description: samuraiEntry.description || `SamuraiZERO by HalfxTiger`,
-              image: imageUrl, // Usar endpoint de renderizado normal
-              external_url: samuraiEntry.external_url || imageUrl,
+              image: samuraiImageUrl,
+              external_url: samuraiEntry.external_url || samuraiImageUrl,
               metadata_version: "2",
               attributes: [
                 {
@@ -373,6 +385,7 @@ export default async function handler(req, res) {
         }
       } catch (error) {
         console.error(`[metadata] 🥷 Error procesando SamuraiZERO ${tokenId}:`, error.message);
+        console.error(`[metadata] 🥷 Stack trace:`, error.stack);
         // Continuar con lógica normal si hay error
       }
     }
