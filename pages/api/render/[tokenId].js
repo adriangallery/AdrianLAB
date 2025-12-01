@@ -212,29 +212,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BANANA (SISTEMA DE TOGGLES) =====
-    // Los toggles se determinan por el estado del contrato (onchain)
-    // IDs de toggles:
-    // "1" = closeup solo
-    // "2" = shadow solo
-    // "3" = glow solo
-    // "4" = bn solo
-    // "5" = bn+shadow
-    // "6" = bn+shadow+closeup
-    // "7" = shadow+closeup
-    // "8" = glow+closeup
-    // "9" = glow+bn
-    // "10" = glow+bn+closeup
-    // "11" = uv solo
-    // "12" = blackout solo
-    // "13" = banana solo
-    
-    let isCloseup = false;
-    let isShadow = false;
-    let isGlow = false;
-    let isBn = false;
-    let isUv = false;
-    let isBlackout = false;
+    // ===== LÓGICA ESPECIAL BANANA (TOGGLE 13) =====
+    // Solo verificamos el toggle 13 (banana) para el almacenamiento en GitHub
+    // Si no tiene toggle 13, se renderiza normalmente sin cambios
     let isBanana = false;
     
     try {
@@ -242,116 +222,49 @@ export default async function handler(req, res) {
       const { zoomInZeros } = await getContracts();
       await updateTogglesIfNeeded(zoomInZeros);
       
-      // Verificar toggles combinados primero (tienen prioridad)
-      const hasToggle5 = hasToggleActive(cleanTokenId, "5"); // bn+shadow
-      const hasToggle6 = hasToggleActive(cleanTokenId, "6"); // bn+shadow+closeup
-      const hasToggle7 = hasToggleActive(cleanTokenId, "7"); // shadow+closeup
-      const hasToggle8 = hasToggleActive(cleanTokenId, "8"); // glow+closeup
-      const hasToggle9 = hasToggleActive(cleanTokenId, "9"); // glow+bn
-      const hasToggle10 = hasToggleActive(cleanTokenId, "10"); // glow+bn+closeup
+      // Verificar solo el toggle 13 (banana)
+      isBanana = hasToggleActive(cleanTokenId, "13"); // toggleId "13" = banana
       
-      // Si hay toggle combinado activo, aplicar esa combinación
-      if (hasToggle10) {
-        // ID 10: glow+bn+closeup
-        isCloseup = true;
-        isGlow = true;
-        isBn = true;
-        isShadow = false;
-        console.log(`[render] 🎨 TOGGLE 10: Token ${cleanTokenId} tiene glow+bn+closeup activo`);
-      } else if (hasToggle9) {
-        // ID 9: glow+bn
-        isCloseup = false;
-        isGlow = true;
-        isBn = true;
-        isShadow = false;
-        console.log(`[render] 🎨 TOGGLE 9: Token ${cleanTokenId} tiene glow+bn activo`);
-      } else if (hasToggle8) {
-        // ID 8: glow+closeup
-        isCloseup = true;
-        isGlow = true;
-        isBn = false;
-        isShadow = false;
-        console.log(`[render] 🎨 TOGGLE 8: Token ${cleanTokenId} tiene glow+closeup activo`);
-      } else if (hasToggle7) {
-        // ID 7: shadow+closeup
-        isCloseup = true;
-        isShadow = true;
-        isGlow = false;
-        isBn = false;
-        console.log(`[render] 🎨 TOGGLE 7: Token ${cleanTokenId} tiene shadow+closeup activo`);
-      } else if (hasToggle6) {
-        // ID 6: bn+shadow+closeup
-        isCloseup = true;
-        isShadow = true;
-        isBn = true;
-        isGlow = false;
-        console.log(`[render] 🎨 TOGGLE 6: Token ${cleanTokenId} tiene bn+shadow+closeup activo`);
-      } else if (hasToggle5) {
-        // ID 5: bn+shadow
-        isCloseup = false;
-        isShadow = true;
-        isBn = true;
-        isGlow = false;
-        console.log(`[render] 🎨 TOGGLE 5: Token ${cleanTokenId} tiene bn+shadow activo`);
-      } else {
-        // Verificar toggles individuales (solo si no hay toggle combinado)
-        isCloseup = hasToggleActive(cleanTokenId, "1"); // toggleId "1" = closeup
-        isShadow = hasToggleActive(cleanTokenId, "2"); // toggleId "2" = shadow
-        isGlow = hasToggleActive(cleanTokenId, "3"); // toggleId "3" = glow
-        isBn = hasToggleActive(cleanTokenId, "4"); // toggleId "4" = blanco y negro
-        isUv = hasToggleActive(cleanTokenId, "11"); // toggleId "11" = uv
-        isBlackout = hasToggleActive(cleanTokenId, "12"); // toggleId "12" = blackout
-        isBanana = hasToggleActive(cleanTokenId, "13"); // toggleId "13" = banana
-        
-        if (isCloseup) {
-          console.log(`[render] 🔍 TOGGLE: Token ${cleanTokenId} tiene closeup activo`);
-        }
-        
-        if (isShadow) {
-          console.log(`[render] 🌑 TOGGLE: Token ${cleanTokenId} tiene shadow activo`);
-        }
-        
-        if (isGlow) {
-          console.log(`[render] ✨ TOGGLE: Token ${cleanTokenId} tiene glow activo`);
-        }
-        
-        if (isBn) {
-          console.log(`[render] ⚫ TOGGLE: Token ${cleanTokenId} tiene BN (blanco y negro) activo`);
-        }
-        
-        if (isUv) {
-          console.log(`[render] 💜 TOGGLE: Token ${cleanTokenId} tiene UV activo`);
-        }
-        
-        if (isBlackout) {
-          console.log(`[render] ⬛ TOGGLE: Token ${cleanTokenId} tiene BLACKOUT activo`);
-        }
-        
-        if (isBanana) {
-          console.log(`[render] 🍌 TOGGLE: Token ${cleanTokenId} tiene BANANA activo`);
-        }
+      if (isBanana) {
+        console.log(`[render] 🍌 TOGGLE: Token ${cleanTokenId} tiene BANANA activo`);
       }
     } catch (error) {
-      console.error(`[render] ⚠️ Error verificando toggles para token ${cleanTokenId}:`, error.message);
-      // En caso de error, no aplicar toggles (fallback seguro)
-      isCloseup = false;
-      isShadow = false;
-      isGlow = false;
-      isBn = false;
-      isUv = false;
-      isBlackout = false;
+      console.error(`[render] ⚠️ Error verificando toggle banana para token ${cleanTokenId}:`, error.message);
+      // En caso de error, no aplicar banana (fallback seguro)
       isBanana = false;
     }
     
-    // Si no hay ningún toggle activo, no renderizar
-    const hasAnyToggle = isCloseup || isShadow || isGlow || isBn || isUv || isBlackout || isBanana;
-    if (!hasAnyToggle) {
-      console.log(`[render] ❌ Token ${cleanTokenId} no tiene ningún toggle activo - No se renderizará`);
-      return res.status(404).json({ 
-        error: 'No toggle active for this token',
-        tokenId: cleanTokenId,
-        message: 'Este token no tiene ningún toggle activo. El contrato se asegura que el usuario pague antes de activar el toggle.'
-      });
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV Y BLACKOUT (PARÁMETROS) =====
+    // Estos se mantienen como parámetros de query (no se verifican onchain aquí)
+    const isCloseup = req.query.closeup === 'true';
+    const isShadow = req.query.shadow === 'true';
+    const isGlow = req.query.glow === 'true';
+    const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
+    const isUv = req.query.uv === 'true' || req.query.UV === 'true'; // uv o UV (case-insensitive)
+    const isBlackout = req.query.blackout === 'true';
+    
+    if (isCloseup) {
+      console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
+    }
+    
+    if (isShadow) {
+      console.log(`[render] 🌑 SHADOW: Token ${cleanTokenId} - Renderizando con sombra`);
+    }
+    
+    if (isGlow) {
+      console.log(`[render] ✨ GLOW: Token ${cleanTokenId} - Renderizando con glow`);
+    }
+    
+    if (isBn) {
+      console.log(`[render] ⚫ BN: Token ${cleanTokenId} - Renderizando en blanco y negro`);
+    }
+    
+    if (isUv) {
+      console.log(`[render] 💜 UV: Token ${cleanTokenId} - Renderizando con efecto UV/Blacklight`);
+    }
+    
+    if (isBlackout) {
+      console.log(`[render] ⬛ BLACKOUT: Token ${cleanTokenId} - Renderizando con blackout (negro completo)`);
     }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
@@ -420,10 +333,10 @@ export default async function handler(req, res) {
 
     console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
 
-    // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB =====
-    // Si tiene toggle activo, verificar si el archivo ya está almacenado en GitHub
-    if (hasAnyToggle) {
-      const renderType = getRenderType(isCloseup, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+    // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB (SOLO SI TIENE TOGGLE 13) =====
+    // Si tiene toggle 13 (banana) activo, verificar si el archivo ya está almacenado en GitHub
+    if (isBanana) {
+      const renderType = 'banana'; // Siempre 'banana' cuando tiene toggle 13
       const existsInGitHub = await fileExistsInGitHub(cleanTokenId, renderType);
       
       if (existsInGitHub) {
@@ -432,11 +345,7 @@ export default async function handler(req, res) {
         // Obtener URL del archivo en GitHub
         const githubUrl = getGitHubFileUrl(cleanTokenId, renderType);
         
-        // Redirigir a la URL de GitHub o devolver la imagen desde GitHub
-        // Opción 1: Redirigir (más eficiente, pero cambia la URL)
-        // return res.redirect(302, githubUrl);
-        
-        // Opción 2: Descargar y servir (mantiene la misma URL)
+        // Descargar y servir desde GitHub
         try {
           const response = await fetch(githubUrl);
           if (response.ok) {
@@ -1884,10 +1793,11 @@ export default async function handler(req, res) {
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
     console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
 
-    // ===== SUBIR A GITHUB SI TIENE TOGGLE ACTIVO =====
+    // ===== SUBIR A GITHUB SI TIENE TOGGLE 13 (BANANA) ACTIVO =====
     // Subir el archivo a GitHub después del renderizado (asíncrono, no bloquea la respuesta)
-    if (hasAnyToggle) {
-      const renderType = getRenderType(isCloseup, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+    // Solo subir si tiene toggle 13 (banana) activo
+    if (isBanana) {
+      const renderType = 'banana';
       
       // Subir de forma asíncrona (no esperar para no bloquear la respuesta)
       uploadFileToGitHub(cleanTokenId, finalBuffer, renderType)
