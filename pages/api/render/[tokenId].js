@@ -1870,18 +1870,23 @@ export default async function handler(req, res) {
     if (isBanana) {
       const renderType = 'banana';
       
-      // Subir de forma asíncrona (no esperar para no bloquear la respuesta)
-      uploadFileToGitHub(cleanTokenId, finalBuffer, renderType)
-        .then(success => {
-          if (success) {
-            console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (${renderType})`);
-          } else {
-            console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (${renderType})`);
-          }
-        })
-        .catch(error => {
-          console.error(`[render] ❌ Error subiendo archivo a GitHub:`, error.message);
-        });
+      // Usar setImmediate para asegurar que la promesa se ejecute después de enviar la respuesta
+      // Esto evita que Vercel termine el proceso antes de que se complete la subida
+      setImmediate(() => {
+        console.log(`[render] 🚀 Iniciando subida asíncrona a GitHub para token ${cleanTokenId} (${renderType})`);
+        uploadFileToGitHub(cleanTokenId, finalBuffer, renderType)
+          .then(success => {
+            if (success) {
+              console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (${renderType})`);
+            } else {
+              console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (${renderType})`);
+            }
+          })
+          .catch(error => {
+            console.error(`[render] ❌ Error subiendo archivo a GitHub:`, error.message);
+            console.error(`[render] ❌ Stack:`, error.stack);
+          });
+      });
     }
 
     // Configurar headers
