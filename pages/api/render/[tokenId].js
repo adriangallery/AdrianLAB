@@ -1865,28 +1865,25 @@ export default async function handler(req, res) {
     console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
 
     // ===== SUBIR A GITHUB SI TIENE TOGGLE 13 (BANANA) ACTIVO =====
-    // Subir el archivo a GitHub después del renderizado (asíncrono, no bloquea la respuesta)
+    // Subir el archivo a GitHub después del renderizado (antes de enviar la respuesta)
     // Solo subir si tiene toggle 13 (banana) activo
+    // Esperamos la subida para garantizar que se complete antes de que Vercel termine el proceso
     if (isBanana) {
       const renderType = 'banana';
       
-      // Usar setImmediate para asegurar que la promesa se ejecute después de enviar la respuesta
-      // Esto evita que Vercel termine el proceso antes de que se complete la subida
-      setImmediate(() => {
-        console.log(`[render] 🚀 Iniciando subida asíncrona a GitHub para token ${cleanTokenId} (${renderType})`);
-        uploadFileToGitHub(cleanTokenId, finalBuffer, renderType)
-          .then(success => {
-            if (success) {
-              console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (${renderType})`);
-            } else {
-              console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (${renderType})`);
-            }
-          })
-          .catch(error => {
-            console.error(`[render] ❌ Error subiendo archivo a GitHub:`, error.message);
-            console.error(`[render] ❌ Stack:`, error.stack);
-          });
-      });
+      console.log(`[render] 🚀 Iniciando subida a GitHub para token ${cleanTokenId} (${renderType})`);
+      try {
+        const uploadSuccess = await uploadFileToGitHub(cleanTokenId, finalBuffer, renderType);
+        if (uploadSuccess) {
+          console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (${renderType})`);
+        } else {
+          console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (${renderType})`);
+        }
+      } catch (error) {
+        console.error(`[render] ❌ Error subiendo archivo a GitHub:`, error.message);
+        console.error(`[render] ❌ Stack:`, error.stack);
+        // Continuar con el renderizado aunque falle la subida a GitHub
+      }
     }
 
     // Configurar headers
