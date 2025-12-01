@@ -423,7 +423,7 @@ export default async function handler(req, res) {
     // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB =====
     // Si tiene toggle activo, verificar si el archivo ya está almacenado en GitHub
     if (hasAnyToggle) {
-      const renderType = getRenderType(isCloseup, isShadow, isGlow, isBn, isUv, isBlackout);
+      const renderType = getRenderType(isCloseup, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
       const existsInGitHub = await fileExistsInGitHub(cleanTokenId, renderType);
       
       if (existsInGitHub) {
