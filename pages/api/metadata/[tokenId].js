@@ -71,7 +71,7 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     console.log(`[metadata] Iniciando request para token ${tokenId}`);
     
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN Y UV (SISTEMA DE TOGGLES) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BANANA (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
     // IDs de toggles:
     // "1" = closeup solo
@@ -85,12 +85,15 @@ export default async function handler(req, res) {
     // "9" = glow+bn
     // "10" = glow+bn+closeup
     // "11" = uv solo
+    // "12" = blackout solo
+    // "13" = banana solo
     let isCloseupToken = false;
     let isShadowToken = false;
     let isGlowToken = false;
     let isBnToken = false;
     let isUvToken = false;
     let isBlackoutToken = false;
+    let isBananaToken = false;
     
     try {
       // Actualizar toggles si es necesario (automático cada 24h)
@@ -156,6 +159,7 @@ export default async function handler(req, res) {
         isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
         isUvToken = hasToggleActive(tokenId, "11"); // toggleId "11" = uv
         isBlackoutToken = hasToggleActive(tokenId, "12"); // toggleId "12" = blackout
+        isBananaToken = hasToggleActive(tokenId, "13"); // toggleId "13" = banana
         
         if (isCloseupToken) {
           console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
@@ -180,6 +184,10 @@ export default async function handler(req, res) {
         if (isBlackoutToken) {
           console.log(`[metadata] ⬛ TOGGLE: Token ${tokenId} tiene BLACKOUT activo`);
         }
+        
+        if (isBananaToken) {
+          console.log(`[metadata] 🍌 TOGGLE: Token ${tokenId} tiene BANANA activo`);
+        }
       }
     } catch (error) {
       console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
@@ -190,6 +198,7 @@ export default async function handler(req, res) {
       isBnToken = false;
       isUvToken = false;
       isBlackoutToken = false;
+      isBananaToken = false;
     }
     
     // Caso especial para el token 100000
@@ -303,6 +312,7 @@ export default async function handler(req, res) {
     if (isBnToken) urlParams.push('bn=true');
     if (isUvToken) urlParams.push('uv=true');
     if (isBlackoutToken) urlParams.push('blackout=true');
+    if (isBananaToken) urlParams.push('banana=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
     const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
     
@@ -348,6 +358,7 @@ export default async function handler(req, res) {
             if (isBnToken) urlParams.push('bn=true');
             if (isUvToken) urlParams.push('uv=true');
             if (isBlackoutToken) urlParams.push('blackout=true');
+            if (isBananaToken) urlParams.push('banana=true');
             const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
             const samuraiImageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
             
