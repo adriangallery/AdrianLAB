@@ -16,6 +16,7 @@ import { getCachedComponent, setCachedComponent } from '../../../lib/component-c
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
 import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl } from '../../../lib/github-storage.js';
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
+import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -123,6 +124,49 @@ const loadMetadataForToken = (tokenId) => {
     console.error(`[render] Error cargando metadata para token ${tokenId}:`, error.message);
     return [];
   }
+};
+
+/**
+ * Obtiene información de traits desde traits.json basado en los traitIds
+ * @param {Array<string|number>} traitIds - Array de IDs de traits equipados
+ * @param {Array} traitsArray - Array de traits cargado desde loadMetadataForToken
+ * @returns {Array<{name: string, category: string}>} - Array de objetos con name y category de cada trait encontrado
+ */
+const getTraitsInfo = (traitIds, traitsArray) => {
+  if (!traitIds || !Array.isArray(traitIds) || traitIds.length === 0) {
+    return [];
+  }
+  
+  if (!traitsArray || !Array.isArray(traitsArray) || traitsArray.length === 0) {
+    return [];
+  }
+  
+  const traitsInfo = [];
+  
+  for (const traitId of traitIds) {
+    try {
+      const traitIdNum = parseInt(traitId);
+      if (isNaN(traitIdNum)) {
+        continue;
+      }
+      
+      // Buscar el trait en el array
+      const trait = traitsArray.find(t => t.tokenId === traitIdNum);
+      
+      if (trait && trait.name && trait.category) {
+        traitsInfo.push({
+          name: trait.name,
+          category: trait.category
+        });
+      }
+    } catch (error) {
+      // Si hay error procesando un trait, continuar con el siguiente
+      console.warn(`[render] Error procesando trait ${traitId}:`, error.message);
+      continue;
+    }
+  }
+  
+  return traitsInfo;
 };
 
 // =============================================
@@ -1769,8 +1813,35 @@ export default async function handler(req, res) {
       try {
         console.log('[render] PASO BANANA - Aplicando transformación Nano Banana');
         
-        // Transformar la imagen con Nano Banana
-        const transformedBuffer = await transformWithNanoBanana(finalBuffer);
+        // Obtener información de traits para el prompt personalizado
+        let customPrompt = null;
+        try {
+          // traitIds y categories ya están disponibles desde getAllEquippedTraits
+          if (traitIds && traitIds.length > 0) {
+            console.log('[render] PASO BANANA - Obteniendo información de traits para prompt personalizado');
+            
+            // Cargar metadata de traits
+            const traitsArray = loadMetadataForToken(cleanTokenId);
+            
+            // Obtener información de traits
+            const traitsInfo = getTraitsInfo(traitIds, traitsArray);
+            
+            if (traitsInfo.length > 0) {
+              console.log(`[render] PASO BANANA - Encontrados ${traitsInfo.length} traits para incluir en prompt`);
+              // Construir prompt personalizado con información de traits
+              customPrompt = buildNanobananaPrompt(traitsInfo);
+              console.log('[render] PASO BANANA - Prompt personalizado construido con información de traits');
+            } else {
+              console.log('[render] PASO BANANA - No se encontraron traits, usando prompt base');
+            }
+          }
+        } catch (error) {
+          console.warn('[render] PASO BANANA - Error obteniendo información de traits, usando prompt base:', error.message);
+          // Continuar con prompt base si hay error
+        }
+        
+        // Transformar la imagen con Nano Banana (con prompt personalizado si está disponible)
+        const transformedBuffer = await transformWithNanoBanana(finalBuffer, customPrompt);
         
         // Usar el buffer transformado como final
         finalBuffer = transformedBuffer;
