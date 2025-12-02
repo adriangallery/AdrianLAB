@@ -14,9 +14,10 @@ import {
 import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
-import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl } from '../../../lib/github-storage.js';
+import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl, fileExistsInGitHubByHash, getGitHubFileUrlByHash, uploadFileToGitHubByHash } from '../../../lib/github-storage.js';
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
 import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
+import { generateRenderHash } from '../../../lib/render-hash.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -878,10 +879,11 @@ export default async function handler(req, res) {
     }
     
     // ===== LÓGICA ESPECIAL SAMURAIZERO =====
+    let samuraiIndex = null; // Variable para almacenar el índice y reutilizarlo después
     if (tagInfo.tag === 'SamuraiZERO') {
       console.log(`[render] 🥷 Token ${cleanTokenId} tiene tag SamuraiZERO - Aplicando lógica especial`);
       
-      const samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
+      samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
       
       if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
         const imageIndex = TAG_CONFIGS.SamuraiZERO.imageBaseIndex + samuraiIndex;
@@ -974,6 +976,118 @@ export default async function handler(req, res) {
       }
     } catch (error) {
       console.log('[render] Error verificando serum aplicado:', error.message);
+    }
+
+    // ===== GENERAR HASH Y VERIFICAR EN GITHUB =====
+    // Generar hash único basado en todas las variables que afectan al render
+    // Esto debe hacerse después de obtener todos los datos del contrato y procesar tags
+    console.log('[render] 🔐 Generando hash único para el render...');
+    
+    // Obtener skintraitId si existe
+    const skintraitId = equippedTraits['SKINTRAIT'] || null;
+    
+    // Obtener tagIndex si es SamuraiZERO (ya se calculó arriba)
+    const tagIndex = samuraiIndex; // Reutilizar el samuraiIndex que ya se calculó
+    
+    const renderHash = generateRenderHash({
+      // Query parameters
+      closeup: isCloseup,
+      shadow: isShadow,
+      glow: isGlow,
+      bn: isBn,
+      uv: isUv,
+      blackout: isBlackout,
+      banana: isBanana,
+      
+      // Token data
+      generation: generation.toString(),
+      mutationLevel: mutationLevel.toString(),
+      canReplicate,
+      hasBeenModified,
+      
+      // Skin
+      skinId: skinId.toString(),
+      skinName,
+      
+      // Traits (ordenados)
+      traitCategories: categories,
+      traitIds: traitIds.map(id => id.toString()),
+      
+      // Serum
+      appliedSerum,
+      serumFailed,
+      failedSerumType,
+      hasAdrianGFSerum,
+      serumHistory,
+      
+      // SKINTRAIT
+      skintraitId,
+      
+      // Tags
+      tag: tagInfo.tag,
+      tagIndex
+    });
+    
+    console.log(`[render] 🔐 Hash generado: ${renderHash}`);
+    
+    // Verificar si el archivo ya existe en GitHub (solo si no es banana, que tiene su propia lógica)
+    if (!isBanana) {
+      const existsInGitHub = await fileExistsInGitHubByHash(cleanTokenId, renderHash);
+      
+      if (existsInGitHub) {
+        console.log(`[render] 📦 Archivo con hash ${renderHash} ya existe en GitHub - Descargando y sirviendo...`);
+        
+        // Obtener URL del archivo en GitHub
+        const githubUrl = getGitHubFileUrlByHash(cleanTokenId, renderHash);
+        
+        // Descargar y servir desde GitHub
+        try {
+          const response = await fetch(githubUrl);
+          if (response.ok) {
+            const imageBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(imageBuffer);
+            
+            // Guardar en caché local para próximas peticiones
+            if (isCloseup) {
+              setCachedAdrianZeroCloseup(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+            } else {
+              setCachedAdrianZeroRender(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+            }
+            
+            const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+            res.setHeader('X-Cache', 'GITHUB');
+            res.setHeader('X-GitHub-Source', 'true');
+            res.setHeader('X-Render-Hash', renderHash);
+            res.setHeader('Content-Type', 'image/png');
+            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+            
+            const versionParts = [];
+            if (isCloseup) versionParts.push('CLOSEUP');
+            if (isShadow) versionParts.push('SHADOW');
+            if (isGlow) versionParts.push('GLOW');
+            if (isBn) versionParts.push('BN');
+            if (isUv) versionParts.push('UV');
+            if (isBlackout) versionParts.push('BLACKOUT');
+            const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
+            
+            if (isCloseup) {
+              res.setHeader('X-Version', `ADRIANZERO-CLOSEUP${versionSuffix}-GITHUB`);
+              res.setHeader('X-Render-Type', 'closeup');
+            } else {
+              res.setHeader('X-Version', `ADRIANZERO${versionSuffix}-GITHUB`);
+              res.setHeader('X-Render-Type', 'full');
+            }
+            
+            console.log(`[render] ✅ Archivo servido desde GitHub (hash: ${renderHash})`);
+            return res.status(200).send(buffer);
+          }
+        } catch (error) {
+          console.error(`[render] ⚠️ Error descargando desde GitHub, continuando con renderizado:`, error.message);
+          // Continuar con el renderizado normal si falla la descarga
+        }
+      } else {
+        console.log(`[render] 📤 Archivo con hash ${renderHash} no existe en GitHub - Se renderizará y subirá`);
+      }
     }
 
     // Generar PNG estático (eliminada lógica de animaciones)
@@ -1885,9 +1999,29 @@ export default async function handler(req, res) {
         // Continuar con el renderizado aunque falle la subida a GitHub
       }
     }
+    
+    // ===== SUBIR A GITHUB CON HASH PARA RENDERS NORMALES =====
+    // Subir el archivo a GitHub usando hash único (solo si no es banana, que tiene su propia lógica)
+    // Esto permite verificar si un render con las mismas características ya existe
+    if (!isBanana) {
+      console.log(`[render] 🚀 Iniciando subida a GitHub con hash para token ${cleanTokenId} (hash: ${renderHash})`);
+      try {
+        const uploadSuccess = await uploadFileToGitHubByHash(cleanTokenId, finalBuffer, renderHash);
+        if (uploadSuccess) {
+          console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (hash: ${renderHash})`);
+        } else {
+          console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (hash: ${renderHash})`);
+        }
+      } catch (error) {
+        console.error(`[render] ❌ Error subiendo archivo a GitHub por hash:`, error.message);
+        console.error(`[render] ❌ Stack:`, error.stack);
+        // Continuar con el renderizado aunque falle la subida a GitHub
+      }
+    }
 
     // Configurar headers
     res.setHeader('X-Cache', 'MISS');
+    res.setHeader('X-Render-Hash', renderHash);
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
     
