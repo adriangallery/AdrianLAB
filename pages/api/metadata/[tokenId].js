@@ -734,6 +734,27 @@ export default async function handler(req, res) {
         });
       }
 
+      // Añadir campo Toggle con nombres de toggles activos
+      const activeToggles = [];
+      
+      // Usar las variables booleanas que ya están disponibles en el scope
+      if (isCloseupToken) activeToggles.push('CLOSEUP');
+      if (isShadowToken) activeToggles.push('SHADOW');
+      if (isGlowToken) activeToggles.push('GLOW');
+      if (isBnToken) activeToggles.push('BN');
+      if (isUvToken) activeToggles.push('UV');
+      if (isBlackoutToken) activeToggles.push('BLACKOUT');
+      if (isBananaToken) activeToggles.push('BANANA');
+      
+      // Añadir campo Toggle solo si hay toggles activos
+      if (activeToggles.length > 0) {
+        baseMetadata.attributes.push({
+          trait_type: "Toggle",
+          value: activeToggles.join(', ')
+        });
+        console.log(`[metadata] Toggle añadido: ${activeToggles.join(', ')}`);
+      }
+
       // Añadir información de debug
       baseMetadata.debug = {
         contracts: {
