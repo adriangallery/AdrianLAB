@@ -289,7 +289,7 @@ export default function Home() {
           <div className={styles.tagsContainer}>
             <h3>🏷️ Filtrar por Tags:</h3>
             <div className={styles.tagsGrid}>
-              {['adrianzero', 'custom', 'external', 'lambo', 'floppy', 'svg', 'test', 'metadata', 'traits'].map(tag => (
+              {['adrianzero', 'custom', 'external', 'lambo', 'floppy', 'svg', 'test', 'metadata', 'traits', 'toggle', 'closeup', 'shadow', 'glow', 'bn', 'uv', 'blackout', 'banana', 'simple'].map(tag => (
                 <button
                   key={tag}
                   className={`${styles.tagButton} ${selectedTags.includes(tag) ? styles.tagActive : ''}`}
@@ -335,6 +335,55 @@ export default function Home() {
                 description: 'Render estándar de token AdrianZERO',
                 tags: ['adrianzero', 'render'],
                 example: '/api/render/1'
+              },
+              {
+                name: 'AdrianZERO Closeup',
+                url: '/api/render/1?closeup=true',
+                description: 'Render closeup 640x640 de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'closeup'],
+                example: '/api/render/1?closeup=true'
+              },
+              {
+                name: 'AdrianZERO Shadow',
+                url: '/api/render/1?shadow=true',
+                description: 'Render con sombra de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'shadow'],
+                example: '/api/render/1?shadow=true'
+              },
+              {
+                name: 'AdrianZERO Glow',
+                url: '/api/render/1?glow=true',
+                description: 'Render con efecto glow de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'glow'],
+                example: '/api/render/1?glow=true'
+              },
+              {
+                name: 'AdrianZERO Black & White',
+                url: '/api/render/1?bn=true',
+                description: 'Render en blanco y negro de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'bn'],
+                example: '/api/render/1?bn=true'
+              },
+              {
+                name: 'AdrianZERO UV',
+                url: '/api/render/1?uv=true',
+                description: 'Render con efecto UV de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'uv'],
+                example: '/api/render/1?uv=true'
+              },
+              {
+                name: 'AdrianZERO Blackout',
+                url: '/api/render/1?blackout=true',
+                description: 'Render con efecto blackout de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'blackout'],
+                example: '/api/render/1?blackout=true'
+              },
+              {
+                name: 'AdrianZERO Banana',
+                url: '/api/render/1?banana=true',
+                description: 'Render con transformación Nano Banana de token AdrianZERO (requiere toggle activo)',
+                tags: ['adrianzero', 'render', 'toggle', 'banana'],
+                example: '/api/render/1?banana=true'
               },
               {
                 name: 'AdrianZERO SVG',
@@ -412,6 +461,13 @@ export default function Home() {
                 description: 'Metadata de pack Floppy',
                 tags: ['metadata', 'floppy'],
                 example: '/api/metadata/floppy/10000'
+              },
+              {
+                name: 'Trait Render',
+                url: '/api/trait/18',
+                description: 'Render individual de trait (500x500)',
+                tags: ['traits', 'render'],
+                example: '/api/trait/18'
               },
               {
                 name: 'Trait Metadata',
