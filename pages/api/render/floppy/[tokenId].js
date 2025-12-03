@@ -4,6 +4,8 @@ import {
   setCachedFloppyRender, 
   getFloppyRenderTTL 
 } from '../../../../lib/cache.js';
+import { generateFloppySimpleHash } from '../../../../lib/render-hash.js';
+import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
@@ -72,6 +74,39 @@ export default async function handler(req, res) {
     if (isSimple) {
       console.log(`[floppy-render] 🔍 SIMPLE RENDER: Token ${tokenIdNum} - Generando versión simplificada`);
       
+      // Generar hash único para el floppy simple
+      const floppyHash = generateFloppySimpleHash(tokenIdNum);
+      console.log(`[floppy-render] 🔐 Hash generado para floppy simple ${tokenIdNum}: ${floppyHash}`);
+      
+      // Verificar si existe en GitHub
+      const existsInGitHub = await fileExistsInGitHubFloppySimple(tokenIdNum, floppyHash);
+      if (existsInGitHub) {
+        console.log(`[floppy-render] ✅ Floppy simple ${tokenIdNum} existe en GitHub, descargando...`);
+        const githubUrl = getGitHubFileUrlFloppySimple(tokenIdNum, floppyHash);
+        
+        try {
+          const response = await fetch(githubUrl);
+          if (response.ok) {
+            const imageBuffer = Buffer.from(await response.arrayBuffer());
+            
+            res.setHeader('Content-Type', 'image/png');
+            res.setHeader('X-Version', 'FLOPPY-SIMPLE');
+            res.setHeader('X-Render-Type', 'simple');
+            res.setHeader('X-Cache', 'GITHUB');
+            res.setHeader('X-Source', 'github');
+            res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora de cache
+            
+            console.log(`[floppy-render] ✅ Floppy simple ${tokenIdNum} servido desde GitHub`);
+            return res.status(200).send(imageBuffer);
+          }
+        } catch (fetchError) {
+          console.error(`[floppy-render] ❌ Error descargando desde GitHub:`, fetchError.message);
+          // Continuar con renderizado normal si falla la descarga
+        }
+      } else {
+        console.log(`[floppy-render] 📤 Floppy simple ${tokenIdNum} no existe en GitHub - Se renderizará y subirá`);
+      }
+      
       const floppyRenderer = new FloppyRenderer();
       const simpleSvg = await floppyRenderer.generateSimpleSVG(tokenIdNum);
       
@@ -84,6 +119,10 @@ export default async function handler(req, res) {
       });
       
       const pngBuffer = resvg.render().asPng();
+      
+      // Subir a GitHub
+      console.log(`[floppy-render] 🚀 Iniciando subida a GitHub para floppy simple ${tokenIdNum} (hash: ${floppyHash})`);
+      await uploadFileToGitHubFloppySimple(tokenIdNum, pngBuffer, floppyHash);
       
       // Configurar headers
       res.setHeader('Content-Type', 'image/png');

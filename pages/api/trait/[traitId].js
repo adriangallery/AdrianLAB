@@ -1,6 +1,8 @@
 import { createCanvas, loadImage } from 'canvas';
 import { getAssetInfo } from '../../../lib/blockchain.js';
 import { getCachedResult, setCachedResult } from '../../../lib/cache.js';
+import { generateTraitHash } from '../../../lib/render-hash.js';
+import { fileExistsInGitHubTrait, getGitHubFileUrlTrait, uploadFileToGitHubTrait } from '../../../lib/github-storage.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -61,6 +63,38 @@ export default async function handler(req, res) {
   }
   
   try {
+    // Generar hash único para el trait
+    const traitHash = generateTraitHash(traitId);
+    console.log(`[trait] 🔐 Hash generado para trait ${traitId}: ${traitHash}`);
+    
+    // Verificar si existe en GitHub
+    const existsInGitHub = await fileExistsInGitHubTrait(traitId, traitHash);
+    if (existsInGitHub) {
+      console.log(`[trait] ✅ Trait ${traitId} existe en GitHub, descargando...`);
+      const githubUrl = getGitHubFileUrlTrait(traitId, traitHash);
+      
+      try {
+        const response = await fetch(githubUrl);
+        if (response.ok) {
+          const imageBuffer = Buffer.from(await response.arrayBuffer());
+          
+          // Cachear el resultado
+          setCachedResult(cacheKey, imageBuffer, 7200);
+          
+          res.setHeader('Content-Type', 'image/png');
+          res.setHeader('Cache-Control', 'public, max-age=7200');
+          res.setHeader('X-Cache', 'GITHUB');
+          res.setHeader('X-Source', 'github');
+          return res.send(imageBuffer);
+        }
+      } catch (fetchError) {
+        console.error(`[trait] ❌ Error descargando desde GitHub:`, fetchError.message);
+        // Continuar con renderizado normal si falla la descarga
+      }
+    } else {
+      console.log(`[trait] 📤 Trait ${traitId} no existe en GitHub - Se renderizará y subirá`);
+    }
+    
     // Get trait info from blockchain
     const assetInfo = await getAssetInfo(traitId);
     if (!assetInfo) {
@@ -124,6 +158,10 @@ export default async function handler(req, res) {
     }
     
     const buffer = canvas.toBuffer('image/png');
+    
+    // Subir a GitHub
+    console.log(`[trait] 🚀 Iniciando subida a GitHub para trait ${traitId} (hash: ${traitHash})`);
+    await uploadFileToGitHubTrait(traitId, buffer, traitHash);
     
     // Cache result
     setCachedResult(cacheKey, buffer, 7200); // 2 hours
