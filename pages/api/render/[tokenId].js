@@ -1685,7 +1685,7 @@ export default async function handler(req, res) {
     let finalCanvas = canvas;
     let finalCtx = ctx;
     
-    if (isCloseup && isCloseupToken) {
+    if (isCloseup) {
       console.log(`[render] 🔍 Aplicando closeup 640x640 para token ${cleanTokenId}`);
       
       // Crear nuevo canvas 640x640 para closeup
