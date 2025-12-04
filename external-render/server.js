@@ -309,5 +309,6 @@ app.post('/gif', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`[external-render] 🚀 Servidor iniciado en puerto ${PORT}`);
   console.log(`[external-render] 🌐 Base URL: ${BASE_URL}`);
+  console.log(`[external-render] 🎬 Soporte GIF habilitado`);
 });
 
