@@ -84,8 +84,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'delay debe ser un número entre 10 y 1000 ms' });
     }
     
-    // Categoría (opcional, default "TOP")
-    const traitCategory = category || 'TOP';
+    // Categoría (opcional, solo para logging, no afecta la ruta del trait)
+    const traitCategory = category || null;
     
     console.log(`[gif-render] Request recibido:`, {
       tokenId,
