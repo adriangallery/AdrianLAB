@@ -2,7 +2,10 @@
 nixPkgs = ["nodejs_22"]
 
 [phases.install]
-cmds = ["bash build.sh"]
+cmds = [
+  "npm install --no-package-lock=false",
+  "npm install --no-save --legacy-peer-deps @resvg/resvg-js-linux-x64-gnu || echo '⚠️  No se pudo instalar dependencia opcional'"
+]
 
 [phases.build]
 cmds = ["echo 'Build phase complete'"]
