@@ -1,7 +1,9 @@
 import { GifRenderer } from '../../../lib/renderers/gif-renderer.js';
 import { renderGifViaExternalService, prepareRenderData } from '../../../lib/external-render-client.js';
 import { getContracts } from '../../../lib/contracts.js';
-import { loadCombinedTraitsMapping } from '../../../lib/traits-loader.js';
+import { getCachedJson, setCachedJson } from '../../../lib/json-cache.js';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
@@ -44,6 +46,154 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // =============================================
+  // FUNCIONES AUXILIARES PARA CARGAR TRAITS
+  // =============================================
+
+  // Función para determinar qué archivo de metadata cargar según el token ID
+  const getMetadataFileForToken = (tokenId) => {
+    const numTokenId = parseInt(tokenId);
+    
+    if (numTokenId >= 10000 && numTokenId <= 10002) {
+      return 'floppy.json';
+    } else if (numTokenId >= 15000 && numTokenId <= 15006) {
+      return 'pagers.json';
+    } else if (numTokenId === 262144) {
+      return 'serums.json';
+    } else if (numTokenId >= 30000 && numTokenId <= 35000) {
+      return 'studio.json';
+    } else if ((numTokenId >= 100001 && numTokenId <= 101003) || (numTokenId >= 101001 && numTokenId <= 101003)) {
+      return 'ogpunks.json';
+    } else {
+      return 'traits.json';
+    }
+  };
+
+  // Función para cargar metadata del archivo correcto
+  const loadMetadataForToken = async (tokenId) => {
+    try {
+      const metadataFile = getMetadataFileForToken(tokenId);
+      
+      // Intentar obtener del caché primero
+      const cachedData = await getCachedJson(metadataFile);
+      if (cachedData) {
+        return cachedData;
+      }
+      
+      const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', metadataFile);
+      
+      console.log(`[gif-render] Cargando metadata desde: ${metadataFile} para token ${tokenId}`);
+      
+      const metadataBuffer = fs.readFileSync(metadataPath);
+      const metadata = JSON.parse(metadataBuffer.toString());
+      
+      // Determinar qué array usar según el archivo
+      let traitsArray;
+      switch (metadataFile) {
+        case 'floppy.json':
+          traitsArray = metadata.floppys;
+          break;
+        case 'pagers.json':
+          traitsArray = metadata.pagers;
+          break;
+        case 'serums.json':
+          traitsArray = metadata.serums;
+          break;
+        case 'studio.json':
+          // Para studio.json, convertir el objeto a array
+          traitsArray = Object.entries(metadata).map(([tokenId, trait]) => ({
+            tokenId: tokenId,
+            category: trait.category,
+            name: trait.name,
+            fileName: `${tokenId}.svg`
+          }));
+          break;
+        case 'ogpunks.json':
+          traitsArray = metadata.traits;
+          break;
+        default:
+          traitsArray = metadata.traits;
+      }
+      
+      // Guardar en caché
+      setCachedJson(metadataFile, traitsArray);
+      
+      return traitsArray;
+    } catch (error) {
+      console.error(`[gif-render] Error cargando metadata para token ${tokenId}:`, error.message);
+      return [];
+    }
+  };
+
+  // Función para cargar mapeo combinado de traits (traits.json + studio.json para traits externos)
+  const loadCombinedTraitsMapping = async (tokenId) => {
+    try {
+      console.log(`[gif-render] Cargando mapeo combinado para token ${tokenId}`);
+      
+      // Cargar mapeo base desde traits.json
+      const baseTraitsArray = await loadMetadataForToken(tokenId);
+      const baseMapping = {};
+      baseTraitsArray.forEach(trait => {
+        if (trait && trait.category) {
+          baseMapping[trait.tokenId] = {
+            category: trait.category.toUpperCase(),
+            name: trait.name || `Trait #${trait.tokenId}`,
+            fileName: trait.fileName || `${trait.tokenId}.svg`
+          };
+        } else {
+          console.warn(`[gif-render] Trait ${trait?.tokenId} sin categoría, asignando 'UNKNOWN'`);
+          baseMapping[trait.tokenId] = {
+            category: 'UNKNOWN',
+            name: trait?.name || `Trait #${trait.tokenId}`,
+            fileName: trait?.fileName || `${trait.tokenId}.svg`
+          };
+        }
+      });
+      
+      console.log(`[gif-render] Mapeo base cargado con ${Object.keys(baseMapping).length} entries`);
+      
+      // Cargar studio.json para traits externos (disponibles para todos los tokens)
+      console.log(`[gif-render] Cargando studio.json para traits externos`);
+      try {
+        const cachedStudioData = await getCachedJson('studio.json');
+        let studioData;
+        
+        if (cachedStudioData) {
+          studioData = cachedStudioData;
+        } else {
+          const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
+          const studioBuffer = fs.readFileSync(studioPath);
+          studioData = JSON.parse(studioBuffer.toString());
+          setCachedJson('studio.json', studioData);
+        }
+        
+        // Añadir traits externos al mapeo base
+        Object.entries(studioData).forEach(([traitId, trait]) => {
+          const traitIdNum = parseInt(traitId);
+          if (traitIdNum >= 30000 && traitIdNum <= 35000) {
+            baseMapping[traitId] = {
+              category: trait.category?.toUpperCase() || 'UNKNOWN',
+              name: trait.name || `Trait #${traitId}`,
+              fileName: `${traitId}.svg`,
+              isExternal: true,
+              external_url: `https://adrianzero.com/designs/${traitId}.svg`
+            };
+          }
+        });
+        
+        console.log(`[gif-render] Traits externos añadidos al mapeo`);
+      } catch (error) {
+        console.error(`[gif-render] Error cargando studio.json:`, error.message);
+        console.log(`[gif-render] Continuando solo con mapeo base`);
+      }
+    
+      return baseMapping;
+    } catch (error) {
+      console.error('[gif-render] Error cargando mapeo combinado:', error);
+      return {};
+    }
+  };
 
   try {
     // Parsear query params
