@@ -1,4 +1,7 @@
 import { GifRenderer } from '../../../lib/renderers/gif-renderer.js';
+import { renderGifViaExternalService, prepareRenderData } from '../../../lib/external-render-client.js';
+import { getContracts } from '../../../lib/contracts.js';
+import { loadCombinedTraitsMapping } from '../../../lib/traits-loader.js';
 
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
@@ -95,11 +98,119 @@ export default async function handler(req, res) {
       category: traitCategory
     });
     
+    // Intentar usar Railway primero
+    let gifBuffer = null;
+    const EXTERNAL_RENDER_ENABLED = process.env.EXTERNAL_RENDER_ENABLED !== 'false';
+    
+    if (EXTERNAL_RENDER_ENABLED) {
+      try {
+        console.log('[gif-render] 🚀 Intentando renderizado externo en Railway...');
+        
+        // Obtener datos del token para enviar al servicio externo
+        const { core, traitsExtension, serumModule } = await getContracts();
+        const tokenData = await core.getTokenData(tokenId);
+        const [generation, mutationLevel, canReplicate, replicationCount, lastReplication, hasBeenModified] = tokenData;
+        
+        const tokenSkinData = await core.getTokenSkin(tokenId);
+        const skinId = tokenSkinData[0].toString();
+        const skinName = tokenSkinData[1];
+        
+        // Determinar skinType basado en skinId
+        let skinType = 'Medium';
+        if (skinId === '1') skinType = 'Medium';
+        else if (skinId === '2') skinType = 'Dark';
+        else if (skinId === '3') skinType = 'Alien';
+        else if (skinId === '4') skinType = 'Albino';
+        
+        // Obtener traits equipados (aunque no los usaremos para el GIF, el servicio externo los necesita)
+        const nested = await traitsExtension.getAllEquippedTraits(tokenId);
+        const categories = nested[0];
+        const traitIds = nested[1];
+        
+        // Construir finalTraits vacío (el GIF aplicará sus propios traits según el patrón)
+        const finalTraits = {};
+        
+        // Obtener serum history
+        const serumHistory = await serumModule.getTokenSerumHistory(tokenId);
+        
+        // Cargar traits mapping
+        const traitsMapping = await loadCombinedTraitsMapping(tokenId);
+        
+        // Determinar baseImagePath
+        const gen = generation.toString();
+        let baseImagePath;
+        if (skinId === '1') {
+          baseImagePath = gen === '0' ? 'ADRIAN/GEN0-Medium.svg' : 'ADRIAN/GEN1-Medium.svg';
+        } else if (skinId === '2') {
+          baseImagePath = gen === '0' ? 'ADRIAN/GEN0-Dark.svg' : 'ADRIAN/GEN1-Dark.svg';
+        } else if (skinId === '3') {
+          baseImagePath = gen === '0' ? 'ADRIAN/GEN0-Alien.svg' : 'ADRIAN/GEN1-Alien.svg';
+        } else if (skinId === '4') {
+          baseImagePath = gen === '0' ? 'ADRIAN/GEN0-Albino.svg' : 'ADRIAN/GEN1-Albino.svg';
+        } else {
+          baseImagePath = gen === '0' ? 'ADRIAN/GEN0-Medium.svg' : 'ADRIAN/GEN1-Medium.svg';
+        }
+        
+        // Preparar datos para el servicio externo
+        const renderData = prepareRenderData({
+          tokenId,
+          generation,
+          skinType,
+          finalTraits,
+          appliedSerum: null,
+          serumSuccess: false,
+          hasAdrianGFSerum: false,
+          serumHistory: serumHistory || null,
+          failedSerumType: null,
+          baseImagePath,
+          skintraitPath: null,
+          skinTraitPath: null,
+          isCloseup: false,
+          traitsMapping,
+          tagInfo: null,
+          samuraiImageIndex: null
+        });
+        
+        // Añadir datos específicos del GIF
+        const gifData = {
+          ...renderData,
+          frames: framesNum,
+          pattern: patternArray,
+          delay: delayMs
+        };
+        
+        gifBuffer = await renderGifViaExternalService(gifData);
+        
+        if (gifBuffer) {
+          console.log('[gif-render] ✅ GIF generado exitosamente en Railway');
+          
+          // Configurar headers
+          res.setHeader('Content-Type', 'image/gif');
+          res.setHeader('Content-Length', gifBuffer.length);
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+          res.setHeader('X-Version', 'GIF-RENDERER-v1-EXTERNAL');
+          res.setHeader('X-Render-Source', 'external');
+          res.setHeader('X-Frame-Count', framesNum.toString());
+          res.setHeader('X-Frame-Delay', `${delayMs}ms`);
+          res.setHeader('X-Pattern', patternArray.join(','));
+          if (traitCategory) res.setHeader('X-Category', traitCategory);
+          
+          return res.status(200).send(gifBuffer);
+        }
+      } catch (error) {
+        console.error('[gif-render] ❌ Error en renderizado externo:', error.message);
+        console.log('[gif-render] 🔄 Fallback a renderizado local...');
+      }
+    }
+    
+    // Fallback a renderizado local
+    console.log('[gif-render] 🏠 Usando renderizado local (fallback)');
+    
     // Crear instancia de GifRenderer
     const gifRenderer = new GifRenderer();
     
     // Generar GIF
-    const gifBuffer = await gifRenderer.generateGif({
+    gifBuffer = await gifRenderer.generateGif({
       tokenId,
       frames: framesNum,
       pattern: patternArray,
@@ -112,10 +223,11 @@ export default async function handler(req, res) {
     res.setHeader('Content-Length', gifBuffer.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.setHeader('X-Version', 'GIF-RENDERER-v1');
+    res.setHeader('X-Render-Source', 'local');
     res.setHeader('X-Frame-Count', framesNum.toString());
     res.setHeader('X-Frame-Delay', `${delayMs}ms`);
     res.setHeader('X-Pattern', patternArray.join(','));
-    res.setHeader('X-Category', traitCategory);
+    if (traitCategory) res.setHeader('X-Category', traitCategory);
     
     console.log(`[gif-render] GIF generado exitosamente (${gifBuffer.length} bytes)`);
     
