@@ -233,9 +233,20 @@ app.get('/', (req, res) => {
   res.status(200).send(html);
 });
 
-// Health check endpoint
+// Health check endpoint - mejorado para Railway
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', service: 'external-render' });
+  res.status(200).json({ 
+    status: 'ok', 
+    service: 'external-render',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    port: PORT
+  });
+});
+
+// Health check simple para Railway (algunos servicios lo requieren)
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
 });
 
 // Render endpoint
@@ -268,8 +279,39 @@ app.post('/render', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+// Iniciar servidor - escuchar en 0.0.0.0 para Railway
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[external-render] 🚀 Servidor iniciado en puerto ${PORT}`);
   console.log(`[external-render] 🌐 Base URL: ${BASE_URL}`);
+  console.log(`[external-render] 📡 Escuchando en 0.0.0.0:${PORT}`);
+});
+
+// Manejar señales de terminación gracefully
+process.on('SIGTERM', () => {
+  console.log('[external-render] ⚠️  SIGTERM recibido, cerrando servidor gracefully...');
+  server.close(() => {
+    console.log('[external-render] ✅ Servidor cerrado correctamente');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('[external-render] ⚠️  SIGINT recibido, cerrando servidor gracefully...');
+  server.close(() => {
+    console.log('[external-render] ✅ Servidor cerrado correctamente');
+    process.exit(0);
+  });
+});
+
+// Manejar errores no capturados
+process.on('uncaughtException', (error) => {
+  console.error('[external-render] ❌ Uncaught Exception:', error);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[external-render] ❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
