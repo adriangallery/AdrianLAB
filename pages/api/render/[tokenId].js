@@ -864,18 +864,22 @@ export default async function handler(req, res) {
     
     if (tagInfo.tag === 'SubZERO') {
       console.log(`[render] 🏷️ Token ${cleanTokenId} tiene tag SubZERO - Aplicando lógica especial`);
+      console.log(`[render] 🏷️ SubZERO: Traits antes de aplicar lógica:`, equippedTraits);
       
-      // Filtrar EYES (solo permitir 1124)
+      // Filtrar EYES (solo permitir 1124) - preserva todos los demás traits
       const filteredTraits = filterEyesForTag(equippedTraits, tagInfo.tag);
-      Object.keys(equippedTraits).forEach(key => delete equippedTraits[key]);
-      Object.assign(equippedTraits, filteredTraits);
+      console.log(`[render] 🏷️ SubZERO: Traits después de filtrar EYES:`, filteredTraits);
       
-      // Forzar SKINTRAIT 1125 con prioridad absoluta
-      const forcedTraits = forceSkinTraitForTag(equippedTraits, tagInfo.tag);
+      // Forzar SKINTRAIT 1125 con prioridad absoluta - aplica sobre los traits filtrados
+      const forcedTraits = forceSkinTraitForTag(filteredTraits, tagInfo.tag);
+      console.log(`[render] 🏷️ SubZERO: Traits después de forzar SKINTRAIT:`, forcedTraits);
+      
+      // Actualizar equippedTraits con el resultado final (preserva todos los traits + SKINTRAIT)
       Object.keys(equippedTraits).forEach(key => delete equippedTraits[key]);
       Object.assign(equippedTraits, forcedTraits);
       
       console.log(`[render] 🏷️ SubZERO: EYES filtrado, SKINTRAIT 1125 forzado con prioridad absoluta`);
+      console.log(`[render] 🏷️ SubZERO: Traits finales:`, equippedTraits);
     }
     
     // ===== LÓGICA ESPECIAL SAMURAIZERO =====
