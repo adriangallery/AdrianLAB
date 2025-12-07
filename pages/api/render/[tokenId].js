@@ -983,11 +983,33 @@ export default async function handler(req, res) {
     // Esto debe hacerse después de obtener todos los datos del contrato y procesar tags
     console.log('[render] 🔐 Generando hash único para el render...');
     
-    // Obtener skintraitId si existe
+    // Obtener skintraitId si existe (después de aplicar lógica de tags)
     const skintraitId = equippedTraits['SKINTRAIT'] || null;
     
     // Obtener tagIndex si es SamuraiZERO (ya se calculó arriba)
     const tagIndex = samuraiIndex; // Reutilizar el samuraiIndex que ya se calculó
+    
+    // IMPORTANTE: Usar equippedTraits finales (después de aplicar lógica de tags)
+    // en lugar de categories/traitIds del contrato, para incluir SKINTRAIT forzado y otros cambios
+    const finalCategories = [];
+    const finalTraitIds = [];
+    
+    // Ordenar las categorías para consistencia en el hash
+    const sortedCategories = Object.keys(equippedTraits).sort();
+    for (const category of sortedCategories) {
+      // Incluir todas las categorías excepto SKINTRAIT (que se incluye por separado)
+      if (category !== 'SKINTRAIT') {
+        finalCategories.push(category);
+        finalTraitIds.push(equippedTraits[category].toString());
+      }
+    }
+    
+    console.log('[render] 🔐 Traits finales para hash:', {
+      categories: finalCategories,
+      traitIds: finalTraitIds,
+      skintraitId,
+      tag: tagInfo.tag
+    });
     
     const renderHash = generateRenderHash({
       // Query parameters
@@ -1009,9 +1031,9 @@ export default async function handler(req, res) {
       skinId: skinId.toString(),
       skinName,
       
-      // Traits (ordenados)
-      traitCategories: categories,
-      traitIds: traitIds.map(id => id.toString()),
+      // Traits (usar equippedTraits finales, no los del contrato)
+      traitCategories: finalCategories,
+      traitIds: finalTraitIds,
       
       // Serum
       appliedSerum,
@@ -1020,8 +1042,8 @@ export default async function handler(req, res) {
       hasAdrianGFSerum,
       serumHistory,
       
-      // SKINTRAIT
-      skintraitId,
+      // SKINTRAIT (incluido por separado, puede ser forzado por tags)
+      skintraitId: skintraitId ? skintraitId.toString() : null,
       
       // Tags
       tag: tagInfo.tag,
