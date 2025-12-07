@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invalidar Renders - Admin AdrianLAB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .result.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      display: block;
+    }
+    
+    .result.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      display: block;
+    }
+    
+    .result pre {
+      margin-top: 10px;
+      background: rgba(0,0,0,0.05);
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    
+    .info {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #0d47a1;
+    }
+    
+    .info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗑️ Invalidar Renders</h1>
+    <p class="subtitle">Elimina renders guardados en GitHub para forzar un nuevo renderizado</p>
+    
+    <div class="info">
+      <strong>ℹ️ Información:</strong>
+      <ul style="margin-left: 20px; margin-top: 8px;">
+        <li>Al invalidar un render, se eliminará el archivo de GitHub</li>
+        <li>La próxima vez que se solicite el render, se generará uno nuevo</li>
+        <li>Puedes invalidar todos los renders de un token o uno específico</li>
+      </ul>
+    </div>
+    
+    <form id="invalidateForm">
+      <div class="form-group">
+        <label for="tokenId">Token ID:</label>
+        <input type="number" id="tokenId" name="tokenId" placeholder="Ej: 1, 100, 434" min="1">
+      </div>
+      
+      <div class="form-group">
+        <label for="renderType">Tipo de Render (opcional):</label>
+        <select id="renderType" name="renderType">
+          <option value="">Todos los renders del token</option>
+          <option value="normal">Normal</option>
+          <option value="closeup">Closeup</option>
+          <option value="shadow">Shadow</option>
+          <option value="glow">Glow</option>
+          <option value="bn">BN</option>
+          <option value="uv">UV</option>
+          <option value="blackout">Blackout</option>
+          <option value="banana">Banana</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="hash">Hash específico (opcional):</label>
+        <input type="text" id="hash" name="hash" placeholder="Ej: a1b2c3d4e5f6g7h8" pattern="[a-f0-9]{16}">
+        <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">Solo para renders con hash específico</small>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="floppySimple" name="floppySimple">
+          <label for="floppySimple" style="margin: 0;">Invalidar Floppy Simple (requiere Token ID)</label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="traitId">Trait ID (opcional, para invalidar trait individual):</label>
+        <input type="number" id="traitId" name="traitId" placeholder="Ej: 324, 870" min="1">
+      </div>
+      
+      <div class="form-group">
+        <label for="apiKey">API Key (opcional, si está configurada):</label>
+        <input type="password" id="apiKey" name="apiKey" placeholder="Dejar vacío si no está configurada">
+      </div>
+      
+      <button type="submit" id="submitBtn">Invalidar Render</button>
+    </form>
+    
+    <div id="result" class="result"></div>
+  </div>
+  
+  <script>
+    const form = document.getElementById('invalidateForm');
+    const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const tokenId = document.getElementById('tokenId').value;
+      const renderType = document.getElementById('renderType').value;
+      const hash = document.getElementById('hash').value;
+      const floppySimple = document.getElementById('floppySimple').checked;
+      const traitId = document.getElementById('traitId').value;
+      const apiKey = document.getElementById('apiKey').value;
+      
+      if (!tokenId && !traitId) {
+        showResult('error', 'Error: Se requiere Token ID o Trait ID');
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Invalidando...';
+      resultDiv.className = 'result';
+      resultDiv.style.display = 'none';
+      
+      try {
+        const body = {};
+        if (tokenId) body.tokenId = tokenId;
+        if (renderType) body.renderType = renderType;
+        if (hash) body.hash = hash;
+        if (floppySimple) body.floppySimple = true;
+        if (traitId) body.traitId = traitId;
+        if (apiKey) body.apiKey = apiKey;
+        
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        if (apiKey) {
+          headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+        
+        const response = await fetch('/api/admin/invalidate-render', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showResult('success', data.message || 'Invalidación exitosa', data);
+        } else {
+          showResult('error', data.message || data.error || 'Error en la invalidación', data);
+        }
+      } catch (error) {
+        showResult('error', `Error: ${error.message}`, error);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Invalidar Render';
+      }
+    });
+    
+    function showResult(type, message, data = null) {
+      resultDiv.className = `result ${type}`;
+      resultDiv.style.display = 'block';
+      
+      let html = `<strong>${type === 'success' ? '✅' : '❌'} ${message}</strong>`;
+      
+      if (data) {
+        html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+      }
+      
+      resultDiv.innerHTML = html;
+      
+      // Scroll to result
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  </script>
+</body>
+</html>
+
