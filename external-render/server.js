@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { renderImage } from './renderer.js';
-import { renderGif } from './gif-renderer.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -174,10 +173,6 @@ app.get('/', (req, res) => {
         <span class="method post">POST</span>
         <code>/render</code> - Renderizar imagen AdrianZERO
       </div>
-      <div class="endpoint">
-        <span class="method post">POST</span>
-        <code>/gif</code> - Generar GIF animado
-      </div>
     </div>
 
     <div class="section">
@@ -273,43 +268,8 @@ app.post('/render', async (req, res) => {
   }
 });
 
-// GIF endpoint
-app.post('/gif', async (req, res) => {
-  try {
-    const startTime = Date.now();
-    console.log('[external-render] 🎬 GIF request recibido:', {
-      tokenId: req.body.tokenId,
-      frames: req.body.frames,
-      pattern: req.body.pattern,
-      delay: req.body.delay
-    });
-
-    const gifBuffer = await renderGif(req.body, BASE_URL);
-    
-    const duration = Date.now() - startTime;
-    console.log(`[external-render] ✅ GIF generado en ${duration}ms`);
-
-    res.setHeader('Content-Type', 'image/gif');
-    res.setHeader('Content-Length', gifBuffer.length);
-    res.setHeader('X-Render-Time', duration.toString());
-    res.setHeader('X-Service', 'external-render');
-    res.setHeader('X-Frame-Count', req.body.frames?.toString() || '0');
-    res.setHeader('X-Frame-Delay', `${req.body.delay || 100}ms`);
-    res.status(200).send(gifBuffer);
-  } catch (error) {
-    console.error('[external-render] ❌ Error generando GIF:', error.message);
-    console.error('[external-render] Stack:', error.stack);
-    res.status(500).json({ 
-      error: 'Error generating GIF', 
-      message: error.message 
-    });
-  }
-});
-
 app.listen(PORT, () => {
   console.log(`[external-render] 🚀 Servidor iniciado en puerto ${PORT}`);
   console.log(`[external-render] 🌐 Base URL: ${BASE_URL}`);
-  console.log(`[external-render] 🎬 Soporte GIF habilitado`);
-  console.log(`[external-render] 📦 Versión: 1.0.1`);
 });
 
