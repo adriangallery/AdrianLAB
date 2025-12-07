@@ -310,5 +310,6 @@ app.listen(PORT, () => {
   console.log(`[external-render] 🚀 Servidor iniciado en puerto ${PORT}`);
   console.log(`[external-render] 🌐 Base URL: ${BASE_URL}`);
   console.log(`[external-render] 🎬 Soporte GIF habilitado`);
+  console.log(`[external-render] 📦 Versión: 1.0.1`);
 });
 
