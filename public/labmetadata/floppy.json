@@ -169,6 +169,18 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 10015,
+      "name": "X-Mas-Floppy",
+      "category": "Floppy discs",
+      "fileName": "10015.gif",
+      "maxSupply": 1000,
+      "floppy": "X-MAS 25",
+      "traitsInside": 4,
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 1123,
       "name": "CensorPack",
       "category": "PACK",
