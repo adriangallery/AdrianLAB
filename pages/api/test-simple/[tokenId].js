@@ -316,6 +316,8 @@ export default async function handler(req, res) {
           // Parsear PNG usando pngjs
           const pngImage = PNG.sync.read(pngBuffer);
           
+          console.log(`[test-simple] PNG parseado: ${pngImage.width}x${pngImage.height}, data: ${pngImage.data.length} bytes`);
+          
           // Crear BitmapImage con el objeto bitmap (constructor acepta { width, height, data })
           const bitmapImage = new BitmapImage({
             width: pngImage.width,
@@ -323,11 +325,13 @@ export default async function handler(req, res) {
             data: pngImage.data
           });
           
+          console.log(`[test-simple] BitmapImage creado: ${bitmapImage.bitmap.width}x${bitmapImage.bitmap.height}`);
+          
           // Crear GifFrame con BitmapImage y delay
           const gifFrame = new GifFrame(bitmapImage, { delayCentisecs });
           gifFrames.push(gifFrame);
           
-          console.log(`[test-simple] Frame ${i + 1} convertido exitosamente`);
+          console.log(`[test-simple] Frame ${i + 1} convertido exitosamente (${gifFrame.bitmap.width}x${gifFrame.bitmap.height})`);
         } catch (frameError) {
           console.error(`[test-simple] Error procesando frame ${i + 1}:`, frameError.message);
           throw new Error(`Error procesando frame ${i + 1}: ${frameError.message}`);
@@ -336,6 +340,8 @@ export default async function handler(req, res) {
       
       // Crear GIF con todos los frames usando GifCodec
       console.log(`[test-simple] Ensamblando GIF con ${gifFrames.length} frames...`);
+      console.log(`[test-simple] Dimensiones del primer frame: ${gifFrames[0].bitmap.width}x${gifFrames[0].bitmap.height}`);
+      
       const codec = new GifCodec();
       const outputGif = await codec.encodeGif(gifFrames, {
         loops: 0 // Loop infinito
