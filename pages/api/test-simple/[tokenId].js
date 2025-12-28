@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
+import { GifFrame, BitmapImage, GifCodec } from 'gifwrap';
+import { PNG } from 'pngjs';
 
 export default async function handler(req, res) {
   // Configuración CORS
@@ -295,29 +297,55 @@ export default async function handler(req, res) {
       console.log(`[test-simple] Frame ${i + 1}/${numFrames} generado, tamaño: ${pngBuffer.length} bytes`);
     }
     
-    // Crear GIF usando gif-frames
-    console.log(`[test-simple] 🎬 Creando GIF con ${frames.length} frames...`);
+    // Crear GIF usando gifwrap
+    console.log(`[test-simple] 🎬 Creando GIF con ${frames.length} frames usando gifwrap...`);
     
     try {
-      const gifFrames = require('gif-frames');
+      const gifFrames = [];
+      const delay = 100; // 100ms delay entre frames
+      const delayCentisecs = Math.round(delay / 10); // Convertir ms a centisegundos
       
-      // Convertir PNG buffers a streams para gif-frames
-      const frameStreams = frames.map((pngBuffer, index) => ({
-        stream: require('stream').Readable.from(pngBuffer),
-        delay: 100 // 100ms delay entre frames
-      }));
+      console.log(`[test-simple] Convirtiendo ${frames.length} frames PNG a GifFrame...`);
       
-      // Crear GIF
-      const gifBuffer = await gifFrames.createGif(frameStreams, {
-        width: 768,
-        height: 1024,
-        repeat: 0 // Loop infinito
+      for (let i = 0; i < frames.length; i++) {
+        const pngBuffer = frames[i];
+        
+        console.log(`[test-simple] Procesando frame ${i + 1}/${frames.length}...`);
+        
+        try {
+          // Parsear PNG usando pngjs
+          const pngImage = PNG.sync.read(pngBuffer);
+          
+          // Crear BitmapImage con el objeto bitmap (constructor acepta { width, height, data })
+          const bitmapImage = new BitmapImage({
+            width: pngImage.width,
+            height: pngImage.height,
+            data: pngImage.data
+          });
+          
+          // Crear GifFrame con BitmapImage y delay
+          const gifFrame = new GifFrame(bitmapImage, { delayCentisecs });
+          gifFrames.push(gifFrame);
+          
+          console.log(`[test-simple] Frame ${i + 1} convertido exitosamente`);
+        } catch (frameError) {
+          console.error(`[test-simple] Error procesando frame ${i + 1}:`, frameError.message);
+          throw new Error(`Error procesando frame ${i + 1}: ${frameError.message}`);
+        }
+      }
+      
+      // Crear GIF con todos los frames usando GifCodec
+      console.log(`[test-simple] Ensamblando GIF con ${gifFrames.length} frames...`);
+      const codec = new GifCodec();
+      const outputGif = await codec.encodeGif(gifFrames, {
+        loops: 0 // Loop infinito
       });
       
+      const gifBuffer = outputGif.buffer;
       console.log(`[test-simple] ✅ GIF generado exitosamente, tamaño: ${gifBuffer.length} bytes`);
       
       res.setHeader('Content-Type', 'image/gif');
-      res.setHeader('X-Version', 'GIF-SIMPLIFICADO-662');
+      res.setHeader('X-Version', 'GIF-SIMPLIFICADO-662-GIFWRAP');
       res.setHeader('X-Frame-Count', frames.length.toString());
       res.setHeader('X-Frame-Delay', '100ms');
       res.setHeader('X-Animation-FPS', '10');
@@ -326,6 +354,7 @@ export default async function handler(req, res) {
       
     } catch (gifError) {
       console.error('[test-simple] Error generando GIF:', gifError);
+      console.error('[test-simple] Stack:', gifError.stack);
       
       // Fallback: devolver el primer frame como PNG
       console.log('[test-simple] 🚨 Fallback: devolviendo primer frame como PNG');
