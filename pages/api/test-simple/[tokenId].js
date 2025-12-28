@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { textToSVGElement, linesToSVG } from '../../../lib/text-to-svg.js';
 import { getContracts } from '../../../lib/contracts.js';
-import { GifFrame, BitmapImage, GifCodec } from 'gifwrap';
+import { GifFrame, BitmapImage, GifCodec, GifUtil } from 'gifwrap';
 import { PNG } from 'pngjs';
 
 export default async function handler(req, res) {
@@ -341,6 +341,11 @@ export default async function handler(req, res) {
       // Crear GIF con todos los frames usando GifCodec
       console.log(`[test-simple] Ensamblando GIF con ${gifFrames.length} frames...`);
       console.log(`[test-simple] Dimensiones del primer frame: ${gifFrames[0].bitmap.width}x${gifFrames[0].bitmap.height}`);
+      
+      // Cuantizar colores (reducir a 256 colores por frame) usando algoritmo Wu
+      console.log(`[test-simple] Cuantizando colores de los frames a 256 colores...`);
+      GifUtil.quantizeWu(gifFrames, 256);
+      console.log(`[test-simple] Cuantización completada`);
       
       const codec = new GifCodec();
       const outputGif = await codec.encodeGif(gifFrames, {
