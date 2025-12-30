@@ -18,12 +18,20 @@ import { createCanvas, loadImage } from 'canvas';
 
 // Mapa de skins especiales y sus rutas
 const SPECIAL_SKINS = {
+  // AdrianGF skins
   'adriangf': '/traits/ADRIANGF/GF1/GF1-Fair.svg',
   'adriangf-fair': '/traits/ADRIANGF/GF1/GF1-Fair.svg',
   'adriangf-tan': '/traits/ADRIANGF/GF1/GF1-Tan.svg',
   'adriangf-albino': '/traits/ADRIANGF/GF1/GEN1_Albino.svg',
-  'darkadrian': '/traits/ADRIAN/DARKADRIAN.svg',
-  'alien': '/traits/ADRIAN/ALIEN.svg',
+  
+  // Adrian skins (GEN0)
+  'medium': '/traits/ADRIAN/GEN0-Medium.svg',
+  'dark': '/traits/ADRIAN/GEN0-Dark.svg',
+  'darkadrian': '/traits/ADRIAN/GEN0-Dark.svg',
+  'alien': '/traits/ADRIAN/GEN0-Alien.svg',
+  'albino': '/traits/ADRIAN/GEN0-Albino.svg',
+  
+  // Mannequins
   'blankmannequin': '/labimages/blankmannequin.svg',
   'mannequin': '/labimages/mannequin.svg'
 };
