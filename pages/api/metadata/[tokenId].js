@@ -325,13 +325,43 @@ export default async function handler(req, res) {
       const { getAnimatedTraits } = await import('../../../lib/animated-traits-helper.js');
       // Obtener traits equipados para detectar animados
       const { traitsExtension } = await getContracts();
-      const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
-      const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
-      const animatedTraits = await getAnimatedTraits(allTraitIds);
+      let allTraitIds = [];
       
-      if (animatedTraits.length > 0) {
-        imageExtension = '.gif';
-        console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+      try {
+        const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+        allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
+      } catch (contractError) {
+        // Si el token no existe en el contrato, intentar verificar directamente en traits.json
+        // si algún trait conocido es animado (fallback para tokens no minteados)
+        console.warn(`[metadata] Token ${tokenId} no existe en contrato, verificando traits.json directamente:`, contractError.message);
+        
+        // Cargar traits.json para verificar si hay traits animados conocidos
+        try {
+          const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+          const traitsContent = fs.readFileSync(traitsPath, 'utf8');
+          const traitsData = JSON.parse(traitsContent);
+          const animatedTraitsInJson = traitsData.traits.filter(t => t.Type === 'Animated');
+          
+          // Si hay traits animados en el JSON, verificar si alguno podría estar equipado
+          // Por ahora, si hay traits animados disponibles, usar .gif como precaución
+          // (esto es un fallback, idealmente el token debería existir en el contrato)
+          if (animatedTraitsInJson.length > 0) {
+            console.log(`[metadata] ⚠️ Token ${tokenId} no existe pero hay ${animatedTraitsInJson.length} traits animados disponibles, usando .gif como fallback`);
+            imageExtension = '.gif';
+          }
+        } catch (jsonError) {
+          console.warn(`[metadata] Error cargando traits.json:`, jsonError.message);
+        }
+      }
+      
+      // Si tenemos traitIds del contrato, verificar si son animados
+      if (allTraitIds.length > 0) {
+        const animatedTraits = await getAnimatedTraits(allTraitIds);
+        
+        if (animatedTraits.length > 0) {
+          imageExtension = '.gif';
+          console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+        }
       }
     } catch (error) {
       console.warn(`[metadata] Error detectando traits animados, usando .png por defecto:`, error.message);
