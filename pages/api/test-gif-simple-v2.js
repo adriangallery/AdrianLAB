@@ -150,6 +150,14 @@ async function loadGifFrames(gifId, targetWidth = null, targetHeight = null) {
   
   console.log(`[loadGifFrames] GIF parseado: ${gifFrames.length} frames`);
   
+  // Extraer paleta de colores del GIF original para preservar calidad
+  // La paleta está en gif.globalColorTable si existe
+  let originalPalette = null;
+  if (gif.globalColorTable && gif.globalColorTable.length > 0) {
+    originalPalette = gif.globalColorTable;
+    console.log(`[loadGifFrames] Paleta original detectada: ${originalPalette.length} colores`);
+  }
+  
   // Detectar tamaño original del GIF desde el primer frame
   const originalWidth = gifFrames[0]?.bitmap?.width || 400;
   const originalHeight = gifFrames[0]?.bitmap?.height || 400;
@@ -198,14 +206,21 @@ async function loadGifFrames(gifId, targetWidth = null, targetHeight = null) {
     const pngBuffer = frameCanvas.toBuffer('image/png');
     
     // Redimensionar solo si es necesario
+    // Usar configuración que preserve mejor la calidad y evite pixel repetition
     let finalBuffer = pngBuffer;
     if (needsResize) {
       finalBuffer = await sharp(pngBuffer)
         .resize(finalWidth, finalHeight, {
           fit: 'contain',
-          background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparente
+          background: { r: 255, g: 255, b: 255, alpha: 0 }, // Transparente
+          kernel: 'lanczos3', // Kernel de alta calidad para evitar pixel repetition
+          withoutEnlargement: false
         })
-        .png()
+        .png({
+          quality: 100, // Máxima calidad PNG
+          compressionLevel: 9, // Máxima compresión sin pérdida
+          palette: false // No aplicar paleta en PNG, lo haremos después en GIF
+        })
         .toBuffer();
     }
     
@@ -222,7 +237,9 @@ async function loadGifFrames(gifId, targetWidth = null, targetHeight = null) {
     width: finalWidth,
     height: finalHeight,
     originalWidth,
-    originalHeight
+    originalHeight,
+    originalPalette: originalPalette,
+    originalGif: gif // Guardar referencia al GIF original para preservar metadata
   };
 }
 
@@ -573,12 +590,17 @@ async function generateGifWithGifwrap(config) {
   let gifFramesData = null;
   let gifWidth = 400;
   let gifHeight = 400;
+  let originalGifPalette = null;
   if (gifId) {
     const gifData = await loadGifFrames(gifId);
     gifFramesData = gifData.frames;
     gifWidth = gifData.width;
     gifHeight = gifData.height;
+    originalGifPalette = gifData.originalPalette;
     console.log(`[GIFWRAP] GIF cargado: ${gifFramesData.length} frames, tamaño: ${gifWidth}x${gifHeight}`);
+    if (originalGifPalette) {
+      console.log(`[GIFWRAP] Paleta original preservada: ${originalGifPalette.length} colores`);
+    }
   }
   
   const outputGifFrames = [];
@@ -631,9 +653,18 @@ async function generateGifWithGifwrap(config) {
     outputGifFrames.push(outputFrame);
   }
   
-  // Cuantizar colores a 256
+  // Cuantizar colores preservando la paleta original si existe
   console.log(`[GIFWRAP] Cuantizando ${outputGifFrames.length} frames...`);
-  GifUtil.quantizeWu(outputGifFrames, 256);
+  if (originalGifPalette && originalGifPalette.length > 0) {
+    // Si tenemos paleta original, usar cuantización que la preserve mejor
+    // Usar el número de colores de la paleta original (máximo 256)
+    const paletteSize = Math.min(originalGifPalette.length, 256);
+    console.log(`[GIFWRAP] Usando paleta original con ${paletteSize} colores`);
+    GifUtil.quantizeWu(outputGifFrames, paletteSize);
+  } else {
+    // Sin paleta original, usar cuantización estándar a 256
+    GifUtil.quantizeWu(outputGifFrames, 256);
+  }
   
   // Generar GIF
   console.log(`[GIFWRAP] Generando GIF...`);
