@@ -318,7 +318,26 @@ export default async function handler(req, res) {
     if (isBlackoutToken) urlParams.push('blackout=true');
     if (isBananaToken) urlParams.push('banana=true');
     const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
-    const imageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
+    
+    // Detectar traits animados para determinar extensión de imagen (.gif o .png)
+    let imageExtension = '.png';
+    try {
+      const { getAnimatedTraits } = await import('../../../lib/animated-traits-helper.js');
+      // Obtener traits equipados para detectar animados
+      const { traitsExtension } = await getContracts();
+      const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+      const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
+      const animatedTraits = await getAnimatedTraits(allTraitIds);
+      
+      if (animatedTraits.length > 0) {
+        imageExtension = '.gif';
+        console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+      }
+    } catch (error) {
+      console.warn(`[metadata] Error detectando traits animados, usando .png por defecto:`, error.message);
+    }
+    
+    const imageUrl = `${baseUrl}/api/render/${tokenId}${imageExtension}${paramsString}`;
     
     // Verificar tag del token ANTES de crear baseMetadata para poder sobreescribir el nombre
     const { getTokenTagInfo } = await import('../../../lib/tag-logic.js');

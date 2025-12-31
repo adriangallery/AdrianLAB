@@ -753,12 +753,13 @@
       const variants = [];
       const letters = 'abcdefghij'.split(''); // Solo buscar hasta 10 variantes (a-j)
       
-      // Intentar detectar variantes (a-j)
+      // IMPORTANTE: Solo buscamos variantes con letras (ej: 1165a, 1165b)
+      // NO incluimos el archivo base sin letra (ej: 1165.svg) - ese es para otros renders
       const baseUrl = 'https://adrianlab.vercel.app';
       
       // Hacer todas las peticiones en paralelo para mayor velocidad
       const checkPromises = letters.map(async (letter) => {
-        const variantId = `${baseId}${letter}`;
+        const variantId = `${baseId}${letter}`; // Siempre con letra: 1165a, 1165b, etc.
         const url = `${baseUrl}/labimages/${variantId}.svg`;
         
         try {
@@ -773,7 +774,8 @@
       });
       
       const results = await Promise.all(checkPromises);
-      variants.push(...results.filter(v => v !== null));
+      // Filtrar resultados y asegurar que solo incluimos variantes con letra
+      variants.push(...results.filter(v => v !== null && v !== baseId)); // baseId sin letra nunca debería estar aquí, pero por seguridad
       
       // Actualizar el trait animado
       animTrait.variants = variants;

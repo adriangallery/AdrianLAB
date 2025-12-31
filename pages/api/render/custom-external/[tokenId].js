@@ -8,7 +8,9 @@ import { getCachedJson, setCachedJson } from '../../../../lib/json-cache.js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../../lib/component-cache.js';
 import { renderViaExternalService, prepareRenderData, checkExternalServiceHealth } from '../../../../lib/external-render-client.js';
-import { getCachedAdrianZeroRender, setCachedAdrianZeroRender, getAdrianZeroRenderTTL, getCachedAdrianZeroCustomRender, setCachedAdrianZeroCustomRender } from '../../../../lib/cache.js';
+import { getCachedAdrianZeroRender, setCachedAdrianZeroRender, getAdrianZeroRenderTTL, getCachedAdrianZeroCustomRender, setCachedAdrianZeroCustomRender, getCachedAdrianZeroGif, setCachedAdrianZeroGif } from '../../../../lib/cache.js';
+import { getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
+import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -1178,10 +1180,14 @@ export default async function handler(req, res) {
       return res.status(200).send(cachedImage);
     }
 
-    // ===== INTENTAR RENDERIZADO EXTERNO =====
-    console.log('[custom-external] 🚀 Intentando renderizado externo...');
-    console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
-    console.log('[custom-external] 📋 BACKGROUND en finalTraits:', finalTraits['BACKGROUND'] || 'NO HAY');
+    // ===== INTENTAR RENDERIZADO EXTERNO (solo si NO hay traits animados) =====
+    // Si hay traits animados, Railway no puede generar GIFs, así que renderizamos directamente en Vercel
+    if (hasAnimatedTraits) {
+      console.log('[custom-external] 🎬 Traits animados detectados - Saltando Railway, renderizando GIF en Vercel');
+    } else {
+      console.log('[custom-external] 🚀 Intentando renderizado externo...');
+      console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
+      console.log('[custom-external] 📋 BACKGROUND en finalTraits:', finalTraits['BACKGROUND'] || 'NO HAY');
     
     // Calcular samuraiImageIndex si es SamuraiZERO
     let samuraiImageIndex = null;
@@ -1780,7 +1786,46 @@ export default async function handler(req, res) {
       finalBuffer = canvas.toBuffer('image/png');
     }
 
-    // Enviar imagen
+    // ===== GENERAR GIF SI HAY TRAITS ANIMADOS =====
+    if (hasAnimatedTraits && animatedTraits.length > 0) {
+      try {
+        console.log('[custom-external] 🎬 Generando GIF con traits animados...');
+        
+        // El finalBuffer contiene el PNG base sin los traits animados
+        // Generar GIF añadiendo los traits animados frame por frame
+        const gifBuffer = await generateGifFromLayers({
+          stableLayers: [
+            { pngBuffer: finalBuffer } // PNG base sin traits animados
+          ],
+          animatedTraits: animatedTraits,
+          width: 1000,
+          height: 1000,
+          delay: 500
+        });
+        
+        // Guardar en caché
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer);
+        
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        console.log(`[custom-external] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
+        
+        // Configurar headers para GIF
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
+        res.setHeader('X-Render-Source', 'local-gif');
+        res.setHeader('Content-Length', gifBuffer.length);
+        
+        return res.status(200).send(gifBuffer);
+      } catch (error) {
+        console.error('[custom-external] 🎬 Error generando GIF, continuando con PNG:', error.message);
+        console.error('[custom-external] 🎬 Stack:', error.stack);
+        // Continuar con PNG si falla la generación de GIF
+      }
+    }
+
+    // Enviar imagen PNG
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Content-Length', finalBuffer.length);
     

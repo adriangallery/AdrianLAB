@@ -7,6 +7,9 @@ import path from 'path';
 import { getCachedJson, setCachedJson } from '../../../../lib/json-cache.js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../../lib/component-cache.js';
+import { getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
+import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
+import { getCachedAdrianZeroGif, setCachedAdrianZeroGif, getAdrianZeroRenderTTL } from '../../../../lib/cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -681,6 +684,33 @@ export default async function handler(req, res) {
     
     let finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
+    
+    // ===== DETECCIÓN DE TRAITS ANIMADOS =====
+    // Obtener lista de traitIds para detectar animados
+    const allTraitIds = Object.values(finalTraits).filter(id => id && id !== 'None' && id !== '');
+    const animatedTraits = await getAnimatedTraits(allTraitIds);
+    const hasAnimatedTraits = animatedTraits.length > 0;
+    
+    if (hasAnimatedTraits) {
+      console.log(`[custom-render] 🎬 Traits animados detectados: ${animatedTraits.length}`);
+      animatedTraits.forEach((at, i) => {
+        console.log(`[custom-render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
+      });
+      
+      // Verificar caché de GIF
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId);
+      if (cachedGif) {
+        console.log(`[custom-render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        res.setHeader('X-Cache', 'HIT');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
+        return res.status(200).send(cachedGif);
+      }
+      
+      console.log(`[custom-render] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+    }
 
     // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
     const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag, getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../../lib/tag-logic.js');
@@ -1447,6 +1477,13 @@ export default async function handler(req, res) {
           }
           const traitId = finalTraits[category];
           
+          // LÓGICA ANIMADA: Saltar traits animados (se renderizarán en el GIF)
+          const isAnimatedTrait = animatedTraits.some(at => at.baseId === traitId.toString());
+          if (isAnimatedTrait) {
+            console.log(`[custom-render] PASO 3 - 🎬 Saltando trait animado ${category} (${traitId}) - se renderizará en GIF`);
+            continue;
+          }
+          
           // Debug mejorado para traits externos
           if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
             console.log(`[custom-render] 🌐 PASO 3 - Renderizando trait externo: ${category} (${traitId}) - ${traitsMapping[traitId].name}`);
@@ -1650,7 +1687,51 @@ export default async function handler(req, res) {
       finalBuffer = canvas.toBuffer('image/png');
     }
 
-    // Enviar imagen
+    // ===== GENERAR GIF SI HAY TRAITS ANIMADOS =====
+    if (hasAnimatedTraits && animatedTraits.length > 0) {
+      try {
+        console.log('[custom-render] 🎬 Generando GIF con traits animados...');
+        
+        // El finalBuffer contiene el PNG base sin los traits animados
+        // Generar GIF añadiendo los traits animados frame por frame
+        const gifBuffer = await generateGifFromLayers({
+          stableLayers: [
+            { pngBuffer: finalBuffer } // PNG base sin traits animados
+          ],
+          animatedTraits: animatedTraits,
+          width: 1000,
+          height: 1000,
+          delay: 500
+        });
+        
+        // Guardar en caché
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer);
+        
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        console.log(`[custom-render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
+        
+        // Configurar headers para GIF
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
+        res.setHeader('Content-Length', gifBuffer.length);
+        
+        if (isCloseup) {
+          res.setHeader('X-Render-Type', 'closeup');
+        } else {
+          res.setHeader('X-Render-Type', 'full');
+        }
+        
+        return res.status(200).send(gifBuffer);
+      } catch (error) {
+        console.error('[custom-render] 🎬 Error generando GIF, continuando con PNG:', error.message);
+        console.error('[custom-render] 🎬 Stack:', error.stack);
+        // Continuar con PNG si falla la generación de GIF
+      }
+    }
+
+    // Enviar imagen PNG
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Content-Length', finalBuffer.length);
     

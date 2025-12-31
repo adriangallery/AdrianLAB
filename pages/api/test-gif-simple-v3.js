@@ -84,9 +84,10 @@ async function detectAnimatedVariants(baseId) {
   const letters = 'abcdefghij'.split(''); // Solo buscar hasta 10 variantes (a-j)
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
   
-  // Verificar variantes en paralelo
+  // IMPORTANTE: Solo buscamos variantes con letras (ej: 1165a, 1165b)
+  // NO incluimos el archivo base sin letra (ej: 1165.svg) - ese es para otros renders
   const checkPromises = letters.map(async (letter) => {
-    const variantId = `${baseId}${letter}`;
+    const variantId = `${baseId}${letter}`; // Siempre con letra: 1165a, 1165b, etc.
     const url = `${baseUrl}/labimages/${variantId}.svg`;
     
     try {
@@ -101,7 +102,8 @@ async function detectAnimatedVariants(baseId) {
   });
   
   const results = await Promise.all(checkPromises);
-  return results.filter(v => v !== null);
+  // Filtrar resultados y asegurar que solo incluimos variantes con letra
+  return results.filter(v => v !== null && v !== baseId); // baseId sin letra nunca debería estar aquí, pero por seguridad
 }
 
 function parseQueryParams(query) {

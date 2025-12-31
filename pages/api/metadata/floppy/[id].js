@@ -143,11 +143,20 @@ export default async function handler(req, res) {
       const rarity = getRarityTagAndColor(tokenData.maxSupply);
       console.log(`[floppy-metadata] Rarity calculada:`, rarity);
 
+      // Detectar si el trait es animado
+      const isAnimated = tokenData.Type === 'Animated';
+      const imageExtension = isAnimated ? '.gif' : '.png';
+      const imageType = isAnimated ? 'image/gif' : 'image/png';
+      
+      if (isAnimated) {
+        console.log(`[floppy-metadata] 🎬 Trait animado detectado: ${tokenIdNum}, usando .gif`);
+      }
+
       // Generar metadata para traits
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}${imageExtension}`,
         external_url: tokenData.external_url || "https://adrianpunks.com/",
         attributes: [
           {
@@ -174,8 +183,8 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.png`,
-              type: "image/png"
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}${imageExtension}`,
+              type: imageType
             }
           ],
           category: "image",

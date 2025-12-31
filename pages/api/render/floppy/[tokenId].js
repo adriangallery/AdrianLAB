@@ -2,8 +2,12 @@ import { FloppyRenderer } from '../../../../lib/renderers/floppy-renderer.js';
 import { 
   getCachedFloppyRender, 
   setCachedFloppyRender, 
-  getFloppyRenderTTL 
+  getFloppyRenderTTL,
+  getCachedFloppyGif,
+  setCachedFloppyGif
 } from '../../../../lib/cache.js';
+import { isTraitAnimated, getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
+import { generateFloppyGif } from '../../../../lib/gif-generator.js';
 import { generateFloppySimpleHash } from '../../../../lib/render-hash.js';
 import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
@@ -253,9 +257,84 @@ export default async function handler(req, res) {
       
       // Determinar si es un serum (GIF) o trait (PNG)
       const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
-      console.log(`[floppy-render] Procesando ${isSerum ? 'serum' : 'trait'} ${tokenId} (renderizado ${isSerum ? 'GIF' : 'PNG'})`);
       
-      // Usar la nueva clase FloppyRenderer
+      // Detectar si el trait es animado (solo para traits, no serums)
+      let isAnimatedTrait = false;
+      let animatedTraits = [];
+      if (!isSerum && tokenIdNum >= 1 && tokenIdNum <= 9999) {
+        isAnimatedTrait = await isTraitAnimated(tokenIdNum);
+        if (isAnimatedTrait) {
+          animatedTraits = await getAnimatedTraits([tokenIdNum]);
+          console.log(`[floppy-render] 🎬 Trait animado detectado: ${tokenIdNum} (${animatedTraits[0]?.variants.length || 0} variantes)`);
+          
+          // Verificar caché de GIF
+          const cachedGif = getCachedFloppyGif(tokenIdNum);
+          if (cachedGif) {
+            console.log(`[floppy-render] 🎬 CACHE HIT para GIF de trait ${tokenIdNum}`);
+            const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+            res.setHeader('X-Cache', 'HIT');
+            res.setHeader('Content-Type', 'image/gif');
+            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+            res.setHeader('X-Version', 'FLOPPY-ANIMATED');
+            return res.status(200).send(cachedGif);
+          }
+          
+          console.log(`[floppy-render] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+        }
+      }
+      
+      console.log(`[floppy-render] Procesando ${isSerum ? 'serum' : isAnimatedTrait ? 'trait animado' : 'trait'} ${tokenId} (renderizado ${isSerum ? 'GIF' : isAnimatedTrait ? 'GIF' : 'PNG'})`);
+      
+      // Si es trait animado, generar GIF
+      if (isAnimatedTrait && animatedTraits.length > 0) {
+        try {
+          // Cargar mannequin directamente desde labimages
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+          const mannequinUrl = `${baseUrl}/labimages/mannequin.svg`;
+          
+          console.log(`[floppy-render] 🎬 Cargando mannequin desde: ${mannequinUrl}`);
+          const mannequinResponse = await fetch(mannequinUrl);
+          if (!mannequinResponse.ok) {
+            throw new Error(`Failed to load mannequin: ${mannequinResponse.status}`);
+          }
+          
+          const mannequinSvg = await mannequinResponse.text();
+          
+          // Convertir SVG del mannequin a PNG buffer
+          const resvg = new Resvg(Buffer.from(mannequinSvg), {
+            fitTo: { mode: 'width', value: 600 }
+          });
+          const mannequinBuffer = resvg.render().asPng();
+          
+          // Generar GIF
+          const gifBuffer = await generateFloppyGif({
+            mannequinBuffer: mannequinBuffer,
+            animatedTraits: animatedTraits,
+            width: 600,
+            height: 600,
+            delay: 500
+          });
+          
+          // Guardar en caché
+          setCachedFloppyGif(tokenIdNum, gifBuffer);
+          
+          const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+          console.log(`[floppy-render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
+          
+          // Configurar headers para GIF
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('Content-Type', 'image/gif');
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+          res.setHeader('X-Version', 'FLOPPY-ANIMATED');
+          
+          return res.status(200).send(gifBuffer);
+        } catch (error) {
+          console.error('[floppy-render] 🎬 Error generando GIF, continuando con PNG:', error.message);
+          // Continuar con PNG si falla la generación de GIF
+        }
+      }
+      
+      // Usar la nueva clase FloppyRenderer para PNG normal
       const renderer = new FloppyRenderer();
       const imageBuffer = await renderer.generatePNG(tokenId);
 

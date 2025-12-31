@@ -18,6 +18,9 @@ import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
 import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
 import { generateRenderHash } from '../../../lib/render-hash.js';
+import { getAnimatedTraits } from '../../../lib/animated-traits-helper.js';
+import { generateGifFromLayers } from '../../../lib/gif-generator.js';
+import { getCachedAdrianZeroGif, setCachedAdrianZeroGif } from '../../../lib/cache.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -858,6 +861,33 @@ export default async function handler(req, res) {
       }
     });
 
+    // ===== DETECCIÓN DE TRAITS ANIMADOS =====
+    // Obtener lista de traitIds para detectar animados
+    const allTraitIds = Object.values(equippedTraits).filter(id => id && id !== 'None' && id !== '');
+    const animatedTraits = await getAnimatedTraits(allTraitIds);
+    const hasAnimatedTraits = animatedTraits.length > 0;
+    
+    if (hasAnimatedTraits) {
+      console.log(`[render] 🎬 Traits animados detectados: ${animatedTraits.length}`);
+      animatedTraits.forEach((at, i) => {
+        console.log(`[render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
+      });
+      
+      // Verificar caché de GIF
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId);
+      if (cachedGif) {
+        console.log(`[render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        res.setHeader('X-Cache', 'HIT');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-ANIMATED');
+        return res.status(200).send(cachedGif);
+      }
+      
+      console.log(`[render] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+    }
+
     // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
     const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag, getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../lib/tag-logic.js');
     const tagInfo = await getTokenTagInfo(cleanTokenId);
@@ -1386,6 +1416,13 @@ export default async function handler(req, res) {
             }
           }
           const traitId = equippedTraits[category];
+          
+          // LÓGICA ANIMADA: Saltar traits animados (se renderizarán en el GIF)
+          const isAnimatedTrait = animatedTraits.some(at => at.baseId === traitId.toString());
+          if (isAnimatedTrait) {
+            console.log(`[render] PASO 3 - 🎬 Saltando trait animado ${category} (${traitId}) - se renderizará en GIF`);
+            continue;
+          }
           
           // LÓGICA ESPECIAL: Tokens 30000-35000 usan URL externa
           let traitImage;
@@ -1946,6 +1983,44 @@ export default async function handler(req, res) {
     // Si no se generó finalBuffer aún, generarlo ahora
     if (!finalBuffer) {
       finalBuffer = (finalCanvas || canvas).toBuffer('image/png');
+    }
+
+    // ===== GENERAR GIF SI HAY TRAITS ANIMADOS =====
+    if (hasAnimatedTraits && animatedTraits.length > 0) {
+      try {
+        console.log('[render] 🎬 Generando GIF con traits animados...');
+        
+        // El finalBuffer contiene el PNG base sin los traits animados
+        // Generar GIF añadiendo los traits animados frame por frame
+        const gifBuffer = await generateGifFromLayers({
+          stableLayers: [
+            { pngBuffer: finalBuffer } // PNG base sin traits animados
+          ],
+          animatedTraits: animatedTraits,
+          width: 1000,
+          height: 1000,
+          delay: 500
+        });
+        
+        // Guardar en caché
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer);
+        
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        console.log(`[render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
+        
+        // Configurar headers para GIF
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-ANIMATED');
+        res.setHeader('Content-Length', gifBuffer.length);
+        
+        return res.status(200).send(gifBuffer);
+      } catch (error) {
+        console.error('[render] 🎬 Error generando GIF, continuando con PNG:', error.message);
+        console.error('[render] 🎬 Stack:', error.stack);
+        // Continuar con PNG si falla la generación de GIF
+      }
     }
 
     // ===== PASO BANANA: aplicar transformación Nano Banana (DEBE SER DESPUÉS DE TODOS LOS EFECTOS) =====
