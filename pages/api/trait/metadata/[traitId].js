@@ -19,6 +19,7 @@ export default async function handler(req, res) {
       : 'https://adrianlab.vercel.app';
     
     // Añadir vtimestamp para forzar recacheo en OpenSea
+    // Cache reset: 2025-12-31
     const version = Date.now();
     
     const metadata = {
