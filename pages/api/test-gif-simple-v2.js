@@ -124,8 +124,9 @@ function parseQueryParams(query) {
 
 /**
  * Cargar y extraer frames de un GIF pre-generado
+ * Retorna los frames y el tamaño original del GIF
  */
-async function loadGifFrames(gifId, targetWidth = 400, targetHeight = 400) {
+async function loadGifFrames(gifId, targetWidth = null, targetHeight = null) {
   console.log(`[loadGifFrames] Cargando GIF: ${gifId}`);
   
   // Construir URL del GIF
@@ -149,7 +150,23 @@ async function loadGifFrames(gifId, targetWidth = 400, targetHeight = 400) {
   
   console.log(`[loadGifFrames] GIF parseado: ${gifFrames.length} frames`);
   
-  // Procesar cada frame: convertir a PNG y redimensionar
+  // Detectar tamaño original del GIF desde el primer frame
+  const originalWidth = gifFrames[0]?.bitmap?.width || 400;
+  const originalHeight = gifFrames[0]?.bitmap?.height || 400;
+  console.log(`[loadGifFrames] Tamaño original del GIF: ${originalWidth}x${originalHeight}`);
+  
+  // Usar tamaño original si no se especifica target
+  const finalWidth = targetWidth || originalWidth;
+  const finalHeight = targetHeight || originalHeight;
+  const needsResize = finalWidth !== originalWidth || finalHeight !== originalHeight;
+  
+  if (needsResize) {
+    console.log(`[loadGifFrames] Redimensionando de ${originalWidth}x${originalHeight} a ${finalWidth}x${finalHeight}`);
+  } else {
+    console.log(`[loadGifFrames] Manteniendo tamaño original: ${originalWidth}x${originalHeight}`);
+  }
+  
+  // Procesar cada frame: convertir a PNG y redimensionar si es necesario
   const processedFrames = [];
   
   for (let i = 0; i < gifFrames.length; i++) {
@@ -180,24 +197,33 @@ async function loadGifFrames(gifId, targetWidth = 400, targetHeight = 400) {
     // Convertir canvas a PNG buffer
     const pngBuffer = frameCanvas.toBuffer('image/png');
     
-    // Redimensionar a 400x400 usando sharp
-    const resizedBuffer = await sharp(pngBuffer)
-      .resize(targetWidth, targetHeight, {
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparente
-      })
-      .png()
-      .toBuffer();
+    // Redimensionar solo si es necesario
+    let finalBuffer = pngBuffer;
+    if (needsResize) {
+      finalBuffer = await sharp(pngBuffer)
+        .resize(finalWidth, finalHeight, {
+          fit: 'contain',
+          background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparente
+        })
+        .png()
+        .toBuffer();
+    }
     
     processedFrames.push({
-      pngBuffer: resizedBuffer,
+      pngBuffer: finalBuffer,
       delay: delayMs,
       index: i
     });
   }
   
   console.log(`[loadGifFrames] ✅ ${processedFrames.length} frames procesados`);
-  return processedFrames;
+  return {
+    frames: processedFrames,
+    width: finalWidth,
+    height: finalHeight,
+    originalWidth,
+    originalHeight
+  };
 }
 
 /**
@@ -464,7 +490,7 @@ async function compositeFrameWithTransforms(layers, width = 400, height = 400) {
  * Generar un frame con múltiples capas y transformaciones
  * Ahora soporta GIF como background
  */
-async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null) {
+async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null, width = 400, height = 400) {
   const layers = [];
   
   // 0. GIF Background (si existe) - va primero (más abajo)
@@ -479,7 +505,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
   
   // 1. Skin base (si existe)
   if (baseId) {
-    const basePng = await svgToPng(baseId, method);
+    const basePng = await svgToPng(baseId, method, width);
     const baseMovement = findMovement(movements, 'base');
     const baseTransform = calculatePosition(baseMovement, frameIndex, totalFrames);
     
@@ -493,7 +519,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
   
   // 2. Traits fijos
   for (const fixedId of fixedIds) {
-    const fixedPng = await svgToPng(fixedId, method);
+    const fixedPng = await svgToPng(fixedId, method, width);
     const fixedMovement = findMovement(movements, 'fixed', fixedId);
     
     if (fixedMovement) {
@@ -514,7 +540,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
   
   // 3. Trait variable del frame
   if (variableId) {
-    const variablePng = await svgToPng(variableId, method);
+    const variablePng = await svgToPng(variableId, method, width);
     const varMovement = findMovement(movements, 'variable');
     const varTransform = calculatePosition(varMovement, frameIndex, totalFrames);
     
@@ -526,8 +552,8 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
     });
   }
   
-  // Componer todas las capas con transformaciones
-  return await compositeFrameWithTransforms(layers);
+  // Componer todas las capas con transformaciones usando el tamaño del GIF
+  return await compositeFrameWithTransforms(layers, width, height);
 }
 
 /**
@@ -545,9 +571,14 @@ async function generateGifWithGifwrap(config) {
   
   // Cargar frames del GIF si existe
   let gifFramesData = null;
+  let gifWidth = 400;
+  let gifHeight = 400;
   if (gifId) {
-    gifFramesData = await loadGifFrames(gifId);
-    console.log(`[GIFWRAP] GIF cargado: ${gifFramesData.length} frames`);
+    const gifData = await loadGifFrames(gifId);
+    gifFramesData = gifData.frames;
+    gifWidth = gifData.width;
+    gifHeight = gifData.height;
+    console.log(`[GIFWRAP] GIF cargado: ${gifFramesData.length} frames, tamaño: ${gifWidth}x${gifHeight}`);
   }
   
   const outputGifFrames = [];
@@ -569,6 +600,7 @@ async function generateGifWithGifwrap(config) {
     console.log(`[GIFWRAP] Frame ${i + 1}/${totalFrames}: GIF frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}, SVG trait ${svgFrame.id}`);
     
     // Generar frame con capas, transformaciones y GIF background
+    // Pasar el tamaño del GIF para mantener la calidad
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
@@ -577,7 +609,9 @@ async function generateGifWithGifwrap(config) {
       movements,
       i,
       totalFrames,
-      gifFrame
+      gifFrame,
+      gifWidth,
+      gifHeight
     );
     
     console.log(`[GIFWRAP] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
@@ -590,8 +624,8 @@ async function generateGifWithGifwrap(config) {
       data: pngImage.data
     });
     
-    // Usar delay del GIF si existe, sino del frame SVG
-    const delayMs = gifFrame ? gifFrame.delay : svgFrame.delay;
+    // Si hay GIF de fondo, SIEMPRE usar el delay del GIF, no del SVG
+    const delayMs = gifFramesData ? gifFrame.delay : svgFrame.delay;
     const delayCentisecs = Math.round(delayMs / 10);
     const outputFrame = new GifFrame(bitmapImage, { delayCentisecs });
     outputGifFrames.push(outputFrame);
@@ -615,8 +649,8 @@ async function generateGifWithGifwrap(config) {
  */
 async function generateGifWithSharp(config) {
   const { base, fixed, frames, movements, gifId } = config;
-  const width = 400;
-  const height = 400;
+  let width = 400;
+  let height = 400;
   
   console.log(`[SHARP] Generando GIF con capas y movimientos:`);
   console.log(`[SHARP] - Base: ${base || 'ninguna'}`);
@@ -628,8 +662,11 @@ async function generateGifWithSharp(config) {
   // Cargar frames del GIF si existe
   let gifFramesData = null;
   if (gifId) {
-    gifFramesData = await loadGifFrames(gifId);
-    console.log(`[SHARP] GIF cargado: ${gifFramesData.length} frames`);
+    const gifData = await loadGifFrames(gifId);
+    gifFramesData = gifData.frames;
+    width = gifData.width;
+    height = gifData.height;
+    console.log(`[SHARP] GIF cargado: ${gifFramesData.length} frames, tamaño: ${width}x${height}`);
   }
   
   // Inicializar encoder
@@ -654,11 +691,12 @@ async function generateGifWithSharp(config) {
     
     console.log(`[SHARP] Frame ${i + 1}/${totalFrames}: GIF frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}, SVG trait ${svgFrame.id}`);
     
-    // Usar delay del GIF si existe, sino del frame SVG
-    const delayMs = gifFrame ? gifFrame.delay : svgFrame.delay;
+    // Si hay GIF de fondo, SIEMPRE usar el delay del GIF, no del SVG
+    const delayMs = gifFramesData ? gifFrame.delay : svgFrame.delay;
     encoder.setDelay(delayMs);
     
     // Generar frame con capas, transformaciones y GIF background
+    // Pasar el tamaño del GIF para mantener la calidad
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
@@ -667,7 +705,9 @@ async function generateGifWithSharp(config) {
       movements,
       i,
       totalFrames,
-      gifFrame
+      gifFrame,
+      width,
+      height
     );
     
     console.log(`[SHARP] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
