@@ -1148,11 +1148,14 @@
       if (builderState.method) params.set('method', builderState.method);
       if (builderState.base) params.set('base', builderState.base);
       
-      // Fixed traits - solo incluir los que tienen frames seleccionados
+      // Fixed traits - solo incluir los que NO tienen configuración de frames
+      // (si tienen configuración de frames, se usarán en el parámetro frames)
       const activeFixed = builderState.fixed.filter(t => {
         if (!t.id) return false;
         const config = builderState.frameConfigs[t.id];
-        return !config || config.frames.length > 0;
+        // Solo incluir si no tiene configuración de frames o si tiene frames pero también debe aparecer fijo
+        // Por ahora, si tiene configuración de frames, no lo incluimos en fixed
+        return !config || !config.frames || config.frames.length === 0;
       });
       if (activeFixed.length > 0) {
         params.set('fixed', activeFixed.map(t => t.id).join(','));
@@ -1161,22 +1164,49 @@
       // Variable frames - generar frames basados en la configuración
       // Si un trait aparece en múltiples frames, generar múltiples entradas
       const frameEntries = [];
-      const hasFrameConfig = builderState.frames.some(f => {
+      
+      // Buscar configuración de frames en Variable Traits primero
+      const hasVariableFrameConfig = builderState.frames.some(f => {
         if (!f.id) return false;
         const config = builderState.frameConfigs[f.id];
         return config && config.frames && config.frames.length > 0;
       });
       
-      if (hasFrameConfig) {
+      // Si no hay en Variable Traits, buscar en Fixed Traits
+      const hasFixedFrameConfig = !hasVariableFrameConfig && builderState.fixed.some(t => {
+        if (!t.id) return false;
+        const config = builderState.frameConfigs[t.id];
+        return config && config.frames && config.frames.length > 0;
+      });
+      
+      if (hasVariableFrameConfig || hasFixedFrameConfig) {
         // Usar configuración de frames: generar un frame por cada frame número donde hay un trait
         for (let frameNum = 1; frameNum <= builderState.totalFrames; frameNum++) {
-          // Encontrar qué trait variable aparece en este frame
-          const traitForFrame = builderState.frames.find(f => {
+          // Primero buscar en Variable Traits
+          let traitForFrame = builderState.frames.find(f => {
             if (!f.id) return false;
             const config = builderState.frameConfigs[f.id];
             const frames = config?.frames || [];
             return frames.includes(frameNum);
           });
+          
+          // Si no se encuentra en Variable Traits, buscar en Fixed Traits
+          if (!traitForFrame) {
+            traitForFrame = builderState.fixed.find(t => {
+              if (!t.id) return false;
+              const config = builderState.frameConfigs[t.id];
+              const frames = config?.frames || [];
+              return frames.includes(frameNum);
+            });
+            
+            // Si encontramos un fixed trait, crear un objeto similar a un frame
+            if (traitForFrame) {
+              traitForFrame = {
+                id: traitForFrame.id,
+                delay: 500 // Default delay para fixed traits
+              };
+            }
+          }
           
           if (traitForFrame) {
             frameEntries.push({
@@ -1186,7 +1216,9 @@
             });
           } else {
             // Si no hay trait para este frame, usar el último trait o el primero como fallback
-            const fallbackTrait = builderState.frames.find(f => f.id) || builderState.frames[0];
+            const fallbackTrait = builderState.frames.find(f => f.id) || 
+                                 builderState.fixed.find(t => t.id) || 
+                                 builderState.frames[0];
             if (fallbackTrait && fallbackTrait.id) {
               frameEntries.push({
                 id: fallbackTrait.id,
@@ -1198,6 +1230,7 @@
         }
       } else {
         // Método antiguo: un frame por cada trait (compatibilidad)
+        // Primero Variable Traits
         builderState.frames
           .filter(f => f.id)
           .forEach(f => {
@@ -1207,6 +1240,19 @@
               frameNum: null
             });
           });
+        
+        // Si no hay Variable Traits, usar Fixed Traits como frames
+        if (frameEntries.length === 0) {
+          builderState.fixed
+            .filter(t => t.id)
+            .forEach(t => {
+              frameEntries.push({
+                id: t.id,
+                delay: 500,
+                frameNum: null
+              });
+            });
+        }
       }
       
       if (frameEntries.length > 0) {
