@@ -751,9 +751,9 @@
       }
       
       const variants = [];
-      const letters = 'abcdefghijklmnopqrstuvwxyz'.split(''); // Convertir string a array
+      const letters = 'abcdefghij'.split(''); // Solo buscar hasta 10 variantes (a-j)
       
-      // Intentar detectar variantes (a-z)
+      // Intentar detectar variantes (a-j)
       const baseUrl = 'https://adrianlab.vercel.app';
       
       // Hacer todas las peticiones en paralelo para mayor velocidad
@@ -1519,9 +1519,15 @@
       const previewArea = document.getElementById('preview-area');
       const previewInfo = document.getElementById('preview-info');
       
+      // Calcular total de frames (frames normales + animated traits)
+      const totalAnimatedFrames = (builderState.animatedTraits || []).reduce((sum, at) => {
+        return sum + (at.variants && at.variants.length > 0 ? at.variants.length : 0);
+      }, 0);
+      const hasFrames = builderState.frames.length > 0 || totalAnimatedFrames > 0;
+      
       // Validate
-      if (builderState.frames.length === 0) {
-        showMessage('Add at least one frame', 'error');
+      if (!hasFrames) {
+        showMessage('Add at least one frame or animated trait', 'error');
         return;
       }
       
