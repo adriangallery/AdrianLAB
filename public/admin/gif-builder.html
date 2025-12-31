@@ -431,6 +431,7 @@
   <script>
     // Builder state
     let builderState = {
+      version: 'v2',
       method: 'gifwrap',
       base: '',
       fixed: [],
@@ -458,12 +459,20 @@
     
     // Apply state to UI
     function applyState() {
+      document.getElementById('version').value = builderState.version || 'v2';
       document.getElementById('method').value = builderState.method;
       document.getElementById('base').value = builderState.base || '';
       renderFixedTraits();
       renderFrames();
       renderMovements();
       updateURL();
+    }
+    
+    // Update version
+    function updateVersion() {
+      builderState.version = document.getElementById('version').value;
+      updateURL();
+      saveState();
     }
     
     // Render fixed traits
@@ -848,7 +857,12 @@
           });
       }
       
-      const url = `https://adrianlab.vercel.app/api/test-gif-simple?${params.toString()}`;
+      // Select endpoint based on version
+      const endpoint = builderState.version === 'v2' 
+        ? 'test-gif-simple-v2' 
+        : 'test-gif-simple';
+      
+      const url = `https://adrianlab.vercel.app/api/${endpoint}?${params.toString()}`;
       document.getElementById('url-display').textContent = url;
     }
     
@@ -935,6 +949,12 @@
     }
     
     // Event listeners
+    document.getElementById('version').addEventListener('change', (e) => {
+      builderState.version = e.target.value;
+      updateURL();
+      saveState();
+    });
+    
     document.getElementById('method').addEventListener('change', (e) => {
       builderState.method = e.target.value;
       updateURL();
