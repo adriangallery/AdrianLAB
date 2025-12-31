@@ -158,8 +158,27 @@ async function loadGifFrames(gifId, targetWidth = 400, targetHeight = 400) {
     
     console.log(`[loadGifFrames] Procesando frame ${i + 1}/${gifFrames.length}, delay: ${delayMs}ms`);
     
-    // Convertir GifFrame a PNG buffer
-    const pngBuffer = frame.bitmap.toPng();
+    // Convertir GifFrame a PNG buffer usando canvas
+    const frameBitmap = frame.bitmap;
+    
+    // Crear canvas temporal para el frame
+    const frameCanvas = createCanvas(frameBitmap.width, frameBitmap.height);
+    const frameCtx = frameCanvas.getContext('2d');
+    
+    // Obtener datos de imagen del frame (bitmap.data es un Buffer en formato RGBA)
+    const imageData = frameCtx.createImageData(frameBitmap.width, frameBitmap.height);
+    const data = imageData.data;
+    
+    // Copiar datos del bitmap al ImageData
+    const frameData = frameBitmap.data;
+    for (let j = 0; j < data.length && j < frameData.length; j++) {
+      data[j] = frameData[j];
+    }
+    
+    frameCtx.putImageData(imageData, 0, 0);
+    
+    // Convertir canvas a PNG buffer
+    const pngBuffer = frameCanvas.toBuffer('image/png');
     
     // Redimensionar a 400x400 usando sharp
     const resizedBuffer = await sharp(pngBuffer)
@@ -409,9 +428,8 @@ async function compositeFrameWithTransforms(layers, width = 400, height = 400) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   
-  // Fondo blanco
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, width, height);
+  // Canvas transparente por defecto (no rellenar fondo)
+  // Esto permite que el GIF tenga transparencia
   
   // Dibujar cada capa en orden con transformaciones
   for (let i = 0; i < layers.length; i++) {
