@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIF Builder - Admin AdrianLAB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .config-panel, .preview-panel {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .section {
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .list-item {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .list-item input {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    
+    .btn-icon {
+      padding: 6px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .movement-config {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .movement-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .movement-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #cbd5e1;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .toggle-switch.active {
+      background: #667eea;
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+    
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+    
+    .preview-area {
+      background: white;
+      border: 2px dashed #e5e7eb;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .preview-area img {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+    }
+    
+    .preview-info {
+      margin-top: 20px;
+      text-align: left;
+      width: 100%;
+    }
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+    
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    
+    .url-display {
+      background: #1f2937;
+      color: #10b981;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      word-break: break-all;
+      margin-bottom: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    .url-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-full {
+      flex: 1;
+    }
+    
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f4f6;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .drag-handle {
+      cursor: move;
+      color: #9ca3af;
+    }
+    
+    .drag-handle:hover {
+      color: #667eea;
+    }
+    
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 GIF Builder</h1>
+    <p class="subtitle">Constructor visual para generar GIFs animados con skins, traits y movimientos</p>
+    
+    <div class="main-layout">
+      <!-- Panel de Configuración -->
+      <div class="config-panel">
+        <!-- Método -->
+        <div class="section">
+          <div class="section-title">⚙️ Método de Render</div>
+          <div class="form-group">
+            <select id="method">
+              <option value="gifwrap">gifwrap (Recomendado)</option>
+              <option value="sharp">sharp (Rápido)</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Skin Base -->
+        <div class="section">
+          <div class="section-title">🎨 Skin Base</div>
+          <div class="form-group">
+            <select id="base">
+              <option value="">Ninguno</option>
+              <option value="medium">Medium</option>
+              <option value="dark">Dark / DarkAdrian</option>
+              <option value="alien">Alien</option>
+              <option value="albino">Albino</option>
+              <option value="adriangf">AdrianGF (Fair)</option>
+              <option value="adriangf-tan">AdrianGF (Tan)</option>
+              <option value="adriangf-albino">AdrianGF (Albino)</option>
+              <option value="blankmannequin">Blank Mannequin</option>
+              <option value="mannequin">Mannequin</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Traits Fijos -->
+        <div class="section">
+          <div class="section-title">📌 Traits Fijos (Still)</div>
+          <div id="fixed-traits-list"></div>
+          <button class="btn btn-primary btn-small" onclick="addFixedTrait()">+ Agregar Trait Fijo</button>
+        </div>
+        
+        <!-- Frames Variables -->
+        <div class="section">
+          <div class="section-title">🎞️ Frames Variables</div>
+          <div id="frames-list"></div>
+          <button class="btn btn-primary btn-small" onclick="addFrame()">+ Agregar Frame</button>
+        </div>
+        
+        <!-- Movimientos -->
+        <div class="section">
+          <div class="section-title">🎭 Movimientos (Fase 1.5)</div>
+          <div id="movements-list"></div>
+          <button class="btn btn-primary btn-small" onclick="addMovement()">+ Agregar Movimiento</button>
+        </div>
+      </div>
+      
+      <!-- Panel de Preview -->
+      <div class="preview-panel">
+        <div class="section-title">👁️ Preview</div>
+        <div class="preview-area" id="preview-area">
+          <p style="color: #9ca3af;">Genera un preview para ver el resultado</p>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="generatePreview()" style="margin-top: 15px;">
+          🎬 Generar Preview
+        </button>
+        
+        <div class="preview-info" id="preview-info" style="display: none;">
+          <div class="info-item">
+            <span>Frames:</span>
+            <span id="info-frames">-</span>
+          </div>
+          <div class="info-item">
+            <span>Duración Total:</span>
+            <span id="info-duration">-</span>
+          </div>
+          <div class="info-item">
+            <span>Tamaño:</span>
+            <span id="info-size">-</span>
+          </div>
+          <div class="info-item">
+            <span>Capas por Frame:</span>
+            <span id="info-layers">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- URL Generada -->
+    <div class="section">
+      <div class="section-title">🔗 URL Generada</div>
+      <div class="url-display" id="url-display">Configura los parámetros para generar la URL...</div>
+      <div class="url-actions">
+        <button class="btn btn-primary btn-full" onclick="copyURL()">📋 Copiar URL</button>
+        <button class="btn btn-secondary btn-full" onclick="openURL()">🔗 Abrir en Nueva Pestaña</button>
+      </div>
+    </div>
+    
+    <!-- Mensajes -->
+    <div id="message-area"></div>
+  </div>
+  
+  <script>
+    // Estado del builder
+    let builderState = {
+      method: 'gifwrap',
+      base: '',
+      fixed: [],
+      frames: [],
+      movements: []
+    };
+    
+    // Cargar estado guardado
+    function loadState() {
+      const saved = localStorage.getItem('gifBuilderState');
+      if (saved) {
+        try {
+          builderState = JSON.parse(saved);
+          applyState();
+        } catch (e) {
+          console.error('Error cargando estado:', e);
+        }
+      }
+    }
+    
+    // Guardar estado
+    function saveState() {
+      localStorage.setItem('gifBuilderState', JSON.stringify(builderState));
+    }
+    
+    // Aplicar estado a la UI
+    function applyState() {
+      document.getElementById('method').value = builderState.method;
+      document.getElementById('base').value = builderState.base || '';
+      renderFixedTraits();
+      renderFrames();
+      renderMovements();
+      updateURL();
+    }
+    
+    // Renderizar traits fijos
+    function renderFixedTraits() {
+      const container = document.getElementById('fixed-traits-list');
+      container.innerHTML = '';
+      
+      builderState.fixed.forEach((trait, index) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <span class="drag-handle">☰</span>
+          <input type="text" value="${trait.id}" placeholder="ID del trait" 
+                 onchange="updateFixedTrait(${index}, this.value)">
+          <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+    
+    // Renderizar frames
+    function renderFrames() {
+      const container = document.getElementById('frames-list');
+      container.innerHTML = '';
+      
+      builderState.frames.forEach((frame, index) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <span class="drag-handle">☰</span>
+          <input type="text" value="${frame.id}" placeholder="ID del trait" 
+                 onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
+          <input type="number" value="${frame.delay}" placeholder="Delay (ms)" min="10" max="5000"
+                 onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
+          <button class="btn btn-secondary btn-small btn-icon" onclick="duplicateFrame(${index})">📋</button>
+          <button class="btn btn-danger btn-small btn-icon" onclick="removeFrame(${index})">×</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+    
+    // Renderizar movimientos
+    function renderMovements() {
+      const container = document.getElementById('movements-list');
+      container.innerHTML = '';
+      
+      builderState.movements.forEach((move, index) => {
+        const item = document.createElement('div');
+        item.className = 'movement-config';
+        item.innerHTML = `
+          <div class="movement-header">
+            <div class="movement-toggle">
+              <div class="toggle-switch ${move.enabled ? 'active' : ''}" 
+                   onclick="toggleMovement(${index})"></div>
+              <strong>${getMovementLabel(move)}</strong>
+            </div>
+            <button class="btn btn-danger btn-small" onclick="removeMovement(${index})">Eliminar</button>
+          </div>
+          <div style="display: ${move.enabled ? 'block' : 'none'};" id="movement-${index}-config">
+            <div class="form-group">
+              <label>Tipo de Movimiento:</label>
+              <select onchange="updateMovementType(${index}, this.value)">
+                <option value="circular" ${move.type === 'circular' ? 'selected' : ''}>Circular</option>
+                <option value="bounce" ${move.type === 'bounce' ? 'selected' : ''}>Bounce</option>
+                <option value="linear" ${move.type === 'linear' ? 'selected' : ''}>Linear</option>
+                <option value="shake" ${move.type === 'shake' ? 'selected' : ''}>Shake</option>
+                <option value="orbit" ${move.type === 'orbit' ? 'selected' : ''}>Orbit</option>
+                <option value="zoom" ${move.type === 'zoom' ? 'selected' : ''}>Zoom</option>
+              </select>
+            </div>
+            ${getMovementParamsHTML(move, index)}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+    
+    function getMovementLabel(move) {
+      const layer = move.layerId ? `${move.layerType}.${move.layerId}` : move.layerType;
+      return `${layer} - ${move.type}`;
+    }
+    
+    function getMovementParamsHTML(move, index) {
+      switch (move.type) {
+        case 'circular':
+          return `
+            <div class="form-group">
+              <label>Radio (px):</label>
+              <input type="number" value="${move.params[0] || 50}" min="1" max="150"
+                     onchange="updateMovementParam(${index}, 0, this.value)">
+            </div>
+            <div class="form-group">
+              <label>Vueltas:</label>
+              <input type="number" value="${move.params[1] || 2}" min="0.1" max="10" step="0.1"
+                     onchange="updateMovementParam(${index}, 1, this.value)">
+            </div>
+          `;
+        case 'bounce':
+          return `
+            <div class="form-group">
+              <label>Dirección:</label>
+              <select onchange="updateMovementParam(${index}, 0, this.value)">
+                <option value="x" ${move.params[0] === 'x' ? 'selected' : ''}>Horizontal (X)</option>
+                <option value="y" ${move.params[0] === 'y' ? 'selected' : ''}>Vertical (Y)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Distancia (px):</label>
+              <input type="number" value="${move.params[1] || 40}" min="1" max="200"
+                     onchange="updateMovementParam(${index}, 1, this.value)">
+            </div>
+            <div class="form-group">
+              <label>Rebotes:</label>
+              <input type="number" value="${move.params[2] || 3}" min="1" max="10"
+                     onchange="updateMovementParam(${index}, 2, this.value)">
+            </div>
+          `;
+        case 'linear':
+          return `
+            <div class="form-group">
+              <label>X (px):</label>
+              <input type="number" value="${move.params.find(p => p === 'x') ? move.params[move.params.indexOf('x') + 1] : 0}" 
+                     onchange="updateLinearMovement(${index}, 'x', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Y (px):</label>
+              <input type="number" value="${move.params.find(p => p === 'y') ? move.params[move.params.indexOf('y') + 1] : 0}" 
+                     onchange="updateLinearMovement(${index}, 'y', this.value)">
+            </div>
+          `;
+        case 'shake':
+          return `
+            <div class="form-group">
+              <label>Intensidad (px):</label>
+              <input type="number" value="${move.params[0] || 10}" min="1" max="50"
+                     onchange="updateMovementParam(${index}, 0, this.value)">
+            </div>
+            <div class="form-group">
+              <label>Velocidad:</label>
+              <select onchange="updateMovementParam(${index}, 1, this.value)">
+                <option value="slow" ${move.params[1] === 'slow' ? 'selected' : ''}>Lenta</option>
+                <option value="normal" ${!move.params[1] || move.params[1] === 'normal' ? 'selected' : ''}>Normal</option>
+                <option value="fast" ${move.params[1] === 'fast' ? 'selected' : ''}>Rápida</option>
+              </select>
+            </div>
+          `;
+        case 'orbit':
+          return `
+            <div class="form-group">
+              <label>Radio (px):</label>
+              <input type="number" value="${move.params[0] || 80}" min="1" max="150"
+                     onchange="updateMovementParam(${index}, 0, this.value)">
+            </div>
+            <div class="form-group">
+              <label>Vueltas:</label>
+              <input type="number" value="${move.params[1] || 2}" min="0.1" max="10" step="0.1"
+                     onchange="updateMovementParam(${index}, 1, this.value)">
+            </div>
+          `;
+        case 'zoom':
+          return `
+            <div class="form-group">
+              <label>Escala Mínima:</label>
+              <input type="number" value="${move.params[0] || 0.5}" min="0.1" max="1" step="0.1"
+                     onchange="updateMovementParam(${index}, 0, this.value)">
+            </div>
+            <div class="form-group">
+              <label>Escala Máxima:</label>
+              <input type="number" value="${move.params[1] || 1.5}" min="1" max="3" step="0.1"
+                     onchange="updateMovementParam(${index}, 1, this.value)">
+            </div>
+          `;
+        default:
+          return '';
+      }
+    }
+    
+    // Funciones de gestión de traits fijos
+    function addFixedTrait() {
+      builderState.fixed.push({ id: '' });
+      renderFixedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    function updateFixedTrait(index, value) {
+      builderState.fixed[index].id = value;
+      updateURL();
+      saveState();
+    }
+    
+    function removeFixedTrait(index) {
+      builderState.fixed.splice(index, 1);
+      renderFixedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    // Funciones de gestión de frames
+    function addFrame() {
+      builderState.frames.push({ id: '', delay: 500 });
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function updateFrameId(index, value) {
+      builderState.frames[index].id = value;
+      updateURL();
+      saveState();
+    }
+    
+    function updateFrameDelay(index, value) {
+      builderState.frames[index].delay = Math.max(10, Math.min(5000, value || 500));
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function duplicateFrame(index) {
+      const frame = { ...builderState.frames[index] };
+      builderState.frames.splice(index + 1, 0, frame);
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function removeFrame(index) {
+      builderState.frames.splice(index, 1);
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    // Funciones de gestión de movimientos
+    function addMovement() {
+      const layerType = prompt('Tipo de capa (base/fixed/variable):', 'fixed');
+      if (!layerType || !['base', 'fixed', 'variable'].includes(layerType)) return;
+      
+      let layerId = null;
+      if (layerType === 'fixed') {
+        layerId = prompt('ID del trait fijo:', '');
+        if (!layerId) return;
+      }
+      
+      builderState.movements.push({
+        layerType,
+        layerId,
+        type: 'circular',
+        params: ['50', '2'],
+        enabled: true
+      });
+      
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    function toggleMovement(index) {
+      builderState.movements[index].enabled = !builderState.movements[index].enabled;
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    function updateMovementType(index, type) {
+      builderState.movements[index].type = type;
+      // Reset params según tipo
+      switch (type) {
+        case 'circular':
+          builderState.movements[index].params = ['50', '2'];
+          break;
+        case 'bounce':
+          builderState.movements[index].params = ['y', '40', '3'];
+          break;
+        case 'linear':
+          builderState.movements[index].params = ['x', '0', 'y', '0'];
+          break;
+        case 'shake':
+          builderState.movements[index].params = ['10', 'normal'];
+          break;
+        case 'orbit':
+          builderState.movements[index].params = ['80', '2'];
+          break;
+        case 'zoom':
+          builderState.movements[index].params = ['0.5', '1.5'];
+          break;
+      }
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    function updateMovementParam(index, paramIndex, value) {
+      builderState.movements[index].params[paramIndex] = value;
+      updateURL();
+      saveState();
+    }
+    
+    function updateLinearMovement(index, axis, value) {
+      const params = builderState.movements[index].params;
+      const axisIndex = params.indexOf(axis);
+      if (axisIndex >= 0) {
+        params[axisIndex + 1] = value;
+      } else {
+        params.push(axis, value);
+      }
+      updateURL();
+      saveState();
+    }
+    
+    function removeMovement(index) {
+      builderState.movements.splice(index, 1);
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    // Generar URL
+    function updateURL() {
+      const params = new URLSearchParams();
+      
+      if (builderState.method) params.set('method', builderState.method);
+      if (builderState.base) params.set('base', builderState.base);
+      if (builderState.fixed.length > 0) {
+        params.set('fixed', builderState.fixed.map(t => t.id).filter(id => id).join(','));
+      }
+      if (builderState.frames.length > 0) {
+        params.set('frames', builderState.frames
+          .filter(f => f.id)
+          .map(f => `${f.id}:${f.delay || 500}`)
+          .join(','));
+      }
+      if (builderState.movements.length > 0) {
+        builderState.movements
+          .filter(m => m.enabled)
+          .forEach(move => {
+            const layerSpec = move.layerId 
+              ? `${move.layerType}.${move.layerId}`
+              : move.layerType;
+            const moveStr = [layerSpec, move.type, ...move.params].join(':');
+            params.append('move', moveStr);
+          });
+      }
+      
+      const url = `https://adrianlab.vercel.app/api/test-gif-simple?${params.toString()}`;
+      document.getElementById('url-display').textContent = url;
+    }
+    
+    // Copiar URL
+    function copyURL() {
+      const url = document.getElementById('url-display').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        showMessage('URL copiada al portapapeles', 'success');
+      }).catch(() => {
+        showMessage('Error al copiar URL', 'error');
+      });
+    }
+    
+    // Abrir URL
+    function openURL() {
+      const url = document.getElementById('url-display').textContent;
+      window.open(url, '_blank');
+    }
+    
+    // Generar preview
+    async function generatePreview() {
+      const previewArea = document.getElementById('preview-area');
+      const previewInfo = document.getElementById('preview-info');
+      
+      // Validar
+      if (builderState.frames.length === 0) {
+        showMessage('Agrega al menos un frame', 'error');
+        return;
+      }
+      
+      if (builderState.frames.some(f => !f.id)) {
+        showMessage('Todos los frames deben tener un ID de trait', 'error');
+        return;
+      }
+      
+      previewArea.innerHTML = '<div class="loading"></div><p style="margin-top: 10px;">Generando preview...</p>';
+      previewInfo.style.display = 'none';
+      
+      try {
+        const url = document.getElementById('url-display').textContent;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        
+        previewArea.innerHTML = `<img src="${imageUrl}" alt="Preview GIF">`;
+        
+        // Mostrar información
+        const frameCount = response.headers.get('X-Frame-Count') || builderState.frames.length;
+        const duration = response.headers.get('X-Duration-Ms') || 'N/A';
+        const size = response.headers.get('X-Size-KB') || 'N/A';
+        const layers = response.headers.get('X-Layers-Per-Frame') || 
+          (1 + builderState.fixed.length + 1);
+        
+        document.getElementById('info-frames').textContent = frameCount;
+        document.getElementById('info-duration').textContent = `${duration}ms`;
+        document.getElementById('info-size').textContent = `${size} KB`;
+        document.getElementById('info-layers').textContent = layers;
+        previewInfo.style.display = 'block';
+        
+        showMessage('Preview generado exitosamente', 'success');
+      } catch (error) {
+        previewArea.innerHTML = `<p style="color: #ef4444;">Error: ${error.message}</p>`;
+        showMessage(`Error generando preview: ${error.message}`, 'error');
+      }
+    }
+    
+    // Mostrar mensaje
+    function showMessage(text, type) {
+      const area = document.getElementById('message-area');
+      const msg = document.createElement('div');
+      msg.className = type === 'error' ? 'error' : 'success';
+      msg.textContent = text;
+      area.innerHTML = '';
+      area.appendChild(msg);
+      
+      setTimeout(() => {
+        msg.remove();
+      }, 5000);
+    }
+    
+    // Event listeners
+    document.getElementById('method').addEventListener('change', (e) => {
+      builderState.method = e.target.value;
+      updateURL();
+      saveState();
+    });
+    
+    document.getElementById('base').addEventListener('change', (e) => {
+      builderState.base = e.target.value;
+      updateURL();
+      saveState();
+    });
+    
+    // Inicializar
+    loadState();
+    updateURL();
+  </script>
+</body>
+</html>
+
