@@ -322,27 +322,43 @@ export default async function handler(req, res) {
     // Detectar traits animados para determinar extensión de imagen (.gif o .png)
     let imageExtension = '.png';
     try {
-      const { getAnimatedTraits } = await import('../../../lib/animated-traits-helper.js');
-      // Obtener traits equipados para detectar animados
-      const { traitsExtension } = await getContracts();
+      // Verificar primero si el token existe en el contrato
+      const { core } = await getContracts();
+      let tokenExists = false;
       
       try {
-        const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
-        const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
+        await core.getTokenData(tokenId);
+        tokenExists = true;
+      } catch (tokenError) {
+        // Token no existe en el contrato
+        console.log(`[metadata] Token ${tokenId} no existe en el contrato, usando .png por defecto`);
+        tokenExists = false;
+      }
+      
+      // Solo intentar detectar traits animados si el token existe
+      if (tokenExists) {
+        const { getAnimatedTraits } = await import('../../../lib/animated-traits-helper.js');
+        // Obtener traits equipados para detectar animados
+        const { traitsExtension } = await getContracts();
         
-        if (allTraitIds.length > 0) {
-          const animatedTraits = await getAnimatedTraits(allTraitIds);
+        try {
+          const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+          const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
           
-          if (animatedTraits.length > 0) {
-            imageExtension = '.gif';
-            console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+          if (allTraitIds.length > 0) {
+            const animatedTraits = await getAnimatedTraits(allTraitIds);
+            
+            if (animatedTraits.length > 0) {
+              imageExtension = '.gif';
+              console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+            }
+          } else {
+            console.log(`[metadata] Token ${tokenId} no tiene traits equipados, usando .png`);
           }
-        } else {
-          console.log(`[metadata] Token ${tokenId} no tiene traits equipados, usando .png`);
+        } catch (contractError) {
+          // Si hay error obteniendo traits, usar .png por defecto
+          console.warn(`[metadata] Error obteniendo traits del contrato para token ${tokenId}, usando .png por defecto:`, contractError.message);
         }
-      } catch (contractError) {
-        // Si el token no existe o hay error obteniendo traits, usar .png por defecto
-        console.warn(`[metadata] Error obteniendo traits del contrato para token ${tokenId}, usando .png por defecto:`, contractError.message);
       }
     } catch (error) {
       console.warn(`[metadata] Error detectando traits animados, usando .png por defecto:`, error.message);
