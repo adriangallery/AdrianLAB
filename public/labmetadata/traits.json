@@ -14814,6 +14814,48 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1165,
+      "name": "Boeller",
+      "category": "GEAR",
+      "fileName": "1165",
+      "maxSupply": 100,
+      "floppy": "HNY",
+      "Type": "Animated",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1166,
+      "name": "HNY",
+      "category": "GEAR",
+      "fileName": "1166",
+      "maxSupply": 100,
+      "floppy": "HNY",
+      "Type": "Animated",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1167,
+      "name": "VESUVIO",
+      "category": "GEAR",
+      "fileName": "1167",
+      "maxSupply": 100,
+      "floppy": "HNY",
+      "Type": "Animated",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
