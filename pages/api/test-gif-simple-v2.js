@@ -77,7 +77,7 @@ function parseMovements(moveParams) {
  * Parsear parámetros del query
  */
 function parseQueryParams(query) {
-  const { method = 'gifwrap', base, fixed, frames, move, svgs, delay } = query;
+  const { method = 'gifwrap', base, fixed, frames, move, gif, gifBackground, svgs, delay } = query;
   
   // Soporte para formato antiguo (compatibilidad hacia atrás)
   if (svgs && delay) {
@@ -89,7 +89,8 @@ function parseQueryParams(query) {
         id: id.trim(), 
         delay: parseInt(delay) 
       })),
-      movements: []
+      movements: [],
+      gifId: null
     };
   }
   
@@ -97,6 +98,9 @@ function parseQueryParams(query) {
   if (!frames) {
     throw new Error('Se requiere el parámetro "frames" (ej: frames=32:200,870:400)');
   }
+  
+  // GIF puede venir como "gif" o "gifBackground" (sinónimos)
+  const gifId = gif || gifBackground || null;
   
   return {
     method,
@@ -113,8 +117,68 @@ function parseQueryParams(query) {
       
       return { id, delay: delayMs };
     }),
-    movements: parseMovements(move)
+    movements: parseMovements(move),
+    gifId: gifId ? gifId.toString() : null
   };
+}
+
+/**
+ * Cargar y extraer frames de un GIF pre-generado
+ */
+async function loadGifFrames(gifId, targetWidth = 400, targetHeight = 400) {
+  console.log(`[loadGifFrames] Cargando GIF: ${gifId}`);
+  
+  // Construir URL del GIF
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+  const gifUrl = `${baseUrl}/labimages/${gifId}.gif`;
+  
+  console.log(`[loadGifFrames] URL: ${gifUrl}`);
+  
+  // Descargar GIF
+  const response = await fetch(gifUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to load GIF ${gifId}: ${response.status} ${response.statusText}`);
+  }
+  
+  const gifBuffer = await response.arrayBuffer();
+  console.log(`[loadGifFrames] GIF descargado: ${gifBuffer.byteLength} bytes`);
+  
+  // Leer GIF con gifwrap
+  const gif = await GifUtil.read(Buffer.from(gifBuffer));
+  const gifFrames = gif.frames;
+  
+  console.log(`[loadGifFrames] GIF parseado: ${gifFrames.length} frames`);
+  
+  // Procesar cada frame: convertir a PNG y redimensionar
+  const processedFrames = [];
+  
+  for (let i = 0; i < gifFrames.length; i++) {
+    const frame = gifFrames[i];
+    const delayMs = (frame.delayCentisecs || 10) * 10; // Convertir a ms
+    
+    console.log(`[loadGifFrames] Procesando frame ${i + 1}/${gifFrames.length}, delay: ${delayMs}ms`);
+    
+    // Convertir GifFrame a PNG buffer
+    const pngBuffer = frame.bitmap.toPng();
+    
+    // Redimensionar a 400x400 usando sharp
+    const resizedBuffer = await sharp(pngBuffer)
+      .resize(targetWidth, targetHeight, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparente
+      })
+      .png()
+      .toBuffer();
+    
+    processedFrames.push({
+      pngBuffer: resizedBuffer,
+      delay: delayMs,
+      index: i
+    });
+  }
+  
+  console.log(`[loadGifFrames] ✅ ${processedFrames.length} frames procesados`);
+  return processedFrames;
 }
 
 /**
@@ -380,9 +444,20 @@ async function compositeFrameWithTransforms(layers, width = 400, height = 400) {
 
 /**
  * Generar un frame con múltiples capas y transformaciones
+ * Ahora soporta GIF como background
  */
-async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames) {
+async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null) {
   const layers = [];
+  
+  // 0. GIF Background (si existe) - va primero (más abajo)
+  if (gifFrame) {
+    layers.push({
+      id: 'gif-background',
+      pngBuffer: gifFrame.pngBuffer,
+      type: 'gif',
+      transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+    });
+  }
   
   // 1. Skin base (si existe)
   if (baseId) {
@@ -438,33 +513,53 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
 }
 
 /**
- * Enfoque A: gifwrap con sistema de capas y movimientos
+ * Enfoque A: gifwrap con sistema de capas, movimientos y GIFs pre-generados
  */
 async function generateGifWithGifwrap(config) {
-  const { base, fixed, frames, movements } = config;
+  const { base, fixed, frames, movements, gifId } = config;
   
   console.log(`[GIFWRAP] Generando GIF con capas y movimientos:`);
   console.log(`[GIFWRAP] - Base: ${base || 'ninguna'}`);
   console.log(`[GIFWRAP] - Fixed: [${fixed.join(', ') || 'ninguno'}]`);
   console.log(`[GIFWRAP] - Frames: ${frames.length}`);
   console.log(`[GIFWRAP] - Movimientos: ${movements.length}`);
+  console.log(`[GIFWRAP] - GIF Background: ${gifId || 'ninguno'}`);
   
-  const gifFrames = [];
-  const totalFrames = frames.length;
+  // Cargar frames del GIF si existe
+  let gifFramesData = null;
+  if (gifId) {
+    gifFramesData = await loadGifFrames(gifId);
+    console.log(`[GIFWRAP] GIF cargado: ${gifFramesData.length} frames`);
+  }
   
-  for (let i = 0; i < frames.length; i++) {
-    const frame = frames[i];
-    console.log(`[GIFWRAP] Frame ${i + 1}/${frames.length}: ${frame.id} (${frame.delay}ms)`);
+  const outputGifFrames = [];
+  const totalSvgFrames = frames.length;
+  
+  // Si hay GIF, el GIF define el número total de frames (cicla si es necesario)
+  // Si no hay GIF, usar frames SVG
+  const totalFrames = gifFramesData ? gifFramesData.length : totalSvgFrames;
+  
+  for (let i = 0; i < totalFrames; i++) {
+    // Determinar qué frame del GIF usar (ciclar si es necesario)
+    const gifFrameIndex = gifFramesData ? (i % gifFramesData.length) : null;
+    const gifFrame = gifFramesData ? gifFramesData[gifFrameIndex] : null;
     
-    // Generar frame con capas y transformaciones
+    // Determinar qué trait SVG usar (ciclar si hay más frames GIF que SVG)
+    const svgFrameIndex = i % totalSvgFrames;
+    const svgFrame = frames[svgFrameIndex];
+    
+    console.log(`[GIFWRAP] Frame ${i + 1}/${totalFrames}: GIF frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}, SVG trait ${svgFrame.id}`);
+    
+    // Generar frame con capas, transformaciones y GIF background
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
-      frame.id,
+      svgFrame.id,
       'resvg',
       movements,
       i,
-      totalFrames
+      totalFrames,
+      gifFrame
     );
     
     console.log(`[GIFWRAP] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
@@ -477,29 +572,31 @@ async function generateGifWithGifwrap(config) {
       data: pngImage.data
     });
     
-    const delayCentisecs = Math.round(frame.delay / 10);
-    const gifFrame = new GifFrame(bitmapImage, { delayCentisecs });
-    gifFrames.push(gifFrame);
+    // Usar delay del GIF si existe, sino del frame SVG
+    const delayMs = gifFrame ? gifFrame.delay : svgFrame.delay;
+    const delayCentisecs = Math.round(delayMs / 10);
+    const outputFrame = new GifFrame(bitmapImage, { delayCentisecs });
+    outputGifFrames.push(outputFrame);
   }
   
   // Cuantizar colores a 256
-  console.log(`[GIFWRAP] Cuantizando ${gifFrames.length} frames...`);
-  GifUtil.quantizeWu(gifFrames, 256);
+  console.log(`[GIFWRAP] Cuantizando ${outputGifFrames.length} frames...`);
+  GifUtil.quantizeWu(outputGifFrames, 256);
   
   // Generar GIF
   console.log(`[GIFWRAP] Generando GIF...`);
   const codec = new GifCodec();
-  const outputGif = await codec.encodeGif(gifFrames, { loops: 0 });
+  const outputGif = await codec.encodeGif(outputGifFrames, { loops: 0 });
   
   console.log(`[GIFWRAP] GIF completado: ${outputGif.buffer.length} bytes`);
   return outputGif.buffer;
 }
 
 /**
- * Enfoque B: sharp + gif-encoder-2 con sistema de capas y movimientos
+ * Enfoque B: sharp + gif-encoder-2 con sistema de capas, movimientos y GIFs pre-generados
  */
 async function generateGifWithSharp(config) {
-  const { base, fixed, frames, movements } = config;
+  const { base, fixed, frames, movements, gifId } = config;
   const width = 400;
   const height = 400;
   
@@ -508,6 +605,14 @@ async function generateGifWithSharp(config) {
   console.log(`[SHARP] - Fixed: [${fixed.join(', ') || 'ninguno'}]`);
   console.log(`[SHARP] - Frames: ${frames.length}`);
   console.log(`[SHARP] - Movimientos: ${movements.length}`);
+  console.log(`[SHARP] - GIF Background: ${gifId || 'ninguno'}`);
+  
+  // Cargar frames del GIF si existe
+  let gifFramesData = null;
+  if (gifId) {
+    gifFramesData = await loadGifFrames(gifId);
+    console.log(`[SHARP] GIF cargado: ${gifFramesData.length} frames`);
+  }
   
   // Inicializar encoder
   const encoder = new GifEncoder(width, height);
@@ -515,24 +620,36 @@ async function generateGifWithSharp(config) {
   encoder.setRepeat(0);
   encoder.setQuality(10);
   
-  const totalFrames = frames.length;
+  // Si hay GIF, el GIF define el número total de frames (cicla si es necesario)
+  // Si no hay GIF, usar frames SVG
+  const totalSvgFrames = frames.length;
+  const totalFrames = gifFramesData ? gifFramesData.length : totalSvgFrames;
   
-  for (let i = 0; i < frames.length; i++) {
-    const frame = frames[i];
-    console.log(`[SHARP] Frame ${i + 1}/${frames.length}: ${frame.id} (${frame.delay}ms)`);
+  for (let i = 0; i < totalFrames; i++) {
+    // Determinar qué frame del GIF usar (ciclar si es necesario)
+    const gifFrameIndex = gifFramesData ? (i % gifFramesData.length) : null;
+    const gifFrame = gifFramesData ? gifFramesData[gifFrameIndex] : null;
     
-    // Configurar delay específico para este frame
-    encoder.setDelay(frame.delay);
+    // Determinar qué trait SVG usar (ciclar si hay más frames GIF que SVG)
+    const svgFrameIndex = i % totalSvgFrames;
+    const svgFrame = frames[svgFrameIndex];
     
-    // Generar frame con capas y transformaciones
+    console.log(`[SHARP] Frame ${i + 1}/${totalFrames}: GIF frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}, SVG trait ${svgFrame.id}`);
+    
+    // Usar delay del GIF si existe, sino del frame SVG
+    const delayMs = gifFrame ? gifFrame.delay : svgFrame.delay;
+    encoder.setDelay(delayMs);
+    
+    // Generar frame con capas, transformaciones y GIF background
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
-      frame.id,
+      svgFrame.id,
       'sharp',
       movements,
       i,
-      totalFrames
+      totalFrames,
+      gifFrame
     );
     
     console.log(`[SHARP] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
@@ -589,10 +706,11 @@ export default async function handler(req, res) {
     }
     
     console.log(`[test-gif-simple-v2] ========================================`);
-    console.log(`[test-gif-simple-v2] V2: Request con capas y movimientos`);
+    console.log(`[test-gif-simple-v2] V2: Request con capas, movimientos y GIFs`);
     console.log(`[test-gif-simple-v2] - Método: ${config.method}`);
     console.log(`[test-gif-simple-v2] - Base: ${config.base || 'ninguna'}`);
     console.log(`[test-gif-simple-v2] - Fixed: [${config.fixed.join(', ') || 'ninguno'}]`);
+    console.log(`[test-gif-simple-v2] - GIF Background: ${config.gifId || 'ninguno'}`);
     console.log(`[test-gif-simple-v2] - Frames: ${config.frames.length}`);
     config.frames.forEach((f, i) => {
       console.log(`[test-gif-simple-v2]   Frame ${i + 1}: ${f.id} (${f.delay}ms)`);
@@ -646,6 +764,7 @@ export default async function handler(req, res) {
     res.setHeader('X-Version', '2.0');
     res.setHeader('X-Phase', '2.0');
     res.setHeader('X-Movements-Count', config.movements.length.toString());
+    res.setHeader('X-Gif-Background', config.gifId || 'none');
     
     return res.status(200).send(gifBuffer);
     
