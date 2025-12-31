@@ -322,25 +322,31 @@ export default async function handler(req, res) {
     // Detectar traits animados para determinar extensión de imagen (.gif o .png)
     let imageExtension = '.png';
     try {
-      // Verificar primero si el token existe en el contrato
-      const { core } = await getContracts();
+      const { getAnimatedTraits, isTraitAnimated } = await import('../../../lib/animated-traits-helper.js');
+      
+      // Si el tokenId está en el rango de traits (1-9999), verificar si es un trait animado directamente
+      if (tokenIdNum >= 1 && tokenIdNum <= 9999) {
+        const isAnimated = await isTraitAnimated(tokenIdNum);
+        if (isAnimated) {
+          imageExtension = '.gif';
+          console.log(`[metadata] 🎬 Token ${tokenId} es un trait animado, usando .gif`);
+        }
+      }
+      
+      // También verificar si el token existe como AdrianZERO y tiene traits animados equipados
+      const { core, traitsExtension } = await getContracts();
       let tokenExists = false;
       
       try {
         await core.getTokenData(tokenId);
         tokenExists = true;
       } catch (tokenError) {
-        // Token no existe en el contrato
-        console.log(`[metadata] Token ${tokenId} no existe en el contrato, usando .png por defecto`);
+        // Token no existe en el contrato como AdrianZERO, pero ya verificamos si es trait animado arriba
         tokenExists = false;
       }
       
-      // Solo intentar detectar traits animados si el token existe
+      // Si el token existe como AdrianZERO, verificar traits equipados
       if (tokenExists) {
-        const { getAnimatedTraits } = await import('../../../lib/animated-traits-helper.js');
-        // Obtener traits equipados para detectar animados
-        const { traitsExtension } = await getContracts();
-        
         try {
           const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
           const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
@@ -350,14 +356,12 @@ export default async function handler(req, res) {
             
             if (animatedTraits.length > 0) {
               imageExtension = '.gif';
-              console.log(`[metadata] 🎬 Traits animados detectados, usando .gif para token ${tokenId}`);
+              console.log(`[metadata] 🎬 Traits animados detectados en AdrianZERO ${tokenId}, usando .gif`);
             }
-          } else {
-            console.log(`[metadata] Token ${tokenId} no tiene traits equipados, usando .png`);
           }
         } catch (contractError) {
-          // Si hay error obteniendo traits, usar .png por defecto
-          console.warn(`[metadata] Error obteniendo traits del contrato para token ${tokenId}, usando .png por defecto:`, contractError.message);
+          // Si hay error obteniendo traits, ya tenemos el resultado del check de trait animado
+          console.warn(`[metadata] Error obteniendo traits del contrato para token ${tokenId}:`, contractError.message);
         }
       }
     } catch (error) {
