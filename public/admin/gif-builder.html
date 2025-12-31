@@ -496,6 +496,16 @@
           </div>
         </div>
         
+        <!-- Animated Traits -->
+        <div class="section">
+          <div class="section-title">🎬 Animated Traits</div>
+          <p style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">
+            Enter base trait ID (e.g. "1166") to auto-detect variants (1166a, 1166b, etc.)
+          </p>
+          <div id="animated-traits-list"></div>
+          <button class="btn btn-primary btn-small" onclick="addAnimatedTrait()">+ Add Animated Trait</button>
+        </div>
+        
         <!-- Variable Frames / Traits -->
         <div class="section">
           <div class="section-title">🎞️ Variable Traits (Frame-based)</div>
@@ -567,6 +577,7 @@
       base: '',
       fixed: [],
       frames: [],
+      animatedTraits: [], // [{ baseId: '1166', variants: ['1166a', '1166b', ...], delay: 500 }]
       movements: [],
       totalFrames: 10, // Total frames for the animation
       frameConfigs: {}, // Configurations per trait: { 'traitId': { frames: [1,2,3], movements: {...} } }
@@ -606,6 +617,7 @@
       }
       
       renderFixedTraits();
+      renderAnimatedTraits();
       renderFrames();
       renderMovements();
       updateURL();
@@ -672,6 +684,151 @@
         `;
         container.appendChild(item);
       });
+    }
+    
+    // Render animated traits
+    function renderAnimatedTraits() {
+      const container = document.getElementById('animated-traits-list');
+      container.innerHTML = '';
+      
+      builderState.animatedTraits.forEach((animTrait, index) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.style.flexDirection = 'column';
+        item.style.alignItems = 'stretch';
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <span class="drag-handle">☰</span>
+            <input type="text" value="${animTrait.baseId}" placeholder="Base ID (e.g. 1166)" 
+                   onchange="updateAnimatedTraitBase(${index}, this.value)" style="flex: 1;">
+            <button class="btn btn-secondary btn-small" onclick="detectAnimatedVariants(${index})">🔍 Detect</button>
+            <input type="number" value="${animTrait.delay || 500}" placeholder="Delay (ms)" min="10" max="5000"
+                   onchange="updateAnimatedTraitDelay(${index}, parseInt(this.value))" style="width: 120px;">
+            <button class="btn btn-danger btn-small btn-icon" onclick="removeAnimatedTrait(${index})">×</button>
+          </div>
+          ${animTrait.variants && animTrait.variants.length > 0 ? `
+            <div class="trait-frame-config">
+              <div class="trait-frame-config-title">
+                Found ${animTrait.variants.length} variants: ${animTrait.variants.join(', ')}
+              </div>
+              <div style="font-size: 11px; color: #6b7280; margin-top: 5px;">
+                Auto-assigned to frames ${animTrait.startFrame || 1} to ${(animTrait.startFrame || 1) + animTrait.variants.length - 1}
+              </div>
+            </div>
+          ` : animTrait.baseId ? `
+            <div style="font-size: 11px; color: #9ca3af; padding: 5px;">
+              Click "Detect" to find variants
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(item);
+      });
+      
+      // Actualizar total frames basado en animated traits
+      updateTotalFramesFromAnimatedTraits();
+    }
+    
+    // Detectar variantes de un trait animado
+    async function detectAnimatedVariants(index) {
+      const animTrait = builderState.animatedTraits[index];
+      if (!animTrait.baseId) {
+        alert('Please enter a base trait ID first');
+        return;
+      }
+      
+      const baseId = animTrait.baseId.trim();
+      const variants = [];
+      const letters = 'abcdefghijklmnopqrstuvwxyz';
+      
+      // Intentar detectar variantes (a-z)
+      const baseUrl = 'https://adrianlab.vercel.app';
+      let detectedCount = 0;
+      
+      for (const letter of letters) {
+        const variantId = `${baseId}${letter}`;
+        const url = `${baseUrl}/labimages/${variantId}.svg`;
+        
+        try {
+          const response = await fetch(url, { method: 'HEAD' });
+          if (response.ok) {
+            variants.push(variantId);
+            detectedCount++;
+          }
+        } catch (e) {
+          // Ignorar errores
+        }
+      }
+      
+      if (variants.length === 0) {
+        alert(`No variants found for ${baseId}. Make sure files like ${baseId}a.svg exist.`);
+        return;
+      }
+      
+      // Actualizar el trait animado
+      animTrait.variants = variants;
+      
+      // Calcular startFrame basado en traits anteriores
+      let startFrame = 1;
+      for (let i = 0; i < index; i++) {
+        const prevTrait = builderState.animatedTraits[i];
+        if (prevTrait.variants && prevTrait.variants.length > 0) {
+          startFrame += prevTrait.variants.length;
+        }
+      }
+      animTrait.startFrame = startFrame;
+      
+      renderAnimatedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    // Actualizar total frames basado en animated traits
+    function updateTotalFramesFromAnimatedTraits() {
+      let totalAnimatedFrames = 0;
+      builderState.animatedTraits.forEach(animTrait => {
+        if (animTrait.variants && animTrait.variants.length > 0) {
+          totalAnimatedFrames += animTrait.variants.length;
+        }
+      });
+      
+      // Si hay animated traits, actualizar total frames
+      if (totalAnimatedFrames > 0) {
+        // Solo actualizar si el total actual es menor o si no hay frames configurados
+        if (totalAnimatedFrames > builderState.totalFrames || builderState.frames.length === 0) {
+          builderState.totalFrames = totalAnimatedFrames;
+          document.getElementById('total-frames').value = builderState.totalFrames;
+        }
+      }
+    }
+    
+    // Animated traits management functions
+    function addAnimatedTrait() {
+      builderState.animatedTraits.push({ baseId: '', variants: [], delay: 500 });
+      renderAnimatedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    function updateAnimatedTraitBase(index, value) {
+      builderState.animatedTraits[index].baseId = value;
+      builderState.animatedTraits[index].variants = []; // Reset variants when base changes
+      renderAnimatedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    function updateAnimatedTraitDelay(index, value) {
+      builderState.animatedTraits[index].delay = Math.max(10, Math.min(5000, value || 500));
+      renderAnimatedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    function removeAnimatedTrait(index) {
+      builderState.animatedTraits.splice(index, 1);
+      renderAnimatedTraits();
+      updateURL();
+      saveState();
     }
     
     // Render frames
@@ -1165,23 +1322,41 @@
       // Si un trait aparece en múltiples frames, generar múltiples entradas
       const frameEntries = [];
       
-      // Buscar configuración de frames en Variable Traits primero
+      // PRIMERO: Animated Traits (tienen prioridad, se asignan primero)
+      builderState.animatedTraits.forEach(animTrait => {
+        if (animTrait.variants && animTrait.variants.length > 0) {
+          animTrait.variants.forEach((variant, variantIndex) => {
+            const frameNum = animTrait.startFrame + variantIndex;
+            frameEntries.push({
+              id: variant,
+              delay: animTrait.delay || 500,
+              frameNum: frameNum
+            });
+          });
+        }
+      });
+      
+      // SEGUNDO: Buscar configuración de frames en Variable Traits
       const hasVariableFrameConfig = builderState.frames.some(f => {
         if (!f.id) return false;
         const config = builderState.frameConfigs[f.id];
         return config && config.frames && config.frames.length > 0;
       });
       
-      // Si no hay en Variable Traits, buscar en Fixed Traits
+      // TERCERO: Si no hay en Variable Traits, buscar en Fixed Traits
       const hasFixedFrameConfig = !hasVariableFrameConfig && builderState.fixed.some(t => {
         if (!t.id) return false;
         const config = builderState.frameConfigs[t.id];
         return config && config.frames && config.frames.length > 0;
       });
       
+      // Calcular el frame inicial para Variable/Fixed traits (después de animated traits)
+      const animatedFramesCount = frameEntries.length;
+      
       if (hasVariableFrameConfig || hasFixedFrameConfig) {
         // Usar configuración de frames: generar un frame por cada frame número donde hay un trait
-        for (let frameNum = 1; frameNum <= builderState.totalFrames; frameNum++) {
+        // Empezar después de los animated traits
+        for (let frameNum = animatedFramesCount + 1; frameNum <= builderState.totalFrames; frameNum++) {
           // Primero buscar en Variable Traits
           let traitForFrame = builderState.frames.find(f => {
             if (!f.id) return false;
