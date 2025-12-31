@@ -672,10 +672,13 @@ export default async function handler(req, res) {
         console.log(`[floppy-metadata] 🔍 DEBUG: Floppy ${tokenIdNum} fuera del rango 10000-10100, usando .gif por defecto`);
       }
       
+      // Añadir vtimestamp para forzar recacheo en OpenSea
+      const version = Date.now();
+      
       const metadata = {
         name: tokenData.name,
         description: tokenData.description || "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}`,
+        image: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}?v=${version}`,
         external_url: tokenData.external_url || "https://adrianzero.com/",
         attributes: [
           {
@@ -706,7 +709,7 @@ export default async function handler(req, res) {
         properties: {
           files: [
             {
-              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}`,
+              uri: `${baseUrl}/api/render/floppy/${tokenIdNum}.${fileExtension}?v=${version}`,
               type: fileType
             }
           ],

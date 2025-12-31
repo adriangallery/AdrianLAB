@@ -18,10 +18,13 @@ export default async function handler(req, res) {
       ? `https://${process.env.VERCEL_URL}`
       : 'https://adrianlab.vercel.app';
     
+    // Añadir vtimestamp para forzar recacheo en OpenSea
+    const version = Date.now();
+    
     const metadata = {
       name: assetInfo.name,
       description: `A ${assetInfo.category.toLowerCase()} trait for AdrianLab BareAdrians`,
-      image: `${baseUrl}/api/trait/${traitId}`,
+      image: `${baseUrl}/api/trait/${traitId}?v=${version}`,
       external_url: `${baseUrl}/traits/${traitId}`,
       attributes: [
         {

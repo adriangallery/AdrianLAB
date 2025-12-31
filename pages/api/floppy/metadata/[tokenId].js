@@ -27,11 +27,14 @@ export default async function handler(req, res) {
       ? `https://${process.env.VERCEL_URL}` 
       : 'https://adrianlab.vercel.app';
     
+    // Añadir vtimestamp para forzar recacheo en OpenSea
+    const version = Date.now();
+    
     // Metadatos del FLOPPY DISK
     const metadata = {
       name: floppyData.name,
       description: floppyData.description,
-      image: `${baseUrl}/api/floppy/render/${tokenId}.png?v=${floppyData.version || 1}`,
+      image: `${baseUrl}/api/floppy/render/${tokenId}.png?v=${version}`,
       external_url: `${baseUrl}/floppy/${tokenId}`,
       attributes: [
         {
