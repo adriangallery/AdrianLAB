@@ -288,30 +288,100 @@ export default async function handler(req, res) {
       // Si es trait animado, generar GIF
       if (isAnimatedTrait && animatedTraits.length > 0) {
         try {
-          // Cargar mannequin directamente desde labimages
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-          const mannequinUrl = `${baseUrl}/labimages/mannequin.svg`;
+          // Usar FloppyRenderer para obtener los datos necesarios
+          const renderer = new FloppyRenderer();
           
-          console.log(`[floppy-render] 🎬 Cargando mannequin desde: ${mannequinUrl}`);
-          const mannequinResponse = await fetch(mannequinUrl);
-          if (!mannequinResponse.ok) {
-            throw new Error(`Failed to load mannequin: ${mannequinResponse.status}`);
+          // Cargar metadata del token
+          const tokenData = await renderer.generateSVG(tokenId).catch(async () => {
+            // Si falla, cargar metadata directamente
+            const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+            const metadataContent = fs.readFileSync(metadataPath, 'utf8');
+            const metadata = JSON.parse(metadataContent);
+            const trait = metadata.traits.find(t => t.tokenId === tokenIdNum);
+            if (!trait) {
+              throw new Error(`No se encontró metadata para token ${tokenIdNum}`);
+            }
+            return null; // Retornamos null para usar el trait directamente
+          });
+          
+          // Obtener metadata directamente si generateSVG falló
+          let tokenDataFinal;
+          if (!tokenData) {
+            const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+            const metadataContent = fs.readFileSync(metadataPath, 'utf8');
+            const metadata = JSON.parse(metadataContent);
+            tokenDataFinal = metadata.traits.find(t => t.tokenId === tokenIdNum);
+            if (!tokenDataFinal) {
+              throw new Error(`No se encontró metadata para token ${tokenIdNum}`);
+            }
+          } else {
+            // Si generateSVG funcionó, necesitamos extraer los datos del renderer
+            // Por ahora, cargamos directamente desde traits.json
+            const metadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+            const metadataContent = fs.readFileSync(metadataPath, 'utf8');
+            const metadata = JSON.parse(metadataContent);
+            tokenDataFinal = metadata.traits.find(t => t.tokenId === tokenIdNum);
           }
           
-          const mannequinSvg = await mannequinResponse.text();
-          
-          // Convertir SVG del mannequin a PNG buffer
-          const resvg = new Resvg(Buffer.from(mannequinSvg), {
-            fitTo: { mode: 'width', value: 600 }
+          // Obtener total minted
+          const totalMinted = await renderer.generatePNG(tokenId).catch(async () => {
+            // Si falla, intentar obtener desde el contrato
+            try {
+              const { getContracts } = await import('../../../../lib/contracts.js');
+              const contracts = getContracts();
+              const floppyContract = contracts.floppy;
+              if (floppyContract) {
+                const totalSupply = await floppyContract.totalSupply(tokenIdNum);
+                return totalSupply.toNumber();
+              }
+            } catch (e) {
+              console.warn(`[floppy-render] No se pudo obtener totalMinted: ${e.message}`);
+            }
+            return 0;
           });
-          const mannequinBuffer = resvg.render().asPng();
           
-          // Generar GIF
+          // Obtener rarity
+          const rarity = renderer.generatePNG ? await (async () => {
+            // Usar método privado del renderer si está disponible
+            const maxSupply = tokenDataFinal.maxSupply || 100;
+            const rarityMap = {
+              1: { tag: 'LEGENDARY', bg: '#ff6b00' },
+              5: { tag: 'EPIC', bg: '#9b59b6' },
+              10: { tag: 'RARE', bg: '#3498db' },
+              50: { tag: 'UNCOMMON', bg: '#2ecc71' },
+              100: { tag: 'COMMON', bg: '#95a5a6' }
+            };
+            
+            for (const [supply, r] of Object.entries(rarityMap)) {
+              if (maxSupply <= parseInt(supply)) {
+                return r;
+              }
+            }
+            return rarityMap[100];
+          })() : { tag: 'COMMON', bg: '#95a5a6' };
+          
+          // Obtener totalMinted desde el contrato
+          let totalMintedFinal = 0;
+          try {
+            const { getContracts } = await import('../../../../lib/contracts.js');
+            const contracts = getContracts();
+            const floppyContract = contracts.floppy;
+            if (floppyContract) {
+              const totalSupply = await floppyContract.totalSupply(tokenIdNum);
+              totalMintedFinal = totalSupply.toNumber();
+            }
+          } catch (e) {
+            console.warn(`[floppy-render] No se pudo obtener totalMinted: ${e.message}`);
+          }
+          
+          // Generar GIF con todos los elementos
           const gifBuffer = await generateFloppyGif({
-            mannequinBuffer: mannequinBuffer,
-            animatedTraits: animatedTraits,
-            width: 600,
-            height: 600,
+            traitId: tokenIdNum,
+            tokenData: tokenDataFinal,
+            totalMinted: totalMintedFinal,
+            rarity: rarity,
+            width: 768,
+            height: 1024,
             delay: 500
           });
           
@@ -330,6 +400,7 @@ export default async function handler(req, res) {
           return res.status(200).send(gifBuffer);
         } catch (error) {
           console.error('[floppy-render] 🎬 Error generando GIF, continuando con PNG:', error.message);
+          console.error('[floppy-render] 🎬 Stack:', error.stack);
           // Continuar con PNG si falla la generación de GIF
         }
       }
