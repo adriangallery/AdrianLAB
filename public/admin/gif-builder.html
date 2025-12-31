@@ -1345,25 +1345,24 @@
         params.set('fixed', activeFixed.map(t => t.id).join(','));
       }
       
+      // Animated Traits - usar formato corto "animated"
+      if (builderState.animatedTraits && Array.isArray(builderState.animatedTraits)) {
+        const activeAnimated = builderState.animatedTraits.filter(animTrait => {
+          return animTrait.baseId && animTrait.variants && animTrait.variants.length > 0;
+        });
+        
+        if (activeAnimated.length > 0) {
+          // Usar formato corto: animated=1167:500,1166:300
+          const animatedParams = activeAnimated.map(animTrait => {
+            return `${animTrait.baseId}:${animTrait.delay || 500}`;
+          });
+          params.set('animated', animatedParams.join(','));
+        }
+      }
+      
       // Variable frames - generar frames basados en la configuración
       // Si un trait aparece en múltiples frames, generar múltiples entradas
       const frameEntries = [];
-      
-      // PRIMERO: Animated Traits (tienen prioridad, se asignan primero)
-      if (builderState.animatedTraits && Array.isArray(builderState.animatedTraits)) {
-        builderState.animatedTraits.forEach(animTrait => {
-          if (animTrait.variants && animTrait.variants.length > 0) {
-            animTrait.variants.forEach((variant, variantIndex) => {
-              const frameNum = animTrait.startFrame + variantIndex;
-              frameEntries.push({
-                id: variant,
-                delay: animTrait.delay || 500,
-                frameNum: frameNum
-              });
-            });
-          }
-        });
-      }
       
       // SEGUNDO: Buscar configuración de frames en Variable Traits
       const hasVariableFrameConfig = builderState.frames.some(f => {
@@ -1459,7 +1458,11 @@
         }
       }
       
-      if (frameEntries.length > 0) {
+      // Solo añadir frames si hay frameEntries Y no hay animated traits activos
+      const hasActiveAnimated = builderState.animatedTraits && 
+        builderState.animatedTraits.some(at => at.baseId && at.variants && at.variants.length > 0);
+      
+      if (frameEntries.length > 0 && !hasActiveAnimated) {
         params.set('frames', frameEntries
           .map(f => `${f.id}:${f.delay}`)
           .join(','));

@@ -76,13 +76,36 @@ function parseMovements(moveParams) {
 /**
  * Parsear parámetros del query
  */
-function parseQueryParams(query) {
-  const { method = 'gifwrap', base, fixed, frames, move, gif, gifBackground, adrianzero, tokenId } = query;
+/**
+ * Detectar variantes de un trait animado (1167 -> 1167a, 1167b, etc.)
+ */
+async function detectAnimatedVariants(baseId) {
+  const variants = [];
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
   
-  // Nuevo formato con delays individuales
-  if (!frames) {
-    throw new Error('Se requiere el parámetro "frames" (ej: frames=32:200,870:400)');
-  }
+  // Verificar variantes en paralelo
+  const checkPromises = letters.map(async (letter) => {
+    const variantId = `${baseId}${letter}`;
+    const url = `${baseUrl}/labimages/${variantId}.svg`;
+    
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      if (response.ok) {
+        return variantId;
+      }
+    } catch (e) {
+      // Ignorar errores
+    }
+    return null;
+  });
+  
+  const results = await Promise.all(checkPromises);
+  return results.filter(v => v !== null);
+}
+
+function parseQueryParams(query) {
+  const { method = 'gifwrap', base, fixed, frames, animated, move, gif, gifBackground, adrianzero, tokenId } = query;
   
   // GIF puede venir como "gif" o "gifBackground" (sinónimos)
   const gifId = gif || gifBackground || null;
@@ -90,21 +113,41 @@ function parseQueryParams(query) {
   // AdrianZERO tokenId puede venir como "adrianzero" o "tokenId" (sinónimos)
   const adrianZeroTokenId = adrianzero || tokenId || null;
   
+  // Parsear animated traits (formato corto: animated=1167:500,1166:300)
+  const animatedTraits = animated ? animated.split(',').map(animStr => {
+    const parts = animStr.split(':');
+    const baseId = parts[0].trim();
+    const delayMs = parts[1] ? parseInt(parts[1]) : 500;
+    return { baseId, delay: delayMs };
+  }) : [];
+  
+  // Parsear frames normales
+  const normalFrames = frames ? frames.split(',').map(frameStr => {
+    const parts = frameStr.split(':');
+    const id = parts[0].trim();
+    const delayMs = parts[1] ? parseInt(parts[1]) : 500;
+    
+    if (isNaN(delayMs)) {
+      throw new Error(`Delay inválido en frame: ${frameStr}`);
+    }
+    
+    return { id, delay: delayMs };
+  }) : [];
+  
+  // Si hay animated traits, se expandirán después
+  // Por ahora, retornar la configuración con animated traits separados
+  
+  // Validar que hay al menos frames o animated
+  if (normalFrames.length === 0 && animatedTraits.length === 0) {
+    throw new Error('Se requiere el parámetro "frames" o "animated" (ej: frames=32:200,870:400 o animated=1167:500)');
+  }
+  
   return {
     method,
     base: base || null,
     fixed: fixed ? fixed.split(',').map(id => id.trim()) : [],
-    frames: frames.split(',').map(frameStr => {
-      const parts = frameStr.split(':');
-      const id = parts[0].trim();
-      const delayMs = parts[1] ? parseInt(parts[1]) : 500;
-      
-      if (isNaN(delayMs)) {
-        throw new Error(`Delay inválido en frame: ${frameStr}`);
-      }
-      
-      return { id, delay: delayMs };
-    }),
+    frames: normalFrames,
+    animatedTraits: animatedTraits,
     movements: parseMovements(move),
     gifId: gifId ? gifId.toString() : null,
     adrianZeroTokenId: adrianZeroTokenId ? adrianZeroTokenId.toString() : null
@@ -693,7 +736,7 @@ async function generateGifWithGifwrap(config) {
  * V3: sharp con SVG controlando frames y delays, GIF como background visual
  */
 async function generateGifWithSharp(config) {
-  const { base, fixed, frames, movements, gifId, adrianZeroTokenId } = config;
+  const { base, fixed, frames, animatedTraits, movements, gifId, adrianZeroTokenId } = config;
   const width = 400;
   const height = 400;
   
@@ -701,9 +744,32 @@ async function generateGifWithSharp(config) {
   console.log(`[SHARP-V3] - Base: ${base || 'ninguna'}`);
   console.log(`[SHARP-V3] - Fixed: [${fixed.join(', ') || 'ninguno'}]`);
   console.log(`[SHARP-V3] - Frames SVG: ${frames.length}`);
+  console.log(`[SHARP-V3] - Animated Traits: ${animatedTraits.length}`);
+  animatedTraits.forEach((at, i) => {
+    console.log(`[SHARP-V3]   Animated ${i + 1}: ${at.baseId} (${at.delay}ms)`);
+  });
   console.log(`[SHARP-V3] - Movimientos: ${movements.length}`);
   console.log(`[SHARP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
   console.log(`[SHARP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
+  
+  // Expandir animated traits a frames
+  let expandedFrames = [...frames];
+  if (animatedTraits && animatedTraits.length > 0) {
+    for (const animTrait of animatedTraits) {
+      const variants = await detectAnimatedVariants(animTrait.baseId);
+      if (variants.length > 0) {
+        console.log(`[SHARP-V3] Animated trait ${animTrait.baseId}: ${variants.length} variants encontrados`);
+        variants.forEach(variant => {
+          expandedFrames.push({
+            id: variant,
+            delay: animTrait.delay
+          });
+        });
+      } else {
+        console.warn(`[SHARP-V3] No se encontraron variantes para ${animTrait.baseId}`);
+      }
+    }
+  }
   
   // Cargar AdrianZERO si existe (una sola vez, se reutiliza en todos los frames)
   let adrianZeroBuffer = null;
@@ -727,9 +793,9 @@ async function generateGifWithSharp(config) {
   encoder.setQuality(10);
   
   // V3: SVG siempre controla el número total de frames
-  const totalFrames = frames.length;
+  const totalFrames = expandedFrames.length;
   
-  console.log(`[SHARP-V3] Total frames: ${totalFrames} (controlados por SVG)`);
+  console.log(`[SHARP-V3] Total frames: ${totalFrames} (controlados por SVG, incluyendo animated traits)`);
   
   for (let i = 0; i < totalFrames; i++) {
     // V3: Ciclar GIF si es necesario (background visual)
@@ -737,7 +803,7 @@ async function generateGifWithSharp(config) {
     const gifFrame = gifFramesData ? gifFramesData[gifFrameIndex] : null;
     
     // V3: Usar frame SVG correspondiente
-    const svgFrame = frames[i];
+    const svgFrame = expandedFrames[i];
     
     console.log(`[SHARP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
     
@@ -789,26 +855,46 @@ export default async function handler(req, res) {
     // Parsear parámetros
     const config = parseQueryParams(req.query);
     
+    // Expandir animated traits a frames antes de validar
+    let totalFrames = config.frames.length;
+    if (config.animatedTraits && config.animatedTraits.length > 0) {
+      for (const animTrait of config.animatedTraits) {
+        const variants = await detectAnimatedVariants(animTrait.baseId);
+        totalFrames += variants.length;
+      }
+    }
+    
     // Validaciones
-    if (config.frames.length < 1) {
+    if (totalFrames < 1) {
       return res.status(400).json({ 
         error: 'Se requiere al menos 1 frame',
-        example: '/api/test-gif-simple-v3?frames=32:200,870:400'
+        example: '/api/test-gif-simple-v3?frames=32:200,870:400 o animated=1167:500'
       });
     }
     
-    if (config.frames.length > 20) {
+    if (totalFrames > 20) {
       return res.status(400).json({ 
         error: 'Máximo 20 frames permitidos',
-        received: config.frames.length
+        received: totalFrames
       });
     }
     
+    // Validar delays de frames normales
     for (const frame of config.frames) {
       if (frame.delay < 10 || frame.delay > 5000) {
         return res.status(400).json({ 
           error: `Delay debe estar entre 10 y 5000 ms (frame: ${frame.id})`,
           received: frame.delay
+        });
+      }
+    }
+    
+    // Validar delays de animated traits
+    for (const animTrait of config.animatedTraits) {
+      if (animTrait.delay < 10 || animTrait.delay > 5000) {
+        return res.status(400).json({ 
+          error: `Delay debe estar entre 10 y 5000 ms (animated: ${animTrait.baseId})`,
+          received: animTrait.delay
         });
       }
     }
@@ -823,6 +909,10 @@ export default async function handler(req, res) {
     console.log(`[test-gif-simple-v3] - Frames SVG: ${config.frames.length}`);
     config.frames.forEach((f, i) => {
       console.log(`[test-gif-simple-v3]   Frame ${i + 1}: ${f.id} (${f.delay}ms)`);
+    });
+    console.log(`[test-gif-simple-v3] - Animated Traits: ${config.animatedTraits.length}`);
+    config.animatedTraits.forEach((at, i) => {
+      console.log(`[test-gif-simple-v3]   Animated ${i + 1}: ${at.baseId} (${at.delay}ms)`);
     });
     console.log(`[test-gif-simple-v3] - Movimientos: ${config.movements.length}`);
     config.movements.forEach((m, i) => {
