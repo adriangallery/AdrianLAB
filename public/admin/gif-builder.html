@@ -524,6 +524,25 @@
           </div>
           <div style="display: ${move.enabled ? 'block' : 'none'};" id="movement-${index}-config">
             <div class="form-group">
+              <label>Target Layer:</label>
+              <select onchange="updateMovementLayer(${index}, this.value)">
+                <option value="base" ${move.layerType === 'base' ? 'selected' : ''}>Base Skin</option>
+                <option value="variable" ${move.layerType === 'variable' ? 'selected' : ''}>Variable (All Frames)</option>
+                ${builderState.fixed.map((t, i) => 
+                  `<option value="fixed.${t.id}" ${move.layerType === 'fixed' && move.layerId === t.id ? 'selected' : ''}>
+                    Fixed: ${t.id || 'New'}
+                  </option>`
+                ).join('')}
+              </select>
+            </div>
+            ${move.layerType === 'fixed' ? `
+              <div class="form-group">
+                <label>Fixed Trait ID:</label>
+                <input type="text" value="${move.layerId || ''}" placeholder="Trait ID" 
+                       onchange="updateMovementLayerId(${index}, this.value)">
+              </div>
+            ` : ''}
+            <div class="form-group">
               <label>Movement Type:</label>
               <select onchange="updateMovementType(${index}, this.value)">
                 <option value="circular" ${move.type === 'circular' ? 'selected' : ''}>Circular</option>
@@ -700,18 +719,18 @@
     
     // Movements management functions
     function addMovement() {
-      const layerType = prompt('Layer type (base/fixed/variable):', 'fixed');
-      if (!layerType || !['base', 'fixed', 'variable'].includes(layerType)) return;
+      // Si hay traits fijos, usar el primero por defecto, sino variable
+      let defaultLayerType = 'variable';
+      let defaultLayerId = null;
       
-      let layerId = null;
-      if (layerType === 'fixed') {
-        layerId = prompt('Fixed trait ID:', '');
-        if (!layerId) return;
+      if (builderState.fixed.length > 0) {
+        defaultLayerType = 'fixed';
+        defaultLayerId = builderState.fixed[0].id;
       }
       
       builderState.movements.push({
-        layerType,
-        layerId,
+        layerType: defaultLayerType,
+        layerId: defaultLayerId,
         type: 'circular',
         params: ['50', '2'],
         enabled: true
@@ -724,6 +743,26 @@
     
     function toggleMovement(index) {
       builderState.movements[index].enabled = !builderState.movements[index].enabled;
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    function updateMovementLayer(index, layerSpec) {
+      const parts = layerSpec.split('.');
+      const layerType = parts[0];
+      const layerId = parts.length > 1 ? parts[1] : null;
+      
+      builderState.movements[index].layerType = layerType;
+      builderState.movements[index].layerId = layerId;
+      
+      renderMovements();
+      updateURL();
+      saveState();
+    }
+    
+    function updateMovementLayerId(index, layerId) {
+      builderState.movements[index].layerId = layerId;
       renderMovements();
       updateURL();
       saveState();
