@@ -431,6 +431,7 @@
             <select id="version">
               <option value="v1">v1 (test-gif-simple) - Stable</option>
               <option value="v2" selected>v2 (test-gif-simple-v2) - Latest</option>
+              <option value="v3">v3 (test-gif-simple-v3) - SVG Controls</option>
             </select>
           </div>
         </div>
@@ -443,6 +444,19 @@
               <option value="gifwrap">gifwrap (Recommended)</option>
               <option value="sharp">sharp (Fast)</option>
             </select>
+          </div>
+        </div>
+        
+        <!-- AdrianZERO Base (v3 only) -->
+        <div class="section" id="adrianzero-section" style="display: none;">
+          <div class="section-title">🎯 AdrianZERO Base (v3)</div>
+          <div class="form-group">
+            <label>Token ID:</label>
+            <input type="text" id="adrianzero-tokenid" placeholder="e.g. 146" 
+                   onchange="updateAdrianZeroTokenId(this.value)">
+            <p style="font-size: 11px; color: #6b7280; margin-top: 5px;">
+              Renderiza un AdrianZERO completo como base (bajo del todo)
+            </p>
           </div>
         </div>
         
@@ -555,7 +569,8 @@
       frames: [],
       movements: [],
       totalFrames: 10, // Total frames for the animation
-      frameConfigs: {} // Configurations per trait: { 'traitId': { frames: [1,2,3], movements: {...} } }
+      frameConfigs: {}, // Configurations per trait: { 'traitId': { frames: [1,2,3], movements: {...} } }
+      adrianZeroTokenId: '' // AdrianZERO tokenId for v3
     };
     
     // Load saved state
@@ -582,15 +597,36 @@
       document.getElementById('method').value = builderState.method;
       document.getElementById('base').value = builderState.base || '';
       document.getElementById('total-frames').value = builderState.totalFrames || 10;
+      document.getElementById('adrianzero-tokenid').value = builderState.adrianZeroTokenId || '';
+      
+      // Mostrar/ocultar sección AdrianZERO según versión
+      const adrianZeroSection = document.getElementById('adrianzero-section');
+      if (adrianZeroSection) {
+        adrianZeroSection.style.display = builderState.version === 'v3' ? 'block' : 'none';
+      }
+      
       renderFixedTraits();
       renderFrames();
       renderMovements();
       updateURL();
     }
     
+    function updateAdrianZeroTokenId(value) {
+      builderState.adrianZeroTokenId = value;
+      updateURL();
+      saveState();
+    }
+    
     // Update version
     function updateVersion() {
       builderState.version = document.getElementById('version').value;
+      
+      // Mostrar/ocultar sección AdrianZERO según versión
+      const adrianZeroSection = document.getElementById('adrianzero-section');
+      if (adrianZeroSection) {
+        adrianZeroSection.style.display = builderState.version === 'v3' ? 'block' : 'none';
+      }
+      
       updateURL();
       saveState();
     }
@@ -1192,10 +1228,18 @@
           });
       }
       
+      // Añadir AdrianZERO tokenId si existe (solo v3)
+      if (builderState.version === 'v3' && builderState.adrianZeroTokenId) {
+        params.set('adrianzero', builderState.adrianZeroTokenId);
+      }
+      
       // Select endpoint based on version
-      const endpoint = builderState.version === 'v2' 
-        ? 'test-gif-simple-v2' 
-        : 'test-gif-simple';
+      let endpoint = 'test-gif-simple';
+      if (builderState.version === 'v2') {
+        endpoint = 'test-gif-simple-v2';
+      } else if (builderState.version === 'v3') {
+        endpoint = 'test-gif-simple-v3';
+      }
       
       const url = `https://adrianlab.vercel.app/api/${endpoint}?${params.toString()}`;
       document.getElementById('url-display').textContent = url;

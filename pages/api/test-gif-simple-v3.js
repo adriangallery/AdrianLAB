@@ -77,7 +77,7 @@ function parseMovements(moveParams) {
  * Parsear parámetros del query
  */
 function parseQueryParams(query) {
-  const { method = 'gifwrap', base, fixed, frames, move, gif, gifBackground } = query;
+  const { method = 'gifwrap', base, fixed, frames, move, gif, gifBackground, adrianzero, tokenId } = query;
   
   // Nuevo formato con delays individuales
   if (!frames) {
@@ -86,6 +86,9 @@ function parseQueryParams(query) {
   
   // GIF puede venir como "gif" o "gifBackground" (sinónimos)
   const gifId = gif || gifBackground || null;
+  
+  // AdrianZERO tokenId puede venir como "adrianzero" o "tokenId" (sinónimos)
+  const adrianZeroTokenId = adrianzero || tokenId || null;
   
   return {
     method,
@@ -103,7 +106,8 @@ function parseQueryParams(query) {
       return { id, delay: delayMs };
     }),
     movements: parseMovements(move),
-    gifId: gifId ? gifId.toString() : null
+    gifId: gifId ? gifId.toString() : null,
+    adrianZeroTokenId: adrianZeroTokenId ? adrianZeroTokenId.toString() : null
   };
 }
 
@@ -465,13 +469,66 @@ async function compositeFrameWithTransforms(layers, width = 400, height = 400) {
 }
 
 /**
+ * Cargar AdrianZERO renderizado por tokenId
+ */
+async function loadAdrianZero(tokenId) {
+  console.log(`[loadAdrianZero] Cargando AdrianZERO token: ${tokenId}`);
+  
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+  const renderUrl = `${baseUrl}/api/render/custom/${tokenId}`;
+  
+  console.log(`[loadAdrianZero] URL: ${renderUrl}`);
+  
+  try {
+    const response = await fetch(renderUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to load AdrianZERO ${tokenId}: ${response.status} ${response.statusText}`);
+    }
+    
+    const pngBuffer = await response.arrayBuffer();
+    console.log(`[loadAdrianZero] AdrianZERO ${tokenId} cargado: ${pngBuffer.byteLength} bytes`);
+    
+    // Redimensionar a 400x400
+    const resizedBuffer = await sharp(Buffer.from(pngBuffer))
+      .resize(400, 400, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 0 }, // Transparente
+        kernel: 'lanczos3',
+        withoutEnlargement: false
+      })
+      .png({
+        quality: 100,
+        compressionLevel: 9,
+        palette: false
+      })
+      .toBuffer();
+    
+    console.log(`[loadAdrianZero] AdrianZERO ${tokenId} redimensionado a 400x400: ${resizedBuffer.length} bytes`);
+    return resizedBuffer;
+  } catch (error) {
+    console.error(`[loadAdrianZero] Error cargando AdrianZERO ${tokenId}:`, error.message);
+    throw error;
+  }
+}
+
+/**
  * Generar un frame con múltiples capas y transformaciones
  * V3: GIF como background visual que se cicla
  */
-async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null, width = 400, height = 400) {
+async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null, adrianZeroBuffer = null, width = 400, height = 400) {
   const layers = [];
   
-  // 0. GIF Background (si existe) - va primero (más abajo)
+  // 0. AdrianZERO renderizado (si existe) - va primero (más abajo de todo)
+  if (adrianZeroBuffer) {
+    layers.push({
+      id: 'adrianzero-base',
+      pngBuffer: adrianZeroBuffer,
+      type: 'adrianzero',
+      transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+    });
+  }
+  
+  // 1. GIF Background (si existe) - va después del AdrianZERO
   if (gifFrame) {
     layers.push({
       id: 'gif-background',
@@ -481,7 +538,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
     });
   }
   
-  // 1. Skin base (si existe)
+  // 2. Skin base (si existe)
   if (baseId) {
     const basePng = await svgToPng(baseId, method, width);
     const baseMovement = findMovement(movements, 'base');
@@ -495,7 +552,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
     });
   }
   
-  // 2. Traits fijos
+  // 3. Traits fijos
   for (const fixedId of fixedIds) {
     const fixedPng = await svgToPng(fixedId, method, width);
     const fixedMovement = findMovement(movements, 'fixed', fixedId);
@@ -509,7 +566,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
     });
   }
   
-  // 3. Trait variable del frame
+  // 4. Trait variable del frame
   if (variableId) {
     const variablePng = await svgToPng(variableId, method, width);
     const varMovement = findMovement(movements, 'variable');
@@ -531,7 +588,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
  * V3: gifwrap con SVG controlando frames y delays, GIF como background visual
  */
 async function generateGifWithGifwrap(config) {
-  const { base, fixed, frames, movements, gifId } = config;
+  const { base, fixed, frames, movements, gifId, adrianZeroTokenId } = config;
   
   console.log(`[GIFWRAP-V3] Generando GIF con SVG controlando frames:`);
   console.log(`[GIFWRAP-V3] - Base: ${base || 'ninguna'}`);
@@ -539,6 +596,14 @@ async function generateGifWithGifwrap(config) {
   console.log(`[GIFWRAP-V3] - Frames SVG: ${frames.length}`);
   console.log(`[GIFWRAP-V3] - Movimientos: ${movements.length}`);
   console.log(`[GIFWRAP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
+  console.log(`[GIFWRAP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
+  
+  // Cargar AdrianZERO si existe (una sola vez, se reutiliza en todos los frames)
+  let adrianZeroBuffer = null;
+  if (adrianZeroTokenId) {
+    adrianZeroBuffer = await loadAdrianZero(adrianZeroTokenId);
+    console.log(`[GIFWRAP-V3] AdrianZERO ${adrianZeroTokenId} cargado como base`);
+  }
   
   // Cargar frames del GIF si existe (solo para background visual)
   let gifFramesData = null;
@@ -573,7 +638,7 @@ async function generateGifWithGifwrap(config) {
     
     console.log(`[GIFWRAP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
     
-    // Generar frame con capas, transformaciones y GIF background
+    // Generar frame con capas, transformaciones, AdrianZERO base y GIF background
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
@@ -583,6 +648,7 @@ async function generateGifWithGifwrap(config) {
       i,
       totalFrames,
       gifFrame,
+      adrianZeroBuffer,
       width,
       height
     );
@@ -627,7 +693,7 @@ async function generateGifWithGifwrap(config) {
  * V3: sharp con SVG controlando frames y delays, GIF como background visual
  */
 async function generateGifWithSharp(config) {
-  const { base, fixed, frames, movements, gifId } = config;
+  const { base, fixed, frames, movements, gifId, adrianZeroTokenId } = config;
   const width = 400;
   const height = 400;
   
@@ -637,6 +703,14 @@ async function generateGifWithSharp(config) {
   console.log(`[SHARP-V3] - Frames SVG: ${frames.length}`);
   console.log(`[SHARP-V3] - Movimientos: ${movements.length}`);
   console.log(`[SHARP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
+  console.log(`[SHARP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
+  
+  // Cargar AdrianZERO si existe (una sola vez, se reutiliza en todos los frames)
+  let adrianZeroBuffer = null;
+  if (adrianZeroTokenId) {
+    adrianZeroBuffer = await loadAdrianZero(adrianZeroTokenId);
+    console.log(`[SHARP-V3] AdrianZERO ${adrianZeroTokenId} cargado como base`);
+  }
   
   // Cargar frames del GIF si existe (solo para background visual)
   let gifFramesData = null;
@@ -671,7 +745,7 @@ async function generateGifWithSharp(config) {
     const delayMs = svgFrame.delay;
     encoder.setDelay(delayMs);
     
-    // Generar frame con capas, transformaciones y GIF background
+    // Generar frame con capas, transformaciones, AdrianZERO base y GIF background
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
@@ -681,6 +755,7 @@ async function generateGifWithSharp(config) {
       i,
       totalFrames,
       gifFrame,
+      adrianZeroBuffer,
       width,
       height
     );
@@ -744,6 +819,7 @@ export default async function handler(req, res) {
     console.log(`[test-gif-simple-v3] - Base: ${config.base || 'ninguna'}`);
     console.log(`[test-gif-simple-v3] - Fixed: [${config.fixed.join(', ') || 'ninguno'}]`);
     console.log(`[test-gif-simple-v3] - GIF Background: ${config.gifId || 'ninguno'} (se cicla)`);
+    console.log(`[test-gif-simple-v3] - AdrianZERO TokenId: ${config.adrianZeroTokenId || 'ninguno'} (base renderizada)`);
     console.log(`[test-gif-simple-v3] - Frames SVG: ${config.frames.length}`);
     config.frames.forEach((f, i) => {
       console.log(`[test-gif-simple-v3]   Frame ${i + 1}: ${f.id} (${f.delay}ms)`);
@@ -798,6 +874,7 @@ export default async function handler(req, res) {
     res.setHeader('X-Phase', '3.0');
     res.setHeader('X-Movements-Count', config.movements.length.toString());
     res.setHeader('X-Gif-Background', config.gifId || 'none');
+    res.setHeader('X-AdrianZero-TokenId', config.adrianZeroTokenId || 'none');
     res.setHeader('X-Approach', 'SVG-controls-frames-delays');
     
     return res.status(200).send(gifBuffer);
