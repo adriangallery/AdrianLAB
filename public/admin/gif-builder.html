@@ -590,6 +590,10 @@
       if (saved) {
         try {
           builderState = JSON.parse(saved);
+          // Asegurar que animatedTraits existe (para compatibilidad con estados antiguos)
+          if (!builderState.animatedTraits) {
+            builderState.animatedTraits = [];
+          }
           applyState();
         } catch (e) {
           console.error('Error loading state:', e);
@@ -691,6 +695,11 @@
       const container = document.getElementById('animated-traits-list');
       container.innerHTML = '';
       
+      // Asegurar que animatedTraits existe
+      if (!builderState.animatedTraits) {
+        builderState.animatedTraits = [];
+      }
+      
       builderState.animatedTraits.forEach((animTrait, index) => {
         const item = document.createElement('div');
         item.className = 'list-item';
@@ -784,6 +793,10 @@
     
     // Actualizar total frames basado en animated traits
     function updateTotalFramesFromAnimatedTraits() {
+      if (!builderState.animatedTraits || !Array.isArray(builderState.animatedTraits)) {
+        return;
+      }
+      
       let totalAnimatedFrames = 0;
       builderState.animatedTraits.forEach(animTrait => {
         if (animTrait.variants && animTrait.variants.length > 0) {
@@ -803,6 +816,10 @@
     
     // Animated traits management functions
     function addAnimatedTrait() {
+      // Asegurar que animatedTraits existe
+      if (!builderState.animatedTraits) {
+        builderState.animatedTraits = [];
+      }
       builderState.animatedTraits.push({ baseId: '', variants: [], delay: 500 });
       renderAnimatedTraits();
       updateURL();
@@ -1323,18 +1340,20 @@
       const frameEntries = [];
       
       // PRIMERO: Animated Traits (tienen prioridad, se asignan primero)
-      builderState.animatedTraits.forEach(animTrait => {
-        if (animTrait.variants && animTrait.variants.length > 0) {
-          animTrait.variants.forEach((variant, variantIndex) => {
-            const frameNum = animTrait.startFrame + variantIndex;
-            frameEntries.push({
-              id: variant,
-              delay: animTrait.delay || 500,
-              frameNum: frameNum
+      if (builderState.animatedTraits && Array.isArray(builderState.animatedTraits)) {
+        builderState.animatedTraits.forEach(animTrait => {
+          if (animTrait.variants && animTrait.variants.length > 0) {
+            animTrait.variants.forEach((variant, variantIndex) => {
+              const frameNum = animTrait.startFrame + variantIndex;
+              frameEntries.push({
+                id: variant,
+                delay: animTrait.delay || 500,
+                frameNum: frameNum
+              });
             });
-          });
-        }
-      });
+          }
+        });
+      }
       
       // SEGUNDO: Buscar configuración de frames en Variable Traits
       const hasVariableFrameConfig = builderState.frames.some(f => {
