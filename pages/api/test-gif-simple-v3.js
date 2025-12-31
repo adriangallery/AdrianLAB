@@ -631,15 +631,38 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
  * V3: gifwrap con SVG controlando frames y delays, GIF como background visual
  */
 async function generateGifWithGifwrap(config) {
-  const { base, fixed, frames, movements, gifId, adrianZeroTokenId } = config;
+  const { base, fixed, frames, animatedTraits, movements, gifId, adrianZeroTokenId } = config;
   
   console.log(`[GIFWRAP-V3] Generando GIF con SVG controlando frames:`);
   console.log(`[GIFWRAP-V3] - Base: ${base || 'ninguna'}`);
   console.log(`[GIFWRAP-V3] - Fixed: [${fixed.join(', ') || 'ninguno'}]`);
   console.log(`[GIFWRAP-V3] - Frames SVG: ${frames.length}`);
+  console.log(`[GIFWRAP-V3] - Animated Traits: ${animatedTraits.length}`);
+  animatedTraits.forEach((at, i) => {
+    console.log(`[GIFWRAP-V3]   Animated ${i + 1}: ${at.baseId} (${at.delay}ms)`);
+  });
   console.log(`[GIFWRAP-V3] - Movimientos: ${movements.length}`);
   console.log(`[GIFWRAP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
   console.log(`[GIFWRAP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
+  
+  // Expandir animated traits a frames
+  let expandedFrames = [...frames];
+  if (animatedTraits && animatedTraits.length > 0) {
+    for (const animTrait of animatedTraits) {
+      const variants = await detectAnimatedVariants(animTrait.baseId);
+      if (variants.length > 0) {
+        console.log(`[GIFWRAP-V3] Animated trait ${animTrait.baseId}: ${variants.length} variants encontrados`);
+        variants.forEach(variant => {
+          expandedFrames.push({
+            id: variant,
+            delay: animTrait.delay
+          });
+        });
+      } else {
+        console.warn(`[GIFWRAP-V3] No se encontraron variantes para ${animTrait.baseId}`);
+      }
+    }
+  }
   
   // Cargar AdrianZERO si existe (una sola vez, se reutiliza en todos los frames)
   let adrianZeroBuffer = null;
@@ -662,22 +685,22 @@ async function generateGifWithGifwrap(config) {
   }
   
   const outputGifFrames = [];
-  const totalSvgFrames = frames.length;
+  const totalSvgFrames = expandedFrames.length;
   
   // V3: SVG siempre controla el número total de frames
   const totalFrames = totalSvgFrames;
   const width = 400;
   const height = 400;
   
-  console.log(`[GIFWRAP-V3] Total frames: ${totalFrames} (controlados por SVG)`);
+  console.log(`[GIFWRAP-V3] Total frames: ${totalFrames} (controlados por SVG, incluyendo animated traits)`);
   
   for (let i = 0; i < totalFrames; i++) {
     // V3: Ciclar GIF si es necesario (background visual)
     const gifFrameIndex = gifFramesData ? (i % gifFramesData.length) : null;
     const gifFrame = gifFramesData ? gifFramesData[gifFrameIndex] : null;
     
-    // V3: Usar frame SVG correspondiente
-    const svgFrame = frames[i];
+    // V3: Usar frame SVG correspondiente (de expandedFrames)
+    const svgFrame = expandedFrames[i];
     
     console.log(`[GIFWRAP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
     
