@@ -500,7 +500,7 @@
         <div class="section">
           <div class="section-title">🎬 Animated Traits</div>
           <p style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">
-            Enter base trait ID (e.g. "1166") to auto-detect variants (1166a, 1166b, etc.)
+            Enter base trait ID (e.g. "1166") - variants (1166a, 1166b, etc.) will be auto-detected
           </p>
           <div id="animated-traits-list"></div>
           <button class="btn btn-primary btn-small" onclick="addAnimatedTrait()">+ Add Animated Trait</button>
@@ -709,8 +709,9 @@
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
             <span class="drag-handle">☰</span>
             <input type="text" value="${animTrait.baseId}" placeholder="Base ID (e.g. 1166)" 
-                   onchange="updateAnimatedTraitBase(${index}, this.value)" style="flex: 1;">
-            <button class="btn btn-secondary btn-small" onclick="detectAnimatedVariants(${index})">🔍 Detect</button>
+                   onchange="updateAnimatedTraitBase(${index}, this.value)" 
+                   onkeyup="if(event.key==='Enter') updateAnimatedTraitBase(${index}, this.value)"
+                   style="flex: 1;">
             <input type="number" value="${animTrait.delay || 500}" placeholder="Delay (ms)" min="10" max="5000"
                    onchange="updateAnimatedTraitDelay(${index}, parseInt(this.value))" style="width: 120px;">
             <button class="btn btn-danger btn-small btn-icon" onclick="removeAnimatedTrait(${index})">×</button>
@@ -726,7 +727,7 @@
             </div>
           ` : animTrait.baseId ? `
             <div style="font-size: 11px; color: #9ca3af; padding: 5px;">
-              Click "Detect" to find variants
+              Detecting variants...
             </div>
           ` : ''}
         `;
@@ -737,41 +738,42 @@
       updateTotalFramesFromAnimatedTraits();
     }
     
-    // Detectar variantes de un trait animado
+    // Detectar variantes de un trait animado (automático)
     async function detectAnimatedVariants(index) {
       const animTrait = builderState.animatedTraits[index];
-      if (!animTrait.baseId) {
-        alert('Please enter a base trait ID first');
+      if (!animTrait || !animTrait.baseId) {
         return;
       }
       
       const baseId = animTrait.baseId.trim();
+      if (!baseId) {
+        return;
+      }
+      
       const variants = [];
       const letters = 'abcdefghijklmnopqrstuvwxyz';
       
       // Intentar detectar variantes (a-z)
       const baseUrl = 'https://adrianlab.vercel.app';
-      let detectedCount = 0;
       
-      for (const letter of letters) {
+      // Hacer todas las peticiones en paralelo para mayor velocidad
+      const checkPromises = letters.map(async (letter) => {
         const variantId = `${baseId}${letter}`;
         const url = `${baseUrl}/labimages/${variantId}.svg`;
         
         try {
           const response = await fetch(url, { method: 'HEAD' });
           if (response.ok) {
-            variants.push(variantId);
-            detectedCount++;
+            return variantId;
           }
         } catch (e) {
           // Ignorar errores
         }
-      }
+        return null;
+      });
       
-      if (variants.length === 0) {
-        alert(`No variants found for ${baseId}. Make sure files like ${baseId}a.svg exist.`);
-        return;
-      }
+      const results = await Promise.all(checkPromises);
+      variants.push(...results.filter(v => v !== null));
       
       // Actualizar el trait animado
       animTrait.variants = variants;
@@ -826,12 +828,20 @@
       saveState();
     }
     
-    function updateAnimatedTraitBase(index, value) {
+    async function updateAnimatedTraitBase(index, value) {
       builderState.animatedTraits[index].baseId = value;
       builderState.animatedTraits[index].variants = []; // Reset variants when base changes
+      
+      // Re-render inmediatamente para mostrar "Detecting..."
       renderAnimatedTraits();
-      updateURL();
-      saveState();
+      
+      // Si hay un valor, detectar variantes automáticamente
+      if (value && value.trim()) {
+        await detectAnimatedVariants(index);
+      } else {
+        updateURL();
+        saveState();
+      }
     }
     
     function updateAnimatedTraitDelay(index, value) {
