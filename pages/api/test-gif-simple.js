@@ -165,8 +165,12 @@ function calculatePosition(movement, frameIndex, totalFrames) {
     return { x: 0, y: 0, scale: 1, rotation: 0 };
   }
   
-  const progress = frameIndex / (totalFrames - 1 || 1); // 0.0 a 1.0
+  // Calcular progress: 0.0 (primer frame) a 1.0 (último frame)
+  // Si solo hay 1 frame, progress = 0
+  const progress = totalFrames > 1 ? frameIndex / (totalFrames - 1) : 0;
   const { type, params } = movement;
+  
+  console.log(`[calculatePosition] Frame ${frameIndex}/${totalFrames}, progress: ${progress.toFixed(3)}, type: ${type}, params: [${params.join(', ')}]`);
   
   switch (type) {
     case 'linear':
@@ -309,11 +313,22 @@ function calculatePath(params, progress) {
  * Encontrar movimiento para una capa específica
  */
 function findMovement(movements, layerType, layerId = null) {
+  if (!movements || movements.length === 0) return null;
+  
   return movements.find(m => {
     if (m.layerType !== layerType) return false;
-    if (layerType === 'fixed' && m.layerId !== layerId) return false;
-    if (layerType === 'base' && m.layerId !== null) return false;
-    if (layerType === 'variable' && m.layerId !== null) return false;
+    
+    // Para fixed, comparar layerId (convertir ambos a string para comparación)
+    if (layerType === 'fixed') {
+      const mId = String(m.layerId || '');
+      const lId = String(layerId || '');
+      if (mId !== lId) return false;
+    }
+    
+    // Para base y variable, no deben tener layerId
+    if (layerType === 'base' && m.layerId !== null && m.layerId !== undefined) return false;
+    if (layerType === 'variable' && m.layerId !== null && m.layerId !== undefined) return false;
+    
     return true;
   });
 }
@@ -384,6 +399,13 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
   for (const fixedId of fixedIds) {
     const fixedPng = await svgToPng(fixedId, method);
     const fixedMovement = findMovement(movements, 'fixed', fixedId);
+    
+    if (fixedMovement) {
+      console.log(`[generateLayeredFrame] Movimiento encontrado para fixed.${fixedId}: ${fixedMovement.type}`);
+    } else {
+      console.log(`[generateLayeredFrame] No se encontró movimiento para fixed.${fixedId} (movimientos disponibles: ${movements.map(m => `${m.layerType}.${m.layerId || ''}`).join(', ')})`);
+    }
+    
     const fixedTransform = calculatePosition(fixedMovement, frameIndex, totalFrames);
     
     layers.push({ 
