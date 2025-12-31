@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -326,28 +326,28 @@
 <body>
   <div class="container">
     <h1>🎬 GIF Builder</h1>
-    <p class="subtitle">Constructor visual para generar GIFs animados con skins, traits y movimientos</p>
+    <p class="subtitle">Visual builder to generate animated GIFs with skins, traits and movements</p>
     
     <div class="main-layout">
       <!-- Panel de Configuración -->
       <div class="config-panel">
-        <!-- Método -->
+        <!-- Method -->
         <div class="section">
-          <div class="section-title">⚙️ Método de Render</div>
+          <div class="section-title">⚙️ Render Method</div>
           <div class="form-group">
             <select id="method">
-              <option value="gifwrap">gifwrap (Recomendado)</option>
-              <option value="sharp">sharp (Rápido)</option>
+              <option value="gifwrap">gifwrap (Recommended)</option>
+              <option value="sharp">sharp (Fast)</option>
             </select>
           </div>
         </div>
         
-        <!-- Skin Base -->
+        <!-- Base Skin -->
         <div class="section">
-          <div class="section-title">🎨 Skin Base</div>
+          <div class="section-title">🎨 Base Skin</div>
           <div class="form-group">
             <select id="base">
-              <option value="">Ninguno</option>
+              <option value="">None</option>
               <option value="medium">Medium</option>
               <option value="dark">Dark / DarkAdrian</option>
               <option value="alien">Alien</option>
@@ -361,25 +361,25 @@
           </div>
         </div>
         
-        <!-- Traits Fijos -->
+        <!-- Fixed Traits -->
         <div class="section">
-          <div class="section-title">📌 Traits Fijos (Still)</div>
+          <div class="section-title">📌 Fixed Traits (Still)</div>
           <div id="fixed-traits-list"></div>
-          <button class="btn btn-primary btn-small" onclick="addFixedTrait()">+ Agregar Trait Fijo</button>
+          <button class="btn btn-primary btn-small" onclick="addFixedTrait()">+ Add Fixed Trait</button>
         </div>
         
-        <!-- Frames Variables -->
+        <!-- Variable Frames -->
         <div class="section">
-          <div class="section-title">🎞️ Frames Variables</div>
+          <div class="section-title">🎞️ Variable Frames</div>
           <div id="frames-list"></div>
-          <button class="btn btn-primary btn-small" onclick="addFrame()">+ Agregar Frame</button>
+          <button class="btn btn-primary btn-small" onclick="addFrame()">+ Add Frame</button>
         </div>
         
-        <!-- Movimientos -->
+        <!-- Movements -->
         <div class="section">
-          <div class="section-title">🎭 Movimientos (Fase 1.5)</div>
+          <div class="section-title">🎭 Movements (Phase 1.5)</div>
           <div id="movements-list"></div>
-          <button class="btn btn-primary btn-small" onclick="addMovement()">+ Agregar Movimiento</button>
+          <button class="btn btn-primary btn-small" onclick="addMovement()">+ Add Movement</button>
         </div>
       </div>
       
@@ -387,10 +387,10 @@
       <div class="preview-panel">
         <div class="section-title">👁️ Preview</div>
         <div class="preview-area" id="preview-area">
-          <p style="color: #9ca3af;">Genera un preview para ver el resultado</p>
+          <p style="color: #9ca3af;">Generate a preview to see the result</p>
         </div>
         <button class="btn btn-primary btn-full" onclick="generatePreview()" style="margin-top: 15px;">
-          🎬 Generar Preview
+          🎬 Generate Preview
         </button>
         
         <div class="preview-info" id="preview-info" style="display: none;">
@@ -399,28 +399,28 @@
             <span id="info-frames">-</span>
           </div>
           <div class="info-item">
-            <span>Duración Total:</span>
+            <span>Total Duration:</span>
             <span id="info-duration">-</span>
           </div>
           <div class="info-item">
-            <span>Tamaño:</span>
+            <span>Size:</span>
             <span id="info-size">-</span>
           </div>
           <div class="info-item">
-            <span>Capas por Frame:</span>
+            <span>Layers per Frame:</span>
             <span id="info-layers">-</span>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- URL Generada -->
+    <!-- Generated URL -->
     <div class="section">
-      <div class="section-title">🔗 URL Generada</div>
-      <div class="url-display" id="url-display">Configura los parámetros para generar la URL...</div>
+      <div class="section-title">🔗 Generated URL</div>
+      <div class="url-display" id="url-display">Configure parameters to generate the URL...</div>
       <div class="url-actions">
-        <button class="btn btn-primary btn-full" onclick="copyURL()">📋 Copiar URL</button>
-        <button class="btn btn-secondary btn-full" onclick="openURL()">🔗 Abrir en Nueva Pestaña</button>
+        <button class="btn btn-primary btn-full" onclick="copyURL()">📋 Copy URL</button>
+        <button class="btn btn-secondary btn-full" onclick="openURL()">🔗 Open in New Tab</button>
       </div>
     </div>
     
@@ -429,7 +429,7 @@
   </div>
   
   <script>
-    // Estado del builder
+    // Builder state
     let builderState = {
       method: 'gifwrap',
       base: '',
@@ -438,7 +438,7 @@
       movements: []
     };
     
-    // Cargar estado guardado
+    // Load saved state
     function loadState() {
       const saved = localStorage.getItem('gifBuilderState');
       if (saved) {
@@ -446,17 +446,17 @@
           builderState = JSON.parse(saved);
           applyState();
         } catch (e) {
-          console.error('Error cargando estado:', e);
+          console.error('Error loading state:', e);
         }
       }
     }
     
-    // Guardar estado
+    // Save state
     function saveState() {
       localStorage.setItem('gifBuilderState', JSON.stringify(builderState));
     }
     
-    // Aplicar estado a la UI
+    // Apply state to UI
     function applyState() {
       document.getElementById('method').value = builderState.method;
       document.getElementById('base').value = builderState.base || '';
@@ -466,7 +466,7 @@
       updateURL();
     }
     
-    // Renderizar traits fijos
+    // Render fixed traits
     function renderFixedTraits() {
       const container = document.getElementById('fixed-traits-list');
       container.innerHTML = '';
@@ -476,7 +476,7 @@
         item.className = 'list-item';
         item.innerHTML = `
           <span class="drag-handle">☰</span>
-          <input type="text" value="${trait.id}" placeholder="ID del trait" 
+          <input type="text" value="${trait.id}" placeholder="Trait ID" 
                  onchange="updateFixedTrait(${index}, this.value)">
           <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
         `;
@@ -484,7 +484,7 @@
       });
     }
     
-    // Renderizar frames
+    // Render frames
     function renderFrames() {
       const container = document.getElementById('frames-list');
       container.innerHTML = '';
@@ -494,7 +494,7 @@
         item.className = 'list-item';
         item.innerHTML = `
           <span class="drag-handle">☰</span>
-          <input type="text" value="${frame.id}" placeholder="ID del trait" 
+          <input type="text" value="${frame.id}" placeholder="Trait ID" 
                  onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
           <input type="number" value="${frame.delay}" placeholder="Delay (ms)" min="10" max="5000"
                  onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
@@ -505,7 +505,7 @@
       });
     }
     
-    // Renderizar movimientos
+    // Render movements
     function renderMovements() {
       const container = document.getElementById('movements-list');
       container.innerHTML = '';
@@ -520,11 +520,11 @@
                    onclick="toggleMovement(${index})"></div>
               <strong>${getMovementLabel(move)}</strong>
             </div>
-            <button class="btn btn-danger btn-small" onclick="removeMovement(${index})">Eliminar</button>
+            <button class="btn btn-danger btn-small" onclick="removeMovement(${index})">Remove</button>
           </div>
           <div style="display: ${move.enabled ? 'block' : 'none'};" id="movement-${index}-config">
             <div class="form-group">
-              <label>Tipo de Movimiento:</label>
+              <label>Movement Type:</label>
               <select onchange="updateMovementType(${index}, this.value)">
                 <option value="circular" ${move.type === 'circular' ? 'selected' : ''}>Circular</option>
                 <option value="bounce" ${move.type === 'bounce' ? 'selected' : ''}>Bounce</option>
@@ -551,12 +551,12 @@
         case 'circular':
           return `
             <div class="form-group">
-              <label>Radio (px):</label>
+              <label>Radius (px):</label>
               <input type="number" value="${move.params[0] || 50}" min="1" max="150"
                      onchange="updateMovementParam(${index}, 0, this.value)">
             </div>
             <div class="form-group">
-              <label>Vueltas:</label>
+              <label>Rotations:</label>
               <input type="number" value="${move.params[1] || 2}" min="0.1" max="10" step="0.1"
                      onchange="updateMovementParam(${index}, 1, this.value)">
             </div>
@@ -564,19 +564,19 @@
         case 'bounce':
           return `
             <div class="form-group">
-              <label>Dirección:</label>
+              <label>Direction:</label>
               <select onchange="updateMovementParam(${index}, 0, this.value)">
                 <option value="x" ${move.params[0] === 'x' ? 'selected' : ''}>Horizontal (X)</option>
                 <option value="y" ${move.params[0] === 'y' ? 'selected' : ''}>Vertical (Y)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Distancia (px):</label>
+              <label>Distance (px):</label>
               <input type="number" value="${move.params[1] || 40}" min="1" max="200"
                      onchange="updateMovementParam(${index}, 1, this.value)">
             </div>
             <div class="form-group">
-              <label>Rebotes:</label>
+              <label>Bounces:</label>
               <input type="number" value="${move.params[2] || 3}" min="1" max="10"
                      onchange="updateMovementParam(${index}, 2, this.value)">
             </div>
@@ -597,28 +597,28 @@
         case 'shake':
           return `
             <div class="form-group">
-              <label>Intensidad (px):</label>
+              <label>Intensity (px):</label>
               <input type="number" value="${move.params[0] || 10}" min="1" max="50"
                      onchange="updateMovementParam(${index}, 0, this.value)">
             </div>
             <div class="form-group">
-              <label>Velocidad:</label>
+              <label>Speed:</label>
               <select onchange="updateMovementParam(${index}, 1, this.value)">
-                <option value="slow" ${move.params[1] === 'slow' ? 'selected' : ''}>Lenta</option>
+                <option value="slow" ${move.params[1] === 'slow' ? 'selected' : ''}>Slow</option>
                 <option value="normal" ${!move.params[1] || move.params[1] === 'normal' ? 'selected' : ''}>Normal</option>
-                <option value="fast" ${move.params[1] === 'fast' ? 'selected' : ''}>Rápida</option>
+                <option value="fast" ${move.params[1] === 'fast' ? 'selected' : ''}>Fast</option>
               </select>
             </div>
           `;
         case 'orbit':
           return `
             <div class="form-group">
-              <label>Radio (px):</label>
+              <label>Radius (px):</label>
               <input type="number" value="${move.params[0] || 80}" min="1" max="150"
                      onchange="updateMovementParam(${index}, 0, this.value)">
             </div>
             <div class="form-group">
-              <label>Vueltas:</label>
+              <label>Rotations:</label>
               <input type="number" value="${move.params[1] || 2}" min="0.1" max="10" step="0.1"
                      onchange="updateMovementParam(${index}, 1, this.value)">
             </div>
@@ -626,12 +626,12 @@
         case 'zoom':
           return `
             <div class="form-group">
-              <label>Escala Mínima:</label>
+              <label>Min Scale:</label>
               <input type="number" value="${move.params[0] || 0.5}" min="0.1" max="1" step="0.1"
                      onchange="updateMovementParam(${index}, 0, this.value)">
             </div>
             <div class="form-group">
-              <label>Escala Máxima:</label>
+              <label>Max Scale:</label>
               <input type="number" value="${move.params[1] || 1.5}" min="1" max="3" step="0.1"
                      onchange="updateMovementParam(${index}, 1, this.value)">
             </div>
@@ -641,7 +641,7 @@
       }
     }
     
-    // Funciones de gestión de traits fijos
+    // Fixed traits management functions
     function addFixedTrait() {
       builderState.fixed.push({ id: '' });
       renderFixedTraits();
@@ -662,7 +662,7 @@
       saveState();
     }
     
-    // Funciones de gestión de frames
+    // Frames management functions
     function addFrame() {
       builderState.frames.push({ id: '', delay: 500 });
       renderFrames();
@@ -698,14 +698,14 @@
       saveState();
     }
     
-    // Funciones de gestión de movimientos
+    // Movements management functions
     function addMovement() {
-      const layerType = prompt('Tipo de capa (base/fixed/variable):', 'fixed');
+      const layerType = prompt('Layer type (base/fixed/variable):', 'fixed');
       if (!layerType || !['base', 'fixed', 'variable'].includes(layerType)) return;
       
       let layerId = null;
       if (layerType === 'fixed') {
-        layerId = prompt('ID del trait fijo:', '');
+        layerId = prompt('Fixed trait ID:', '');
         if (!layerId) return;
       }
       
@@ -782,7 +782,7 @@
       saveState();
     }
     
-    // Generar URL
+    // Generate URL
     function updateURL() {
       const params = new URLSearchParams();
       
@@ -813,39 +813,39 @@
       document.getElementById('url-display').textContent = url;
     }
     
-    // Copiar URL
+    // Copy URL
     function copyURL() {
       const url = document.getElementById('url-display').textContent;
       navigator.clipboard.writeText(url).then(() => {
-        showMessage('URL copiada al portapapeles', 'success');
+        showMessage('URL copied to clipboard', 'success');
       }).catch(() => {
-        showMessage('Error al copiar URL', 'error');
+        showMessage('Error copying URL', 'error');
       });
     }
     
-    // Abrir URL
+    // Open URL
     function openURL() {
       const url = document.getElementById('url-display').textContent;
       window.open(url, '_blank');
     }
     
-    // Generar preview
+    // Generate preview
     async function generatePreview() {
       const previewArea = document.getElementById('preview-area');
       const previewInfo = document.getElementById('preview-info');
       
-      // Validar
+      // Validate
       if (builderState.frames.length === 0) {
-        showMessage('Agrega al menos un frame', 'error');
+        showMessage('Add at least one frame', 'error');
         return;
       }
       
       if (builderState.frames.some(f => !f.id)) {
-        showMessage('Todos los frames deben tener un ID de trait', 'error');
+        showMessage('All frames must have a trait ID', 'error');
         return;
       }
       
-      previewArea.innerHTML = '<div class="loading"></div><p style="margin-top: 10px;">Generando preview...</p>';
+      previewArea.innerHTML = '<div class="loading"></div><p style="margin-top: 10px;">Generating preview...</p>';
       previewInfo.style.display = 'none';
       
       try {
@@ -861,7 +861,7 @@
         
         previewArea.innerHTML = `<img src="${imageUrl}" alt="Preview GIF">`;
         
-        // Mostrar información
+        // Show information
         const frameCount = response.headers.get('X-Frame-Count') || builderState.frames.length;
         const duration = response.headers.get('X-Duration-Ms') || 'N/A';
         const size = response.headers.get('X-Size-KB') || 'N/A';
@@ -874,14 +874,14 @@
         document.getElementById('info-layers').textContent = layers;
         previewInfo.style.display = 'block';
         
-        showMessage('Preview generado exitosamente', 'success');
+        showMessage('Preview generated successfully', 'success');
       } catch (error) {
         previewArea.innerHTML = `<p style="color: #ef4444;">Error: ${error.message}</p>`;
-        showMessage(`Error generando preview: ${error.message}`, 'error');
+        showMessage(`Error generating preview: ${error.message}`, 'error');
       }
     }
     
-    // Mostrar mensaje
+    // Show message
     function showMessage(text, type) {
       const area = document.getElementById('message-area');
       const msg = document.createElement('div');
@@ -908,7 +908,7 @@
       saveState();
     });
     
-    // Inicializar
+    // Initialize
     loadState();
     updateURL();
   </script>
