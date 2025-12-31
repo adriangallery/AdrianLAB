@@ -316,6 +316,94 @@
       color: #667eea;
     }
     
+    .frame-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .frame-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 12px;
+    }
+    
+    .frame-checkbox:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+    
+    .frame-checkbox input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+    
+    .frame-checkbox.selected {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .total-frames-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .total-frames-control input {
+      width: 80px;
+    }
+    
+    .trait-frame-config {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .trait-frame-config-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    
+    .quick-select-buttons {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .quick-select-btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .quick-select-btn:hover {
+      background: #f3f4f6;
+    }
+    
     @media (max-width: 1024px) {
       .main-layout {
         grid-template-columns: 1fr;
@@ -325,8 +413,13 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎬 GIF Builder</h1>
-    <p class="subtitle">Visual builder to generate animated GIFs with skins, traits and movements</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div>
+        <h1>🎬 GIF Builder</h1>
+        <p class="subtitle">Visual builder to generate animated GIFs with skins, traits and movements</p>
+      </div>
+      <a href="/admin" class="btn btn-secondary" style="text-decoration: none; margin-top: 10px;">← Admin Panel</a>
+    </div>
     
     <div class="main-layout">
       <!-- Panel de Configuración -->
@@ -379,18 +472,31 @@
           <button class="btn btn-primary btn-small" onclick="addFixedTrait()">+ Add Fixed Trait</button>
         </div>
         
-        <!-- Variable Frames -->
+        <!-- Total Frames Control -->
         <div class="section">
-          <div class="section-title">🎞️ Variable Frames</div>
+          <div class="section-title">🎞️ Total Frames</div>
+          <div class="total-frames-control">
+            <label>Number of frames:</label>
+            <input type="number" id="total-frames" value="10" min="1" max="100" 
+                   onchange="updateTotalFrames(parseInt(this.value))">
+          </div>
+        </div>
+        
+        <!-- Variable Frames / Traits -->
+        <div class="section">
+          <div class="section-title">🎞️ Variable Traits (Frame-based)</div>
           <div id="frames-list"></div>
-          <button class="btn btn-primary btn-small" onclick="addFrame()">+ Add Frame</button>
+          <button class="btn btn-primary btn-small" onclick="addFrame()">+ Add Trait</button>
         </div>
         
         <!-- Movements -->
         <div class="section">
-          <div class="section-title">🎭 Movements (Phase 1.5)</div>
+          <div class="section-title">🎭 Movements</div>
           <div id="movements-list"></div>
           <button class="btn btn-primary btn-small" onclick="addMovement()">+ Add Movement</button>
+          <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+            💡 Tip: Movements can be applied to specific frames by configuring the trait's frame selection above.
+          </p>
         </div>
       </div>
       
@@ -447,7 +553,9 @@
       base: '',
       fixed: [],
       frames: [],
-      movements: []
+      movements: [],
+      totalFrames: 10, // Total frames for the animation
+      frameConfigs: {} // Configurations per trait: { 'traitId': { frames: [1,2,3], movements: {...} } }
     };
     
     // Load saved state
@@ -473,6 +581,7 @@
       document.getElementById('version').value = builderState.version || 'v2';
       document.getElementById('method').value = builderState.method;
       document.getElementById('base').value = builderState.base || '';
+      document.getElementById('total-frames').value = builderState.totalFrames || 10;
       renderFixedTraits();
       renderFrames();
       renderMovements();
@@ -492,13 +601,38 @@
       container.innerHTML = '';
       
       builderState.fixed.forEach((trait, index) => {
+        const frameConfig = builderState.frameConfigs[trait.id] || { frames: [], movements: {} };
+        const selectedFrames = frameConfig.frames || [];
+        // Si no hay configuración, mostrar en todos los frames por defecto
+        const defaultFrames = selectedFrames.length === 0 
+          ? Array.from({length: builderState.totalFrames}, (_, i) => i + 1)
+          : selectedFrames;
+        
         const item = document.createElement('div');
         item.className = 'list-item';
+        item.style.flexDirection = 'column';
+        item.style.alignItems = 'stretch';
         item.innerHTML = `
-          <span class="drag-handle">☰</span>
-          <input type="text" value="${trait.id}" placeholder="Trait ID" 
-                 onchange="updateFixedTrait(${index}, this.value)">
-          <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <span class="drag-handle">☰</span>
+            <input type="text" value="${trait.id}" placeholder="Trait ID" 
+                   onchange="updateFixedTrait(${index}, this.value)" style="flex: 1;">
+            <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
+          </div>
+          ${trait.id ? `
+            <div class="trait-frame-config">
+              <div class="trait-frame-config-title">Appears in frames:</div>
+              <div class="quick-select-buttons">
+                <button class="quick-select-btn" onclick="selectAllFrames('${trait.id}')">All</button>
+                <button class="quick-select-btn" onclick="selectNoFrames('${trait.id}')">None</button>
+                <button class="quick-select-btn" onclick="selectFirstHalf('${trait.id}')">First Half</button>
+                <button class="quick-select-btn" onclick="selectSecondHalf('${trait.id}')">Second Half</button>
+              </div>
+              <div class="frame-selector" id="frame-selector-${trait.id}">
+                ${generateFrameCheckboxes(trait.id, defaultFrames)}
+              </div>
+            </div>
+          ` : ''}
         `;
         container.appendChild(item);
       });
@@ -510,19 +644,131 @@
       container.innerHTML = '';
       
       builderState.frames.forEach((frame, index) => {
+        const frameConfig = builderState.frameConfigs[frame.id] || { frames: [], movements: {} };
+        const selectedFrames = frameConfig.frames || [];
+        
         const item = document.createElement('div');
         item.className = 'list-item';
+        item.style.flexDirection = 'column';
+        item.style.alignItems = 'stretch';
         item.innerHTML = `
-          <span class="drag-handle">☰</span>
-          <input type="text" value="${frame.id}" placeholder="Trait ID" 
-                 onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
-          <input type="number" value="${frame.delay}" placeholder="Delay (ms)" min="10" max="5000"
-                 onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
-          <button class="btn btn-secondary btn-small btn-icon" onclick="duplicateFrame(${index})">📋</button>
-          <button class="btn btn-danger btn-small btn-icon" onclick="removeFrame(${index})">×</button>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <span class="drag-handle">☰</span>
+            <input type="text" value="${frame.id}" placeholder="Trait ID" 
+                   onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
+            <input type="number" value="${frame.delay || 500}" placeholder="Delay (ms)" min="10" max="5000"
+                   onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
+            <button class="btn btn-secondary btn-small btn-icon" onclick="duplicateFrame(${index})">📋</button>
+            <button class="btn btn-danger btn-small btn-icon" onclick="removeFrame(${index})">×</button>
+          </div>
+          ${frame.id ? `
+            <div class="trait-frame-config">
+              <div class="trait-frame-config-title">Appears in frames:</div>
+              <div class="quick-select-buttons">
+                <button class="quick-select-btn" onclick="selectAllFrames('${frame.id}')">All</button>
+                <button class="quick-select-btn" onclick="selectNoFrames('${frame.id}')">None</button>
+                <button class="quick-select-btn" onclick="selectFirstHalf('${frame.id}')">First Half</button>
+                <button class="quick-select-btn" onclick="selectSecondHalf('${frame.id}')">Second Half</button>
+              </div>
+              <div class="frame-selector" id="frame-selector-${frame.id}">
+                ${generateFrameCheckboxes(frame.id, selectedFrames)}
+              </div>
+            </div>
+          ` : ''}
         `;
         container.appendChild(item);
       });
+    }
+    
+    // Generate frame checkboxes
+    function generateFrameCheckboxes(traitId, selectedFrames) {
+      let html = '';
+      for (let i = 1; i <= builderState.totalFrames; i++) {
+        const isSelected = selectedFrames.includes(i);
+        html += `
+          <label class="frame-checkbox ${isSelected ? 'selected' : ''}">
+            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                   onchange="toggleFrameForTrait('${traitId}', ${i}, this.checked)">
+            ${i}
+          </label>
+        `;
+      }
+      return html;
+    }
+    
+    // Frame selection functions
+    function toggleFrameForTrait(traitId, frameNum, selected) {
+      if (!builderState.frameConfigs[traitId]) {
+        builderState.frameConfigs[traitId] = { frames: [], movements: {} };
+      }
+      
+      const frames = builderState.frameConfigs[traitId].frames;
+      if (selected) {
+        if (!frames.includes(frameNum)) {
+          frames.push(frameNum);
+          frames.sort((a, b) => a - b);
+        }
+      } else {
+        const index = frames.indexOf(frameNum);
+        if (index > -1) {
+          frames.splice(index, 1);
+        }
+      }
+      
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function selectAllFrames(traitId) {
+      if (!builderState.frameConfigs[traitId]) {
+        builderState.frameConfigs[traitId] = { frames: [], movements: {} };
+      }
+      builderState.frameConfigs[traitId].frames = Array.from({length: builderState.totalFrames}, (_, i) => i + 1);
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function selectNoFrames(traitId) {
+      if (!builderState.frameConfigs[traitId]) {
+        builderState.frameConfigs[traitId] = { frames: [], movements: {} };
+      }
+      builderState.frameConfigs[traitId].frames = [];
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function selectFirstHalf(traitId) {
+      if (!builderState.frameConfigs[traitId]) {
+        builderState.frameConfigs[traitId] = { frames: [], movements: {} };
+      }
+      const half = Math.ceil(builderState.totalFrames / 2);
+      builderState.frameConfigs[traitId].frames = Array.from({length: half}, (_, i) => i + 1);
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function selectSecondHalf(traitId) {
+      if (!builderState.frameConfigs[traitId]) {
+        builderState.frameConfigs[traitId] = { frames: [], movements: {} };
+      }
+      const half = Math.ceil(builderState.totalFrames / 2);
+      builderState.frameConfigs[traitId].frames = Array.from({length: builderState.totalFrames - half}, (_, i) => i + half + 1);
+      renderFrames();
+      updateURL();
+      saveState();
+    }
+    
+    function updateTotalFrames(value) {
+      builderState.totalFrames = Math.max(1, Math.min(100, value || 10));
+      document.getElementById('total-frames').value = builderState.totalFrames;
+      renderFrames();
+      renderFixedTraits();
+      updateURL();
+      saveState();
     }
     
     // Render movements
@@ -689,7 +935,16 @@
     }
     
     function updateFixedTrait(index, value) {
+      const oldId = builderState.fixed[index].id;
       builderState.fixed[index].id = value;
+      
+      // Si cambió el ID, migrar la configuración
+      if (oldId && oldId !== value && builderState.frameConfigs[oldId]) {
+        builderState.frameConfigs[value] = builderState.frameConfigs[oldId];
+        delete builderState.frameConfigs[oldId];
+      }
+      
+      renderFixedTraits();
       updateURL();
       saveState();
     }
@@ -710,7 +965,16 @@
     }
     
     function updateFrameId(index, value) {
+      const oldId = builderState.frames[index].id;
       builderState.frames[index].id = value;
+      
+      // Si cambió el ID, migrar la configuración
+      if (oldId && oldId !== value && builderState.frameConfigs[oldId]) {
+        builderState.frameConfigs[value] = builderState.frameConfigs[oldId];
+        delete builderState.frameConfigs[oldId];
+      }
+      
+      renderFrames();
       updateURL();
       saveState();
     }
@@ -847,15 +1111,75 @@
       
       if (builderState.method) params.set('method', builderState.method);
       if (builderState.base) params.set('base', builderState.base);
-      if (builderState.fixed.length > 0) {
-        params.set('fixed', builderState.fixed.map(t => t.id).filter(id => id).join(','));
+      
+      // Fixed traits - solo incluir los que tienen frames seleccionados
+      const activeFixed = builderState.fixed.filter(t => {
+        if (!t.id) return false;
+        const config = builderState.frameConfigs[t.id];
+        return !config || config.frames.length > 0;
+      });
+      if (activeFixed.length > 0) {
+        params.set('fixed', activeFixed.map(t => t.id).join(','));
       }
-      if (builderState.frames.length > 0) {
-        params.set('frames', builderState.frames
+      
+      // Variable frames - generar frames basados en la configuración
+      // Si un trait aparece en múltiples frames, generar múltiples entradas
+      const frameEntries = [];
+      const hasFrameConfig = builderState.frames.some(f => {
+        if (!f.id) return false;
+        const config = builderState.frameConfigs[f.id];
+        return config && config.frames && config.frames.length > 0;
+      });
+      
+      if (hasFrameConfig) {
+        // Usar configuración de frames: generar un frame por cada frame número donde hay un trait
+        for (let frameNum = 1; frameNum <= builderState.totalFrames; frameNum++) {
+          // Encontrar qué trait variable aparece en este frame
+          const traitForFrame = builderState.frames.find(f => {
+            if (!f.id) return false;
+            const config = builderState.frameConfigs[f.id];
+            const frames = config?.frames || [];
+            return frames.includes(frameNum);
+          });
+          
+          if (traitForFrame) {
+            frameEntries.push({
+              id: traitForFrame.id,
+              delay: traitForFrame.delay || 500,
+              frameNum: frameNum
+            });
+          } else {
+            // Si no hay trait para este frame, usar el último trait o el primero como fallback
+            const fallbackTrait = builderState.frames.find(f => f.id) || builderState.frames[0];
+            if (fallbackTrait && fallbackTrait.id) {
+              frameEntries.push({
+                id: fallbackTrait.id,
+                delay: fallbackTrait.delay || 500,
+                frameNum: frameNum
+              });
+            }
+          }
+        }
+      } else {
+        // Método antiguo: un frame por cada trait (compatibilidad)
+        builderState.frames
           .filter(f => f.id)
-          .map(f => `${f.id}:${f.delay || 500}`)
+          .forEach(f => {
+            frameEntries.push({
+              id: f.id,
+              delay: f.delay || 500,
+              frameNum: null
+            });
+          });
+      }
+      
+      if (frameEntries.length > 0) {
+        params.set('frames', frameEntries
+          .map(f => `${f.id}:${f.delay}`)
           .join(','));
       }
+      
+      // Movements - incluir movimientos que estén habilitados
       if (builderState.movements.length > 0) {
         builderState.movements
           .filter(m => m.enabled)
@@ -978,8 +1302,19 @@
       saveState();
     });
     
+    document.getElementById('total-frames').addEventListener('change', (e) => {
+      updateTotalFrames(parseInt(e.target.value));
+    });
+    
     // Initialize
     loadState();
+    // Asegurar que totalFrames tiene un valor por defecto
+    if (!builderState.totalFrames) {
+      builderState.totalFrames = 10;
+    }
+    if (!builderState.frameConfigs) {
+      builderState.frameConfigs = {};
+    }
     updateURL();
   </script>
 </body>
