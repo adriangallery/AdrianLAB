@@ -1259,9 +1259,14 @@ export default async function handler(req, res) {
       console.error('[custom-external] ❌ Error en renderizado externo:', error.message);
       console.log('[custom-external] 🔄 Fallback a renderizado local...');
     }
+    } // Cerrar else
 
-    // Si el servicio externo falló, continuar con renderizado local
-    console.log('[custom-external] 🏠 Usando renderizado local (fallback)');
+    // Si el servicio externo falló o hay traits animados, continuar con renderizado local
+    if (hasAnimatedTraits) {
+      console.log('[custom-external] 🎬 Renderizando GIF en Vercel (traits animados detectados)');
+    } else {
+      console.log('[custom-external] 🏠 Usando renderizado local (fallback)');
+    }
 
     // 1. PRIMERO: Renderizar BACKGROUND si existe
     if (finalTraits['BACKGROUND']) {
