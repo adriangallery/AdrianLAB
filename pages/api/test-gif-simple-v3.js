@@ -81,7 +81,7 @@ function parseMovements(moveParams) {
  */
 async function detectAnimatedVariants(baseId) {
   const variants = [];
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const letters = 'abcdefghijklmnopqrstuvwxyz'.split(''); // Convertir string a array
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
   
   // Verificar variantes en paralelo
