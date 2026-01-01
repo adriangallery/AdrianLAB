@@ -64,7 +64,7 @@ async function generateGifWithGifwrap(svgIds, delay) {
   
   // 3. Cuantizar colores a 256
   console.log(`[test-gif-simple] [GIFWRAP] Cuantizando ${gifFrames.length} frames a 256 colores...`);
-  GifUtil.quantizeWu(gifFrames, 256);
+  GifUtil.quantizeSorokin(gifFrames, 256);
   console.log(`[test-gif-simple] [GIFWRAP] Cuantización completada`);
   
   // 4. Generar GIF

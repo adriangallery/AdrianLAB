@@ -342,9 +342,9 @@ export default async function handler(req, res) {
       console.log(`[test-simple] Ensamblando GIF con ${gifFrames.length} frames...`);
       console.log(`[test-simple] Dimensiones del primer frame: ${gifFrames[0].bitmap.width}x${gifFrames[0].bitmap.height}`);
       
-      // Cuantizar colores (reducir a 256 colores por frame) usando algoritmo Wu
+      // Cuantizar colores (reducir a 256 colores por frame) usando algoritmo Sorokin para mejor calidad
       console.log(`[test-simple] Cuantizando colores de los frames a 256 colores...`);
-      GifUtil.quantizeWu(gifFrames, 256);
+      GifUtil.quantizeSorokin(gifFrames, 256);
       console.log(`[test-simple] Cuantización completada`);
       
       const codec = new GifCodec();

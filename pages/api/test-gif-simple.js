@@ -481,7 +481,7 @@ async function generateGifWithGifwrap(config) {
   
   // Cuantizar colores a 256
   console.log(`[GIFWRAP] Cuantizando ${gifFrames.length} frames...`);
-  GifUtil.quantizeWu(gifFrames, 256);
+  GifUtil.quantizeSorokin(gifFrames, 256);
   
   // Generar GIF
   console.log(`[GIFWRAP] Generando GIF...`);

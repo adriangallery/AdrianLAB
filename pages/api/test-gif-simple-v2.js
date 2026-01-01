@@ -660,10 +660,10 @@ async function generateGifWithGifwrap(config) {
     // Usar el número de colores de la paleta original (máximo 256)
     const paletteSize = Math.min(originalGifPalette.length, 256);
     console.log(`[GIFWRAP] Usando paleta original con ${paletteSize} colores`);
-    GifUtil.quantizeWu(outputGifFrames, paletteSize);
+    GifUtil.quantizeSorokin(outputGifFrames, paletteSize);
   } else {
     // Sin paleta original, usar cuantización estándar a 256
-    GifUtil.quantizeWu(outputGifFrames, 256);
+    GifUtil.quantizeSorokin(outputGifFrames, 256);
   }
   
   // Generar GIF
