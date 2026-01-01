@@ -734,6 +734,33 @@
         container.appendChild(item);
       });
       
+      // Mostrar información de sincronización si hay múltiples traits
+      const syncInfo = calculateSyncInfo();
+      if (syncInfo && builderState.animatedTraits.length > 1) {
+        const syncDiv = document.createElement('div');
+        syncDiv.style.cssText = 'margin-top: 15px; padding: 10px; background: #f3f4f6; border-radius: 6px; font-size: 12px;';
+        syncDiv.innerHTML = `
+          <div style="font-weight: 600; margin-bottom: 5px; color: #374151;">📊 Sincronización de Traits:</div>
+          <div style="color: ${syncInfo.syncMode === 'perfect' ? '#059669' : '#d97706'}; margin-bottom: 5px;">
+            ${syncInfo.message}
+          </div>
+          ${syncInfo.cycles ? `
+            <div style="margin-top: 8px; color: #6b7280;">
+              <div style="font-weight: 500; margin-bottom: 3px;">Ciclos por trait:</div>
+              ${syncInfo.cycles.map(c => 
+                `<div style="margin-left: 10px;">• Trait ${c.traitId}: ${c.variants} variantes → ${c.cycles} ciclos completos</div>`
+              ).join('')}
+            </div>
+          ` : ''}
+          ${syncInfo.syncMode === 'cycled' ? `
+            <div style="margin-top: 8px; color: #6b7280; font-style: italic;">
+              Los traits ciclarán independientemente usando módulo (preserva loops cerrados)
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(syncDiv);
+      }
+      
       // Actualizar total frames basado en animated traits
       updateTotalFramesFromAnimatedTraits();
     }
@@ -795,24 +822,100 @@
       saveState();
     }
     
-    // Actualizar total frames basado en animated traits
+    // Calcular GCD (Máximo Común Divisor)
+    function calculateGCD(a, b) {
+      while (b !== 0) {
+        [a, b] = [b, a % b];
+      }
+      return a;
+    }
+    
+    // Calcular LCM (Mínimo Común Múltiplo) de un array de números
+    function calculateLCM(numbers) {
+      if (numbers.length === 0) return 1;
+      if (numbers.length === 1) return numbers[0];
+      
+      let lcm = numbers[0];
+      for (let i = 1; i < numbers.length; i++) {
+        lcm = (lcm * numbers[i]) / calculateGCD(lcm, numbers[i]);
+      }
+      return lcm;
+    }
+    
+    // Calcular información de sincronización para múltiples traits animados
+    function calculateSyncInfo() {
+      if (!builderState.animatedTraits || !Array.isArray(builderState.animatedTraits)) {
+        return null;
+      }
+      
+      const variantCounts = [];
+      let maxVariants = 0;
+      
+      builderState.animatedTraits.forEach(animTrait => {
+        if (animTrait.variants && animTrait.variants.length > 0) {
+          variantCounts.push(animTrait.variants.length);
+          maxVariants = Math.max(maxVariants, animTrait.variants.length);
+        }
+      });
+      
+      if (variantCounts.length === 0) {
+        return null;
+      }
+      
+      const MAX_FRAMES_LCM = 15;
+      let totalFrames;
+      let syncMode;
+      let syncInfo;
+      
+      if (variantCounts.length === 1) {
+        totalFrames = variantCounts[0];
+        syncMode = 'single';
+        syncInfo = { totalFrames, syncMode, message: `Un solo trait: ${totalFrames} frames` };
+      } else {
+        const lcm = calculateLCM(variantCounts);
+        
+        if (lcm <= MAX_FRAMES_LCM) {
+          totalFrames = lcm;
+          syncMode = 'perfect';
+          const cycles = variantCounts.map((count, i) => ({
+            traitId: builderState.animatedTraits[i].baseId,
+            variants: count,
+            cycles: lcm / count
+          }));
+          syncInfo = {
+            totalFrames,
+            syncMode,
+            lcm,
+            cycles,
+            message: `✅ Sincronización perfecta: ${lcm} frames (MCM ≤ ${MAX_FRAMES_LCM})`
+          };
+        } else {
+          totalFrames = maxVariants;
+          syncMode = 'cycled';
+          syncInfo = {
+            totalFrames,
+            syncMode,
+            lcm,
+            message: `⚠️ MCM (${lcm}) > ${MAX_FRAMES_LCM}: usando ${totalFrames} frames (con ciclos)`
+          };
+        }
+      }
+      
+      return syncInfo;
+    }
+    
+    // Actualizar total frames basado en animated traits usando lógica MCM
     function updateTotalFramesFromAnimatedTraits() {
       if (!builderState.animatedTraits || !Array.isArray(builderState.animatedTraits)) {
         return;
       }
       
-      let totalAnimatedFrames = 0;
-      builderState.animatedTraits.forEach(animTrait => {
-        if (animTrait.variants && animTrait.variants.length > 0) {
-          totalAnimatedFrames += animTrait.variants.length;
-        }
-      });
+      const syncInfo = calculateSyncInfo();
       
-      // Si hay animated traits, actualizar total frames
-      if (totalAnimatedFrames > 0) {
-        // Solo actualizar si el total actual es menor o si no hay frames configurados
-        if (totalAnimatedFrames > builderState.totalFrames || builderState.frames.length === 0) {
-          builderState.totalFrames = totalAnimatedFrames;
+      if (syncInfo && syncInfo.totalFrames > 0) {
+        // Actualizar total frames con el valor calculado
+        if (syncInfo.totalFrames > builderState.totalFrames || builderState.frames.length === 0) {
+          builderState.totalFrames = syncInfo.totalFrames;
           document.getElementById('total-frames').value = builderState.totalFrames;
         }
       }
