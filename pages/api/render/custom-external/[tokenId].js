@@ -726,6 +726,33 @@ export default async function handler(req, res) {
     // Detectar si hay traits personalizados comparando finalTraits con currentTraits
     const hasCustomTraits = JSON.stringify(finalTraits) !== JSON.stringify(currentTraits);
 
+    // ===== DETECCIÓN DE TRAITS ANIMADOS =====
+    // Obtener lista de traitIds para detectar animados
+    const allTraitIds = Object.values(finalTraits).filter(id => id && id !== 'None' && id !== '');
+    const animatedTraits = await getAnimatedTraits(allTraitIds);
+    const hasAnimatedTraits = animatedTraits.length > 0;
+    
+    if (hasAnimatedTraits) {
+      console.log(`[custom-external] 🎬 Traits animados detectados: ${animatedTraits.length}`);
+      animatedTraits.forEach((at, i) => {
+        console.log(`[custom-external] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
+      });
+      
+      // Verificar caché de GIF
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId);
+      if (cachedGif) {
+        console.log(`[custom-external] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
+        const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+        res.setHeader('X-Cache', 'HIT');
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
+        return res.status(200).send(cachedGif);
+      }
+      
+      console.log(`[custom-external] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+    }
+
     // Generar PNG estático (eliminada lógica de animaciones)
     console.log('[custom-render] Generando PNG estático...');
 
@@ -1588,6 +1615,13 @@ export default async function handler(req, res) {
           }
           const traitId = finalTraits[category];
           
+          // LÓGICA ANIMADA: Saltar traits animados (se renderizarán en el GIF)
+          const isAnimatedTrait = animatedTraits.some(at => at.baseId === traitId.toString());
+          if (isAnimatedTrait) {
+            console.log(`[custom-external] PASO 3 - 🎬 Saltando trait animado ${category} (${traitId}) - se renderizará en GIF`);
+            continue;
+          }
+          
           // Debug mejorado para traits externos
           if (traitsMapping[traitId] && traitsMapping[traitId].isExternal) {
             console.log(`[custom-render] 🌐 PASO 3 - Renderizando trait externo: ${category} (${traitId}) - ${traitsMapping[traitId].name}`);
@@ -1641,6 +1675,13 @@ export default async function handler(req, res) {
     for (const category of topOrder) {
       if (finalTraits[category]) {
         const traitId = finalTraits[category];
+        
+        // LÓGICA ANIMADA: Saltar traits animados (se renderizarán en el GIF)
+        const isAnimatedTrait = animatedTraits.some(at => at.baseId === traitId.toString());
+        if (isAnimatedTrait) {
+          console.log(`[custom-external] PASO 3 - 🎬 Saltando trait animado ${category} (${traitId}) - se renderizará en GIF`);
+          continue;
+        }
         
         // Intentar obtener del caché de componentes primero
         const cachedTopTrait = getCachedComponent('trait', traitId);
