@@ -697,10 +697,10 @@ export default async function handler(req, res) {
         console.log(`[custom-render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
       });
       
-      // Verificar caché de GIF
-      const cachedGif = getCachedAdrianZeroGif(cleanTokenId);
+      // Verificar caché de GIF (incluyendo finalTraits en la clave)
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, finalTraits);
       if (cachedGif) {
-        console.log(`[custom-render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
+        console.log(`[custom-render] 🎬 CACHE HIT para GIF de token ${cleanTokenId} con traits personalizados`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('Content-Type', 'image/gif');
@@ -1704,8 +1704,8 @@ export default async function handler(req, res) {
           delay: 500
         });
         
-        // Guardar en caché
-        setCachedAdrianZeroGif(cleanTokenId, gifBuffer);
+        // Guardar en caché (incluyendo finalTraits en la clave)
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, finalTraits);
         
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         console.log(`[custom-render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);

@@ -873,8 +873,10 @@ export default async function handler(req, res) {
         console.log(`[render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
       });
       
-      // Verificar caché de GIF
-      const cachedGif = getCachedAdrianZeroGif(cleanTokenId);
+      // Verificar caché de GIF (usando equippedTraits, que se modificará después si es necesario)
+      // Nota: equippedTraits puede modificarse después (SubZERO, SamuraiZERO), pero la detección de animados
+      // se hace antes. El caché se actualizará con equippedTraits final cuando se guarde.
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, equippedTraits);
       if (cachedGif) {
         console.log(`[render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -2002,8 +2004,8 @@ export default async function handler(req, res) {
           delay: 500
         });
         
-        // Guardar en caché
-        setCachedAdrianZeroGif(cleanTokenId, gifBuffer);
+        // Guardar en caché (usando equippedTraits final después de todas las modificaciones)
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, equippedTraits);
         
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         console.log(`[render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
