@@ -5,6 +5,32 @@ import sharp from 'sharp';
 import GifEncoder from 'gif-encoder-2';
 import { createCanvas, loadImage } from 'canvas';
 
+const MAX_FRAMES_LCM = 15; // Límite máximo para usar MCM (sincronización perfecta)
+
+/**
+ * Calcular Máximo Común Divisor (GCD)
+ */
+function calculateGCD(a, b) {
+  while (b !== 0) {
+    [a, b] = [b, a % b];
+  }
+  return a;
+}
+
+/**
+ * Calcular Mínimo Común Múltiplo (LCM) de un array de números
+ */
+function calculateLCM(numbers) {
+  if (numbers.length === 0) return 1;
+  if (numbers.length === 1) return numbers[0];
+  
+  let lcm = numbers[0];
+  for (let i = 1; i < numbers.length; i++) {
+    lcm = (lcm * numbers[i]) / calculateGCD(lcm, numbers[i]);
+  }
+  return lcm;
+}
+
 /**
  * V3: Endpoint con GIF como background visual
  * 
@@ -559,8 +585,9 @@ async function loadAdrianZero(tokenId) {
 /**
  * Generar un frame con múltiples capas y transformaciones
  * V3: GIF como background visual que se cicla
+ * @param {Array} animatedVariants - Array de variantes de animated traits para combinar simultáneamente [{ id, baseId, delay }, ...]
  */
-async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null, adrianZeroBuffer = null, width = 400, height = 400) {
+async function generateLayeredFrame(baseId, fixedIds, variableId, method, movements, frameIndex, totalFrames, gifFrame = null, adrianZeroBuffer = null, width = 400, height = 400, animatedVariants = null) {
   const layers = [];
   
   // 0. AdrianZERO renderizado (si existe) - va primero (más abajo de todo)
@@ -611,8 +638,22 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
     });
   }
   
-  // 4. Trait variable del frame
-  if (variableId) {
+  // 4. Trait variable del frame O animated traits combinados
+  if (animatedVariants && animatedVariants.length > 0) {
+    // Combinar múltiples animated traits simultáneamente
+    for (const animVariant of animatedVariants) {
+      const variantPng = await svgToPng(animVariant.id, method, width);
+      // Por ahora, no aplicar movimientos a animated traits (se pueden añadir después)
+      layers.push({ 
+        id: animVariant.id, 
+        pngBuffer: variantPng, 
+        type: 'animated',
+        baseId: animVariant.baseId,
+        transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+      });
+    }
+  } else if (variableId) {
+    // Trait variable normal (un solo trait)
     const variablePng = await svgToPng(variableId, method, width);
     const varMovement = findMovement(movements, 'variable');
     const varTransform = calculatePosition(varMovement, frameIndex, totalFrames);
@@ -647,22 +688,72 @@ async function generateGifWithGifwrap(config) {
   console.log(`[GIFWRAP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
   console.log(`[GIFWRAP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
   
-  // Expandir animated traits a frames
+  // Expandir animated traits usando lógica MCM (combinar simultáneamente, no secuencialmente)
   let expandedFrames = [...frames];
+  let animatedTraitsData = []; // Almacenar datos de animated traits para combinarlos
+  
   if (animatedTraits && animatedTraits.length > 0) {
+    // Primero, detectar todas las variantes de todos los animated traits
     for (const animTrait of animatedTraits) {
       const variants = await detectAnimatedVariants(animTrait.baseId);
       if (variants.length > 0) {
         console.log(`[GIFWRAP-V3] Animated trait ${animTrait.baseId}: ${variants.length} variants encontrados`);
-        variants.forEach(variant => {
-          expandedFrames.push({
-            id: variant,
-            delay: animTrait.delay
-          });
+        animatedTraitsData.push({
+          baseId: animTrait.baseId,
+          variants: variants,
+          delay: animTrait.delay
         });
       } else {
         console.warn(`[GIFWRAP-V3] No se encontraron variantes para ${animTrait.baseId}`);
       }
+    }
+    
+    // Si hay animated traits, calcular total de frames usando MCM
+    if (animatedTraitsData.length > 0) {
+      const variantCounts = animatedTraitsData.map(at => at.variants.length);
+      const maxVariants = Math.max(...variantCounts);
+      let totalAnimatedFrames;
+      let syncMode;
+      
+      if (variantCounts.length === 1) {
+        totalAnimatedFrames = variantCounts[0];
+        syncMode = 'single';
+      } else {
+        const lcm = calculateLCM(variantCounts);
+        if (lcm <= MAX_FRAMES_LCM) {
+          totalAnimatedFrames = lcm;
+          syncMode = 'perfect';
+          console.log(`[GIFWRAP-V3] ✅ MCM (${lcm}) ≤ ${MAX_FRAMES_LCM}: usando ${totalAnimatedFrames} frames (sincronización perfecta)`);
+        } else {
+          totalAnimatedFrames = maxVariants;
+          syncMode = 'cycled';
+          console.log(`[GIFWRAP-V3] ⚠️ MCM (${lcm}) > ${MAX_FRAMES_LCM}: usando máximo ${totalAnimatedFrames} frames (con ciclos)`);
+        }
+      }
+      
+      // Generar frames combinando todos los animated traits simultáneamente
+      for (let frameIndex = 0; frameIndex < totalAnimatedFrames; frameIndex++) {
+        // Para cada frame, combinar las variantes correspondientes de todos los traits
+        const animatedVariants = animatedTraitsData.map(animTrait => {
+          const variantIndex = frameIndex % animTrait.variants.length; // Ciclar usando módulo
+          return {
+            id: animTrait.variants[variantIndex],
+            baseId: animTrait.baseId,
+            delay: animTrait.delay
+          };
+        });
+        
+        // Usar el delay del primer animated trait (o el común si todos tienen el mismo)
+        const commonDelay = animatedTraitsData[0].delay;
+        
+        expandedFrames.push({
+          id: null, // No hay un solo trait variable, hay múltiples animated traits
+          animatedVariants: animatedVariants, // Array de variantes combinadas
+          delay: commonDelay
+        });
+      }
+      
+      console.log(`[GIFWRAP-V3] Generados ${totalAnimatedFrames} frames combinando ${animatedTraitsData.length} animated traits (modo: ${syncMode})`);
     }
   }
   
@@ -704,13 +795,21 @@ async function generateGifWithGifwrap(config) {
     // V3: Usar frame SVG correspondiente (de expandedFrames)
     const svgFrame = expandedFrames[i];
     
-    console.log(`[GIFWRAP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
+    // Determinar si este frame tiene animated traits combinados
+    const hasAnimatedVariants = svgFrame.animatedVariants && svgFrame.animatedVariants.length > 0;
+    const variableId = hasAnimatedVariants ? null : svgFrame.id; // Si hay animated variants, no usar variableId
+    
+    if (hasAnimatedVariants) {
+      console.log(`[GIFWRAP-V3] Frame ${i + 1}/${totalFrames}: Animated traits combinados: ${svgFrame.animatedVariants.map(av => av.id).join(', ')} (${svgFrame.delay}ms)`);
+    } else {
+      console.log(`[GIFWRAP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
+    }
     
     // Generar frame con capas, transformaciones, AdrianZERO base y GIF background
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
-      svgFrame.id,
+      variableId,
       'resvg',
       movements,
       i,
@@ -718,7 +817,8 @@ async function generateGifWithGifwrap(config) {
       gifFrame,
       adrianZeroBuffer,
       width,
-      height
+      height,
+      hasAnimatedVariants ? svgFrame.animatedVariants : null // Pasar animated variants si existen
     );
     
     console.log(`[GIFWRAP-V3] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
@@ -777,22 +877,72 @@ async function generateGifWithSharp(config) {
   console.log(`[SHARP-V3] - GIF Background: ${gifId || 'ninguno'} (se cicla como background)`);
   console.log(`[SHARP-V3] - AdrianZERO TokenId: ${adrianZeroTokenId || 'ninguno'} (base renderizada)`);
   
-  // Expandir animated traits a frames
+  // Expandir animated traits usando lógica MCM (combinar simultáneamente, no secuencialmente)
   let expandedFrames = [...frames];
+  let animatedTraitsData = []; // Almacenar datos de animated traits para combinarlos
+  
   if (animatedTraits && animatedTraits.length > 0) {
+    // Primero, detectar todas las variantes de todos los animated traits
     for (const animTrait of animatedTraits) {
       const variants = await detectAnimatedVariants(animTrait.baseId);
       if (variants.length > 0) {
         console.log(`[SHARP-V3] Animated trait ${animTrait.baseId}: ${variants.length} variants encontrados`);
-        variants.forEach(variant => {
-          expandedFrames.push({
-            id: variant,
-            delay: animTrait.delay
-          });
+        animatedTraitsData.push({
+          baseId: animTrait.baseId,
+          variants: variants,
+          delay: animTrait.delay
         });
       } else {
         console.warn(`[SHARP-V3] No se encontraron variantes para ${animTrait.baseId}`);
       }
+    }
+    
+    // Si hay animated traits, calcular total de frames usando MCM
+    if (animatedTraitsData.length > 0) {
+      const variantCounts = animatedTraitsData.map(at => at.variants.length);
+      const maxVariants = Math.max(...variantCounts);
+      let totalAnimatedFrames;
+      let syncMode;
+      
+      if (variantCounts.length === 1) {
+        totalAnimatedFrames = variantCounts[0];
+        syncMode = 'single';
+      } else {
+        const lcm = calculateLCM(variantCounts);
+        if (lcm <= MAX_FRAMES_LCM) {
+          totalAnimatedFrames = lcm;
+          syncMode = 'perfect';
+          console.log(`[SHARP-V3] ✅ MCM (${lcm}) ≤ ${MAX_FRAMES_LCM}: usando ${totalAnimatedFrames} frames (sincronización perfecta)`);
+        } else {
+          totalAnimatedFrames = maxVariants;
+          syncMode = 'cycled';
+          console.log(`[SHARP-V3] ⚠️ MCM (${lcm}) > ${MAX_FRAMES_LCM}: usando máximo ${totalAnimatedFrames} frames (con ciclos)`);
+        }
+      }
+      
+      // Generar frames combinando todos los animated traits simultáneamente
+      for (let frameIndex = 0; frameIndex < totalAnimatedFrames; frameIndex++) {
+        // Para cada frame, combinar las variantes correspondientes de todos los traits
+        const animatedVariants = animatedTraitsData.map(animTrait => {
+          const variantIndex = frameIndex % animTrait.variants.length; // Ciclar usando módulo
+          return {
+            id: animTrait.variants[variantIndex],
+            baseId: animTrait.baseId,
+            delay: animTrait.delay
+          };
+        });
+        
+        // Usar el delay del primer animated trait (o el común si todos tienen el mismo)
+        const commonDelay = animatedTraitsData[0].delay;
+        
+        expandedFrames.push({
+          id: null, // No hay un solo trait variable, hay múltiples animated traits
+          animatedVariants: animatedVariants, // Array de variantes combinadas
+          delay: commonDelay
+        });
+      }
+      
+      console.log(`[SHARP-V3] Generados ${totalAnimatedFrames} frames combinando ${animatedTraitsData.length} animated traits (modo: ${syncMode})`);
     }
   }
   
@@ -827,10 +977,18 @@ async function generateGifWithSharp(config) {
     const gifFrameIndex = gifFramesData ? (i % gifFramesData.length) : null;
     const gifFrame = gifFramesData ? gifFramesData[gifFrameIndex] : null;
     
-    // V3: Usar frame SVG correspondiente
+    // V3: Usar frame SVG correspondiente (de expandedFrames)
     const svgFrame = expandedFrames[i];
     
-    console.log(`[SHARP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
+    // Determinar si este frame tiene animated traits combinados
+    const hasAnimatedVariants = svgFrame.animatedVariants && svgFrame.animatedVariants.length > 0;
+    const variableId = hasAnimatedVariants ? null : svgFrame.id; // Si hay animated variants, no usar variableId
+    
+    if (hasAnimatedVariants) {
+      console.log(`[SHARP-V3] Frame ${i + 1}/${totalFrames}: Animated traits combinados: ${svgFrame.animatedVariants.map(av => av.id).join(', ')} (${svgFrame.delay}ms)`);
+    } else {
+      console.log(`[SHARP-V3] Frame ${i + 1}/${totalFrames}: SVG trait ${svgFrame.id} (${svgFrame.delay}ms), GIF background frame ${gifFrameIndex !== null ? gifFrameIndex + 1 : 'N/A'}`);
+    }
     
     // V3: SIEMPRE usar el delay del SVG (SVG controla la velocidad)
     const delayMs = svgFrame.delay;
@@ -840,7 +998,7 @@ async function generateGifWithSharp(config) {
     const compositePng = await generateLayeredFrame(
       base,
       fixed,
-      svgFrame.id,
+      variableId,
       'sharp',
       movements,
       i,
@@ -848,7 +1006,8 @@ async function generateGifWithSharp(config) {
       gifFrame,
       adrianZeroBuffer,
       width,
-      height
+      height,
+      hasAnimatedVariants ? svgFrame.animatedVariants : null // Pasar animated variants si existen
     );
     
     console.log(`[SHARP-V3] Frame ${i + 1} compuesto, tamaño: ${compositePng.length} bytes`);
@@ -880,12 +1039,27 @@ export default async function handler(req, res) {
     // Parsear parámetros
     const config = parseQueryParams(req.query);
     
-    // Expandir animated traits a frames antes de validar
+    // Calcular total de frames antes de validar (usando lógica MCM para animated traits)
     let totalFrames = config.frames.length;
     if (config.animatedTraits && config.animatedTraits.length > 0) {
+      // Detectar variantes de todos los animated traits
+      const animatedTraitsData = [];
       for (const animTrait of config.animatedTraits) {
         const variants = await detectAnimatedVariants(animTrait.baseId);
-        totalFrames += variants.length;
+        if (variants.length > 0) {
+          animatedTraitsData.push(variants.length);
+        }
+      }
+      
+      // Calcular frames usando MCM si hay múltiples animated traits
+      if (animatedTraitsData.length > 0) {
+        if (animatedTraitsData.length === 1) {
+          totalFrames += animatedTraitsData[0];
+        } else {
+          const maxVariants = Math.max(...animatedTraitsData);
+          const lcm = calculateLCM(animatedTraitsData);
+          totalFrames += (lcm <= MAX_FRAMES_LCM) ? lcm : maxVariants;
+        }
       }
     }
     

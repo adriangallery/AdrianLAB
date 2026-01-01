@@ -722,7 +722,9 @@
                 Found ${animTrait.variants.length} variants: ${animTrait.variants.join(', ')}
               </div>
               <div style="font-size: 11px; color: #6b7280; margin-top: 5px;">
-                Auto-assigned to frames ${animTrait.startFrame || 1} to ${(animTrait.startFrame || 1) + animTrait.variants.length - 1}
+                ${builderState.animatedTraits.length > 1 
+                  ? 'Combinado simultáneamente con otros animated traits' 
+                  : `Auto-assigned to frames ${animTrait.startFrame || 1} to ${(animTrait.startFrame || 1) + animTrait.variants.length - 1}`}
               </div>
             </div>
           ` : animTrait.baseId ? `
@@ -806,16 +808,7 @@
       
       // Actualizar el trait animado
       animTrait.variants = variants;
-      
-      // Calcular startFrame basado en traits anteriores
-      let startFrame = 1;
-      for (let i = 0; i < index; i++) {
-        const prevTrait = builderState.animatedTraits[i];
-        if (prevTrait.variants && prevTrait.variants.length > 0) {
-          startFrame += prevTrait.variants.length;
-        }
-      }
-      animTrait.startFrame = startFrame;
+      // No calcular startFrame - los animated traits se combinan simultáneamente, no secuencialmente
       
       renderAnimatedTraits();
       updateURL();
