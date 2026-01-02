@@ -102,6 +102,8 @@ export default async function handler(req, res) {
 
     // Crear customFrameGenerator que aplica bounce por capas
     const customFrameGenerator = async (frameIndex, totalFrames) => {
+      console.log(`[bounce-test] Generando frame ${frameIndex}/${totalFrames}`);
+      
       const layers = [];
       
       // 1. Base/Skin - con bounce SIN delay
@@ -114,6 +116,8 @@ export default async function handler(req, res) {
           bounceConfig.bounces,
           0 // Sin delay para skin
         );
+        
+        console.log(`[bounce-test] Frame ${frameIndex}: Skin bounce transform:`, bounceTransform);
         
         layers.push({
           pngBuffer: basePng,
@@ -131,6 +135,8 @@ export default async function handler(req, res) {
           bounceConfig.bounces,
           bounceConfig.delay // Delay para traits
         );
+        
+        console.log(`[bounce-test] Frame ${frameIndex}: Trait ${fixedIds[i]} bounce transform:`, bounceTransform);
         
         layers.push({
           pngBuffer: fixedPngs[i],
@@ -173,13 +179,15 @@ export default async function handler(req, res) {
     };
 
     // Generar GIF usando generateGifFromLayers
+    // IMPORTANTE: Pasar totalFrames explícitamente para que customFrameGenerator lo use correctamente
     const gifBuffer = await generateGifFromLayers({
       stableLayers: [],
       animatedTraits: [],
       width: canvasWidth,
       height: canvasHeight,
       delay: 500,
-      customFrameGenerator: customFrameGenerator
+      customFrameGenerator: customFrameGenerator,
+      totalFrames: totalFrames // Pasar totalFrames explícitamente
     });
 
     console.log(`[bounce-test] GIF generado: ${gifBuffer.length} bytes`);
