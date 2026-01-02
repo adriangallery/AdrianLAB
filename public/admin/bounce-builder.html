@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bounce Animation Builder - AdrianLAB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .config-panel, .preview-panel {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .section {
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .list-item {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .list-item input {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    
+    .btn-icon {
+      padding: 6px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .preview-area {
+      background: white;
+      border: 2px dashed #e5e7eb;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .preview-area img {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+    }
+    
+    .url-display {
+      background: #1f2937;
+      color: #10b981;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      word-break: break-all;
+      margin-bottom: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    .url-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-full {
+      flex: 1;
+    }
+    
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f4f6;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .info-box {
+      background: #f0f4ff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+    
+    .info-box strong {
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Bounce Animation Builder</h1>
+    <p class="subtitle">Herramienta simplificada para probar animaciones de bounce</p>
+    
+    <div class="main-layout">
+      <!-- Panel de Configuración -->
+      <div class="config-panel">
+        <div class="section">
+          <div class="section-title">🎨 Base Skin</div>
+          <div class="form-group">
+            <label for="base-skin">Skin Base</label>
+            <select id="base-skin" onchange="updateConfig()">
+              <option value="medium">Medium</option>
+              <option value="zero">Zero</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">📌 Fixed Traits</div>
+          <p style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">
+            Añade traits que aparecerán en todos los frames
+          </p>
+          <div id="fixed-traits-list"></div>
+          <button class="btn btn-primary btn-small" onclick="addFixedTrait()">+ Añadir Trait</button>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">⚡ Bounce Configuration</div>
+          
+          <div class="form-group">
+            <label for="bounce-direction">Direction</label>
+            <select id="bounce-direction" onchange="updateConfig()">
+              <option value="y">Vertical (Y) - Recommended</option>
+              <option value="x">Horizontal (X)</option>
+              <option value="both">Both (Diagonal)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="bounce-distance">Distance (pixels)</label>
+            <input type="number" id="bounce-distance" value="10" min="0" max="200" step="5" onchange="updateConfig()">
+          </div>
+          
+          <div class="form-group">
+            <label for="bounce-count">Number of Bounces</label>
+            <input type="number" id="bounce-count" value="3" min="1" max="10" step="1" onchange="updateConfig()">
+          </div>
+          
+          <div class="form-group">
+            <label for="bounce-frames">Total Frames</label>
+            <input type="number" id="bounce-frames" value="8" min="4" max="32" step="1" onchange="updateConfig()">
+          </div>
+          
+          <div class="form-group">
+            <label for="bounce-delay">Delay Skin → Traits (frames)</label>
+            <input type="number" id="bounce-delay" value="1" min="0" max="8" step="1" onchange="updateConfig()">
+            <p style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+              Cuántos frames de delay entre el bounce del skin y el bounce de los traits
+            </p>
+          </div>
+          
+          <div class="info-box">
+            <strong>Sync Info:</strong>
+            <div id="sync-info" style="margin-top: 5px;">-</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel de Preview -->
+      <div class="preview-panel">
+        <div class="section-title">👁️ Preview</div>
+        <div class="preview-area" id="preview-area">
+          <p style="color: #9ca3af;">Genera un preview para ver el resultado</p>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="generatePreview()" style="margin-top: 15px;">
+          🎬 Generate Preview
+        </button>
+      </div>
+    </div>
+    
+    <!-- Generated URL -->
+    <div class="section">
+      <div class="section-title">🔗 Generated URL</div>
+      <div class="url-display" id="url-display">Configura los parámetros para generar la URL...</div>
+      <div class="url-actions">
+        <button class="btn btn-primary btn-full" onclick="copyURL()">📋 Copy URL</button>
+        <button class="btn btn-primary btn-full" onclick="openURL()">🔗 Open in New Tab</button>
+      </div>
+    </div>
+    
+    <!-- Mensajes -->
+    <div id="message-area"></div>
+  </div>
+  
+  <script>
+    // State
+    let state = {
+      base: 'medium',
+      fixed: [],
+      bounceConfig: {
+        direction: 'y',
+        distance: 10,
+        bounces: 3,
+        frames: 8,
+        delay: 1
+      }
+    };
+    
+    // Load saved state
+    function loadState() {
+      const saved = localStorage.getItem('bounceBuilderState');
+      if (saved) {
+        try {
+          state = JSON.parse(saved);
+          applyState();
+        } catch (e) {
+          console.error('Error loading state:', e);
+        }
+      } else {
+        applyState();
+      }
+    }
+    
+    // Save state
+    function saveState() {
+      localStorage.setItem('bounceBuilderState', JSON.stringify(state));
+    }
+    
+    // Apply state to UI
+    function applyState() {
+      document.getElementById('base-skin').value = state.base || 'medium';
+      document.getElementById('bounce-direction').value = state.bounceConfig.direction || 'y';
+      document.getElementById('bounce-distance').value = state.bounceConfig.distance || 10;
+      document.getElementById('bounce-count').value = state.bounceConfig.bounces || 3;
+      document.getElementById('bounce-frames').value = state.bounceConfig.frames || 8;
+      document.getElementById('bounce-delay').value = state.bounceConfig.delay || 1;
+      
+      renderFixedTraits();
+      updateSyncInfo();
+      updateURL();
+    }
+    
+    // Update config
+    function updateConfig() {
+      state.base = document.getElementById('base-skin').value;
+      state.bounceConfig.direction = document.getElementById('bounce-direction').value;
+      state.bounceConfig.distance = parseFloat(document.getElementById('bounce-distance').value) || 10;
+      state.bounceConfig.bounces = parseInt(document.getElementById('bounce-count').value) || 3;
+      state.bounceConfig.frames = parseInt(document.getElementById('bounce-frames').value) || 8;
+      state.bounceConfig.delay = parseInt(document.getElementById('bounce-delay').value) || 1;
+      
+      updateSyncInfo();
+      updateURL();
+      saveState();
+    }
+    
+    // Update sync info
+    function updateSyncInfo() {
+      const syncInfo = document.getElementById('sync-info');
+      const { frames, delay } = state.bounceConfig;
+      syncInfo.textContent = `Skin: ${frames} frames (inmediato) | Traits: ${frames} frames (${delay} frame delay)`;
+    }
+    
+    // Render fixed traits
+    function renderFixedTraits() {
+      const container = document.getElementById('fixed-traits-list');
+      container.innerHTML = '';
+      
+      state.fixed.forEach((traitId, index) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <span style="color: #9ca3af;">☰</span>
+          <input type="text" value="${traitId}" placeholder="Trait ID" 
+                 onchange="updateFixedTrait(${index}, this.value)">
+          <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+    
+    // Add fixed trait
+    function addFixedTrait() {
+      state.fixed.push('');
+      renderFixedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    // Update fixed trait
+    function updateFixedTrait(index, value) {
+      state.fixed[index] = value.trim();
+      updateURL();
+      saveState();
+    }
+    
+    // Remove fixed trait
+    function removeFixedTrait(index) {
+      state.fixed.splice(index, 1);
+      renderFixedTraits();
+      updateURL();
+      saveState();
+    }
+    
+    // Update URL
+    function updateURL() {
+      const params = new URLSearchParams();
+      
+      if (state.base) params.set('base', state.base);
+      
+      const activeFixed = state.fixed.filter(id => id && id.trim());
+      if (activeFixed.length > 0) {
+        params.set('fixed', activeFixed.join(','));
+      }
+      
+      params.set('bounce', 'true');
+      params.set('bounceDir', state.bounceConfig.direction);
+      params.set('bounceDist', state.bounceConfig.distance.toString());
+      params.set('bounceCount', state.bounceConfig.bounces.toString());
+      params.set('bounceFrames', state.bounceConfig.frames.toString());
+      params.set('bounceDelay', state.bounceConfig.delay.toString());
+      params.set('width', '400');
+      params.set('height', '400');
+      
+      const url = `https://adrianlab.vercel.app/api/bounce-test?${params.toString()}`;
+      document.getElementById('url-display').textContent = url;
+    }
+    
+    // Generate preview
+    async function generatePreview() {
+      const previewArea = document.getElementById('preview-area');
+      const messageArea = document.getElementById('message-area');
+      
+      const activeFixed = state.fixed.filter(id => id && id.trim());
+      if (activeFixed.length === 0) {
+        showMessage('Añade al menos un trait fijo', 'error');
+        return;
+      }
+      
+      previewArea.innerHTML = '<div class="loading"></div><p style="margin-top: 10px;">Generando preview...</p>';
+      messageArea.innerHTML = '';
+      
+      try {
+        const params = new URLSearchParams();
+        if (state.base) params.set('base', state.base);
+        params.set('fixed', activeFixed.join(','));
+        params.set('bounce', 'true');
+        params.set('bounceDir', state.bounceConfig.direction);
+        params.set('bounceDist', state.bounceConfig.distance.toString());
+        params.set('bounceCount', state.bounceConfig.bounces.toString());
+        params.set('bounceFrames', state.bounceConfig.frames.toString());
+        params.set('bounceDelay', state.bounceConfig.delay.toString());
+        params.set('width', '400');
+        params.set('height', '400');
+        
+        const url = `https://adrianlab.vercel.app/api/bounce-test?${params.toString()}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        
+        previewArea.innerHTML = `<img src="${imageUrl}" alt="Bounce Preview">`;
+        showMessage('Preview generado exitosamente', 'success');
+      } catch (error) {
+        previewArea.innerHTML = '<p style="color: #ef4444;">Error generando preview</p>';
+        showMessage(`Error: ${error.message}`, 'error');
+        console.error('Preview error:', error);
+      }
+    }
+    
+    // Copy URL
+    function copyURL() {
+      const url = document.getElementById('url-display').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        showMessage('URL copiada al portapapeles', 'success');
+      }).catch(() => {
+        showMessage('Error copiando URL', 'error');
+      });
+    }
+    
+    // Open URL
+    function openURL() {
+      const url = document.getElementById('url-display').textContent;
+      window.open(url, '_blank');
+    }
+    
+    // Show message
+    function showMessage(message, type) {
+      const messageArea = document.getElementById('message-area');
+      messageArea.innerHTML = `<div class="${type}">${message}</div>`;
+      setTimeout(() => {
+        messageArea.innerHTML = '';
+      }, 3000);
+    }
+    
+    // Initialize
+    loadState();
+  </script>
+</body>
+</html>
+
