@@ -53,14 +53,14 @@ export default async function handler(req, res) {
     console.log(`[bounce-test] - Bounce config:`, bounceConfig);
     console.log(`[bounce-test] - Total frames: ${totalFrames}`);
 
-    // Mapeo de skins base a sus rutas
+    // Mapeo de skins base a sus rutas (igual que test-gif-simple-v3.js)
     const baseSkinMap = {
-      'medium': '/labimages/ADRIAN/GEN0-Medium.svg',
-      'zero': '/labimages/ADRIAN/GEN0-Medium.svg',
-      'dark': '/labimages/ADRIAN/GEN0-Dark.svg',
-      'darkadrian': '/labimages/ADRIAN/GEN0-Dark.svg',
-      'alien': '/labimages/ADRIAN/GEN0-Alien.svg',
-      'albino': '/labimages/ADRIAN/GEN0-Albino.svg',
+      'medium': '/traits/ADRIAN/GEN0-Medium.svg',
+      'zero': '/traits/ADRIAN/GEN0-Medium.svg',
+      'dark': '/traits/ADRIAN/GEN0-Dark.svg',
+      'darkadrian': '/traits/ADRIAN/GEN0-Dark.svg',
+      'alien': '/traits/ADRIAN/GEN0-Alien.svg',
+      'albino': '/traits/ADRIAN/GEN0-Albino.svg',
       'blankmannequin': '/labimages/blankmannequin.svg',
       'mannequin': '/labimages/mannequin.svg'
     };
