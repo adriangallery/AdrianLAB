@@ -53,17 +53,26 @@ export default async function handler(req, res) {
     console.log(`[bounce-test] - Bounce config:`, bounceConfig);
     console.log(`[bounce-test] - Total frames: ${totalFrames}`);
 
+    // Mapeo de skins base a sus rutas
+    const baseSkinMap = {
+      'medium': '/labimages/ADRIAN/GEN0-Medium.svg',
+      'zero': '/labimages/ADRIAN/GEN0-Medium.svg',
+      'dark': '/labimages/ADRIAN/GEN0-Dark.svg',
+      'darkadrian': '/labimages/ADRIAN/GEN0-Dark.svg',
+      'alien': '/labimages/ADRIAN/GEN0-Alien.svg',
+      'albino': '/labimages/ADRIAN/GEN0-Albino.svg',
+      'blankmannequin': '/labimages/blankmannequin.svg',
+      'mannequin': '/labimages/mannequin.svg'
+    };
+
     // Función para convertir SVG a PNG
     const svgToPng = async (id, w = canvasWidth) => {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
       let url;
       
       // Mapear skins base a sus rutas correctas
-      if (id === 'medium' || id === 'zero') {
-        // Medium/Zero usa GEN1-Medium
-        url = `${baseUrl}/labimages/ADRIAN/GEN1-Medium.svg`;
-      } else if (id === 'dark') {
-        url = `${baseUrl}/labimages/ADRIAN/GEN1-Dark.svg`;
+      if (baseSkinMap[id]) {
+        url = `${baseUrl}${baseSkinMap[id]}`;
       } else {
         // Traits normales
         url = `${baseUrl}/labimages/${id}.svg`;
