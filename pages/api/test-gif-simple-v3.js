@@ -808,6 +808,7 @@ async function generateGifWithGifwrap(config) {
     let compositePng;
     
     if (bounceConfig && bounceConfig.enabled) {
+      console.log(`[GIFWRAP-V3] 🎬 BOUNCE: Frame ${frameIndex}/${totalFrames}, bounceFrames=${bounceConfig.frames}, delay=${bounceConfig.delay}`);
       // Aplicar bounce por capas para que el delay funcione correctamente
       const { calculateBounceWithDelay } = await import('../../lib/animation-helpers.js');
       
@@ -841,9 +842,10 @@ async function generateGifWithGifwrap(config) {
         const baseTransform = calculatePosition(baseMovement, frameIndex, totalFrames);
         
         // Añadir bounce sin delay al skin
+        // Usar totalFrames del GIF, no bounceConfig.frames, para sincronizar con el ciclo del GIF
         const bounceTransform = calculateBounceWithDelay(
           frameIndex,
-          bounceConfig.frames,
+          totalFrames, // Usar totalFrames del GIF para sincronizar
           bounceConfig.direction,
           bounceConfig.distance,
           bounceConfig.bounces,
@@ -871,9 +873,10 @@ async function generateGifWithGifwrap(config) {
         const fixedTransform = calculatePosition(fixedMovement, frameIndex, totalFrames);
         
         // Añadir bounce con delay a los fixed traits
+        // Usar totalFrames del GIF, no bounceConfig.frames, para sincronizar con el ciclo del GIF
         const bounceTransform = calculateBounceWithDelay(
           frameIndex,
-          bounceConfig.frames,
+          totalFrames, // Usar totalFrames del GIF para sincronizar
           bounceConfig.direction,
           bounceConfig.distance,
           bounceConfig.bounces,
@@ -900,9 +903,10 @@ async function generateGifWithGifwrap(config) {
           const variantPng = await svgToPng(animVariant.id, 'resvg', width);
           
           // Añadir bounce con delay a los animated traits
+          // Usar totalFrames del GIF, no bounceConfig.frames, para sincronizar con el ciclo del GIF
           const bounceTransform = calculateBounceWithDelay(
             frameIndex,
-            bounceConfig.frames,
+            totalFrames, // Usar totalFrames del GIF para sincronizar
             bounceConfig.direction,
             bounceConfig.distance,
             bounceConfig.bounces,
@@ -923,9 +927,10 @@ async function generateGifWithGifwrap(config) {
         const varTransform = calculatePosition(varMovement, frameIndex, totalFrames);
         
         // Añadir bounce con delay al trait variable
+        // Usar totalFrames del GIF, no bounceConfig.frames, para sincronizar con el ciclo del GIF
         const bounceTransform = calculateBounceWithDelay(
           frameIndex,
-          bounceConfig.frames,
+          totalFrames, // Usar totalFrames del GIF para sincronizar
           bounceConfig.direction,
           bounceConfig.distance,
           bounceConfig.bounces,
