@@ -58,15 +58,22 @@ export default async function handler(req, res) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
       let url;
       
-      if (id === 'medium' || id === 'zero' || id === 'dark') {
-        url = `${baseUrl}/labimages/${id}.svg`;
+      // Mapear skins base a sus rutas correctas
+      if (id === 'medium' || id === 'zero') {
+        // Medium/Zero usa GEN1-Medium
+        url = `${baseUrl}/labimages/ADRIAN/GEN1-Medium.svg`;
+      } else if (id === 'dark') {
+        url = `${baseUrl}/labimages/ADRIAN/GEN1-Dark.svg`;
       } else {
+        // Traits normales
         url = `${baseUrl}/labimages/${id}.svg`;
       }
       
+      console.log(`[bounce-test] Cargando: ${url}`);
+      
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`Failed to load ${id}: ${response.status}`);
+        throw new Error(`Failed to load ${id}: ${response.status} (${url})`);
       }
       
       const svgContent = await response.text();
