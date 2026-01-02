@@ -522,6 +522,60 @@
             💡 Tip: Movements can be applied to specific frames by configuring the trait's frame selection above.
           </p>
         </div>
+        
+        <!-- Bounce Animation -->
+        <div class="section">
+          <div class="section-title">⚡ Bounce Animation</div>
+          <p style="font-size: 12px; color: #6b7280; margin-bottom: 15px;">
+            Apply bounce effect: skin/base bounces first, traits bounce after with delay
+          </p>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="bounce-enabled" onchange="updateBounceConfig()" style="width: auto; margin-right: 8px;">
+              Enable Bounce Animation
+            </label>
+          </div>
+          
+          <div id="bounce-config" style="display: none;">
+            <div class="form-group">
+              <label for="bounce-direction">Direction</label>
+              <select id="bounce-direction" onchange="updateBounceConfig()">
+                <option value="y">Vertical (Y) - Recommended</option>
+                <option value="x">Horizontal (X)</option>
+                <option value="both">Both (Diagonal)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="bounce-distance">Distance (pixels)</label>
+              <input type="number" id="bounce-distance" value="50" min="0" max="200" step="5" onchange="updateBounceConfig()">
+            </div>
+            
+            <div class="form-group">
+              <label for="bounce-count">Number of Bounces</label>
+              <input type="number" id="bounce-count" value="3" min="1" max="10" step="1" onchange="updateBounceConfig()">
+            </div>
+            
+            <div class="form-group">
+              <label for="bounce-frames">Total Frames</label>
+              <input type="number" id="bounce-frames" value="12" min="4" max="32" step="1" onchange="updateBounceConfig()">
+            </div>
+            
+            <div class="form-group">
+              <label for="bounce-delay">Delay Skin → Traits (frames)</label>
+              <input type="number" id="bounce-delay" value="2" min="0" max="8" step="1" onchange="updateBounceConfig()">
+              <p style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                How many frames delay between skin bounce and traits bounce
+              </p>
+            </div>
+            
+            <div style="background: #f0f4ff; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 12px; color: #4b5563;">
+              <strong>Sync Info:</strong>
+              <div id="bounce-sync-info" style="margin-top: 5px;">-</div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- Panel de Preview -->
@@ -581,7 +635,15 @@
       movements: [],
       totalFrames: 10, // Total frames for the animation
       frameConfigs: {}, // Configurations per trait: { 'traitId': { frames: [1,2,3], movements: {...} } }
-      adrianZeroTokenId: '' // AdrianZERO tokenId for v3
+      adrianZeroTokenId: '', // AdrianZERO tokenId for v3
+      bounceConfig: {
+        enabled: false,
+        direction: 'y',
+        distance: 50,
+        bounces: 3,
+        frames: 12,
+        delay: 2
+      }
     };
     
     // Load saved state
@@ -614,6 +676,34 @@
       document.getElementById('total-frames').value = builderState.totalFrames || 10;
       document.getElementById('adrianzero-tokenid').value = builderState.adrianZeroTokenId || '';
       
+      // Asegurar que bounceConfig existe
+      if (!builderState.bounceConfig) {
+        builderState.bounceConfig = {
+          enabled: false,
+          direction: 'y',
+          distance: 50,
+          bounces: 3,
+          frames: 12,
+          delay: 2
+        };
+      }
+      
+      // Aplicar configuración de bounce
+      const bounceEnabled = document.getElementById('bounce-enabled');
+      const bounceConfig = document.getElementById('bounce-config');
+      if (bounceEnabled && bounceConfig) {
+        bounceEnabled.checked = builderState.bounceConfig.enabled || false;
+        bounceConfig.style.display = bounceEnabled.checked ? 'block' : 'none';
+        
+        document.getElementById('bounce-direction').value = builderState.bounceConfig.direction || 'y';
+        document.getElementById('bounce-distance').value = builderState.bounceConfig.distance || 50;
+        document.getElementById('bounce-count').value = builderState.bounceConfig.bounces || 3;
+        document.getElementById('bounce-frames').value = builderState.bounceConfig.frames || 12;
+        document.getElementById('bounce-delay').value = builderState.bounceConfig.delay || 2;
+        
+        updateBounceSyncInfo();
+      }
+      
       // Mostrar/ocultar sección AdrianZERO según versión
       const adrianZeroSection = document.getElementById('adrianzero-section');
       if (adrianZeroSection) {
@@ -625,6 +715,40 @@
       renderFrames();
       renderMovements();
       updateURL();
+    }
+    
+    // Update bounce configuration
+    function updateBounceConfig() {
+      const enabled = document.getElementById('bounce-enabled').checked;
+      const bounceConfig = document.getElementById('bounce-config');
+      
+      builderState.bounceConfig = {
+        enabled: enabled,
+        direction: document.getElementById('bounce-direction').value,
+        distance: parseFloat(document.getElementById('bounce-distance').value) || 50,
+        bounces: parseInt(document.getElementById('bounce-count').value) || 3,
+        frames: parseInt(document.getElementById('bounce-frames').value) || 12,
+        delay: parseInt(document.getElementById('bounce-delay').value) || 2
+      };
+      
+      bounceConfig.style.display = enabled ? 'block' : 'none';
+      updateBounceSyncInfo();
+      updateURL();
+      saveState();
+    }
+    
+    // Update bounce sync info display
+    function updateBounceSyncInfo() {
+      const syncInfo = document.getElementById('bounce-sync-info');
+      if (!syncInfo || !builderState.bounceConfig.enabled) {
+        return;
+      }
+      
+      const { frames, delay } = builderState.bounceConfig;
+      const skinFrames = frames;
+      const traitsFrames = frames;
+      const syncText = `Skin: ${skinFrames} frames (immediate) | Traits: ${traitsFrames} frames (${delay} frame delay)`;
+      syncInfo.textContent = syncText;
     }
     
     function updateAdrianZeroTokenId(value) {
@@ -1582,6 +1706,17 @@
       // Añadir AdrianZERO tokenId si existe (solo v3)
       if (builderState.version === 'v3' && builderState.adrianZeroTokenId) {
         params.set('adrianzero', builderState.adrianZeroTokenId);
+      }
+      
+      // Añadir configuración de bounce si está habilitada
+      if (builderState.bounceConfig && builderState.bounceConfig.enabled) {
+        const bc = builderState.bounceConfig;
+        params.set('bounce', 'true');
+        params.set('bounceDir', bc.direction);
+        params.set('bounceDist', bc.distance.toString());
+        params.set('bounceCount', bc.bounces.toString());
+        params.set('bounceFrames', bc.frames.toString());
+        params.set('bounceDelay', bc.delay.toString());
       }
       
       // Select endpoint based on version

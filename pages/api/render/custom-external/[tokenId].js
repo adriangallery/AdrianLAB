@@ -455,12 +455,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // ===== LÓGICA ESPECIAL CLOSEUP (PARÁMETRO) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP Y BOUNCE (PARÁMETROS) =====
     const isCloseup = req.query.closeup === 'true';
     const isCloseupToken = isCloseup; // Cualquier token con ?closeup=true
+    const isBounce = req.query.bounce === 'true';
+    const bounceConfig = isBounce ? {
+      enabled: true,
+      direction: req.query.bounceDir || 'y',
+      distance: parseFloat(req.query.bounceDist) || 50,
+      bounces: parseInt(req.query.bounceCount) || 3,
+      frames: parseInt(req.query.bounceFrames) || 12,
+      delay: parseInt(req.query.bounceDelay) || 2
+    } : null;
     
     if (isCloseup) {
       console.log(`[custom-render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
+    }
+    
+    if (isBounce) {
+      console.log(`[custom-external] ⚡ BOUNCE: Token ${cleanTokenId} - Animación bounce activa`);
     }
 
     // DETECCIÓN TEMPRANA DE TRAITS EXTERNOS Y SAMURAIZERO
@@ -739,7 +752,7 @@ export default async function handler(req, res) {
       });
       
       // Verificar caché de GIF (incluyendo finalTraits en la clave)
-      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, finalTraits);
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, finalTraits, bounceConfig);
       if (cachedGif) {
         console.log(`[custom-external] 🎬 CACHE HIT para GIF de token ${cleanTokenId} con traits personalizados`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1839,7 +1852,7 @@ export default async function handler(req, res) {
         
         // El finalBuffer contiene el PNG base sin los traits animados
         // Generar GIF añadiendo los traits animados frame por frame
-        const gifBuffer = await generateGifFromLayers({
+        let gifConfig = {
           stableLayers: [
             { pngBuffer: finalBuffer } // PNG base sin traits animados
           ],
@@ -1847,10 +1860,28 @@ export default async function handler(req, res) {
           width: 1000,
           height: 1000,
           delay: 500
-        });
+        };
+        
+        // Aplicar bounce si está configurado
+        if (bounceConfig && bounceConfig.enabled) {
+          const { createBounceFrameGenerator } = await import('../../../../lib/gif-generator.js');
+          gifConfig.customFrameGenerator = createBounceFrameGenerator({
+            stableLayers: gifConfig.stableLayers,
+            animatedTraits: gifConfig.animatedTraits,
+            bounceConfig: bounceConfig,
+            width: gifConfig.width,
+            height: gifConfig.height,
+            delay: gifConfig.delay
+          });
+          // Limpiar stableLayers y animatedTraits ya que se manejan en customFrameGenerator
+          gifConfig.stableLayers = [];
+          gifConfig.animatedTraits = [];
+        }
+        
+        const gifBuffer = await generateGifFromLayers(gifConfig);
         
         // Guardar en caché (incluyendo finalTraits en la clave)
-        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, finalTraits);
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, finalTraits, bounceConfig);
         
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         console.log(`[custom-external] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
@@ -1859,7 +1890,12 @@ export default async function handler(req, res) {
         res.setHeader('X-Cache', 'MISS');
         res.setHeader('Content-Type', 'image/gif');
         res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-        res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
+        const gifVersionParts = ['ADRIANZERO-CUSTOM-ANIMATED'];
+        if (isBounce) {
+          gifVersionParts.push('BOUNCE');
+          res.setHeader('X-Bounce', 'enabled');
+        }
+        res.setHeader('X-Version', gifVersionParts.join('-'));
         res.setHeader('X-Render-Source', 'local-gif');
         res.setHeader('Content-Length', gifBuffer.length);
         
@@ -1871,19 +1907,61 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== APLICAR BOUNCE A PNG SI ESTÁ CONFIGURADO =====
+    if (bounceConfig && bounceConfig.enabled && !hasAnimatedTraits) {
+      try {
+        const { calculateBounceWithDelay } = await import('../../../../lib/animation-helpers.js');
+        // Para PNG estático, usar frame 0 del ciclo de bounce
+        const bounceTransform = calculateBounceWithDelay(
+          0,
+          bounceConfig.frames,
+          bounceConfig.direction,
+          bounceConfig.distance,
+          bounceConfig.bounces,
+          0
+        );
+        
+        // Aplicar transformación de bounce al PNG
+        const canvas = createCanvas(1000, 1000);
+        const ctx = canvas.getContext('2d');
+        const img = await loadImage(finalBuffer);
+        
+        ctx.save();
+        ctx.translate(1000 / 2 + bounceTransform.x, 1000 / 2 + bounceTransform.y);
+        if (bounceTransform.rotation !== 0) {
+          ctx.rotate(bounceTransform.rotation * Math.PI / 180);
+        }
+        if (bounceTransform.scale !== 1) {
+          ctx.scale(bounceTransform.scale, bounceTransform.scale);
+        }
+        ctx.drawImage(img, -1000 / 2, -1000 / 2, 1000, 1000);
+        ctx.restore();
+        
+        finalBuffer = canvas.toBuffer('image/png');
+        console.log('[custom-external] ⚡ Bounce aplicado a PNG estático');
+      } catch (error) {
+        console.warn('[custom-external] ⚡ Error aplicando bounce a PNG, continuando sin bounce:', error.message);
+      }
+    }
+    
     // Enviar imagen PNG
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Content-Length', finalBuffer.length);
     
+    const versionParts = [];
     if (isCloseup) {
-      res.setHeader('X-Version', 'ADRIANZERO-CLOSEUP-CUSTOM-FALLBACK');
+      versionParts.push('ADRIANZERO-CLOSEUP-CUSTOM-FALLBACK');
       res.setHeader('X-Render-Type', 'closeup');
-      res.setHeader('X-Render-Source', 'local-fallback');
     } else {
-      res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-FALLBACK');
+      versionParts.push('ADRIANZERO-CUSTOM-FALLBACK');
       res.setHeader('X-Render-Type', 'full');
-      res.setHeader('X-Render-Source', 'local-fallback');
     }
+    if (isBounce) {
+      versionParts.push('BOUNCE');
+      res.setHeader('X-Bounce', 'enabled');
+    }
+    res.setHeader('X-Version', versionParts.join('-'));
+    res.setHeader('X-Render-Source', 'local-fallback');
     
     res.send(finalBuffer);
 

@@ -4,7 +4,7 @@ import { PNG } from 'pngjs';
 import sharp from 'sharp';
 import GifEncoder from 'gif-encoder-2';
 import { createCanvas, loadImage } from 'canvas';
-import { generateGifFromLayers } from '../../lib/gif-generator.js';
+import { generateGifFromLayers, createBounceFrameGenerator } from '../../lib/gif-generator.js';
 
 const MAX_FRAMES_LCM = 15; // Límite máximo para usar MCM (sincronización perfecta)
 
@@ -134,7 +134,8 @@ async function detectAnimatedVariants(baseId) {
 }
 
 function parseQueryParams(query) {
-  const { method = 'gifwrap', base, fixed, frames, animated, move, gif, gifBackground, adrianzero, tokenId } = query;
+  const { method = 'gifwrap', base, fixed, frames, animated, move, gif, gifBackground, adrianzero, tokenId, 
+          bounce, bounceDir, bounceDist, bounceCount, bounceFrames, bounceDelay } = query;
   
   // GIF puede venir como "gif" o "gifBackground" (sinónimos)
   const gifId = gif || gifBackground || null;
@@ -163,6 +164,16 @@ function parseQueryParams(query) {
     return { id, delay: delayMs };
   }) : [];
   
+  // Parsear configuración de bounce
+  const bounceConfig = bounce === 'true' ? {
+    enabled: true,
+    direction: bounceDir || 'y',
+    distance: parseFloat(bounceDist) || 50,
+    bounces: parseInt(bounceCount) || 3,
+    frames: parseInt(bounceFrames) || 12,
+    delay: parseInt(bounceDelay) || 2
+  } : null;
+  
   // Si hay animated traits, se expandirán después
   // Por ahora, retornar la configuración con animated traits separados
   
@@ -179,7 +190,8 @@ function parseQueryParams(query) {
     animatedTraits: animatedTraits,
     movements: parseMovements(move),
     gifId: gifId ? gifId.toString() : null,
-    adrianZeroTokenId: adrianZeroTokenId ? adrianZeroTokenId.toString() : null
+    adrianZeroTokenId: adrianZeroTokenId ? adrianZeroTokenId.toString() : null,
+    bounceConfig
   };
 }
 
@@ -676,7 +688,7 @@ async function generateLayeredFrame(baseId, fixedIds, variableId, method, moveme
  * Ahora usa generateGifFromLayers unificado
  */
 async function generateGifWithGifwrap(config) {
-  const { base, fixed, frames, animatedTraits, movements, gifId, adrianZeroTokenId } = config;
+  const { base, fixed, frames, animatedTraits, movements, gifId, adrianZeroTokenId, bounceConfig } = config;
   
   console.log(`[GIFWRAP-V3] Generando GIF con SVG controlando frames (usando generateGifFromLayers):`);
   console.log(`[GIFWRAP-V3] - Base: ${base || 'ninguna'}`);
@@ -792,7 +804,7 @@ async function generateGifWithGifwrap(config) {
     const variableId = hasAnimatedVariants ? null : svgFrame.id;
     
     // Generar frame con capas, transformaciones, AdrianZERO base y GIF background
-    const compositePng = await generateLayeredFrame(
+    let compositePng = await generateLayeredFrame(
       base,
       fixed,
       variableId,
@@ -806,6 +818,37 @@ async function generateGifWithGifwrap(config) {
       height,
       hasAnimatedVariants ? svgFrame.animatedVariants : null
     );
+    
+    // Aplicar bounce si está configurado
+    if (bounceConfig && bounceConfig.enabled) {
+      const { calculateBounceWithDelay } = await import('../../lib/animation-helpers.js');
+      const bounceTransform = calculateBounceWithDelay(
+        frameIndex,
+        bounceConfig.frames,
+        bounceConfig.direction,
+        bounceConfig.distance,
+        bounceConfig.bounces,
+        0 // Sin delay para aplicar bounce al frame completo
+      );
+      
+      // Aplicar transformación de bounce al frame completo
+      const canvas = createCanvas(width, height);
+      const ctx = canvas.getContext('2d');
+      const img = await loadImage(compositePng);
+      
+      ctx.save();
+      ctx.translate(width / 2 + bounceTransform.x, height / 2 + bounceTransform.y);
+      if (bounceTransform.rotation !== 0) {
+        ctx.rotate(bounceTransform.rotation * Math.PI / 180);
+      }
+      if (bounceTransform.scale !== 1) {
+        ctx.scale(bounceTransform.scale, bounceTransform.scale);
+      }
+      ctx.drawImage(img, -width / 2, -height / 2, width, height);
+      ctx.restore();
+      
+      compositePng = canvas.toBuffer('image/png');
+    }
     
     return {
       pngBuffer: compositePng,

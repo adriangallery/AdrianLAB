@@ -282,7 +282,7 @@ export default async function handler(req, res) {
       isBanana = false;
     }
     
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV Y BLACKOUT (PARÁMETROS) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BOUNCE (PARÁMETROS) =====
     // Estos se mantienen como parámetros de query (no se verifican onchain aquí)
     const isCloseup = req.query.closeup === 'true';
     const isShadow = req.query.shadow === 'true';
@@ -290,6 +290,15 @@ export default async function handler(req, res) {
     const isBn = req.query.bn === 'true' || req.query.bw === 'true'; // bn o bw para blanco y negro
     const isUv = req.query.uv === 'true' || req.query.UV === 'true'; // uv o UV (case-insensitive)
     const isBlackout = req.query.blackout === 'true';
+    const isBounce = req.query.bounce === 'true';
+    const bounceConfig = isBounce ? {
+      enabled: true,
+      direction: req.query.bounceDir || 'y',
+      distance: parseFloat(req.query.bounceDist) || 50,
+      bounces: parseInt(req.query.bounceCount) || 3,
+      frames: parseInt(req.query.bounceFrames) || 12,
+      delay: parseInt(req.query.bounceDelay) || 2
+    } : null;
     
     if (isCloseup) {
       console.log(`[render] 🔍 CLOSEUP: Token ${cleanTokenId} - Renderizando closeup 640x640`);
@@ -876,7 +885,7 @@ export default async function handler(req, res) {
       // Verificar caché de GIF (usando equippedTraits, que se modificará después si es necesario)
       // Nota: equippedTraits puede modificarse después (SubZERO, SamuraiZERO), pero la detección de animados
       // se hace antes. El caché se actualizará con equippedTraits final cuando se guarde.
-      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, equippedTraits);
+      const cachedGif = getCachedAdrianZeroGif(cleanTokenId, equippedTraits, bounceConfig);
       if (cachedGif) {
         console.log(`[render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1994,7 +2003,7 @@ export default async function handler(req, res) {
         
         // El finalBuffer contiene el PNG base sin los traits animados
         // Generar GIF añadiendo los traits animados frame por frame
-        const gifBuffer = await generateGifFromLayers({
+        let gifConfig = {
           stableLayers: [
             { pngBuffer: finalBuffer } // PNG base sin traits animados
           ],
@@ -2002,10 +2011,28 @@ export default async function handler(req, res) {
           width: 1000,
           height: 1000,
           delay: 500
-        });
+        };
+        
+        // Aplicar bounce si está configurado
+        if (bounceConfig && bounceConfig.enabled) {
+          const { createBounceFrameGenerator } = await import('../../../lib/gif-generator.js');
+          gifConfig.customFrameGenerator = createBounceFrameGenerator({
+            stableLayers: gifConfig.stableLayers,
+            animatedTraits: gifConfig.animatedTraits,
+            bounceConfig: bounceConfig,
+            width: gifConfig.width,
+            height: gifConfig.height,
+            delay: gifConfig.delay
+          });
+          // Limpiar stableLayers y animatedTraits ya que se manejan en customFrameGenerator
+          gifConfig.stableLayers = [];
+          gifConfig.animatedTraits = [];
+        }
+        
+        const gifBuffer = await generateGifFromLayers(gifConfig);
         
         // Guardar en caché (usando equippedTraits final después de todas las modificaciones)
-        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, equippedTraits);
+        setCachedAdrianZeroGif(cleanTokenId, gifBuffer, equippedTraits, bounceConfig);
         
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         console.log(`[render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
@@ -2014,7 +2041,12 @@ export default async function handler(req, res) {
         res.setHeader('X-Cache', 'MISS');
         res.setHeader('Content-Type', 'image/gif');
         res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
-        res.setHeader('X-Version', 'ADRIANZERO-ANIMATED');
+        const gifVersionParts = ['ADRIANZERO-ANIMATED'];
+        if (isBounce) {
+          gifVersionParts.push('BOUNCE');
+          res.setHeader('X-Bounce', 'enabled');
+        }
+        res.setHeader('X-Version', gifVersionParts.join('-'));
         res.setHeader('Content-Length', gifBuffer.length);
         
         return res.status(200).send(gifBuffer);
@@ -2136,6 +2168,7 @@ export default async function handler(req, res) {
     if (isUv) versionParts.push('UV');
     if (isBlackout) versionParts.push('BLACKOUT');
     if (isBanana) versionParts.push('BANANA');
+    if (isBounce) versionParts.push('BOUNCE');
     const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
     
     if (isCloseup) {
@@ -2168,6 +2201,47 @@ export default async function handler(req, res) {
     
     if (isBanana) {
       res.setHeader('X-Banana', 'enabled');
+    }
+    
+    if (isBounce) {
+      res.setHeader('X-Bounce', 'enabled');
+    }
+    
+    // ===== APLICAR BOUNCE A PNG SI ESTÁ CONFIGURADO =====
+    if (bounceConfig && bounceConfig.enabled && !hasAnimatedTraits) {
+      try {
+        const { calculateBounceWithDelay } = await import('../../../lib/animation-helpers.js');
+        // Para PNG estático, usar frame 0 del ciclo de bounce
+        const bounceTransform = calculateBounceWithDelay(
+          0,
+          bounceConfig.frames,
+          bounceConfig.direction,
+          bounceConfig.distance,
+          bounceConfig.bounces,
+          0
+        );
+        
+        // Aplicar transformación de bounce al PNG
+        const canvas = createCanvas(1000, 1000);
+        const ctx = canvas.getContext('2d');
+        const img = await loadImage(finalBuffer);
+        
+        ctx.save();
+        ctx.translate(1000 / 2 + bounceTransform.x, 1000 / 2 + bounceTransform.y);
+        if (bounceTransform.rotation !== 0) {
+          ctx.rotate(bounceTransform.rotation * Math.PI / 180);
+        }
+        if (bounceTransform.scale !== 1) {
+          ctx.scale(bounceTransform.scale, bounceTransform.scale);
+        }
+        ctx.drawImage(img, -1000 / 2, -1000 / 2, 1000, 1000);
+        ctx.restore();
+        
+        finalBuffer = canvas.toBuffer('image/png');
+        console.log('[render] ⚡ Bounce aplicado a PNG estático');
+      } catch (error) {
+        console.warn('[render] ⚡ Error aplicando bounce a PNG, continuando sin bounce:', error.message);
+      }
     }
     
     res.setHeader('Content-Length', finalBuffer.length);
