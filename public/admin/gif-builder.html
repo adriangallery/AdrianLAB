@@ -415,8 +415,8 @@
   <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div>
-        <h1>🎬 GIF Builder</h1>
-        <p class="subtitle">Visual builder to generate animated GIFs with skins, traits and movements</p>
+    <h1>🎬 GIF Builder</h1>
+    <p class="subtitle">Visual builder to generate animated GIFs with skins, traits and movements</p>
       </div>
       <a href="/admin" class="btn btn-secondary" style="text-decoration: none; margin-top: 10px;">← Admin Panel</a>
     </div>
@@ -790,10 +790,10 @@
         item.style.alignItems = 'stretch';
         item.innerHTML = `
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <span class="drag-handle">☰</span>
-            <input type="text" value="${trait.id}" placeholder="Trait ID" 
+          <span class="drag-handle">☰</span>
+          <input type="text" value="${trait.id}" placeholder="Trait ID" 
                    onchange="updateFixedTrait(${index}, this.value)" style="flex: 1;">
-            <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
+          <button class="btn btn-danger btn-small btn-icon" onclick="removeFixedTrait(${index})">×</button>
           </div>
           ${trait.id ? `
             <div class="trait-frame-config">
@@ -1095,13 +1095,13 @@
         item.style.alignItems = 'stretch';
         item.innerHTML = `
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <span class="drag-handle">☰</span>
-            <input type="text" value="${frame.id}" placeholder="Trait ID" 
-                   onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
+          <span class="drag-handle">☰</span>
+          <input type="text" value="${frame.id}" placeholder="Trait ID" 
+                 onchange="updateFrameId(${index}, this.value)" style="flex: 1;">
             <input type="number" value="${frame.delay || 500}" placeholder="Delay (ms)" min="10" max="5000"
-                   onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
-            <button class="btn btn-secondary btn-small btn-icon" onclick="duplicateFrame(${index})">📋</button>
-            <button class="btn btn-danger btn-small btn-icon" onclick="removeFrame(${index})">×</button>
+                 onchange="updateFrameDelay(${index}, parseInt(this.value))" style="width: 120px;">
+          <button class="btn btn-secondary btn-small btn-icon" onclick="duplicateFrame(${index})">📋</button>
+          <button class="btn btn-danger btn-small btn-icon" onclick="removeFrame(${index})">×</button>
           </div>
           ${frame.id ? `
             <div class="trait-frame-config">
@@ -1719,16 +1719,39 @@
         params.set('bounceDelay', bc.delay.toString());
       }
       
-      // Select endpoint based on version
-      let endpoint = 'test-gif-simple';
-      if (builderState.version === 'v2') {
-        endpoint = 'test-gif-simple-v2';
-      } else if (builderState.version === 'v3') {
-        endpoint = 'test-gif-simple-v3';
-      }
+      // Si bounce está activo, usar endpoint simplificado de bounce
+      let endpoint;
+      if (builderState.bounceConfig && builderState.bounceConfig.enabled) {
+        endpoint = 'bounce-test';
+        // Simplificar parámetros para bounce-test
+        const bounceParams = new URLSearchParams();
+        if (builderState.base) bounceParams.set('base', builderState.base);
+        if (activeFixed.length > 0) {
+          bounceParams.set('fixed', activeFixed.map(t => t.id).join(','));
+        }
+        bounceParams.set('bounce', 'true');
+        bounceParams.set('bounceDir', builderState.bounceConfig.direction);
+        bounceParams.set('bounceDist', builderState.bounceConfig.distance.toString());
+        bounceParams.set('bounceCount', builderState.bounceConfig.bounces.toString());
+        bounceParams.set('bounceFrames', builderState.bounceConfig.frames.toString());
+        bounceParams.set('bounceDelay', builderState.bounceConfig.delay.toString());
+        bounceParams.set('width', '400');
+        bounceParams.set('height', '400');
+        
+        const url = `https://adrianlab.vercel.app/api/${endpoint}?${bounceParams.toString()}`;
+        document.getElementById('url-display').textContent = url;
+      } else {
+        // Select endpoint based on version (lógica normal)
+        endpoint = 'test-gif-simple';
+        if (builderState.version === 'v2') {
+          endpoint = 'test-gif-simple-v2';
+        } else if (builderState.version === 'v3') {
+          endpoint = 'test-gif-simple-v3';
+        }
       
       const url = `https://adrianlab.vercel.app/api/${endpoint}?${params.toString()}`;
       document.getElementById('url-display').textContent = url;
+      }
     }
     
     // Copy URL
