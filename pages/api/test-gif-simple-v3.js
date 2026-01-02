@@ -804,50 +804,166 @@ async function generateGifWithGifwrap(config) {
     const variableId = hasAnimatedVariants ? null : svgFrame.id;
     
     // Generar frame con capas, transformaciones, AdrianZERO base y GIF background
-    let compositePng = await generateLayeredFrame(
-      base,
-      fixed,
-      variableId,
-      'resvg',
-      movements,
-      frameIndex,
-      totalFrames,
-      gifFrame,
-      adrianZeroBuffer,
-      width,
-      height,
-      hasAnimatedVariants ? svgFrame.animatedVariants : null
-    );
+    // Si bounce está activo, necesitamos aplicar bounce por capas, no al frame completo
+    let compositePng;
     
-    // Aplicar bounce si está configurado
     if (bounceConfig && bounceConfig.enabled) {
+      // Aplicar bounce por capas para que el delay funcione correctamente
       const { calculateBounceWithDelay } = await import('../../lib/animation-helpers.js');
-      const bounceTransform = calculateBounceWithDelay(
+      
+      // Generar capas sin bounce primero
+      const layers = [];
+      
+      // 0. AdrianZERO renderizado (si existe) - sin bounce (es la base completa)
+      if (adrianZeroBuffer) {
+        layers.push({
+          id: 'adrianzero-base',
+          pngBuffer: adrianZeroBuffer,
+          type: 'adrianzero',
+          transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+        });
+      }
+      
+      // 1. GIF Background (si existe) - sin bounce
+      if (gifFrame) {
+        layers.push({
+          id: 'gif-background',
+          pngBuffer: gifFrame.pngBuffer,
+          type: 'gif',
+          transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+        });
+      }
+      
+      // 2. Skin base (si existe) - con bounce SIN delay
+      if (base) {
+        const basePng = await svgToPng(base, 'resvg', width);
+        const baseMovement = findMovement(movements, 'base');
+        const baseTransform = calculatePosition(baseMovement, frameIndex, totalFrames);
+        
+        // Añadir bounce sin delay al skin
+        const bounceTransform = calculateBounceWithDelay(
+          frameIndex,
+          bounceConfig.frames,
+          bounceConfig.direction,
+          bounceConfig.distance,
+          bounceConfig.bounces,
+          0 // Sin delay para skin
+        );
+        
+        // Combinar transformaciones (movement + bounce)
+        layers.push({ 
+          id: base, 
+          pngBuffer: basePng, 
+          type: 'base',
+          transform: {
+            x: baseTransform.x + bounceTransform.x,
+            y: baseTransform.y + bounceTransform.y,
+            scale: baseTransform.scale * bounceTransform.scale,
+            rotation: baseTransform.rotation + bounceTransform.rotation
+          }
+        });
+      }
+      
+      // 3. Traits fijos - con bounce CON delay
+      for (const fixedId of fixed) {
+        const fixedPng = await svgToPng(fixedId, 'resvg', width);
+        const fixedMovement = findMovement(movements, 'fixed', fixedId);
+        const fixedTransform = calculatePosition(fixedMovement, frameIndex, totalFrames);
+        
+        // Añadir bounce con delay a los fixed traits
+        const bounceTransform = calculateBounceWithDelay(
+          frameIndex,
+          bounceConfig.frames,
+          bounceConfig.direction,
+          bounceConfig.distance,
+          bounceConfig.bounces,
+          bounceConfig.delay // Delay para traits
+        );
+        
+        // Combinar transformaciones (movement + bounce)
+        layers.push({ 
+          id: fixedId, 
+          pngBuffer: fixedPng, 
+          type: 'fixed',
+          transform: {
+            x: fixedTransform.x + bounceTransform.x,
+            y: fixedTransform.y + bounceTransform.y,
+            scale: fixedTransform.scale * bounceTransform.scale,
+            rotation: fixedTransform.rotation + bounceTransform.rotation
+          }
+        });
+      }
+      
+      // 4. Trait variable o animated traits - con bounce CON delay
+      if (hasAnimatedVariants && svgFrame.animatedVariants) {
+        for (const animVariant of svgFrame.animatedVariants) {
+          const variantPng = await svgToPng(animVariant.id, 'resvg', width);
+          
+          // Añadir bounce con delay a los animated traits
+          const bounceTransform = calculateBounceWithDelay(
+            frameIndex,
+            bounceConfig.frames,
+            bounceConfig.direction,
+            bounceConfig.distance,
+            bounceConfig.bounces,
+            bounceConfig.delay // Delay para traits
+          );
+          
+          layers.push({ 
+            id: animVariant.id, 
+            pngBuffer: variantPng, 
+            type: 'animated',
+            baseId: animVariant.baseId,
+            transform: bounceTransform
+          });
+        }
+      } else if (variableId) {
+        const variablePng = await svgToPng(variableId, 'resvg', width);
+        const varMovement = findMovement(movements, 'variable');
+        const varTransform = calculatePosition(varMovement, frameIndex, totalFrames);
+        
+        // Añadir bounce con delay al trait variable
+        const bounceTransform = calculateBounceWithDelay(
+          frameIndex,
+          bounceConfig.frames,
+          bounceConfig.direction,
+          bounceConfig.distance,
+          bounceConfig.bounces,
+          bounceConfig.delay // Delay para traits
+        );
+        
+        // Combinar transformaciones (movement + bounce)
+        layers.push({ 
+          id: variableId, 
+          pngBuffer: variablePng, 
+          type: 'variable',
+          transform: {
+            x: varTransform.x + bounceTransform.x,
+            y: varTransform.y + bounceTransform.y,
+            scale: varTransform.scale * bounceTransform.scale,
+            rotation: varTransform.rotation + bounceTransform.rotation
+          }
+        });
+      }
+      
+      // Componer todas las capas con transformaciones de bounce
+      compositePng = await compositeFrameWithTransforms(layers, width, height);
+    } else {
+      // Sin bounce, usar la función normal
+      compositePng = await generateLayeredFrame(
+        base,
+        fixed,
+        variableId,
+        'resvg',
+        movements,
         frameIndex,
-        bounceConfig.frames,
-        bounceConfig.direction,
-        bounceConfig.distance,
-        bounceConfig.bounces,
-        0 // Sin delay para aplicar bounce al frame completo
+        totalFrames,
+        gifFrame,
+        adrianZeroBuffer,
+        width,
+        height,
+        hasAnimatedVariants ? svgFrame.animatedVariants : null
       );
-      
-      // Aplicar transformación de bounce al frame completo
-      const canvas = createCanvas(width, height);
-      const ctx = canvas.getContext('2d');
-      const img = await loadImage(compositePng);
-      
-      ctx.save();
-      ctx.translate(width / 2 + bounceTransform.x, height / 2 + bounceTransform.y);
-      if (bounceTransform.rotation !== 0) {
-        ctx.rotate(bounceTransform.rotation * Math.PI / 180);
-      }
-      if (bounceTransform.scale !== 1) {
-        ctx.scale(bounceTransform.scale, bounceTransform.scale);
-      }
-      ctx.drawImage(img, -width / 2, -height / 2, width, height);
-      ctx.restore();
-      
-      compositePng = canvas.toBuffer('image/png');
     }
     
     return {
