@@ -211,17 +211,17 @@ async function loadGifFrames(gifId, targetWidth = null, targetHeight = null) {
     if (needsResize) {
       finalBuffer = await sharp(pngBuffer)
         .resize(finalWidth, finalHeight, {
-          fit: 'contain',
+        fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 0 }, // Transparente
           kernel: 'lanczos3', // Kernel de alta calidad para evitar pixel repetition
           withoutEnlargement: false
-        })
+      })
         .png({
           quality: 100, // Máxima calidad PNG
           compressionLevel: 9, // Máxima compresión sin pérdida
           palette: false // No aplicar paleta en PNG, lo haremos después en GIF
         })
-        .toBuffer();
+      .toBuffer();
     }
     
     processedFrames.push({
