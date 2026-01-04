@@ -4,11 +4,13 @@ import sharp from 'sharp';
 import { Resvg } from '@resvg/resvg-js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-const BEDROOM_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
-const BEDROOM_PNG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.png');
+const BEDROOM_SVG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
+const BEDROOM_PNG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedr.png');
 const BEDROOM_WIDTH = 1049.6;
 const BEDROOM_HEIGHT = 548.375;
 let cachedBedroomPng = null;
+let bedroomWidth = BEDROOM_WIDTH;
+let bedroomHeight = BEDROOM_HEIGHT;
 
 async function loadBufferFromUrl(url) {
   const resp = await fetch(url);
@@ -24,15 +26,24 @@ async function loadBedroomBase() {
   // Si existe PNG pre-renderizado, usarlo (evita límites de nodos)
   if (fs.existsSync(BEDROOM_PNG_PATH)) {
     cachedBedroomPng = fs.readFileSync(BEDROOM_PNG_PATH);
+    try {
+      const meta = await sharp(cachedBedroomPng).metadata();
+      if (meta.width && meta.height) {
+        bedroomWidth = meta.width;
+        bedroomHeight = meta.height;
+      }
+    } catch (e) {
+      console.warn('[bedrooms] metadata PNG no disponible:', e.message);
+    }
     return cachedBedroomPng;
   }
-  if (!fs.existsSync(BEDROOM_PATH)) {
+  if (!fs.existsSync(BEDROOM_SVG_PATH)) {
     throw new Error('Bedroom base not found');
   }
-  const svgContent = fs.readFileSync(BEDROOM_PATH, 'utf8');
+  const svgContent = fs.readFileSync(BEDROOM_SVG_PATH, 'utf8');
   // Rasterizador manual para evitar límite de nodos: interpreta los <use> y pinta un mapa de píxeles
-  const width = Math.round(BEDROOM_WIDTH);
-  const height = Math.round(BEDROOM_HEIGHT);
+  const width = Math.round(bedroomWidth);
+  const height = Math.round(bedroomHeight);
   const buffer = Buffer.alloc(width * height * 4, 0);
 
   const regex = /x="([\d.]+)" y="([\d.]+)" fill="rgba\((\d+),(\d+),(\d+),([\d.]+)\)"/g;
