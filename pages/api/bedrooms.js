@@ -1,11 +1,13 @@
 import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
+import { Resvg } from '@resvg/resvg-js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
 const BEDROOM_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
 const BEDROOM_WIDTH = 1049.6;
 const BEDROOM_HEIGHT = 548.375;
+let cachedBedroomPng = null;
 
 async function loadBufferFromUrl(url) {
   const resp = await fetch(url);
@@ -17,11 +19,19 @@ async function loadBufferFromUrl(url) {
 }
 
 async function loadBedroomBase() {
+  if (cachedBedroomPng) return cachedBedroomPng;
   if (!fs.existsSync(BEDROOM_PATH)) {
     throw new Error('Bedroom base not found');
   }
-  const svg = fs.readFileSync(BEDROOM_PATH);
-  return sharp(svg, { density: 300 }).png().toBuffer();
+  const svgContent = fs.readFileSync(BEDROOM_PATH);
+  // Usar Resvg para evitar límites de glib y referencias masivas
+  const resvg = new Resvg(svgContent, {
+    fitTo: { mode: 'original' },
+    background: 'rgba(0,0,0,0)'
+  });
+  const pngData = resvg.render().asPng();
+  cachedBedroomPng = Buffer.from(pngData);
+  return cachedBedroomPng;
 }
 
 function parseExtrasParam(extrasParam) {
