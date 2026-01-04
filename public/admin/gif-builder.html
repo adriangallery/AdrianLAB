@@ -432,6 +432,7 @@
               <option value="v1">v1 (test-gif-simple) - Stable</option>
               <option value="v2" selected>v2 (test-gif-simple-v2) - Latest</option>
               <option value="v3">v3 (test-gif-simple-v3) - SVG Controls</option>
+              <option value="v4">v4 (PNG AdrianZERO)</option>
             </select>
           </div>
         </div>
@@ -449,7 +450,7 @@
         
         <!-- AdrianZERO Base (v3 only) -->
         <div class="section" id="adrianzero-section" style="display: none;">
-          <div class="section-title">🎯 AdrianZERO Base (v3)</div>
+          <div class="section-title">🎯 AdrianZERO Base (v3/v4)</div>
           <div class="form-group">
             <label>Token ID:</label>
             <input type="text" id="adrianzero-tokenid" placeholder="e.g. 146" 
@@ -707,7 +708,7 @@
       // Mostrar/ocultar sección AdrianZERO según versión
       const adrianZeroSection = document.getElementById('adrianzero-section');
       if (adrianZeroSection) {
-        adrianZeroSection.style.display = builderState.version === 'v3' ? 'block' : 'none';
+        adrianZeroSection.style.display = (builderState.version === 'v3' || builderState.version === 'v4') ? 'block' : 'none';
       }
       
       renderFixedTraits();
@@ -764,7 +765,7 @@
       // Mostrar/ocultar sección AdrianZERO según versión
       const adrianZeroSection = document.getElementById('adrianzero-section');
       if (adrianZeroSection) {
-        adrianZeroSection.style.display = builderState.version === 'v3' ? 'block' : 'none';
+        adrianZeroSection.style.display = (builderState.version === 'v3' || builderState.version === 'v4') ? 'block' : 'none';
       }
       
       updateURL();
@@ -1719,6 +1720,56 @@
         params.set('bounceDelay', bc.delay.toString());
       }
       
+      // V4: PNG con AdrianZERO
+      if (builderState.version === 'v4') {
+        if (!builderState.adrianZeroTokenId) {
+          document.getElementById('url-display').textContent = 'Añade un AdrianZERO Token ID para generar el PNG';
+          return;
+        }
+
+        // Traits combinados (acepta animados y no animados)
+        const traitIds = new Set();
+        builderState.fixed.forEach(t => t.id && traitIds.add(t.id));
+        builderState.frames.forEach(f => f.id && traitIds.add(f.id));
+        (builderState.animatedTraits || []).forEach(at => at.baseId && traitIds.add(at.baseId));
+
+        // Parámetros específicos v4
+        const v4Params = new URLSearchParams();
+        v4Params.set('adrianzero', builderState.adrianZeroTokenId);
+        if (traitIds.size > 0) {
+          v4Params.set('traits', Array.from(traitIds).join(','));
+        }
+
+        if (builderState.fixed.length > 0) {
+          const fixedIds = builderState.fixed.filter(t => t.id).map(t => t.id);
+          if (fixedIds.length > 0) {
+            v4Params.set('fixed', fixedIds.join(','));
+          }
+        }
+
+        if (builderState.frames.length > 0) {
+          const framePairs = builderState.frames
+            .filter(f => f.id)
+            .map(f => `${f.id}:${f.delay || 500}`);
+          if (framePairs.length > 0) {
+            v4Params.set('frames', framePairs.join(','));
+          }
+        }
+
+        const activeAnimatedV4 = (builderState.animatedTraits || [])
+          .filter(animTrait => animTrait.baseId);
+        if (activeAnimatedV4.length > 0) {
+          const animatedParamsV4 = activeAnimatedV4.map(animTrait => {
+            return `${animTrait.baseId}:${animTrait.delay || 500}`;
+          });
+          v4Params.set('animated', animatedParamsV4.join(','));
+        }
+
+        const url = `https://adrianlab.vercel.app/api/test-gif-simple-v4?${v4Params.toString()}`;
+        document.getElementById('url-display').textContent = url;
+        return;
+      }
+
       // Si bounce está activo, usar endpoint simplificado de bounce
       let endpoint;
       if (builderState.bounceConfig && builderState.bounceConfig.enabled) {
@@ -1774,6 +1825,7 @@
     async function generatePreview() {
       const previewArea = document.getElementById('preview-area');
       const previewInfo = document.getElementById('preview-info');
+      const isV4 = builderState.version === 'v4';
       
       // Calcular total de frames (frames normales + animated traits)
       const totalAnimatedFrames = (builderState.animatedTraits || []).reduce((sum, at) => {
@@ -1782,11 +1834,16 @@
       const hasFrames = builderState.frames.length > 0 || totalAnimatedFrames > 0;
       
       // Validate
-      if (!hasFrames) {
+      if (isV4 && !builderState.adrianZeroTokenId) {
+        showMessage('Añade un AdrianZERO Token ID para generar el PNG', 'error');
+        return;
+      }
+
+      if (!hasFrames && !isV4) {
         showMessage('Add at least one frame or animated trait', 'error');
         return;
       }
-      
+
       if (builderState.frames.some(f => !f.id)) {
         showMessage('All frames must have a trait ID', 'error');
         return;
@@ -1809,14 +1866,15 @@
         previewArea.innerHTML = `<img src="${imageUrl}" alt="Preview GIF">`;
         
         // Show information
-        const frameCount = response.headers.get('X-Frame-Count') || builderState.frames.length;
-        const duration = response.headers.get('X-Duration-Ms') || 'N/A';
+        const frameCount = isV4 ? 1 : (response.headers.get('X-Frame-Count') || builderState.frames.length);
+        const duration = isV4 ? 'N/A' : (response.headers.get('X-Duration-Ms') || 'N/A');
         const size = response.headers.get('X-Size-KB') || 'N/A';
-        const layers = response.headers.get('X-Layers-Per-Frame') || 
-          (1 + builderState.fixed.length + 1);
+        const layers = isV4 
+          ? (1 + builderState.fixed.filter(t => t.id).length + builderState.frames.filter(f => f.id).length + (builderState.animatedTraits || []).filter(at => at.baseId).length)
+          : (response.headers.get('X-Layers-Per-Frame') || (1 + builderState.fixed.length + 1));
         
         document.getElementById('info-frames').textContent = frameCount;
-        document.getElementById('info-duration').textContent = `${duration}ms`;
+        document.getElementById('info-duration').textContent = isV4 ? 'N/A' : `${duration}ms`;
         document.getElementById('info-size').textContent = `${size} KB`;
         document.getElementById('info-layers').textContent = layers;
         previewInfo.style.display = 'block';
