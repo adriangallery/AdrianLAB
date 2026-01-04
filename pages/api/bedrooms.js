@@ -3,7 +3,7 @@ import fs from 'fs';
 import sharp from 'sharp';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-const BEDROOM_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom.svg');
+const BEDROOM_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
 const BEDROOM_WIDTH = 1049.6;
 const BEDROOM_HEIGHT = 548.375;
 
