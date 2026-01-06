@@ -945,6 +945,16 @@ export default async function handler(req, res) {
       res.setHeader('X-Blackout', 'enabled');
     }
     
+    // ===== PRUEBA PUNTUAL: Token 682 - animation_url =====
+    // TODO: ELIMINAR ESTA SECCIÓN DESPUÉS DE LA PRUEBA
+    // Este es un test temporal para añadir animation_url al token 682
+    // Para revertir: simplemente eliminar este bloque if completo
+    if (tokenIdNum === 682) {
+      baseMetadata.animation_url = 'https://adrianzero.com/cigarrette/';
+      console.log(`[metadata] 🧪 TEST: animation_url añadido para token 682 → ${baseMetadata.animation_url}`);
+    }
+    // ===== FIN PRUEBA PUNTUAL =====
+    
     return res.status(200).json(baseMetadata);
   } catch (error) {
     console.error('[metadata] Error general:', error);
