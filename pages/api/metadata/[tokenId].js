@@ -950,7 +950,7 @@ export default async function handler(req, res) {
     // Este es un test temporal para añadir animation_url al token 682
     // Para revertir: simplemente eliminar este bloque if completo
     if (tokenIdNum === 682) {
-      baseMetadata.animation_url = 'https://adrianzero.com/cigarrettev2/';
+      baseMetadata.animation_url = 'https://adrianzero.com/cigarrettev3/';
       console.log(`[metadata] 🧪 TEST: animation_url añadido para token 682 → ${baseMetadata.animation_url}`);
     }
     // ===== FIN PRUEBA PUNTUAL =====
