@@ -179,9 +179,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extraer tokenId de la ruta
+    // Extraer tokenId de la ruta, eliminando .png o .gif si existe
     const { tokenId } = req.query;
-    const cleanTokenId = tokenId.replace('.png', '');
+    const cleanTokenId = tokenId.toString().replace(/\.(png|gif)$/, '');
     console.log(`[test-external] Iniciando test de renderizado externo para token ${cleanTokenId}`);
 
     // Verificar tokenId

@@ -72,8 +72,10 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Extraer tokenId de la ruta, eliminando .png o .gif si existe
     const { tokenId } = req.query;
-    console.log(`[metadata] Iniciando request para token ${tokenId}`);
+    const cleanTokenId = tokenId.toString().replace(/\.(png|gif)$/, '');
+    console.log(`[metadata] Iniciando request para token ${cleanTokenId}`);
     
     // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BANANA (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
@@ -105,12 +107,12 @@ export default async function handler(req, res) {
       await updateTogglesIfNeeded(zoomInZeros);
       
       // Verificar toggles combinados primero (tienen prioridad)
-      const hasToggle5 = hasToggleActive(tokenId, "5"); // bn+shadow
-      const hasToggle6 = hasToggleActive(tokenId, "6"); // bn+shadow+closeup
-      const hasToggle7 = hasToggleActive(tokenId, "7"); // shadow+closeup
-      const hasToggle8 = hasToggleActive(tokenId, "8"); // glow+closeup
-      const hasToggle9 = hasToggleActive(tokenId, "9"); // glow+bn
-      const hasToggle10 = hasToggleActive(tokenId, "10"); // glow+bn+closeup
+      const hasToggle5 = hasToggleActive(cleanTokenId, "5"); // bn+shadow
+      const hasToggle6 = hasToggleActive(cleanTokenId, "6"); // bn+shadow+closeup
+      const hasToggle7 = hasToggleActive(cleanTokenId, "7"); // shadow+closeup
+      const hasToggle8 = hasToggleActive(cleanTokenId, "8"); // glow+closeup
+      const hasToggle9 = hasToggleActive(cleanTokenId, "9"); // glow+bn
+      const hasToggle10 = hasToggleActive(cleanTokenId, "10"); // glow+bn+closeup
       
       // Si hay toggle combinado activo, aplicar esa combinación
       if (hasToggle10) {
@@ -119,82 +121,82 @@ export default async function handler(req, res) {
         isGlowToken = true;
         isBnToken = true;
         isShadowToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 10: Token ${tokenId} tiene glow+bn+closeup activo`);
+        console.log(`[metadata] 🎨 TOGGLE 10: Token ${cleanTokenId} tiene glow+bn+closeup activo`);
       } else if (hasToggle9) {
         // ID 9: glow+bn
         isCloseupToken = false;
         isGlowToken = true;
         isBnToken = true;
         isShadowToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 9: Token ${tokenId} tiene glow+bn activo`);
+        console.log(`[metadata] 🎨 TOGGLE 9: Token ${cleanTokenId} tiene glow+bn activo`);
       } else if (hasToggle8) {
         // ID 8: glow+closeup
         isCloseupToken = true;
         isGlowToken = true;
         isBnToken = false;
         isShadowToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 8: Token ${tokenId} tiene glow+closeup activo`);
+        console.log(`[metadata] 🎨 TOGGLE 8: Token ${cleanTokenId} tiene glow+closeup activo`);
       } else if (hasToggle7) {
         // ID 7: shadow+closeup
         isCloseupToken = true;
         isShadowToken = true;
         isGlowToken = false;
         isBnToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 7: Token ${tokenId} tiene shadow+closeup activo`);
+        console.log(`[metadata] 🎨 TOGGLE 7: Token ${cleanTokenId} tiene shadow+closeup activo`);
       } else if (hasToggle6) {
         // ID 6: bn+shadow+closeup
         isCloseupToken = true;
         isShadowToken = true;
         isBnToken = true;
         isGlowToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 6: Token ${tokenId} tiene bn+shadow+closeup activo`);
+        console.log(`[metadata] 🎨 TOGGLE 6: Token ${cleanTokenId} tiene bn+shadow+closeup activo`);
       } else if (hasToggle5) {
         // ID 5: bn+shadow
         isCloseupToken = false;
         isShadowToken = true;
         isBnToken = true;
         isGlowToken = false;
-        console.log(`[metadata] 🎨 TOGGLE 5: Token ${tokenId} tiene bn+shadow activo`);
+        console.log(`[metadata] 🎨 TOGGLE 5: Token ${cleanTokenId} tiene bn+shadow activo`);
       } else {
         // Verificar toggles individuales (solo si no hay toggle combinado)
-        isCloseupToken = hasToggleActive(tokenId, "1"); // toggleId "1" = closeup
-        isShadowToken = hasToggleActive(tokenId, "2"); // toggleId "2" = shadow
-        isGlowToken = hasToggleActive(tokenId, "3"); // toggleId "3" = glow
-        isBnToken = hasToggleActive(tokenId, "4"); // toggleId "4" = blanco y negro
-        isUvToken = hasToggleActive(tokenId, "11"); // toggleId "11" = uv
-        isBlackoutToken = hasToggleActive(tokenId, "12"); // toggleId "12" = blackout
-        isBananaToken = hasToggleActive(tokenId, "13"); // toggleId "13" = banana
+        isCloseupToken = hasToggleActive(cleanTokenId, "1"); // toggleId "1" = closeup
+        isShadowToken = hasToggleActive(cleanTokenId, "2"); // toggleId "2" = shadow
+        isGlowToken = hasToggleActive(cleanTokenId, "3"); // toggleId "3" = glow
+        isBnToken = hasToggleActive(cleanTokenId, "4"); // toggleId "4" = blanco y negro
+        isUvToken = hasToggleActive(cleanTokenId, "11"); // toggleId "11" = uv
+        isBlackoutToken = hasToggleActive(cleanTokenId, "12"); // toggleId "12" = blackout
+        isBananaToken = hasToggleActive(cleanTokenId, "13"); // toggleId "13" = banana
         
         if (isCloseupToken) {
-          console.log(`[metadata] 🔍 TOGGLE: Token ${tokenId} tiene closeup activo`);
+          console.log(`[metadata] 🔍 TOGGLE: Token ${cleanTokenId} tiene closeup activo`);
         }
         
         if (isShadowToken) {
-          console.log(`[metadata] 🌑 TOGGLE: Token ${tokenId} tiene shadow activo`);
+          console.log(`[metadata] 🌑 TOGGLE: Token ${cleanTokenId} tiene shadow activo`);
         }
         
         if (isGlowToken) {
-          console.log(`[metadata] ✨ TOGGLE: Token ${tokenId} tiene glow activo`);
+          console.log(`[metadata] ✨ TOGGLE: Token ${cleanTokenId} tiene glow activo`);
         }
         
         if (isBnToken) {
-          console.log(`[metadata] ⚫ TOGGLE: Token ${tokenId} tiene BN (blanco y negro) activo`);
+          console.log(`[metadata] ⚫ TOGGLE: Token ${cleanTokenId} tiene BN (blanco y negro) activo`);
         }
         
         if (isUvToken) {
-          console.log(`[metadata] 💜 TOGGLE: Token ${tokenId} tiene UV activo`);
+          console.log(`[metadata] 💜 TOGGLE: Token ${cleanTokenId} tiene UV activo`);
         }
         
         if (isBlackoutToken) {
-          console.log(`[metadata] ⬛ TOGGLE: Token ${tokenId} tiene BLACKOUT activo`);
+          console.log(`[metadata] ⬛ TOGGLE: Token ${cleanTokenId} tiene BLACKOUT activo`);
         }
         
         if (isBananaToken) {
-          console.log(`[metadata] 🍌 TOGGLE: Token ${tokenId} tiene BANANA activo`);
+          console.log(`[metadata] 🍌 TOGGLE: Token ${cleanTokenId} tiene BANANA activo`);
         }
       }
     } catch (error) {
-      console.error(`[metadata] ⚠️ Error verificando toggles para token ${tokenId}:`, error.message);
+      console.error(`[metadata] ⚠️ Error verificando toggles para token ${cleanTokenId}:`, error.message);
       // En caso de error, no aplicar toggles (fallback seguro)
       isCloseupToken = false;
       isShadowToken = false;
@@ -206,7 +208,7 @@ export default async function handler(req, res) {
     }
     
     // Caso especial para el token 100000
-    if (tokenId === '100000' || tokenId === '100000.json') {
+    if (cleanTokenId === '100000' || req.query.tokenId === '100000.json') {
       const metadataPath = path.join(process.cwd(), 'public', 'metadata', '100000.json');
       const metadataData = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
       
@@ -218,14 +220,14 @@ export default async function handler(req, res) {
       return res.status(200).json(metadataData);
     }
     
-    // Verify that tokenId is valid
-    if (!tokenId || isNaN(parseInt(tokenId))) {
-      console.error(`[metadata] Token ID inválido: ${tokenId}`);
+    // Verify that cleanTokenId is valid
+    if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
+      console.error(`[metadata] Token ID inválido: ${cleanTokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
     }
 
-    // Convert tokenId to number for comparisons
-    const tokenIdNum = parseInt(tokenId);
+    // Convert cleanTokenId to number for comparisons
+    const tokenIdNum = parseInt(cleanTokenId);
 
     // Build base URL for images
     const baseUrl = 'https://adrianlab.vercel.app';
@@ -329,7 +331,7 @@ export default async function handler(req, res) {
         const isAnimated = await isTraitAnimated(tokenIdNum);
         if (isAnimated) {
           imageExtension = '.gif';
-          console.log(`[metadata] 🎬 Token ${tokenId} es un trait animado, usando .gif`);
+          console.log(`[metadata] 🎬 Token ${cleanTokenId} es un trait animado, usando .gif`);
         }
       }
       
@@ -338,7 +340,7 @@ export default async function handler(req, res) {
       let tokenExists = false;
       
       try {
-        await core.getTokenData(tokenId);
+        await core.getTokenData(cleanTokenId);
         tokenExists = true;
       } catch (tokenError) {
         // Token no existe en el contrato como AdrianZERO, pero ya verificamos si es trait animado arriba
@@ -348,7 +350,7 @@ export default async function handler(req, res) {
       // Si el token existe como AdrianZERO, verificar traits equipados
       if (tokenExists) {
         try {
-          const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(tokenId);
+          const [categories, traitIds] = await traitsExtension.getAllEquippedTraits(cleanTokenId);
           const allTraitIds = traitIds.map(id => id.toString()).filter(id => id && id !== 'None' && id !== '');
           
           if (allTraitIds.length > 0) {
@@ -356,39 +358,39 @@ export default async function handler(req, res) {
             
             if (animatedTraits.length > 0) {
               imageExtension = '.gif';
-              console.log(`[metadata] 🎬 Traits animados detectados en AdrianZERO ${tokenId}, usando .gif`);
+              console.log(`[metadata] 🎬 Traits animados detectados en AdrianZERO ${cleanTokenId}, usando .gif`);
             }
           }
         } catch (contractError) {
           // Si hay error obteniendo traits, ya tenemos el resultado del check de trait animado
-          console.warn(`[metadata] Error obteniendo traits del contrato para token ${tokenId}:`, contractError.message);
+          console.warn(`[metadata] Error obteniendo traits del contrato para token ${cleanTokenId}:`, contractError.message);
         }
       }
     } catch (error) {
       console.warn(`[metadata] Error detectando traits animados, usando .png por defecto:`, error.message);
     }
     
-    const imageUrl = `${baseUrl}/api/render/${tokenId}${imageExtension}${paramsString}`;
+    const imageUrl = `${baseUrl}/api/render/${cleanTokenId}${imageExtension}${paramsString}`;
     
     // Verificar tag del token ANTES de crear baseMetadata para poder sobreescribir el nombre
     const { getTokenTagInfo } = await import('../../../lib/tag-logic.js');
-    const tagInfo = await getTokenTagInfo(tokenId);
+    const tagInfo = await getTokenTagInfo(cleanTokenId);
     
     // Determinar el nombre base según el tag
-    let tokenName = `AdrianZero #${tokenId}`;
+    let tokenName = `AdrianZero #${cleanTokenId}`;
     if (tagInfo.tag === 'SubZERO') {
       tokenName = 'SubZERO';
-      console.log(`[metadata] Token ${tokenId} tiene tag SubZERO, sobreescribiendo nombre a "SubZERO"`);
+      console.log(`[metadata] Token ${cleanTokenId} tiene tag SubZERO, sobreescribiendo nombre a "SubZERO"`);
     }
     
     // ===== LÓGICA ESPECIAL SAMURAIZERO =====
     if (tagInfo.tag === 'SamuraiZERO') {
       try {
         const { getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../lib/tag-logic.js');
-        const samuraiIndex = await getSamuraiZEROIndex(tokenId);
+        const samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
         
         if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
-          console.log(`[metadata] 🥷 Token ${tokenId} es SamuraiZERO con índice ${samuraiIndex}`);
+          console.log(`[metadata] 🥷 Token ${cleanTokenId} es SamuraiZERO con índice ${samuraiIndex}`);
           
           // Cargar samuraimetadata.json
           const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
@@ -402,7 +404,7 @@ export default async function handler(req, res) {
             // Extraer nombre base y reemplazar número con tokenId real
             const nameMatch = samuraiEntry.name.match(/^(.+?)\s*#\d+$/);
             const baseName = nameMatch ? nameMatch[1] : samuraiEntry.name.split('#')[0].trim();
-            const finalName = `${baseName} #${tokenId}`;
+            const finalName = `${baseName} #${cleanTokenId}`;
             
             // Construir URL de imagen (usar endpoint de renderizado normal)
             const urlParams = [];
@@ -414,7 +416,7 @@ export default async function handler(req, res) {
             if (isBlackoutToken) urlParams.push('blackout=true');
             if (isBananaToken) urlParams.push('banana=true');
             const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
-            const samuraiImageUrl = `${baseUrl}/api/render/${tokenId}.png${paramsString}`;
+            const samuraiImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png${paramsString}`;
             
             // Construir metadata completo
             const samuraiMetadataResult = {
@@ -446,10 +448,10 @@ export default async function handler(req, res) {
             console.error(`[metadata] 🥷 SamuraiZERO índice ${samuraiIndex} no encontrado en JSON`);
           }
         } else {
-          console.error(`[metadata] 🥷 SamuraiZERO token ${tokenId} tiene índice inválido: ${samuraiIndex}`);
+          console.error(`[metadata] 🥷 SamuraiZERO token ${cleanTokenId} tiene índice inválido: ${samuraiIndex}`);
         }
       } catch (error) {
-        console.error(`[metadata] 🥷 Error procesando SamuraiZERO ${tokenId}:`, error.message);
+        console.error(`[metadata] 🥷 Error procesando SamuraiZERO ${cleanTokenId}:`, error.message);
         console.error(`[metadata] 🥷 Stack trace:`, error.stack);
         // Continuar con lógica normal si hay error
       }
@@ -491,7 +493,7 @@ export default async function handler(req, res) {
       let customName = null;
       try {
         console.log('[metadata] Llamando a getTokenNameHistory desde AdrianNameRegistry...');
-        const nameHistory = await adrianNameRegistry.getTokenNameHistory(tokenId);
+        const nameHistory = await adrianNameRegistry.getTokenNameHistory(cleanTokenId);
         console.log('[metadata] Respuesta de getTokenNameHistory:', {
           history: nameHistory.map(change => ({
             name: change[0],
@@ -516,7 +518,7 @@ export default async function handler(req, res) {
       let profileName = null;
       try {
         console.log('[metadata] Llamando a getTokenStatus desde PatientZERO...');
-        const tokenStatus = await patientZero.getTokenStatus(tokenId);
+        const tokenStatus = await patientZero.getTokenStatus(cleanTokenId);
         const status = tokenStatus[0];
         const profileId = tokenStatus[1];
         
@@ -568,13 +570,13 @@ export default async function handler(req, res) {
         // El nombre ya fue establecido como "SubZERO" arriba, mantenerlo
         console.log(`[metadata] Nombre SubZERO mantenido (prioridad máxima): ${baseMetadata.name}`);
       } else if (profileName) {
-        baseMetadata.name = `${profileName} #${tokenId}`;
+        baseMetadata.name = `${profileName} #${cleanTokenId}`;
         console.log(`[metadata] Nombre de perfil aplicado (prioridad alta): ${baseMetadata.name}`);
       } else if (customName) {
-        baseMetadata.name = `${customName} #${tokenId}`;
+        baseMetadata.name = `${customName} #${cleanTokenId}`;
         console.log(`[metadata] Nombre personalizado aplicado (prioridad media): ${baseMetadata.name}`);
       } else {
-        baseMetadata.name = `AdrianZero #${tokenId}`;
+        baseMetadata.name = `AdrianZero #${cleanTokenId}`;
         console.log(`[metadata] Nombre por defecto aplicado: ${baseMetadata.name}`);
       }
  
@@ -673,7 +675,7 @@ export default async function handler(req, res) {
       console.log('[metadata] Cargando datos de metadata...');
       let traitsData;
       try {
-        const traitsArray = loadMetadataForToken(tokenId);
+        const traitsArray = loadMetadataForToken(cleanTokenId);
         traitsData = { traits: traitsArray };
         console.log(`[metadata] Metadata cargado: ${traitsArray.length} items encontrados`);
       } catch (error) {
@@ -690,7 +692,7 @@ export default async function handler(req, res) {
       // Obtener historial de serums desde SerumModule
       try {
         console.log('[metadata] Llamando a getTokenSerumHistory desde SerumModule...');
-        const serumHistory = await serumModule.getTokenSerumHistory(tokenId);
+        const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
         console.log('[metadata] Respuesta de getTokenSerumHistory:', {
           history: serumHistory.map(serum => ({
             serumId: serum[0].toString(),
@@ -731,7 +733,7 @@ export default async function handler(req, res) {
         const config = (await import('../../../lib/tag-logic.js')).TAG_CONFIGS.SubZERO;
         if (config && config.metadataGenOverride) {
           generationValue = config.metadataGenOverride;
-          console.log(`[metadata] Token ${tokenId} tiene tag SubZERO, sobreescribiendo Generation a "${generationValue}"`);
+          console.log(`[metadata] Token ${cleanTokenId} tiene tag SubZERO, sobreescribiendo Generation a "${generationValue}"`);
         }
       }
       
