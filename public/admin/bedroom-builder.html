@@ -26,6 +26,14 @@
     .url-box { background: #0b1220; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; word-break: break-all; color: #a5b4fc; }
     .actions { display: flex; gap: 10px; margin-top: 10px; }
     .badge { display: inline-block; background: #334155; color: #cbd5e1; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 6px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { background: #0b1220; border: 1px solid #334155; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer; color: #e2e8f0; }
+    .chip:hover { border-color: #818cf8; color: #c7d2fe; }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+    .item-actions { display: flex; gap: 6px; }
+    .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+    .btn-ghost:hover { border-color: #818cf8; color: #c7d2fe; }
+    .stack-note { color: #94a3b8; font-size: 12px; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -57,14 +65,27 @@
             <input id="ascale" type="number" step="0.01" value="0.45">
           </div>
         </div>
-        <p class="small" style="margin-top:8px;">Usa el tamaño del SVG de bedroom (1049.6 × 548.375). Posición/escala en px relativas al lienzo.</p>
+        <p class="small" style="margin-top:8px;">Lienzo: bedroom assets (1049.6 × 548.375 aprox). Posición/escala en px relativas al lienzo.</p>
       </div>
 
-      <div class="panel">
-        <h3>Extras</h3>
-        <p class="small">Formato param: <code>id@x,y,scale</code> separados por coma. Ej: <code>plant@820,360,1</code></p>
-        <div class="list" id="extras-list"></div>
-        <button class="btn btn-secondary" onclick="addExtra()">+ Añadir extra</button>
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="panel">
+          <h3>Assets rápidos</h3>
+          <p class="small">Click para añadir capa con x=0, y=0, escala=1. El orden en la lista define el z-index.</p>
+          <div class="chip-list" id="quick-assets"></div>
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn btn-secondary" onclick="applyBasePreset()">Cargar pack base</button>
+            <button class="btn btn-secondary" onclick="resetExtrasOnly()">Limpiar extras</button>
+          </div>
+          <p class="stack-note">Consejo: usa mover ↑/↓ en la lista para probar stacking.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Extras</h3>
+          <p class="small">Formato param: <code>id@x,y,scale</code> separados por coma. Ej: <code>plant@820,360,1</code></p>
+          <div class="list" id="extras-list"></div>
+          <button class="btn btn-secondary" onclick="addExtra()">+ Añadir extra</button>
+        </div>
       </div>
     </div>
 
@@ -85,12 +106,35 @@
   </div>
 
   <script>
+    const basePreset = [
+      { id: 'bedrooms/assets/Layer_3_Floor.png', x: 0, y: 0, scale: 1 },
+      { id: 'bedrooms/assets/Layer_2.png', x: 0, y: 0, scale: 1 },
+      { id: 'bedrooms/assets/Window_1.png', x: 0, y: 0, scale: 1 },
+      { id: 'bedrooms/assets/Layer4_Window-Its_Ok.png', x: 0, y: 0, scale: 1 },
+    ];
+
+    const quickAssets = [
+      { id: 'bedrooms/assets/Layer_3_Floor.png', label: 'Layer 3 Floor' },
+      { id: 'bedrooms/assets/Layer_2.png', label: 'Layer 2' },
+      { id: 'bedrooms/assets/Window_1.png', label: 'Window 1' },
+      { id: 'bedrooms/assets/Layer4_Window-Its_Ok.png', label: 'Window Overlay' },
+      { id: 'bedrooms/assets/Board_Left.png', label: 'Board Left' },
+      { id: 'bedrooms/assets/Board_Right.png', label: 'Board Right' },
+      { id: 'bedrooms/assets/Desk_1.png', label: 'Desk 1' },
+      { id: 'bedrooms/assets/Desk_2.png', label: 'Desk 2' },
+      { id: 'bedrooms/assets/Lamp.png', label: 'Lamp' },
+      { id: 'bedrooms/assets/Boom-Box.png', label: 'Boom Box' },
+      { id: 'bedrooms/assets/OG_Poster.png', label: 'OG Poster' },
+      { id: 'bedrooms/assets/Trophy_Golden_Floppy.png', label: 'Trophy Golden' },
+      { id: 'bedrooms/assets/Trophy_XMas_Floppy.png', label: 'Trophy Xmas' }
+    ];
+
     const state = {
       tokenId: '',
       ax: 40,
       ay: 90,
       ascale: 0.45,
-      extras: []
+      extras: basePreset.map(e => ({ ...e }))
     };
 
     function loadSaved() {
@@ -99,6 +143,9 @@
         try {
           const obj = JSON.parse(saved);
           Object.assign(state, obj);
+          if (!state.extras || state.extras.length === 0) {
+            state.extras = basePreset.map(e => ({ ...e }));
+          }
         } catch (e) { console.warn('No se pudo cargar estado'); }
       }
     }
@@ -114,8 +161,16 @@
         const div = document.createElement('div');
         div.className = 'item';
         div.innerHTML = `
+          <div class="item-header">
+            <div><strong>#${idx + 1}</strong> <span class="badge">z ${idx + 1}</span></div>
+            <div class="item-actions">
+              <button class="btn-ghost" onclick="moveExtra(${idx}, -1)">↑</button>
+              <button class="btn-ghost" onclick="moveExtra(${idx}, 1)">↓</button>
+              <button class="btn btn-danger" onclick="removeExtra(${idx})">Eliminar</button>
+            </div>
+          </div>
           <label>ID / Ruta</label>
-          <input value="${ex.id || ''}" oninput="updateExtra(${idx}, 'id', this.value)" placeholder="p.ej. plant.svg o custom.png">
+          <input value="${ex.id || ''}" oninput="updateExtra(${idx}, 'id', this.value)" placeholder="p.ej. bedrooms/assets/Desk_1.png">
           <div class="row" style="margin-top:8px;">
             <div>
               <label>X</label>
@@ -130,12 +185,19 @@
               <input type="number" step="0.01" value="${ex.scale ?? 1}" oninput="updateExtra(${idx}, 'scale', parseFloat(this.value))">
             </div>
           </div>
-          <button class="btn btn-danger" style="margin-top:8px;" onclick="removeExtra(${idx})">Eliminar</button>
         `;
         list.appendChild(div);
       });
       updateUrl();
       save();
+    }
+
+    function moveExtra(idx, direction) {
+      const target = idx + direction;
+      if (target < 0 || target >= state.extras.length) return;
+      const [item] = state.extras.splice(idx, 1);
+      state.extras.splice(target, 0, item);
+      renderExtras();
     }
 
     function addExtra() {
@@ -150,6 +212,34 @@
       state.extras[idx][key] = val;
       updateUrl();
       save();
+    }
+
+    function quickAdd(id) {
+      state.extras.push({ id, x: 0, y: 0, scale: 1 });
+      renderExtras();
+    }
+
+    function resetExtrasOnly() {
+      state.extras = [];
+      renderExtras();
+    }
+
+    function applyBasePreset() {
+      state.extras = basePreset.map(e => ({ ...e }));
+      renderExtras();
+    }
+
+    function renderQuickAssets() {
+      const container = document.getElementById('quick-assets');
+      container.innerHTML = '';
+      quickAssets.forEach(asset => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.textContent = asset.label;
+        btn.title = asset.id;
+        btn.onclick = () => quickAdd(asset.id);
+        container.appendChild(btn);
+      });
     }
 
     function updateUrl() {
@@ -198,7 +288,7 @@
     function resetState() {
       state.tokenId = '';
       state.ax = 40; state.ay = 90; state.ascale = 0.45;
-      state.extras = [];
+      state.extras = basePreset.map(e => ({ ...e }));
       document.getElementById('tokenId').value = '';
       document.getElementById('ax').value = 40;
       document.getElementById('ay').value = 90;
@@ -220,6 +310,7 @@
     function init() {
       loadSaved();
       bindInputs();
+      renderQuickAssets();
       renderExtras();
       updateUrl();
     }

@@ -8,9 +8,18 @@ const BEDROOM_SVG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedroo
 const BEDROOM_PNG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedr.png');
 const BEDROOM_WIDTH = 1049.6;
 const BEDROOM_HEIGHT = 548.375;
-let cachedBedroomPng = null;
+const BEDROOM_ASSET_BASE_LAYERS = [
+  'bedrooms/assets/Layer_3_Floor.png',
+  'bedrooms/assets/Layer_2.png',
+  'bedrooms/assets/Window_1.png',
+  'bedrooms/assets/Layer4_Window-Its_Ok.png'
+];
+
+let cachedBaseLayers = null;
+let cachedFallbackPng = null;
 let bedroomWidth = BEDROOM_WIDTH;
 let bedroomHeight = BEDROOM_HEIGHT;
+const LABIMAGES_ROOT = path.join(process.cwd(), 'public', 'labimages');
 
 async function loadBufferFromUrl(url) {
   const resp = await fetch(url);
@@ -22,12 +31,36 @@ async function loadBufferFromUrl(url) {
 }
 
 async function loadBedroomBase() {
-  if (cachedBedroomPng) return cachedBedroomPng;
-  // Si existe PNG pre-renderizado, usarlo (evita límites de nodos)
-  if (fs.existsSync(BEDROOM_PNG_PATH)) {
-    cachedBedroomPng = fs.readFileSync(BEDROOM_PNG_PATH);
+  if (cachedBaseLayers) {
+    return { layers: cachedBaseLayers, width: bedroomWidth, height: bedroomHeight };
+  }
+
+  const baseLayers = [];
+
+  for (const file of BEDROOM_ASSET_BASE_LAYERS) {
     try {
-      const meta = await sharp(cachedBedroomPng).metadata();
+      const raw = await loadAsset(file);
+      const png = await rasterizeIfSvg(raw);
+      const meta = await sharp(png).metadata();
+      if (meta.width && meta.height) {
+        bedroomWidth = meta.width;
+        bedroomHeight = meta.height;
+      }
+      baseLayers.push({ input: png, left: 0, top: 0 });
+    } catch (err) {
+      console.warn(`[bedrooms] capa base ${file} no cargó: ${err.message}`);
+    }
+  }
+
+  if (baseLayers.length > 0) {
+    cachedBaseLayers = baseLayers;
+    return { layers: cachedBaseLayers, width: bedroomWidth, height: bedroomHeight };
+  }
+
+  if (fs.existsSync(BEDROOM_PNG_PATH)) {
+    cachedFallbackPng = fs.readFileSync(BEDROOM_PNG_PATH);
+    try {
+      const meta = await sharp(cachedFallbackPng).metadata();
       if (meta.width && meta.height) {
         bedroomWidth = meta.width;
         bedroomHeight = meta.height;
@@ -35,8 +68,10 @@ async function loadBedroomBase() {
     } catch (e) {
       console.warn('[bedrooms] metadata PNG no disponible:', e.message);
     }
-    return cachedBedroomPng;
+    cachedBaseLayers = [{ input: cachedFallbackPng, left: 0, top: 0 }];
+    return { layers: cachedBaseLayers, width: bedroomWidth, height: bedroomHeight };
   }
+
   if (!fs.existsSync(BEDROOM_SVG_PATH)) {
     throw new Error('Bedroom base not found');
   }
@@ -63,11 +98,12 @@ async function loadBedroomBase() {
     buffer[idx + 3] = Math.round(a * 255);
   }
 
-  cachedBedroomPng = await sharp(buffer, {
+  const rasterized = await sharp(buffer, {
     raw: { width, height, channels: 4 }
   }).png().toBuffer();
 
-  return cachedBedroomPng;
+  cachedBaseLayers = [{ input: rasterized, left: 0, top: 0 }];
+  return { layers: cachedBaseLayers, width: bedroomWidth, height: bedroomHeight };
 }
 
 function parseExtrasParam(extrasParam) {
@@ -83,15 +119,54 @@ function parseExtrasParam(extrasParam) {
   }).filter(Boolean);
 }
 
+function tryLoadLocalAsset(candidate) {
+  const relPaths = [];
+  if (candidate.startsWith('labimages/')) {
+    relPaths.push(candidate.replace(/^labimages\//, ''));
+  } else if (candidate.startsWith('bedrooms/')) {
+    relPaths.push(candidate);
+  } else {
+    relPaths.push(`bedrooms/assets/${candidate}`, candidate);
+  }
+  for (const rel of relPaths) {
+    const full = path.join(LABIMAGES_ROOT, rel);
+    if (fs.existsSync(full)) {
+      return fs.readFileSync(full);
+    }
+  }
+  return null;
+}
+
 async function loadAsset(id) {
   const hasExt = id.includes('.');
   const candidates = hasExt ? [id] : [`${id}.svg`, `${id}.png`, id];
   let lastError = null;
   for (const candidate of candidates) {
-    const url = `${BASE_URL}/labimages/${candidate}`;
+    const local = tryLoadLocalAsset(candidate);
+    if (local) return local;
+
+    let url;
+    if (candidate.startsWith('http')) {
+      url = candidate;
+    } else if (candidate.startsWith('labimages/')) {
+      url = `${BASE_URL}/${candidate}`;
+    } else if (candidate.startsWith('bedrooms/')) {
+      url = `${BASE_URL}/labimages/${candidate}`;
+    } else {
+      url = `${BASE_URL}/labimages/bedrooms/assets/${candidate}`;
+    }
     try {
       return await loadBufferFromUrl(url);
     } catch (err) {
+      if (!candidate.startsWith('labimages/') && !candidate.startsWith('bedrooms/')) {
+        const fallbackUrl = `${BASE_URL}/labimages/${candidate}`;
+        try {
+          return await loadBufferFromUrl(fallbackUrl);
+        } catch (err2) {
+          lastError = err2;
+          continue;
+        }
+      }
       lastError = err;
     }
   }
@@ -123,7 +198,7 @@ export default async function handler(req, res) {
     const scale = parseFloat(ascale ?? '0.45') || 0.45;
 
     // Cargar base bedroom
-    const basePng = await loadBedroomBase();
+    const base = await loadBedroomBase();
 
     // Cargar AdrianZERO
     const adrianBuffer = await loadAdrianZero(tokenId);
@@ -161,15 +236,15 @@ export default async function handler(req, res) {
 
     // Componer
     const layers = [
-      { input: basePng, left: 0, top: 0 },
+      ...base.layers,
       { input: adrianResized, left: Math.round(posX), top: Math.round(posY) },
       ...extrasBuffers
     ];
 
     const finalPng = await sharp({
       create: {
-        width: Math.round(BEDROOM_WIDTH),
-        height: Math.round(BEDROOM_HEIGHT),
+        width: Math.round(bedroomWidth),
+        height: Math.round(bedroomHeight),
         channels: 4,
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       }
@@ -180,7 +255,7 @@ export default async function handler(req, res) {
 
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', 'public, max-age=60');
-    res.setHeader('X-Bedroom-Size', `${BEDROOM_WIDTH}x${BEDROOM_HEIGHT}`);
+    res.setHeader('X-Bedroom-Size', `${Math.round(bedroomWidth)}x${Math.round(bedroomHeight)}`);
     res.setHeader('X-Layers', layers.length.toString());
     return res.status(200).send(finalPng);
   } catch (err) {
