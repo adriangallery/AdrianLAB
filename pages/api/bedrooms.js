@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
 import { Resvg } from '@resvg/resvg-js';
+import { loadLabimagesAsset } from '../../lib/github-storage.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
 const BEDROOM_SVG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
@@ -142,9 +143,34 @@ async function loadAsset(id) {
   const candidates = hasExt ? [id] : [`${id}.svg`, `${id}.png`, id];
   let lastError = null;
   for (const candidate of candidates) {
+    // 1. Intentar desde filesystem local
     const local = tryLoadLocalAsset(candidate);
     if (local) return local;
 
+    // 2. Intentar desde GitHub (si es un asset de labimages)
+    let githubPath = null;
+    if (candidate.startsWith('bedrooms/')) {
+      githubPath = candidate;
+    } else if (candidate.startsWith('labimages/')) {
+      githubPath = candidate.replace(/^labimages\//, '');
+    } else if (!candidate.startsWith('http')) {
+      // Intentar como asset de bedrooms primero
+      githubPath = `bedrooms/assets/${candidate}`;
+    }
+    
+    if (githubPath) {
+      try {
+        const buffer = await loadLabimagesAsset(githubPath);
+        if (buffer) {
+          console.log(`[bedrooms] Asset cargado desde GitHub: ${githubPath}`);
+          return buffer;
+        }
+      } catch (err) {
+        console.log(`[bedrooms] Asset no encontrado en GitHub: ${githubPath}, intentando URL...`);
+      }
+    }
+
+    // 3. Fallback a URL (para compatibilidad con assets externos)
     let url;
     if (candidate.startsWith('http')) {
       url = candidate;

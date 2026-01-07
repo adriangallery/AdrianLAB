@@ -14,7 +14,7 @@ import {
 import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
-import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl, fileExistsInGitHubByHash, getGitHubFileUrlByHash, uploadFileToGitHubByHash } from '../../../lib/github-storage.js';
+import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl, fileExistsInGitHubByHash, getGitHubFileUrlByHash, uploadFileToGitHubByHash, loadLabimagesAsset } from '../../../lib/github-storage.js';
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
 import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
 import { generateRenderHash } from '../../../lib/render-hash.js';
@@ -686,20 +686,18 @@ export default async function handler(req, res) {
       }
     };
 
-    // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId
+    // NUEVA FUNCIÓN: Cargar directamente desde labimages/ usando solo traitId (con fallback a GitHub)
     const loadTraitFromLabimages = async (traitId) => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-        const imageUrl = `${baseUrl}/labimages/${traitId}.svg`;
-        console.log(`[render] Cargando trait desde labimages: ${imageUrl}`);
-
-        const response = await fetch(imageUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const assetPath = `${traitId}.svg`;
+        const svgBuffer = await loadLabimagesAsset(assetPath);
+        
+        if (!svgBuffer) {
+          throw new Error(`Asset no encontrado: ${assetPath}`);
         }
         
-        const svgBuffer = await response.arrayBuffer();
-        const svgContent = Buffer.from(svgBuffer);
+        const svgContent = svgBuffer;
+        console.log(`[render] Cargando trait desde labimages (con fallback GitHub): ${assetPath}`);
         
         // Intentar obtener del caché SVG→PNG primero
         const cachedPng = getCachedSvgPng(svgContent.toString());
@@ -763,20 +761,18 @@ export default async function handler(req, res) {
       }
     };
 
-    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101003
+    // NUEVA FUNCIÓN: Cargar trait desde ogpunks para tokens 100001-101003 (con fallback a GitHub)
     const loadOgpunkTrait = async (traitId) => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-        const imageUrl = `${baseUrl}/labimages/ogpunks/${traitId}.svg`;
-        console.log(`[render] 🎯 LÓGICA OGPUNKS: Cargando trait ${traitId} desde ogpunks: ${imageUrl}`);
-
-        const response = await fetch(imageUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const assetPath = `ogpunks/${traitId}.svg`;
+        const svgBuffer = await loadLabimagesAsset(assetPath);
+        
+        if (!svgBuffer) {
+          throw new Error(`Asset no encontrado: ${assetPath}`);
         }
         
-        const svgBuffer = await response.arrayBuffer();
-        const svgContent = Buffer.from(svgBuffer);
+        const svgContent = svgBuffer;
+        console.log(`[render] 🎯 LÓGICA OGPUNKS: Cargando trait ${traitId} desde ogpunks (con fallback GitHub): ${assetPath}`);
         
         // Intentar obtener del caché SVG→PNG primero
         const cachedPng = getCachedSvgPng(svgContent.toString());
@@ -1485,15 +1481,14 @@ export default async function handler(req, res) {
           } else {
             console.error(`[render] PASO 4 - 🌐 Error al cargar TOP trait ${category} (${traitId}) desde URL externa`);
 
-        // LÓGICA ESPECIAL: Si el TOP trait es 101003 CAESAR → responder con GIF
+        // LÓGICA ESPECIAL: Si el TOP trait es 101003 CAESAR → responder con GIF (con fallback a GitHub)
         if (category === 'TOP' && traitId === 101003) {
           try {
-            const gifResponse = await fetch('https://adrianlab.vercel.app/labimages/ogpunks/101003.gif');
-            if (gifResponse.ok) {
-              const gifBuffer = await gifResponse.arrayBuffer();
+            const gifBuffer = await loadLabimagesAsset('ogpunks/101003.gif');
+            if (gifBuffer) {
               res.setHeader('Content-Type', 'image/gif');
               res.setHeader('Cache-Control', 'public, max-age=3600');
-              res.send(Buffer.from(gifBuffer));
+              res.send(gifBuffer);
               return;
             }
           } catch (e) {
@@ -1512,19 +1507,18 @@ export default async function handler(req, res) {
           // LÓGICA ESPECIAL: SamuraiZERO traits SOLO si el token tiene tag SamuraiZERO
           let traitImage;
           if (tagInfo && tagInfo.tag === 'SamuraiZERO' && traitId >= 500 && traitId <= 1099) {
-            // Es un SamuraiZERO con trait TOP válido, cargar desde samuraizero/
-            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-            const imageUrl = `${baseUrl}/labimages/samuraizero/${traitId}.svg`;
-            console.log(`[render] 🥷 Cargando SamuraiZERO trait desde: ${imageUrl}`);
+            // Es un SamuraiZERO con trait TOP válido, cargar desde samuraizero/ (con fallback a GitHub)
+            const assetPath = `samuraizero/${traitId}.svg`;
+            console.log(`[render] 🥷 Cargando SamuraiZERO trait desde (con fallback GitHub): ${assetPath}`);
             
             try {
-              const response = await fetch(imageUrl);
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+              const svgBuffer = await loadLabimagesAsset(assetPath);
+              
+              if (!svgBuffer) {
+                throw new Error(`Asset no encontrado: ${assetPath}`);
               }
               
-              const svgBuffer = await response.arrayBuffer();
-              const svgContent = Buffer.from(svgBuffer);
+              const svgContent = svgBuffer;
               
               // Intentar obtener del caché SVG→PNG primero
               const cachedPng = getCachedSvgPng(svgContent.toString());
