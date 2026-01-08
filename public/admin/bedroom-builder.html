@@ -390,21 +390,19 @@
       const maxWidth = container.clientWidth - 20;
       canvasScale = Math.min(1, maxWidth / canvas.width);
       
-      // Renderizar elementos en el canvas
-      const loadedImages = new Map();
-      
+      // Renderizar elementos en el canvas (en orden de z-index)
       for (let i = 0; i < state.extras.length; i++) {
         const ex = state.extras[i];
         if (!ex.id) continue;
         
         try {
           const img = await loadImageForCanvas(ex.id);
-          if (img) {
+          if (img && img.complete && img.naturalWidth > 0) {
             const x = ex.x || 0;
             const y = ex.y || 0;
             const scale = ex.scale || 1;
-            const width = img.width * scale;
-            const height = img.height * scale;
+            const width = img.naturalWidth * scale;
+            const height = img.naturalHeight * scale;
             
             ctx.drawImage(img, x, y, width, height);
             
@@ -425,8 +423,8 @@
             // Drag & drop en canvas
             element.addEventListener('mousedown', (e) => {
               e.preventDefault();
+              e.stopPropagation();
               draggedElement = element;
-              const rect = element.getBoundingClientRect();
               const canvasRect = canvas.getBoundingClientRect();
               dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
               dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
@@ -434,9 +432,30 @@
             });
             
             overlay.appendChild(element);
+          } else {
+            console.warn(`Imagen no válida para ${ex.id}`);
           }
         } catch (err) {
-          console.warn(`No se pudo cargar ${ex.id}:`, err);
+          console.error(`No se pudo cargar ${ex.id}:`, err);
+          // Mostrar placeholder en el canvas para elementos que no se cargaron
+          const x = ex.x || 0;
+          const y = ex.y || 0;
+          const element = document.createElement('div');
+          element.className = 'canvas-element';
+          element.dataset.index = i;
+          element.style.left = `${x * canvasScale}px`;
+          element.style.top = `${y * canvasScale}px`;
+          element.style.width = `100px`;
+          element.style.height = `50px`;
+          element.style.borderColor = '#ef4444';
+          element.style.background = 'rgba(239, 68, 68, 0.2)';
+          
+          const label = document.createElement('div');
+          label.className = 'canvas-element-label';
+          label.textContent = `#${i + 1} ERROR: ${ex.id.split('/').pop()}`;
+          label.style.color = '#f87171';
+          element.appendChild(label);
+          overlay.appendChild(element);
         }
       }
       
@@ -500,16 +519,42 @@
 
     async function loadImageForCanvas(src) {
       try {
-        const url = `${location.origin}/labimages/${src}`;
+        // Construir URL correcta según el formato del asset
+        let url;
+        if (src.startsWith('http')) {
+          url = src;
+        } else if (src.startsWith('bedrooms/')) {
+          url = `${location.origin}/labimages/${src}`;
+        } else if (src.startsWith('labimages/')) {
+          url = `${location.origin}/${src}`;
+        } else {
+          url = `${location.origin}/labimages/${src}`;
+        }
+        
         return new Promise((resolve, reject) => {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.onload = () => resolve(img);
-          img.onerror = () => reject(new Error(`Failed to load ${url}`));
+          
+          const timeout = setTimeout(() => {
+            reject(new Error(`Timeout loading ${url}`));
+          }, 10000);
+          
+          img.onload = () => {
+            clearTimeout(timeout);
+            resolve(img);
+          };
+          
+          img.onerror = (err) => {
+            clearTimeout(timeout);
+            console.error(`Error loading image ${url}:`, err);
+            reject(new Error(`Failed to load ${url}`));
+          };
+          
           img.src = url;
         });
       } catch (err) {
-        return null;
+        console.error(`Error in loadImageForCanvas for ${src}:`, err);
+        throw err;
       }
     }
 
