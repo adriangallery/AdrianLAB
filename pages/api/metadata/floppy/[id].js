@@ -509,6 +509,59 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Pagers metadata' });
       }
 
+    // ===== LÓGICA ESPECIAL: TOKEN 15014 (McORDER DASH) =====
+    } else if (tokenIdNum === 15014) {
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para McORDER DASH`);
+      
+      try {
+        const imageUrl = `${baseUrl}/labimages/15014.png?v=${version}`;
+        
+        const specialMetadata = {
+          name: "McORDER DASH",
+          description: "An interactive minigame NFT from AdrianLAB. Play McORDER DASH and experience the AdrianZero universe through this unique interactive experience. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+          image: imageUrl,
+          external_url: imageUrl,
+          animation_url: "https://adrianzero.com/mcinteractive/",
+          attributes: [
+            {
+              trait_type: "Type",
+              value: "Interactive Minigame"
+            },
+            {
+              trait_type: "Collection",
+              value: "AdrianLAB"
+            },
+            {
+              trait_type: "Interactive",
+              value: "Yes"
+            }
+          ],
+          properties: {
+            files: [
+              {
+                uri: imageUrl,
+                type: "image/png"
+              }
+            ],
+            category: "image",
+            creators: ["Adrian | HalfxTiger"]
+          }
+        };
+
+        // Cache y headers
+        setCachedFloppyMetadata(tokenIdNum, specialMetadata);
+        const ttlSeconds = Math.floor(getFloppyMetadataTTL(tokenIdNum) / 1000);
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        
+        console.log(`[floppy-metadata] ===== METADATA MORDER DASH GENERADA EXITOSAMENTE =====`);
+        return res.status(200).json(specialMetadata);
+      } catch (err) {
+        console.error('[floppy-metadata] Error sirviendo token 15014:', err.message);
+        return res.status(500).json({ error: 'Error loading token 15014 metadata' });
+      }
+
     } else if ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003)) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para OGPUNKS (100001-101003)`);
       try {

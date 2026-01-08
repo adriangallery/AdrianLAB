@@ -237,46 +237,6 @@ export default async function handler(req, res) {
     // El código antiguo basado en rango ha sido reemplazado por lógica basada en tags del contrato
     // Ver lógica de SamuraiZERO más abajo (después de obtener tagInfo)
 
-    // ===== LÓGICA ESPECIAL: TOKEN 15014 (McORDER DASH) =====
-    if (tokenIdNum === 15014) {
-      try {
-        const imageUrl = `${baseUrl}/labimages/15014.png?v=${version}`;
-        
-        const specialMetadata = {
-          name: "McORDER DASH",
-          description: "An interactive minigame NFT from AdrianLAB. Play McORDER DASH and experience the AdrianZero universe through this unique interactive experience. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
-          image: imageUrl,
-          external_url: imageUrl,
-          animation_url: "https://adrianzero.com/mcinteractive/",
-          metadata_version: "2",
-          attributes: [
-            {
-              trait_type: "Type",
-              value: "Interactive Minigame"
-            },
-            {
-              trait_type: "Collection",
-              value: "AdrianLAB"
-            },
-            {
-              trait_type: "Interactive",
-              value: "Yes"
-            }
-          ]
-        };
-
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.setHeader('Surrogate-Control', 'no-store');
-
-        return res.status(200).json(specialMetadata);
-      } catch (err) {
-        console.error('[metadata] Error sirviendo token 15014:', err.message);
-        return res.status(500).json({ error: 'Error loading token 15014 metadata' });
-      }
-    }
-
     // ===== LÓGICA ESPECIAL: ACTION PACKS (15008-15010) =====
     if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
       try {
