@@ -49,6 +49,14 @@
     .drag-handle { cursor: grab; padding: 4px 8px; color: #94a3b8; }
     .drag-handle:active { cursor: grabbing; }
     .full-width { grid-column: 1 / -1; }
+    .item.locked { opacity: 0.7; background: #1a2332; }
+    .item.locked input { background: #0a0f1a; cursor: not-allowed; }
+    .lock-btn { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+    .lock-btn:hover { border-color: #818cf8; color: #c7d2fe; }
+    .lock-btn.locked { background: #fbbf24; border-color: #fbbf24; color: #1e293b; }
+    .lock-btn.locked:hover { background: #f59e0b; border-color: #f59e0b; }
+    .canvas-element.locked { border-color: #fbbf24 !important; opacity: 0.8; cursor: not-allowed; }
+    .canvas-element.locked:hover { border-color: #f59e0b !important; }
   </style>
 </head>
 <body>
@@ -212,7 +220,7 @@
       selectedAssets.forEach(id => {
         const asset = quickAssets.find(a => a.id === id);
         if (asset) {
-          state.extras.push({ id: asset.id, x: 0, y: 0, scale: 1 });
+          state.extras.push({ id: asset.id, x: 0, y: 0, scale: 1, locked: false });
         }
       });
       renderExtras();
@@ -224,8 +232,9 @@
       list.innerHTML = '';
       state.extras.forEach((ex, idx) => {
         const div = document.createElement('div');
-        div.className = 'item';
-        div.draggable = true;
+        const isLocked = ex.locked || false;
+        div.className = `item ${isLocked ? 'locked' : ''}`;
+        div.draggable = !isLocked;
         div.dataset.index = idx;
         
         div.innerHTML = `
@@ -233,27 +242,31 @@
             <div>
               <span class="drag-handle">☰</span>
               <strong>#${idx + 1}</strong> <span class="badge">z ${idx + 1}</span>
+              ${isLocked ? '<span class="badge" style="background:#fbbf24;color:#1e293b;">🔒 Bloqueado</span>' : ''}
             </div>
             <div class="item-actions">
-              <button class="btn-ghost" onclick="moveExtra(${idx}, -1)">↑</button>
-              <button class="btn-ghost" onclick="moveExtra(${idx}, 1)">↓</button>
+              <button class="lock-btn ${isLocked ? 'locked' : ''}" onclick="toggleLock(${idx})" title="${isLocked ? 'Desbloquear' : 'Bloquear'}">
+                ${isLocked ? '🔓' : '🔒'}
+              </button>
+              <button class="btn-ghost" onclick="moveExtra(${idx}, -1)" ${isLocked ? 'disabled' : ''}>↑</button>
+              <button class="btn-ghost" onclick="moveExtra(${idx}, 1)" ${isLocked ? 'disabled' : ''}>↓</button>
               <button class="btn btn-danger" onclick="removeExtra(${idx})">Eliminar</button>
             </div>
           </div>
           <label>ID / Ruta</label>
-          <input value="${ex.id || ''}" oninput="updateExtra(${idx}, 'id', this.value)" placeholder="p.ej. bedrooms/assets/Desk_1.png">
+          <input value="${ex.id || ''}" oninput="updateExtra(${idx}, 'id', this.value)" placeholder="p.ej. bedrooms/assets/Desk_1.png" ${isLocked ? 'disabled' : ''}>
           <div class="row" style="margin-top:8px;">
             <div>
               <label>X</label>
-              <input type="number" value="${ex.x ?? 0}" oninput="updateExtra(${idx}, 'x', parseFloat(this.value)); renderCanvas();">
+              <input type="number" value="${ex.x ?? 0}" oninput="updateExtra(${idx}, 'x', parseFloat(this.value)); renderCanvas();" ${isLocked ? 'disabled' : ''}>
             </div>
             <div>
               <label>Y</label>
-              <input type="number" value="${ex.y ?? 0}" oninput="updateExtra(${idx}, 'y', parseFloat(this.value)); renderCanvas();">
+              <input type="number" value="${ex.y ?? 0}" oninput="updateExtra(${idx}, 'y', parseFloat(this.value)); renderCanvas();" ${isLocked ? 'disabled' : ''}>
             </div>
             <div>
               <label>Escala</label>
-              <input type="number" step="0.01" value="${ex.scale ?? 1}" oninput="updateExtra(${idx}, 'scale', parseFloat(this.value)); renderCanvas();">
+              <input type="number" step="0.01" value="${ex.scale ?? 1}" oninput="updateExtra(${idx}, 'scale', parseFloat(this.value)); renderCanvas();" ${isLocked ? 'disabled' : ''}>
             </div>
           </div>
         `;
@@ -309,7 +322,7 @@
     }
 
     function addExtra() {
-      state.extras.push({ id: '', x: 0, y: 0, scale: 1 });
+      state.extras.push({ id: '', x: 0, y: 0, scale: 1, locked: false });
       renderExtras();
       renderCanvas();
     }
@@ -326,6 +339,13 @@
       save();
     }
 
+    function toggleLock(idx) {
+      if (!state.extras[idx]) return;
+      state.extras[idx].locked = !state.extras[idx].locked;
+      renderExtras();
+      renderCanvas();
+    }
+
     function quickAdd(id) {
       const chip = document.querySelector(`[data-asset-id="${id}"]`);
       if (chip) {
@@ -336,7 +356,7 @@
           selectedAssets.delete(id);
         }
       }
-      state.extras.push({ id, x: 0, y: 0, scale: 1 });
+      state.extras.push({ id, x: 0, y: 0, scale: 1, locked: false });
       renderExtras();
       renderCanvas();
     }
@@ -420,16 +440,26 @@
             label.textContent = `#${i + 1} ${ex.id.split('/').pop()}`;
             element.appendChild(label);
             
-            // Drag & drop en canvas
-            element.addEventListener('mousedown', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              draggedElement = element;
-              const canvasRect = canvas.getBoundingClientRect();
-              dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
-              dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
-              element.classList.add('selected');
-            });
+            // Marcar como bloqueado si corresponde
+            if (ex.locked) {
+              element.classList.add('locked');
+            }
+            
+            // Drag & drop en canvas (solo si no está bloqueado)
+            if (!ex.locked) {
+              element.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                draggedElement = element;
+                const canvasRect = canvas.getBoundingClientRect();
+                dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
+                dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
+                element.classList.add('selected');
+              });
+            } else {
+              element.style.cursor = 'not-allowed';
+              element.title = 'Capa bloqueada - Click en 🔓 para desbloquear';
+            }
             
             overlay.appendChild(element);
           } else {
