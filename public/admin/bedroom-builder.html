@@ -88,7 +88,7 @@
             <input id="ascale" type="number" step="0.01" value="0.45">
           </div>
         </div>
-        <p class="small" style="margin-top:8px;">Lienzo: bedroom assets (1049.6 × 548.375 aprox). Posición/escala en px relativas al lienzo.</p>
+        <p class="small" style="margin-top:8px;">Lienzo: bedroom assets (1049.6 × 548.375). Posición/escala en px relativas al lienzo.</p>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:20px;">
@@ -120,7 +120,7 @@
       <h3>Canvas interactivo</h3>
       <p class="small">Arrastra los elementos en el canvas para moverlos. Las coordenadas se actualizan automáticamente.</p>
       <div class="canvas-container" id="canvas-container">
-        <canvas id="canvas" width="1050" height="548"></canvas>
+        <canvas id="canvas"></canvas>
         <div id="canvas-overlay" class="canvas-overlay"></div>
       </div>
     </div>
@@ -178,6 +178,13 @@
     let dragOffset = { x: 0, y: 0 };
     let draggedItemIndex = null;
     let canvasScale = 1;
+    
+    // Dimensiones exactas del bedroom (deben coincidir con el endpoint)
+    // Usamos valores exactos para cálculos, pero el canvas usa enteros
+    const BEDROOM_WIDTH = 1049.6;
+    const BEDROOM_HEIGHT = 548.375;
+    const CANVAS_WIDTH = Math.round(BEDROOM_WIDTH);
+    const CANVAS_HEIGHT = Math.round(BEDROOM_HEIGHT);
 
     function loadSaved() {
       const saved = localStorage.getItem('bedroomsBuilder');
@@ -398,6 +405,10 @@
       const ctx = canvas.getContext('2d');
       const overlay = document.getElementById('canvas-overlay');
       
+      // Establecer dimensiones del canvas (usando enteros pero manteniendo proporción exacta)
+      canvas.width = CANVAS_WIDTH;
+      canvas.height = CANVAS_HEIGHT;
+      
       // Limpiar canvas
       ctx.fillStyle = '#0b1220';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -405,10 +416,13 @@
       // Limpiar overlay
       overlay.innerHTML = '';
       
-      // Calcular escala para que quepa en el contenedor
+      // Calcular escala para que quepa en el contenedor manteniendo proporciones exactas
       const container = document.getElementById('canvas-container');
       const maxWidth = container.clientWidth - 20;
-      canvasScale = Math.min(1, maxWidth / canvas.width);
+      const maxHeight = window.innerHeight * 0.6; // Máximo 60% de la altura de la ventana
+      const scaleX = maxWidth / BEDROOM_WIDTH;
+      const scaleY = maxHeight / BEDROOM_HEIGHT;
+      canvasScale = Math.min(scaleX, scaleY, 1); // No escalar más allá del 100%
       
       // Renderizar elementos en el canvas (en orden de z-index)
       for (let i = 0; i < state.extras.length; i++) {
@@ -418,13 +432,14 @@
         try {
           const img = await loadImageForCanvas(ex.id);
           if (img && img.complete && img.naturalWidth > 0) {
-            const x = ex.x || 0;
-            const y = ex.y || 0;
-            const scale = ex.scale || 1;
-            const width = img.naturalWidth * scale;
-            const height = img.naturalHeight * scale;
-            
-            ctx.drawImage(img, x, y, width, height);
+          const x = ex.x || 0;
+          const y = ex.y || 0;
+          const scale = ex.scale || 1;
+          const width = img.naturalWidth * scale;
+          const height = img.naturalHeight * scale;
+          
+          // Dibujar en coordenadas exactas (sin redondear aquí, el endpoint redondea)
+          ctx.drawImage(img, x, y, width, height);
             
             // Crear elemento interactivo en overlay
             const element = document.createElement('div');
@@ -540,11 +555,13 @@
         }
       }
       
-      // Ajustar tamaño del overlay
-      overlay.style.width = `${canvas.width * canvasScale}px`;
-      overlay.style.height = `${canvas.height * canvasScale}px`;
-      canvas.style.width = `${canvas.width * canvasScale}px`;
-      canvas.style.height = `${canvas.height * canvasScale}px`;
+      // Ajustar tamaño del overlay y canvas manteniendo proporciones exactas
+      const displayWidth = BEDROOM_WIDTH * canvasScale;
+      const displayHeight = BEDROOM_HEIGHT * canvasScale;
+      overlay.style.width = `${displayWidth}px`;
+      overlay.style.height = `${displayHeight}px`;
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.height = `${displayHeight}px`;
     }
 
     async function loadImageForCanvas(src) {
@@ -647,8 +664,11 @@
       const canvasRect = canvas.getBoundingClientRect();
       const elementRect = draggedElement.getBoundingClientRect();
       
-      const x = Math.round((elementRect.left - canvasRect.left) / canvasScale);
-      const y = Math.round((elementRect.top - canvasRect.top) / canvasScale);
+      // Calcular coordenadas exactas (el endpoint redondea con Math.round)
+      const rawX = (elementRect.left - canvasRect.left) / canvasScale;
+      const rawY = (elementRect.top - canvasRect.top) / canvasScale;
+      const x = Math.round(rawX);
+      const y = Math.round(rawY);
       
       if (draggedElement.dataset.adrian === 'true') {
         state.ax = x;
