@@ -6,13 +6,13 @@
   <title>Bedrooms Builder - Admin AdrianLAB</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+    .container { max-width: 1400px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
     h1 { margin: 0 0 8px; }
     .subtitle { margin: 0 0 20px; color: #94a3b8; font-size: 14px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .panel { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; }
     label { display: block; margin-bottom: 6px; color: #cbd5e1; font-weight: 600; font-size: 13px; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 6px; background: #0b1220; color: #e2e8f0; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 6px; background: #0b1220; color: #e2e8f0; box-sizing: border-box; }
     input:focus, textarea:focus { outline: 2px solid #818cf8; border-color: #818cf8; }
     .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .btn { padding: 10px 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -20,20 +20,35 @@
     .btn-secondary { background: #334155; color: #e2e8f0; }
     .btn-danger { background: #ef4444; color: white; }
     .list { margin-top: 10px; display: grid; gap: 10px; }
-    .item { border: 1px solid #334155; border-radius: 8px; padding: 10px; background: #0b1220; }
+    .item { border: 1px solid #334155; border-radius: 8px; padding: 10px; background: #0b1220; cursor: move; position: relative; }
+    .item.dragging { opacity: 0.5; border-color: #818cf8; }
+    .item.drag-over { border-color: #818cf8; border-style: dashed; }
     .small { font-size: 12px; color: #94a3b8; }
     .preview { background: #0b1220; border: 1px dashed #334155; border-radius: 8px; padding: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
     .url-box { background: #0b1220; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; word-break: break-all; color: #a5b4fc; }
-    .actions { display: flex; gap: 10px; margin-top: 10px; }
+    .actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
     .badge { display: inline-block; background: #334155; color: #cbd5e1; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 6px; }
     .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip { background: #0b1220; border: 1px solid #334155; border-radius: 999px; padding: 6px 10px; font-size: 12px; cursor: pointer; color: #e2e8f0; }
     .chip:hover { border-color: #818cf8; color: #c7d2fe; }
+    .chip.selected { background: #6366f1; border-color: #6366f1; color: white; }
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
     .item-actions { display: flex; gap: 6px; }
     .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
     .btn-ghost:hover { border-color: #818cf8; color: #c7d2fe; }
     .stack-note { color: #94a3b8; font-size: 12px; margin-top: 6px; }
+    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+    #canvas { display: block; cursor: crosshair; max-width: 100%; }
+    .canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+    .canvas-element { position: absolute; border: 2px solid #818cf8; background: rgba(99, 102, 241, 0.1); cursor: move; pointer-events: all; }
+    .canvas-element.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.2); }
+    .canvas-element:hover { border-color: #c7d2fe; }
+    .canvas-element-label { position: absolute; top: -20px; left: 0; background: #1e293b; color: #e2e8f0; padding: 2px 6px; font-size: 10px; border-radius: 4px; white-space: nowrap; }
+    .select-all-container { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px; background: #0b1220; border-radius: 6px; }
+    .select-all-container input[type="checkbox"] { width: auto; margin: 0; }
+    .drag-handle { cursor: grab; padding: 4px 8px; color: #94a3b8; }
+    .drag-handle:active { cursor: grabbing; }
+    .full-width { grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -41,7 +56,7 @@
     <div style="display:flex; justify-content: space-between; align-items: center;">
       <div>
         <h1>Bedrooms Builder</h1>
-        <p class="subtitle">Probar composición de dormitorio con AdrianZERO y objetos extra (Fase 1)</p>
+        <p class="subtitle">Probar composición de dormitorio con AdrianZERO y objetos extra</p>
       </div>
       <a href="/admin" class="btn btn-secondary" style="text-decoration:none;">← Admin</a>
     </div>
@@ -71,21 +86,34 @@
       <div style="display:flex; flex-direction:column; gap:20px;">
         <div class="panel">
           <h3>Assets rápidos</h3>
-          <p class="small">Click para añadir capa con x=0, y=0, escala=1. El orden en la lista define el z-index.</p>
+          <div class="select-all-container">
+            <input type="checkbox" id="select-all-assets" onchange="toggleSelectAll()">
+            <label for="select-all-assets" style="margin:0; cursor:pointer;">Seleccionar todos</label>
+          </div>
+          <p class="small">Click para añadir capa. Arrastra en el canvas para posicionar.</p>
           <div class="chip-list" id="quick-assets"></div>
           <div class="actions" style="margin-top:10px;">
+            <button class="btn btn-secondary" onclick="addSelectedAssets()">Añadir seleccionados</button>
             <button class="btn btn-secondary" onclick="applyBasePreset()">Cargar pack base</button>
             <button class="btn btn-secondary" onclick="resetExtrasOnly()">Limpiar extras</button>
           </div>
-          <p class="stack-note">Consejo: usa mover ↑/↓ en la lista para probar stacking.</p>
         </div>
 
         <div class="panel">
-          <h3>Extras</h3>
-          <p class="small">Formato param: <code>id@x,y,scale</code> separados por coma. Ej: <code>plant@820,360,1</code></p>
+          <h3>Extras (arrastra para reordenar)</h3>
+          <p class="small">El orden define el z-index. Arrastra elementos en la lista o en el canvas.</p>
           <div class="list" id="extras-list"></div>
           <button class="btn btn-secondary" onclick="addExtra()">+ Añadir extra</button>
         </div>
+      </div>
+    </div>
+
+    <div class="panel full-width" style="margin-top:20px;">
+      <h3>Canvas interactivo</h3>
+      <p class="small">Arrastra los elementos en el canvas para moverlos. Las coordenadas se actualizan automáticamente.</p>
+      <div class="canvas-container" id="canvas-container">
+        <canvas id="canvas" width="1050" height="548"></canvas>
+        <div id="canvas-overlay" class="canvas-overlay"></div>
       </div>
     </div>
 
@@ -137,6 +165,12 @@
       extras: basePreset.map(e => ({ ...e }))
     };
 
+    let selectedAssets = new Set();
+    let draggedElement = null;
+    let dragOffset = { x: 0, y: 0 };
+    let draggedItemIndex = null;
+    let canvasScale = 1;
+
     function loadSaved() {
       const saved = localStorage.getItem('bedroomsBuilder');
       if (saved) {
@@ -154,15 +188,52 @@
       localStorage.setItem('bedroomsBuilder', JSON.stringify(state));
     }
 
+    function toggleSelectAll() {
+      const checkbox = document.getElementById('select-all-assets');
+      const allSelected = quickAssets.every(asset => selectedAssets.has(asset.id));
+      
+      if (allSelected) {
+        selectedAssets.clear();
+        quickAssets.forEach(asset => {
+          const chip = document.querySelector(`[data-asset-id="${asset.id}"]`);
+          if (chip) chip.classList.remove('selected');
+        });
+      } else {
+        quickAssets.forEach(asset => {
+          selectedAssets.add(asset.id);
+          const chip = document.querySelector(`[data-asset-id="${asset.id}"]`);
+          if (chip) chip.classList.add('selected');
+        });
+      }
+      checkbox.checked = !allSelected;
+    }
+
+    function addSelectedAssets() {
+      selectedAssets.forEach(id => {
+        const asset = quickAssets.find(a => a.id === id);
+        if (asset) {
+          state.extras.push({ id: asset.id, x: 0, y: 0, scale: 1 });
+        }
+      });
+      renderExtras();
+      renderCanvas();
+    }
+
     function renderExtras() {
       const list = document.getElementById('extras-list');
       list.innerHTML = '';
       state.extras.forEach((ex, idx) => {
         const div = document.createElement('div');
         div.className = 'item';
+        div.draggable = true;
+        div.dataset.index = idx;
+        
         div.innerHTML = `
           <div class="item-header">
-            <div><strong>#${idx + 1}</strong> <span class="badge">z ${idx + 1}</span></div>
+            <div>
+              <span class="drag-handle">☰</span>
+              <strong>#${idx + 1}</strong> <span class="badge">z ${idx + 1}</span>
+            </div>
             <div class="item-actions">
               <button class="btn-ghost" onclick="moveExtra(${idx}, -1)">↑</button>
               <button class="btn-ghost" onclick="moveExtra(${idx}, 1)">↓</button>
@@ -174,18 +245,54 @@
           <div class="row" style="margin-top:8px;">
             <div>
               <label>X</label>
-              <input type="number" value="${ex.x ?? 0}" oninput="updateExtra(${idx}, 'x', parseFloat(this.value))">
+              <input type="number" value="${ex.x ?? 0}" oninput="updateExtra(${idx}, 'x', parseFloat(this.value)); renderCanvas();">
             </div>
             <div>
               <label>Y</label>
-              <input type="number" value="${ex.y ?? 0}" oninput="updateExtra(${idx}, 'y', parseFloat(this.value))">
+              <input type="number" value="${ex.y ?? 0}" oninput="updateExtra(${idx}, 'y', parseFloat(this.value)); renderCanvas();">
             </div>
             <div>
               <label>Escala</label>
-              <input type="number" step="0.01" value="${ex.scale ?? 1}" oninput="updateExtra(${idx}, 'scale', parseFloat(this.value))">
+              <input type="number" step="0.01" value="${ex.scale ?? 1}" oninput="updateExtra(${idx}, 'scale', parseFloat(this.value)); renderCanvas();">
             </div>
           </div>
         `;
+        
+        // Drag & drop para reordenar
+        div.addEventListener('dragstart', (e) => {
+          draggedItemIndex = idx;
+          div.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        div.addEventListener('dragend', () => {
+          div.classList.remove('dragging');
+          draggedItemIndex = null;
+        });
+        
+        div.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (draggedItemIndex !== null && draggedItemIndex !== idx) {
+            div.classList.add('drag-over');
+          }
+        });
+        
+        div.addEventListener('dragleave', () => {
+          div.classList.remove('drag-over');
+        });
+        
+        div.addEventListener('drop', (e) => {
+          e.preventDefault();
+          div.classList.remove('drag-over');
+          if (draggedItemIndex !== null && draggedItemIndex !== idx) {
+            const [item] = state.extras.splice(draggedItemIndex, 1);
+            state.extras.splice(idx, 0, item);
+            renderExtras();
+            renderCanvas();
+          }
+        });
+        
         list.appendChild(div);
       });
       updateUrl();
@@ -198,16 +305,21 @@
       const [item] = state.extras.splice(idx, 1);
       state.extras.splice(target, 0, item);
       renderExtras();
+      renderCanvas();
     }
 
     function addExtra() {
       state.extras.push({ id: '', x: 0, y: 0, scale: 1 });
       renderExtras();
+      renderCanvas();
     }
+    
     function removeExtra(idx) {
       state.extras.splice(idx, 1);
       renderExtras();
+      renderCanvas();
     }
+    
     function updateExtra(idx, key, val) {
       state.extras[idx][key] = val;
       updateUrl();
@@ -215,18 +327,36 @@
     }
 
     function quickAdd(id) {
+      const chip = document.querySelector(`[data-asset-id="${id}"]`);
+      if (chip) {
+        chip.classList.toggle('selected');
+        if (chip.classList.contains('selected')) {
+          selectedAssets.add(id);
+        } else {
+          selectedAssets.delete(id);
+        }
+      }
       state.extras.push({ id, x: 0, y: 0, scale: 1 });
       renderExtras();
+      renderCanvas();
     }
 
     function resetExtrasOnly() {
       state.extras = [];
+      selectedAssets.clear();
+      document.getElementById('select-all-assets').checked = false;
+      quickAssets.forEach(asset => {
+        const chip = document.querySelector(`[data-asset-id="${asset.id}"]`);
+        if (chip) chip.classList.remove('selected');
+      });
       renderExtras();
+      renderCanvas();
     }
 
     function applyBasePreset() {
       state.extras = basePreset.map(e => ({ ...e }));
       renderExtras();
+      renderCanvas();
     }
 
     function renderQuickAssets() {
@@ -237,10 +367,197 @@
         btn.className = 'chip';
         btn.textContent = asset.label;
         btn.title = asset.id;
+        btn.dataset.assetId = asset.id;
         btn.onclick = () => quickAdd(asset.id);
         container.appendChild(btn);
       });
     }
+
+    async function renderCanvas() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const overlay = document.getElementById('canvas-overlay');
+      
+      // Limpiar canvas
+      ctx.fillStyle = '#0b1220';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Limpiar overlay
+      overlay.innerHTML = '';
+      
+      // Calcular escala para que quepa en el contenedor
+      const container = document.getElementById('canvas-container');
+      const maxWidth = container.clientWidth - 20;
+      canvasScale = Math.min(1, maxWidth / canvas.width);
+      
+      // Renderizar elementos en el canvas
+      const loadedImages = new Map();
+      
+      for (let i = 0; i < state.extras.length; i++) {
+        const ex = state.extras[i];
+        if (!ex.id) continue;
+        
+        try {
+          const img = await loadImageForCanvas(ex.id);
+          if (img) {
+            const x = ex.x || 0;
+            const y = ex.y || 0;
+            const scale = ex.scale || 1;
+            const width = img.width * scale;
+            const height = img.height * scale;
+            
+            ctx.drawImage(img, x, y, width, height);
+            
+            // Crear elemento interactivo en overlay
+            const element = document.createElement('div');
+            element.className = 'canvas-element';
+            element.dataset.index = i;
+            element.style.left = `${x * canvasScale}px`;
+            element.style.top = `${y * canvasScale}px`;
+            element.style.width = `${width * canvasScale}px`;
+            element.style.height = `${height * canvasScale}px`;
+            
+            const label = document.createElement('div');
+            label.className = 'canvas-element-label';
+            label.textContent = `#${i + 1} ${ex.id.split('/').pop()}`;
+            element.appendChild(label);
+            
+            // Drag & drop en canvas
+            element.addEventListener('mousedown', (e) => {
+              e.preventDefault();
+              draggedElement = element;
+              const rect = element.getBoundingClientRect();
+              const canvasRect = canvas.getBoundingClientRect();
+              dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
+              dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
+              element.classList.add('selected');
+            });
+            
+            overlay.appendChild(element);
+          }
+        } catch (err) {
+          console.warn(`No se pudo cargar ${ex.id}:`, err);
+        }
+      }
+      
+      // Renderizar AdrianZERO si existe
+      if (state.tokenId) {
+        try {
+          const adrianUrl = `${location.origin}/api/render/${state.tokenId}`;
+          const img = await new Promise((resolve, reject) => {
+            const i = new Image();
+            i.crossOrigin = 'anonymous';
+            i.onload = () => resolve(i);
+            i.onerror = reject;
+            i.src = adrianUrl;
+          });
+          
+          const x = state.ax || 40;
+          const y = state.ay || 90;
+          const scale = state.ascale || 0.45;
+          const width = img.width * scale;
+          const height = img.height * scale;
+          
+          ctx.drawImage(img, x, y, width, height);
+          
+          // Elemento interactivo para AdrianZERO
+          const element = document.createElement('div');
+          element.className = 'canvas-element';
+          element.dataset.adrian = 'true';
+          element.style.left = `${x * canvasScale}px`;
+          element.style.top = `${y * canvasScale}px`;
+          element.style.width = `${width * canvasScale}px`;
+          element.style.height = `${height * canvasScale}px`;
+          element.style.borderColor = '#fbbf24';
+          
+          const label = document.createElement('div');
+          label.className = 'canvas-element-label';
+          label.textContent = `AdrianZERO #${state.tokenId}`;
+          element.appendChild(label);
+          
+          element.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            draggedElement = element;
+            const rect = element.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
+            dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
+            element.classList.add('selected');
+          });
+          
+          overlay.appendChild(element);
+        } catch (err) {
+          console.warn('No se pudo cargar AdrianZERO:', err);
+        }
+      }
+      
+      // Ajustar tamaño del overlay
+      overlay.style.width = `${canvas.width * canvasScale}px`;
+      overlay.style.height = `${canvas.height * canvasScale}px`;
+      canvas.style.width = `${canvas.width * canvasScale}px`;
+      canvas.style.height = `${canvas.height * canvasScale}px`;
+    }
+
+    async function loadImageForCanvas(src) {
+      try {
+        const url = `${location.origin}/labimages/${src}`;
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error(`Failed to load ${url}`));
+          img.src = url;
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    // Mouse events para drag & drop en canvas
+    document.addEventListener('mousemove', (e) => {
+      if (!draggedElement) return;
+      
+      const canvas = document.getElementById('canvas');
+      const canvasRect = canvas.getBoundingClientRect();
+      const x = (e.clientX - canvasRect.left) / canvasScale - dragOffset.x;
+      const y = (e.clientY - canvasRect.top) / canvasScale - dragOffset.y;
+      
+      draggedElement.style.left = `${x * canvasScale}px`;
+      draggedElement.style.top = `${y * canvasScale}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!draggedElement) return;
+      
+      const canvas = document.getElementById('canvas');
+      const canvasRect = canvas.getBoundingClientRect();
+      const elementRect = draggedElement.getBoundingClientRect();
+      
+      const x = Math.round((elementRect.left - canvasRect.left) / canvasScale);
+      const y = Math.round((elementRect.top - canvasRect.top) / canvasScale);
+      
+      if (draggedElement.dataset.adrian === 'true') {
+        state.ax = x;
+        state.ay = y;
+        document.getElementById('ax').value = x;
+        document.getElementById('ay').value = y;
+      } else {
+        const idx = parseInt(draggedElement.dataset.index);
+        if (idx !== undefined && state.extras[idx]) {
+          state.extras[idx].x = x;
+          state.extras[idx].y = y;
+          const inputs = document.querySelectorAll(`#extras-list .item:nth-child(${idx + 1}) input[type="number"]`);
+          if (inputs[0]) inputs[0].value = x;
+          if (inputs[1]) inputs[1].value = y;
+        }
+      }
+      
+      draggedElement.classList.remove('selected');
+      draggedElement = null;
+      updateUrl();
+      save();
+      renderCanvas();
+    });
 
     function updateUrl() {
       const { tokenId, ax, ay, ascale, extras } = state;
@@ -289,11 +606,18 @@
       state.tokenId = '';
       state.ax = 40; state.ay = 90; state.ascale = 0.45;
       state.extras = basePreset.map(e => ({ ...e }));
+      selectedAssets.clear();
       document.getElementById('tokenId').value = '';
       document.getElementById('ax').value = 40;
       document.getElementById('ay').value = 90;
       document.getElementById('ascale').value = 0.45;
+      document.getElementById('select-all-assets').checked = false;
+      quickAssets.forEach(asset => {
+        const chip = document.querySelector(`[data-asset-id="${asset.id}"]`);
+        if (chip) chip.classList.remove('selected');
+      });
       renderExtras();
+      renderCanvas();
     }
 
     function bindInputs() {
@@ -301,10 +625,30 @@
       document.getElementById('ax').value = state.ax;
       document.getElementById('ay').value = state.ay;
       document.getElementById('ascale').value = state.ascale;
-      document.getElementById('tokenId').addEventListener('input', e => { state.tokenId = e.target.value; updateUrl(); save(); });
-      document.getElementById('ax').addEventListener('input', e => { state.ax = parseFloat(e.target.value); updateUrl(); save(); });
-      document.getElementById('ay').addEventListener('input', e => { state.ay = parseFloat(e.target.value); updateUrl(); save(); });
-      document.getElementById('ascale').addEventListener('input', e => { state.ascale = parseFloat(e.target.value); updateUrl(); save(); });
+      document.getElementById('tokenId').addEventListener('input', e => { 
+        state.tokenId = e.target.value; 
+        updateUrl(); 
+        save(); 
+        renderCanvas();
+      });
+      document.getElementById('ax').addEventListener('input', e => { 
+        state.ax = parseFloat(e.target.value); 
+        updateUrl(); 
+        save(); 
+        renderCanvas();
+      });
+      document.getElementById('ay').addEventListener('input', e => { 
+        state.ay = parseFloat(e.target.value); 
+        updateUrl(); 
+        save(); 
+        renderCanvas();
+      });
+      document.getElementById('ascale').addEventListener('input', e => { 
+        state.ascale = parseFloat(e.target.value); 
+        updateUrl(); 
+        save(); 
+        renderCanvas();
+      });
     }
 
     function init() {
@@ -312,10 +656,15 @@
       bindInputs();
       renderQuickAssets();
       renderExtras();
+      renderCanvas();
       updateUrl();
+      
+      // Ajustar canvas al redimensionar
+      window.addEventListener('resize', () => {
+        renderCanvas();
+      });
     }
     init();
   </script>
 </body>
 </html>
-
