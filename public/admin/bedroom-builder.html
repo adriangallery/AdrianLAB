@@ -37,12 +37,13 @@
     .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
     .btn-ghost:hover { border-color: #818cf8; color: #c7d2fe; }
     .stack-note { color: #94a3b8; font-size: 12px; margin-top: 6px; }
-    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: hidden; margin-top: 10px; }
-    #canvas { display: block; cursor: crosshair; max-width: 100%; }
+    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: visible; margin-top: 10px; }
+    #canvas { display: block; cursor: crosshair; max-width: 100%; image-rendering: pixelated; }
     .canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
     .canvas-element { position: absolute; border: 2px solid #818cf8; background: rgba(99, 102, 241, 0.1); cursor: move; pointer-events: all; }
     .canvas-element.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.2); }
     .canvas-element:hover { border-color: #c7d2fe; }
+    .canvas-element.locked { pointer-events: none !important; }
     .canvas-element-label { position: absolute; top: -20px; left: 0; background: #1e293b; color: #e2e8f0; padding: 2px 6px; font-size: 10px; border-radius: 4px; white-space: nowrap; }
     .select-all-container { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px; background: #0b1220; border-radius: 6px; }
     .select-all-container input[type="checkbox"] { width: auto; margin: 0; }
@@ -55,7 +56,7 @@
     .lock-btn:hover { border-color: #818cf8; color: #c7d2fe; }
     .lock-btn.locked { background: #fbbf24; border-color: #fbbf24; color: #1e293b; }
     .lock-btn.locked:hover { background: #f59e0b; border-color: #f59e0b; }
-    .canvas-element.locked { border-color: #fbbf24 !important; opacity: 0.8; cursor: not-allowed; }
+    .canvas-element.locked { border-color: #fbbf24 !important; opacity: 0.8; cursor: not-allowed; pointer-events: none !important; }
     .canvas-element.locked:hover { border-color: #f59e0b !important; }
   </style>
 </head>
@@ -438,8 +439,21 @@
           const width = img.naturalWidth * scale;
           const height = img.naturalHeight * scale;
           
+          // Asegurar que la imagen no se dibuje fuera del canvas
+          const drawX = Math.max(0, Math.min(x, canvas.width));
+          const drawY = Math.max(0, Math.min(y, canvas.height));
+          const drawWidth = Math.min(width, canvas.width - drawX);
+          const drawHeight = Math.min(height, canvas.height - drawY);
+          
           // Dibujar en coordenadas exactas (sin redondear aquí, el endpoint redondea)
-          ctx.drawImage(img, x, y, width, height);
+          if (drawWidth > 0 && drawHeight > 0) {
+            ctx.drawImage(img, 
+              Math.max(0, -x), Math.max(0, -y), // Source X, Y (si está fuera del canvas)
+              drawWidth, drawHeight, // Source width, height
+              drawX, drawY, // Destination X, Y
+              drawWidth, drawHeight // Destination width, height
+            );
+          }
             
             // Crear elemento interactivo en overlay
             const element = document.createElement('div');
@@ -458,10 +472,10 @@
             // Marcar como bloqueado si corresponde
             if (ex.locked) {
               element.classList.add('locked');
-            }
-            
-            // Drag & drop en canvas (solo si no está bloqueado)
-            if (!ex.locked) {
+              element.style.pointerEvents = 'none'; // Permitir que los clics pasen a través
+              element.title = 'Capa bloqueada - Click en 🔓 para desbloquear';
+            } else {
+              // Drag & drop en canvas (solo si no está bloqueado)
               element.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -471,9 +485,6 @@
                 dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
                 element.classList.add('selected');
               });
-            } else {
-              element.style.cursor = 'not-allowed';
-              element.title = 'Capa bloqueada - Click en 🔓 para desbloquear';
             }
             
             overlay.appendChild(element);
@@ -562,6 +573,11 @@
       overlay.style.height = `${displayHeight}px`;
       canvas.style.width = `${displayWidth}px`;
       canvas.style.height = `${displayHeight}px`;
+      
+      // Asegurar que el contenedor tenga el tamaño correcto
+      const container = document.getElementById('canvas-container');
+      container.style.width = `${displayWidth}px`;
+      container.style.height = `${displayHeight}px`;
     }
 
     async function loadImageForCanvas(src) {
