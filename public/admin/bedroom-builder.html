@@ -531,31 +531,70 @@
           url = `${location.origin}/labimages/${src}`;
         }
         
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
+        // Intentar cargar desde Vercel primero
+        try {
+          const img = await new Promise((resolve, reject) => {
+            const i = new Image();
+            i.crossOrigin = 'anonymous';
+            
+            const timeout = setTimeout(() => {
+              reject(new Error(`Timeout loading ${url}`));
+            }, 5000);
+            
+            i.onload = () => {
+              clearTimeout(timeout);
+              resolve(i);
+            };
+            
+            i.onerror = () => {
+              clearTimeout(timeout);
+              reject(new Error(`Failed to load ${url}`));
+            };
+            
+            i.src = url;
+          });
           
-          const timeout = setTimeout(() => {
-            reject(new Error(`Timeout loading ${url}`));
-          }, 10000);
-          
-          img.onload = () => {
-            clearTimeout(timeout);
-            resolve(img);
-          };
-          
-          img.onerror = (err) => {
-            clearTimeout(timeout);
-            console.error(`Error loading image ${url}:`, err);
-            reject(new Error(`Failed to load ${url}`));
-          };
-          
-          img.src = url;
-        });
+          return img;
+        } catch (err) {
+          // Si falla, intentar desde GitHub raw
+          console.log(`Fallback a GitHub raw para ${src}`);
+          const githubUrl = getGitHubLabimagesUrl(src);
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            const timeout = setTimeout(() => {
+              reject(new Error(`Timeout loading ${githubUrl}`));
+            }, 10000);
+            
+            img.onload = () => {
+              clearTimeout(timeout);
+              resolve(img);
+            };
+            
+            img.onerror = (err) => {
+              clearTimeout(timeout);
+              console.error(`Error loading image from GitHub ${githubUrl}:`, err);
+              reject(new Error(`Failed to load ${githubUrl}`));
+            };
+            
+            img.src = githubUrl;
+          });
+        }
       } catch (err) {
         console.error(`Error in loadImageForCanvas for ${src}:`, err);
         throw err;
       }
+    }
+
+    function getGitHubLabimagesUrl(assetPath) {
+      // Construir URL de GitHub raw
+      const GITHUB_OWNER = 'adriangallery';
+      const GITHUB_REPO = 'AdrianLAB';
+      const GITHUB_BRANCH = 'main';
+      const filePath = `public/labimages/${assetPath}`;
+      const encodedPath = encodeURIComponent(filePath).replace(/%2F/g, '/');
+      return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${encodedPath}`;
     }
 
     // Mouse events para drag & drop en canvas
