@@ -37,7 +37,7 @@
     .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
     .btn-ghost:hover { border-color: #818cf8; color: #c7d2fe; }
     .stack-note { color: #94a3b8; font-size: 12px; margin-top: 6px; }
-    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: visible; margin-top: 10px; }
+    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: auto; margin-top: 10px; }
     #canvas { display: block; cursor: crosshair; max-width: 100%; image-rendering: pixelated; }
     .canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
     .canvas-element { position: absolute; border: 2px solid #818cf8; background: rgba(99, 102, 241, 0.1); cursor: move; pointer-events: all; }
@@ -89,7 +89,7 @@
             <input id="ascale" type="number" step="0.01" value="0.45">
           </div>
         </div>
-        <p class="small" style="margin-top:8px;">Lienzo: bedroom assets (1049.6 × 548.375). Posición/escala en px relativas al lienzo.</p>
+        <p class="small" style="margin-top:8px;">Lienzo: bedroom assets (1500 × 496). Posición/escala en px relativas al lienzo.</p>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:20px;">
@@ -180,12 +180,12 @@
     let draggedItemIndex = null;
     let canvasScale = 1;
     
-    // Dimensiones exactas del bedroom (deben coincidir con el endpoint)
-    // Usamos valores exactos para cálculos, pero el canvas usa enteros
-    const BEDROOM_WIDTH = 1049.6;
-    const BEDROOM_HEIGHT = 548.375;
-    const CANVAS_WIDTH = Math.round(BEDROOM_WIDTH);
-    const CANVAS_HEIGHT = Math.round(BEDROOM_HEIGHT);
+    // Dimensiones exactas del bedroom (deben coincidir con las imágenes reales)
+    // Las imágenes base tienen dimensiones de 1500 x 496
+    const BEDROOM_WIDTH = 1500;
+    const BEDROOM_HEIGHT = 496;
+    const CANVAS_WIDTH = BEDROOM_WIDTH;
+    const CANVAS_HEIGHT = BEDROOM_HEIGHT;
 
     function loadSaved() {
       const saved = localStorage.getItem('bedroomsBuilder');
@@ -439,21 +439,8 @@
           const width = img.naturalWidth * scale;
           const height = img.naturalHeight * scale;
           
-          // Asegurar que la imagen no se dibuje fuera del canvas
-          const drawX = Math.max(0, Math.min(x, canvas.width));
-          const drawY = Math.max(0, Math.min(y, canvas.height));
-          const drawWidth = Math.min(width, canvas.width - drawX);
-          const drawHeight = Math.min(height, canvas.height - drawY);
-          
-          // Dibujar en coordenadas exactas (sin redondear aquí, el endpoint redondea)
-          if (drawWidth > 0 && drawHeight > 0) {
-            ctx.drawImage(img, 
-              Math.max(0, -x), Math.max(0, -y), // Source X, Y (si está fuera del canvas)
-              drawWidth, drawHeight, // Source width, height
-              drawX, drawY, // Destination X, Y
-              drawWidth, drawHeight // Destination width, height
-            );
-          }
+          // Dibujar en coordenadas exactas (el canvas HTML5 maneja automáticamente elementos fuera de límites)
+          ctx.drawImage(img, x, y, width, height);
             
             // Crear elemento interactivo en overlay
             const element = document.createElement('div');
@@ -574,10 +561,8 @@
       canvas.style.width = `${displayWidth}px`;
       canvas.style.height = `${displayHeight}px`;
       
-      // Asegurar que el contenedor tenga el tamaño correcto
-      const container = document.getElementById('canvas-container');
-      container.style.width = `${displayWidth}px`;
-      container.style.height = `${displayHeight}px`;
+      // Asegurar que el contenedor permita mostrar el canvas completo
+      // No limitamos el tamaño del contenedor para evitar cortes
     }
 
     async function loadImageForCanvas(src) {
