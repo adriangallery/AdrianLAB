@@ -561,6 +561,8 @@
       const displayHeight = BEDROOM_HEIGHT * canvasScale;
       overlay.style.width = `${displayWidth}px`;
       overlay.style.height = `${displayHeight}px`;
+      overlay.style.left = '0px';
+      overlay.style.top = '0px';
       canvas.style.width = `${displayWidth}px`;
       canvas.style.height = `${displayHeight}px`;
       
@@ -668,16 +670,20 @@
       const canvas = document.getElementById('canvas');
       const canvasRect = canvas.getBoundingClientRect();
       
-      // Usar la posición del estilo del elemento (que ya está en coordenadas del canvas escaladas)
-      // en lugar de getBoundingClientRect que puede incluir el label
+      // Calcular coordenadas usando la posición del elemento relativa al overlay
+      // El overlay está perfectamente alineado con el canvas (top: 0, left: 0)
       const elementLeft = parseFloat(draggedElement.style.left) || 0;
       const elementTop = parseFloat(draggedElement.style.top) || 0;
       
-      // Convertir de coordenadas escaladas a coordenadas reales del canvas
+      // Convertir de coordenadas escaladas (píxeles del overlay) a coordenadas reales del canvas
+      // El overlay tiene el mismo tamaño que el canvas escalado, así que dividimos por canvasScale
       const rawX = elementLeft / canvasScale;
       const rawY = elementTop / canvasScale;
       const x = Math.round(rawX);
       const y = Math.round(rawY);
+      
+      // Debug: log para verificar coordenadas
+      console.log(`[Debug] Elemento movido: X=${x}, Y=${y} (raw: ${rawX}, ${rawY}, scale: ${canvasScale})`);
       
       if (draggedElement.dataset.adrian === 'true') {
         state.ax = x;
