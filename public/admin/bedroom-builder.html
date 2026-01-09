@@ -663,11 +663,15 @@
       
       const canvas = document.getElementById('canvas');
       const canvasRect = canvas.getBoundingClientRect();
-      const elementRect = draggedElement.getBoundingClientRect();
       
-      // Calcular coordenadas exactas (el endpoint redondea con Math.round)
-      const rawX = (elementRect.left - canvasRect.left) / canvasScale;
-      const rawY = (elementRect.top - canvasRect.top) / canvasScale;
+      // Usar la posición del estilo del elemento (que ya está en coordenadas del canvas escaladas)
+      // en lugar de getBoundingClientRect que puede incluir el label
+      const elementLeft = parseFloat(draggedElement.style.left) || 0;
+      const elementTop = parseFloat(draggedElement.style.top) || 0;
+      
+      // Convertir de coordenadas escaladas a coordenadas reales del canvas
+      const rawX = elementLeft / canvasScale;
+      const rawY = elementTop / canvasScale;
       const x = Math.round(rawX);
       const y = Math.round(rawY);
       
