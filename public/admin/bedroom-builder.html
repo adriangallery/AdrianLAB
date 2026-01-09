@@ -37,9 +37,9 @@
     .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
     .btn-ghost:hover { border-color: #818cf8; color: #c7d2fe; }
     .stack-note { color: #94a3b8; font-size: 12px; margin-top: 6px; }
-    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: auto; margin-top: 10px; }
-    #canvas { display: block; cursor: crosshair; max-width: 100%; image-rendering: pixelated; }
-    .canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+    .canvas-container { position: relative; background: #0b1220; border: 2px solid #334155; border-radius: 8px; overflow: auto; margin-top: 10px; padding: 0; }
+    #canvas { display: block; cursor: crosshair; max-width: 100%; image-rendering: pixelated; margin: 0; padding: 0; }
+    .canvas-overlay { position: absolute; top: 0; left: 0; pointer-events: none; margin: 0; padding: 0; }
     .canvas-element { position: absolute; border: 2px solid #818cf8; background: rgba(99, 102, 241, 0.1); cursor: move; pointer-events: all; }
     .canvas-element.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.2); }
     .canvas-element:hover { border-color: #c7d2fe; }
@@ -467,9 +467,11 @@
                 e.preventDefault();
                 e.stopPropagation();
                 draggedElement = element;
-                const canvasRect = canvas.getBoundingClientRect();
-                dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
-                dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
+                // Usar el contenedor como referencia para evitar desajustes por padding/margin
+                const container = document.getElementById('canvas-container');
+                const containerRect = container.getBoundingClientRect();
+                dragOffset.x = (e.clientX - containerRect.left) / canvasScale - x;
+                dragOffset.y = (e.clientY - containerRect.top) / canvasScale - y;
                 element.classList.add('selected');
               });
             }
@@ -540,10 +542,11 @@
           element.addEventListener('mousedown', (e) => {
             e.preventDefault();
             draggedElement = element;
-            const rect = element.getBoundingClientRect();
-            const canvasRect = canvas.getBoundingClientRect();
-            dragOffset.x = (e.clientX - canvasRect.left) / canvasScale - x;
-            dragOffset.y = (e.clientY - canvasRect.top) / canvasScale - y;
+            // Usar el contenedor como referencia para evitar desajustes por padding/margin
+            const container = document.getElementById('canvas-container');
+            const containerRect = container.getBoundingClientRect();
+            dragOffset.x = (e.clientX - containerRect.left) / canvasScale - x;
+            dragOffset.y = (e.clientY - containerRect.top) / canvasScale - y;
             element.classList.add('selected');
           });
           
@@ -649,10 +652,11 @@
     document.addEventListener('mousemove', (e) => {
       if (!draggedElement) return;
       
-      const canvas = document.getElementById('canvas');
-      const canvasRect = canvas.getBoundingClientRect();
-      const x = (e.clientX - canvasRect.left) / canvasScale - dragOffset.x;
-      const y = (e.clientY - canvasRect.top) / canvasScale - dragOffset.y;
+      // Usar el contenedor como referencia para evitar desajustes por padding/margin
+      const container = document.getElementById('canvas-container');
+      const containerRect = container.getBoundingClientRect();
+      const x = (e.clientX - containerRect.left) / canvasScale - dragOffset.x;
+      const y = (e.clientY - containerRect.top) / canvasScale - dragOffset.y;
       
       draggedElement.style.left = `${x * canvasScale}px`;
       draggedElement.style.top = `${y * canvasScale}px`;
