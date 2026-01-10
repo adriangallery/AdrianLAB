@@ -7,8 +7,9 @@ import { loadLabimagesAsset } from '../../lib/github-storage.js';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
 const BEDROOM_SVG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedroom_pixelated_min.svg');
 const BEDROOM_PNG_PATH = path.join(process.cwd(), 'public', 'labimages', 'bedrooms', 'bedr.png');
-const BEDROOM_WIDTH = 1049.6;
-const BEDROOM_HEIGHT = 548.375;
+// Dimensiones reales de Layer_3_Floor.png (imagen base principal)
+const BEDROOM_WIDTH = 1500;
+const BEDROOM_HEIGHT = 496;
 const BEDROOM_ASSET_BASE_LAYERS = [
   'bedrooms/assets/Layer_3_Floor.png',
   'bedrooms/assets/Layer_2.png',
