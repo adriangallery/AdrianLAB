@@ -14858,6 +14858,20 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 1168,
+      "name": "Smoking-cigarrette",
+      "category": "MOUTH",
+      "fileName": "1168",
+      "maxSupply": 300,
+      "floppy": "ShitDROP",
+      "Type": "Animated",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 6001,
       "name": "Text Eyes 6001",
       "category": "EYES",
@@ -15106,7 +15120,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 1275,
+    "totalTraits": 1276,
     "categories": [
       "BACKGROUND",
       "EAR",
