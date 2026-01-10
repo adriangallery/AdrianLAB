@@ -232,7 +232,10 @@ export default async function handler(req, res) {
             trait_type: "Floppy",
             value: tokenData.floppy || "OG"
           }
-        ],
+        ].concat(isAnimated ? [{
+          trait_type: "Type",
+          value: "Animated"
+        }] : []),
         properties: {
           files: [
             {
