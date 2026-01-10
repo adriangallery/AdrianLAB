@@ -571,48 +571,50 @@
     }
 
     async function loadImageForCanvas(src) {
+      // Construir URL correcta según el formato del asset
+      let url;
+      if (src.startsWith('http')) {
+        url = src;
+      } else if (src.startsWith('bedrooms/')) {
+        url = `${location.origin}/labimages/${src}`;
+      } else if (src.startsWith('labimages/')) {
+        url = `${location.origin}/${src}`;
+      } else {
+        url = `${location.origin}/labimages/${src}`;
+      }
+      
+      // Intentar cargar desde Vercel primero
       try {
-        // Construir URL correcta según el formato del asset
-        let url;
-        if (src.startsWith('http')) {
-          url = src;
-        } else if (src.startsWith('bedrooms/')) {
-          url = `${location.origin}/labimages/${src}`;
-        } else if (src.startsWith('labimages/')) {
-          url = `${location.origin}/${src}`;
-        } else {
-          url = `${location.origin}/labimages/${src}`;
-        }
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image();
+          i.crossOrigin = 'anonymous';
+          
+          const timeout = setTimeout(() => {
+            reject(new Error(`Timeout loading ${url}`));
+          }, 3000); // Reducir timeout para fallback más rápido
+          
+          i.onload = () => {
+            clearTimeout(timeout);
+            resolve(i);
+          };
+          
+          i.onerror = (err) => {
+            clearTimeout(timeout);
+            reject(new Error(`Failed to load ${url}`));
+          };
+          
+          i.src = url;
+        });
         
-        // Intentar cargar desde Vercel primero
+        return img;
+      } catch (err) {
+        // Si falla, intentar desde GitHub raw
+        console.log(`[Bedroom Builder] Fallback a GitHub raw para ${src}`);
+        const githubUrl = getGitHubLabimagesUrl(src);
+        console.log(`[Bedroom Builder] Intentando cargar desde GitHub: ${githubUrl}`);
+        
         try {
           const img = await new Promise((resolve, reject) => {
-            const i = new Image();
-            i.crossOrigin = 'anonymous';
-            
-            const timeout = setTimeout(() => {
-              reject(new Error(`Timeout loading ${url}`));
-            }, 5000);
-            
-            i.onload = () => {
-              clearTimeout(timeout);
-              resolve(i);
-            };
-            
-            i.onerror = () => {
-              clearTimeout(timeout);
-              reject(new Error(`Failed to load ${url}`));
-            };
-            
-            i.src = url;
-          });
-          
-          return img;
-        } catch (err) {
-          // Si falla, intentar desde GitHub raw
-          console.log(`Fallback a GitHub raw para ${src}`);
-          const githubUrl = getGitHubLabimagesUrl(src);
-          return new Promise((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             
@@ -622,21 +624,24 @@
             
             img.onload = () => {
               clearTimeout(timeout);
+              console.log(`[Bedroom Builder] ✅ Imagen cargada desde GitHub: ${src}`);
               resolve(img);
             };
             
             img.onerror = (err) => {
               clearTimeout(timeout);
-              console.error(`Error loading image from GitHub ${githubUrl}:`, err);
+              console.error(`[Bedroom Builder] ❌ Error loading image from GitHub ${githubUrl}:`, err);
               reject(new Error(`Failed to load ${githubUrl}`));
             };
             
             img.src = githubUrl;
           });
+          
+          return img;
+        } catch (githubErr) {
+          console.error(`[Bedroom Builder] ❌ Error completo cargando ${src}:`, githubErr);
+          throw githubErr;
         }
-      } catch (err) {
-        console.error(`Error in loadImageForCanvas for ${src}:`, err);
-        throw err;
       }
     }
 
