@@ -2142,7 +2142,9 @@ export default async function handler(req, res) {
     }
 
     // ===== PASO BANANA: aplicar transformación Nano Banana (DEBE SER DESPUÉS DE TODOS LOS EFECTOS) =====
-    if (isBanana) {
+    // NOTA: Si hay messageText, NO aplicar banana - usar renderizado normal por capas
+    // Banana y messages son lógicas completamente separadas
+    if (isBanana && !messageText) {
       try {
         console.log('[render] PASO BANANA - Aplicando transformación Nano Banana');
         
@@ -2184,6 +2186,8 @@ export default async function handler(req, res) {
         console.warn('[render] PASO BANANA - Falló la transformación Nano Banana, continuando sin banana:', e.message);
         // Continuar con el buffer original si falla la transformación
       }
+    } else if (isBanana && messageText) {
+      console.log('[render] PASO BANANA - Banana detectado pero messageText presente, omitiendo transformación Nano Banana');
     }
 
     // ===== GUARDAR EN CACHÉ Y RETORNAR =====
