@@ -1084,7 +1084,8 @@ export default async function handler(req, res) {
       bn: isBn,
       uv: isUv,
       blackout: isBlackout,
-      banana: isBanana,
+      // Si hay messageText, NO considerar banana en el hash (no se aplicará la transformación)
+      banana: isBanana && !messageText,
       messages: messageText,
       
       // Token data
@@ -2198,9 +2199,10 @@ export default async function handler(req, res) {
 
     // ===== SUBIR A GITHUB SI TIENE TOGGLE 13 (BANANA) ACTIVO =====
     // Subir el archivo a GitHub después del renderizado (antes de enviar la respuesta)
-    // Solo subir si tiene toggle 13 (banana) activo
+    // Solo subir si tiene toggle 13 (banana) activo Y NO hay messageText
+    // Si hay messageText, no subir como banana para no sobrescribir el archivo original
     // Esperamos la subida para garantizar que se complete antes de que Vercel termine el proceso
-    if (isBanana) {
+    if (isBanana && !messageText) {
       const renderType = 'banana';
       
       console.log(`[render] 🚀 Iniciando subida a GitHub para token ${cleanTokenId} (${renderType})`);
