@@ -1800,11 +1800,11 @@ export default async function handler(req, res) {
       try {
         console.log('[render] 💬 PASO MESSAGES - Renderizando mensaje estilo cómic');
         
-        const fontSize = 48;
+        const fontSize = 192; // 4 veces más grande que 48px
         const margin = 10;
         // Posición del texto: centro-derecha del canvas original (x=800, y=400)
         // Pero como el canvas ahora es 3000px, ajustamos a la parte derecha
-        const textX = 1500; // Centro de la parte derecha (1000 + 500)
+        const textX = 1400; // 100 píxeles a la izquierda de 1500
         const textY = 400;  // Misma altura que el centro del AdrianZERO
         
         // Configurar fuente y medir texto
