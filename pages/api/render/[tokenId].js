@@ -1,7 +1,7 @@
 // API endpoint for rendering tokens by tokenId
 import path from 'path';
 import fs from 'fs';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getContracts } from '../../../lib/contracts.js';
 import { 
@@ -282,7 +282,7 @@ export default async function handler(req, res) {
       isBanana = false;
     }
     
-    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BOUNCE (PARÁMETROS) =====
+    // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT, BOUNCE Y MESSAGES (PARÁMETROS) =====
     // Estos se mantienen como parámetros de query (no se verifican onchain aquí)
     const isCloseup = req.query.closeup === 'true';
     const isShadow = req.query.shadow === 'true';
@@ -291,6 +291,7 @@ export default async function handler(req, res) {
     const isUv = req.query.uv === 'true' || req.query.UV === 'true'; // uv o UV (case-insensitive)
     const isBlackout = req.query.blackout === 'true';
     const isBounce = req.query.bounce === 'true';
+    const messageText = req.query.messages ? decodeURIComponent(req.query.messages) : null;
     const bounceConfig = isBounce ? {
       enabled: true,
       direction: req.query.bounceDir || 'y',
@@ -323,15 +324,19 @@ export default async function handler(req, res) {
     if (isBlackout) {
       console.log(`[render] ⬛ BLACKOUT: Token ${cleanTokenId} - Renderizando con blackout (negro completo)`);
     }
+    
+    if (messageText) {
+      console.log(`[render] 💬 MESSAGES: Token ${cleanTokenId} - Renderizando con mensaje: "${messageText}"`);
+    }
 
     // ===== SISTEMA DE CACHÉ PARA ADRIANZERO RENDER =====
-    // El caché debe diferenciar según los efectos (shadow, glow, bn, uv, blackout)
+    // El caché debe diferenciar según los efectos (shadow, glow, bn, uv, blackout, messages)
     let cachedImage;
     
     if (isCloseup) {
       cachedImage = getCachedAdrianZeroCloseup(cleanTokenId, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
     } else {
-      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+      cachedImage = getCachedAdrianZeroRender(cleanTokenId, isShadow, isGlow, isBn, isUv, isBlackout, isBanana, messageText);
     }
     
     if (cachedImage) {
@@ -351,6 +356,7 @@ export default async function handler(req, res) {
       if (isUv) versionParts.push('UV');
       if (isBlackout) versionParts.push('BLACKOUT');
       if (isBanana) versionParts.push('BANANA');
+      if (messageText) versionParts.push('MESSAGES');
       const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
       
       if (isCloseup) {
@@ -385,6 +391,10 @@ export default async function handler(req, res) {
         res.setHeader('X-Banana', 'enabled');
       }
       
+      if (messageText) {
+        res.setHeader('X-Messages', 'enabled');
+      }
+      
       return res.status(200).send(cachedImage);
     }
 
@@ -413,7 +423,7 @@ export default async function handler(req, res) {
             if (isCloseup) {
               setCachedAdrianZeroCloseup(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
             } else {
-              setCachedAdrianZeroRender(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+              setCachedAdrianZeroRender(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana, messageText);
             }
             
             const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -498,21 +508,34 @@ export default async function handler(req, res) {
       traitIds: traitIds.map(id => id.toString())
     });
 
-    // Crear canvas con fondo blanco
-    const canvas = createCanvas(1000, 1000);
+    // Crear canvas con fondo blanco (3000x1000 si hay mensaje, 1000x1000 normal)
+    const canvasWidth = messageText ? 3000 : 1000;
+    const canvasHeight = 1000;
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 1000, 1000);
-    console.log('[render] Canvas creado con fondo blanco');
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    console.log(`[render] Canvas creado con fondo blanco (${canvasWidth}x${canvasHeight})`);
+    
+    // Registrar fuente ADRIAN_ZERO si hay mensaje
+    if (messageText) {
+      try {
+        const fontPath = path.join(process.cwd(), 'public', 'fonts', 'ADRIAN_ZERO.otf');
+        registerFont(fontPath, { family: 'AdrianZERO' });
+        console.log('[render] 💬 Fuente ADRIAN_ZERO registrada correctamente');
+      } catch (error) {
+        console.error('[render] 💬 Error registrando fuente ADRIAN_ZERO:', error.message);
+      }
+    }
 
     // Canvas intermedio para renderizar todas las capas excepto el BACKGROUND (solo si shadow, glow o blackout está activo)
     let contentCanvas = null;
     let contentCtx = null;
     if (isShadow || isGlow || isBlackout) {
-      contentCanvas = createCanvas(1000, 1000);
+      contentCanvas = createCanvas(canvasWidth, canvasHeight);
       contentCtx = contentCanvas.getContext('2d');
       const effectName = isShadow ? 'sombra' : (isGlow ? 'glow' : 'blackout');
-      console.log(`[render] Canvas de contenido (sin background) creado para ${effectName}`);
+      console.log(`[render] Canvas de contenido (sin background) creado para ${effectName} (${canvasWidth}x${canvasHeight})`);
     }
 
     // Nota: GLOW se dibuja directamente en el canvas principal (1000x1000)
@@ -1114,7 +1137,7 @@ export default async function handler(req, res) {
             if (isCloseup) {
               setCachedAdrianZeroCloseup(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
             } else {
-              setCachedAdrianZeroRender(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+              setCachedAdrianZeroRender(cleanTokenId, buffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana, messageText);
             }
             
             const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1163,8 +1186,14 @@ export default async function handler(req, res) {
       
       const bgImage = await loadAndRenderSvg(bgPath);
       if (bgImage) {
-        ctx.drawImage(bgImage, 0, 0, 1000, 1000);
-        console.log('[render] PASO 1 - Background renderizado correctamente');
+        // Si hay mensaje, estirar el background horizontalmente a 3000px
+        if (messageText) {
+          ctx.drawImage(bgImage, 0, 0, 3000, 1000);
+          console.log('[render] PASO 1 - Background renderizado y estirado a 3000x1000 correctamente');
+        } else {
+          ctx.drawImage(bgImage, 0, 0, 1000, 1000);
+          console.log('[render] PASO 1 - Background renderizado correctamente');
+        }
       }
     }
 
@@ -1579,11 +1608,11 @@ export default async function handler(req, res) {
     if (isShadow && !isGlow && contentCanvas) {
       try {
         console.log('[render] PASO SHADOW - Generando sombra del contenido');
-        const shadowCanvas = createCanvas(1000, 1000);
+        const shadowCanvas = createCanvas(canvasWidth, canvasHeight);
         const shadowCtx = shadowCanvas.getContext('2d');
-        shadowCtx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        shadowCtx.drawImage(contentCanvas, 0, 0, canvasWidth, canvasHeight);
 
-        const imgData = shadowCtx.getImageData(0, 0, 1000, 1000);
+        const imgData = shadowCtx.getImageData(0, 0, canvasWidth, canvasHeight);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
           const a = data[i + 3];
@@ -1597,16 +1626,17 @@ export default async function handler(req, res) {
         shadowCtx.putImageData(imgData, 0, 0);
 
         // Dibujar sombra desplazada a la izquierda 40px y hacia abajo 15px
-        ctx.drawImage(shadowCanvas, -40, 15, 1000, 1000);
+        // Solo aplicar sombra a la parte de AdrianZERO (primeros 1000px)
+        ctx.drawImage(shadowCanvas, -40, 15, 1000, 1000, 0, 0, 1000, 1000);
         console.log('[render] PASO SHADOW - Sombra aplicada (-40px izquierda, +15px abajo)');
 
-        // Dibujar contenido original encima
-        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        // Dibujar contenido original encima (solo parte de AdrianZERO)
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
         console.log('[render] PASO SHADOW - Contenido original dibujado');
       } catch (e) {
         console.warn('[render] PASO SHADOW - Falló la generación de sombra, continuando sin sombra:', e.message);
-        // Fallback: dibujar contenido sin sombra
-        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        // Fallback: dibujar contenido sin sombra (solo parte de AdrianZERO)
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
       }
     }
 
@@ -1615,11 +1645,11 @@ export default async function handler(req, res) {
     if (isBlackout && !isShadow && !isGlow && contentCanvas) {
       try {
         console.log('[render] PASO BLACKOUT - Generando AdrianZERO completamente negro');
-        const blackoutCanvas = createCanvas(1000, 1000);
+        const blackoutCanvas = createCanvas(canvasWidth, canvasHeight);
         const blackoutCtx = blackoutCanvas.getContext('2d');
-        blackoutCtx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        blackoutCtx.drawImage(contentCanvas, 0, 0, canvasWidth, canvasHeight);
 
-        const imgData = blackoutCtx.getImageData(0, 0, 1000, 1000);
+        const imgData = blackoutCtx.getImageData(0, 0, canvasWidth, canvasHeight);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
           const a = data[i + 3];
@@ -1634,17 +1664,17 @@ export default async function handler(req, res) {
         }
         blackoutCtx.putImageData(imgData, 0, 0);
 
-        // Dibujar blackout en la posición original (sin desplazar)
-        ctx.drawImage(blackoutCanvas, 0, 0, 1000, 1000);
+        // Dibujar blackout en la posición original (solo parte de AdrianZERO)
+        ctx.drawImage(blackoutCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
         console.log('[render] PASO BLACKOUT - AdrianZERO negro aplicado en posición original');
       } catch (e) {
         console.warn('[render] PASO BLACKOUT - Falló la generación de blackout, continuando sin blackout:', e.message);
-        // Fallback: dibujar contenido sin blackout
-        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        // Fallback: dibujar contenido sin blackout (solo parte de AdrianZERO)
+        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
       }
     } else if (isBlackout && contentCanvas) {
-      // Si blackout está activo pero shadow o glow también, dibujar contenido normal
-      ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+      // Si blackout está activo pero shadow o glow también, dibujar contenido normal (solo parte de AdrianZERO)
+      ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
       console.log('[render] PASO BLACKOUT - Blackout deshabilitado por conflicto con shadow/glow');
     }
 
@@ -1733,18 +1763,75 @@ export default async function handler(req, res) {
           
           layerCtx.putImageData(layerImgData, 0, 0);
           
-          // Dibujar esta capa en el canvas principal (las partes que se salen se recortan automáticamente)
-          ctx.drawImage(layerCanvas, layerOffset, layerOffset);
+          // Dibujar esta capa en el canvas principal (solo en la parte de AdrianZERO cuando hay mensaje)
+          // Las partes que se salen se recortan automáticamente
+          if (messageText) {
+            // Solo dibujar en la parte izquierda (0-1000px)
+            ctx.drawImage(layerCanvas, layerOffset, layerOffset, 1000, 1000, 0, 0, 1000, 1000);
+          } else {
+            ctx.drawImage(layerCanvas, layerOffset, layerOffset);
+          }
         }
         
-        // Dibujar el contenido original encima del glow (tamaño original 1000x1000)
-        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        // Dibujar el contenido original encima del glow (solo parte de AdrianZERO cuando hay mensaje)
+        if (messageText) {
+          ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
+        } else {
+          ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        }
         
         console.log('[render] PASO GLOW - Glow arcoíris aplicado alrededor del contenido (tamaño original preservado)');
       } catch (e) {
         console.warn('[render] PASO GLOW - Falló la generación de glow, continuando sin glow:', e.message);
-        // Fallback: dibujar contenido sin glow
-        ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        // Fallback: dibujar contenido sin glow (solo parte de AdrianZERO cuando hay mensaje)
+        if (messageText) {
+          ctx.drawImage(contentCanvas, 0, 0, 1000, 1000, 0, 0, 1000, 1000);
+        } else {
+          ctx.drawImage(contentCanvas, 0, 0, 1000, 1000);
+        }
+      }
+    }
+
+    // ===== PASO MESSAGES: renderizar texto y recuadro estilo cómic =====
+    if (messageText) {
+      try {
+        console.log('[render] 💬 PASO MESSAGES - Renderizando mensaje estilo cómic');
+        
+        const fontSize = 48;
+        const margin = 10;
+        // Posición del texto: centro-derecha del canvas original (x=800, y=400)
+        // Pero como el canvas ahora es 3000px, ajustamos a la parte derecha
+        const textX = 1500; // Centro de la parte derecha (1000 + 500)
+        const textY = 400;  // Misma altura que el centro del AdrianZERO
+        
+        // Configurar fuente y medir texto
+        ctx.font = `${fontSize}px AdrianZERO`;
+        ctx.fillStyle = '#000000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const textMetrics = ctx.measureText(messageText);
+        const textWidth = textMetrics.width;
+        const textHeight = fontSize * 1.2; // Altura aproximada del texto
+        
+        // Calcular dimensiones del recuadro blanco
+        const boxX = textX - (textWidth / 2) - margin;
+        const boxY = textY - (textHeight / 2) - margin;
+        const boxWidth = textWidth + (margin * 2);
+        const boxHeight = textHeight + (margin * 2);
+        
+        // Dibujar recuadro blanco primero
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+        console.log(`[render] 💬 Recuadro blanco dibujado: x=${boxX}, y=${boxY}, w=${boxWidth}, h=${boxHeight}`);
+        
+        // Dibujar texto en negro encima del recuadro
+        ctx.fillStyle = '#000000';
+        ctx.fillText(messageText, textX, textY);
+        console.log(`[render] 💬 Texto renderizado: "${messageText}" en x=${textX}, y=${textY}`);
+        
+      } catch (e) {
+        console.warn('[render] 💬 PASO MESSAGES - Falló el renderizado del mensaje, continuando sin mensaje:', e.message);
       }
     }
 
@@ -2101,7 +2188,7 @@ export default async function handler(req, res) {
     if (isCloseup) {
       setCachedAdrianZeroCloseup(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
     } else {
-      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana);
+      setCachedAdrianZeroRender(cleanTokenId, finalBuffer, isShadow, isGlow, isBn, isUv, isBlackout, isBanana, messageText);
     }
 
     const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);

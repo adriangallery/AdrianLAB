@@ -379,6 +379,13 @@ export default function Home() {
                 example: '/api/render/1?blackout=true'
               },
               {
+                name: 'AdrianZERO Messages',
+                url: '/api/render/1?messages=Hola%20mundo',
+                description: 'Render con mensaje estilo cómic de token AdrianZERO (canvas 3000x1000)',
+                tags: ['adrianzero', 'render', 'messages', 'comic'],
+                example: '/api/render/1?messages=Hola%20mundo'
+              },
+              {
                 name: 'AdrianZERO Banana',
                 url: '/api/render/1?banana=true',
                 description: 'Render con transformación Nano Banana de token AdrianZERO (requiere toggle activo)',
