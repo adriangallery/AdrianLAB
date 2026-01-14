@@ -402,7 +402,8 @@ export default async function handler(req, res) {
 
     // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB (SOLO SI TIENE TOGGLE 13) =====
     // Si tiene toggle 13 (banana) activo, verificar si el archivo ya está almacenado en GitHub
-    if (isBanana) {
+    // NOTA: Si hay mensaje, NO usar el archivo de banana sin mensaje - debe generar uno nuevo
+    if (isBanana && !messageText) {
       const renderType = 'banana'; // Siempre 'banana' cuando tiene toggle 13
       const existsInGitHub = await fileExistsInGitHub(cleanTokenId, renderType);
       
@@ -1084,6 +1085,7 @@ export default async function handler(req, res) {
       uv: isUv,
       blackout: isBlackout,
       banana: isBanana,
+      messages: messageText,
       
       // Token data
       generation: generation.toString(),
