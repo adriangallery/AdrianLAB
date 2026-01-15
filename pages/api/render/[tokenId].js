@@ -1838,15 +1838,28 @@ export default async function handler(req, res) {
         const bubbleX = textX - bubbleWidth / 2;
         const bubbleY = textY - bubbleHeight / 2;
 
-        // Bocadillo estilo pixel-art simple: rectángulo blanco con borde negro tipo 8-bit
-        // Borde exterior negro
+        // Bocadillo estilo pixel-art: rectángulo blanco con borde negro tipo 8-bit + “cola” hacia AdrianZERO
+        const px = 4; // tamaño de pixel base del borde/cola
+
+        // Borde exterior negro (ligeramente más grueso)
         ctx.fillStyle = '#000000';
-        ctx.fillRect(bubbleX - 4, bubbleY - 4, bubbleWidth + 8, bubbleHeight + 8);
+        ctx.fillRect(bubbleX - 2 * px, bubbleY - 2 * px, bubbleWidth + 4 * px, bubbleHeight + 4 * px);
         // Interior blanco
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
 
-        console.log(`[render] 💬 Bocadillo renderizado (canvas): x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
+        // Cola del bocadillo hacia la izquierda (apuntando a la boca de AdrianZERO)
+        // Pequeña escalera de píxeles negros para dar sensación 8‑bit
+        const tailBaseX = bubbleX; // lado izquierdo del bocadillo
+        const tailBaseY = textY;   // alineado verticalmente con el texto
+
+        ctx.fillStyle = '#000000';
+        // Tres “escalones” hacia la izquierda
+        ctx.fillRect(tailBaseX - px, tailBaseY - 1 * px, px, px);
+        ctx.fillRect(tailBaseX - 2 * px, tailBaseY, px, px);
+        ctx.fillRect(tailBaseX - 3 * px, tailBaseY + 1 * px, px, px);
+
+        console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
         
         // Dibujar texto en negro encima del bocadillo
         ctx.fillStyle = '#000000';
