@@ -1800,7 +1800,20 @@ export default async function handler(req, res) {
       try {
         console.log('[render] 💬 PASO MESSAGES - Renderizando mensaje estilo cómic');
         
-        const fontSize = 182; // ligeramente más pequeño que antes
+        // Modo de fuente: por defecto tipo pixel (Press Start 2P),
+        // si en la URL viene ?AZ=true (o ?az=true o ?font=AZ) usar AdrianZERO
+        const useAdrianFont = req.query.AZ === 'true' || req.query.az === 'true' || req.query.font === 'AZ';
+
+        // Registrar fuentes necesarias
+        try {
+          const pressStartPath = path.join(process.cwd(), 'public', 'fonts', 'retro', 'PressStart2P-Regular.ttf');
+          registerFont(pressStartPath, { family: 'PressStart2P' });
+        } catch (e) {
+          console.warn('[render] 💬 No se pudo registrar PressStart2P, se usará AdrianZERO como fallback:', e.message);
+        }
+
+        const fontFamily = useAdrianFont ? 'AdrianZERO' : 'PressStart2P';
+        const fontSize = useAdrianFont ? 182 : 64; // AZ grande, PressStart algo más pequeño
         const margin = 10; // margen estándar alrededor del texto
         // Posición del texto: centro-derecha del canvas original (x=800, y=400)
         // Pero como el canvas ahora es 3000px, ajustamos a la parte derecha
@@ -1808,7 +1821,7 @@ export default async function handler(req, res) {
         const textY = 400;  // Misma altura que el centro del AdrianZERO
         
         // Configurar fuente y medir texto
-        ctx.font = `${fontSize}px AdrianZERO`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.fillStyle = '#000000';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1819,79 +1832,21 @@ export default async function handler(req, res) {
 
         // Altura objetivo del bocadillo (un poco más alta que el texto)
         const bubbleHeight = textHeight + margin * 2;
+        const bubbleWidth = textWidth + margin * 2;
 
-        // Cargar bocadillo base y right-cap desde labimages
-        const loadBubbleImage = async (filename) => {
-          try {
-            const svgBuffer = await loadLabimagesAsset(filename);
-            if (!svgBuffer) {
-              console.warn(`[render] 💬 Bocadillo: no se encontró ${filename} en labimages`);
-              return null;
-            }
+        // Coordenadas del bocadillo (centrado alrededor de textX/textY)
+        const bubbleX = textX - bubbleWidth / 2;
+        const bubbleY = textY - bubbleHeight / 2;
 
-            const resvg = new Resvg(svgBuffer, {
-              fitTo: {
-                mode: 'width',
-                value: 100 // tamaño base, luego escalamos en drawImage
-              }
-            });
-            const pngBuffer = resvg.render().asPng();
-            return await loadImage(pngBuffer);
-          } catch (err) {
-            console.warn(`[render] 💬 Error cargando bocadillo ${filename}:`, err.message);
-            return null;
-          }
-        };
+        // Bocadillo estilo pixel-art simple: rectángulo blanco con borde negro tipo 8-bit
+        // Borde exterior negro
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(bubbleX - 4, bubbleY - 4, bubbleWidth + 8, bubbleHeight + 8);
+        // Interior blanco
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
 
-        const bubbleBaseImage = await loadBubbleImage('bocadillo.svg');
-        const bubbleRightCapImage = await loadBubbleImage('bocadillob.svg');
-
-        if (bubbleBaseImage && bubbleRightCapImage) {
-          // Escalar bocadillo a la altura objetivo
-          const baseScale = bubbleHeight / bubbleBaseImage.height;
-          const rightScale = bubbleHeight / bubbleRightCapImage.height;
-
-          const rightCapWidth = bubbleRightCapImage.width * rightScale;
-
-          // Ancho total del bocadillo = texto + márgenes + right-cap
-          const bubbleWidth = textWidth + margin * 2 + rightCapWidth;
-
-          // Coordenadas del bocadillo (centrado alrededor de textX/textY)
-          const bubbleX = textX - (bubbleWidth - rightCapWidth) / 2;
-          const bubbleY = textY - bubbleHeight / 2;
-
-          const baseWidth = bubbleWidth - rightCapWidth;
-
-          // Dibujar parte izquierda/central del bocadillo estirada
-          ctx.drawImage(
-            bubbleBaseImage,
-            bubbleX,
-            bubbleY,
-            baseWidth,
-            bubbleHeight
-          );
-
-          // Dibujar right-cap al final para cerrar el bocadillo
-          ctx.drawImage(
-            bubbleRightCapImage,
-            bubbleX + baseWidth,
-            bubbleY,
-            rightCapWidth,
-            bubbleHeight
-          );
-
-          console.log(`[render] 💬 Bocadillo renderizado: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
-        } else {
-          // Fallback: usar recuadro blanco antiguo
-          const boxX = textX - (textWidth / 2) - margin;
-          const boxY = textY - (textHeight / 2) - margin;
-          const boxWidth = textWidth + (margin * 2);
-          const boxHeight = textHeight + (margin * 2);
-
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-          console.log(`[render] 💬 Fallback bocadillo: recuadro blanco x=${boxX}, y=${boxY}, w=${boxWidth}, h=${boxHeight}`);
-        }
+        console.log(`[render] 💬 Bocadillo renderizado (canvas): x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
         
         // Dibujar texto en negro encima del bocadillo
         ctx.fillStyle = '#000000';
