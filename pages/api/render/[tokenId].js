@@ -1842,7 +1842,7 @@ export default async function handler(req, res) {
         // - Rectángulo con “esquinas redondeadas” a base de píxeles (efecto escalera)
         // - Cola más grande en esquina inferior izquierda
         // - Sombra suave debajo/derecha
-        const px = 4; // tamaño de pixel base
+        const px = 6; // tamaño de pixel base (más grande para un look más marcado)
 
         // Sombra (similar a .bubble.shadow)
         ctx.fillStyle = 'rgba(0,0,0,0.1)';
@@ -1887,17 +1887,19 @@ export default async function handler(req, res) {
         const tailBaseX = bubbleX + 3 * px;
         const tailBaseY = bubbleY + bubbleHeight;
 
-        // Parte negra exterior de la cola (4 “escalones”)
-        ctx.fillRect(tailBaseX, tailBaseY + px, px, px);
-        ctx.fillRect(tailBaseX - px, tailBaseY + 2 * px, px, px);
-        ctx.fillRect(tailBaseX - 2 * px, tailBaseY + 3 * px, px, px);
-        ctx.fillRect(tailBaseX - 3 * px, tailBaseY + 4 * px, px, px);
+        // Parte negra exterior de la cola (escalera más grande y ancha)
+        ctx.fillRect(tailBaseX,           tailBaseY + px,     2 * px, px);
+        ctx.fillRect(tailBaseX - px,      tailBaseY + 2 * px, 2 * px, px);
+        ctx.fillRect(tailBaseX - 2 * px,  tailBaseY + 3 * px, 2 * px, px);
+        ctx.fillRect(tailBaseX - 3 * px,  tailBaseY + 4 * px, 2 * px, px);
+        ctx.fillRect(tailBaseX - 4 * px,  tailBaseY + 5 * px, 2 * px, px);
 
         // Relleno blanco interior para integrarlo con el bocadillo
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(tailBaseX, tailBaseY, px, px);
-        ctx.fillRect(tailBaseX - px, tailBaseY + px, px, px);
-        ctx.fillRect(tailBaseX - 2 * px, tailBaseY + 2 * px, px, px);
+        ctx.fillRect(tailBaseX,           tailBaseY,          2 * px, px);
+        ctx.fillRect(tailBaseX - px,      tailBaseY + px,     2 * px, px);
+        ctx.fillRect(tailBaseX - 2 * px,  tailBaseY + 2 * px, 2 * px, px);
+        ctx.fillRect(tailBaseX - 3 * px,  tailBaseY + 3 * px, 2 * px, px);
 
         console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola grande y bordes escalonados: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
         
