@@ -1838,28 +1838,53 @@ export default async function handler(req, res) {
         const bubbleX = textX - bubbleWidth / 2;
         const bubbleY = textY - bubbleHeight / 2;
 
-        // Bocadillo estilo pixel-art: rectángulo blanco con borde negro tipo 8-bit + “cola” hacia AdrianZERO
-        const px = 4; // tamaño de pixel base del borde/cola
+        // Bocadillo estilo pixel-art inspirado en el CSS de referencia:
+        // - Rectángulo con “esquinas redondeadas” a base de píxeles
+        // - Cola en esquina inferior izquierda
+        // - Sombra suave debajo/derecha
+        const px = 4; // tamaño de pixel base
 
-        // Borde exterior negro (ligeramente más grueso)
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(bubbleX - 2 * px, bubbleY - 2 * px, bubbleWidth + 4 * px, bubbleHeight + 4 * px);
-        // Interior blanco
+        // Sombra (similar a .bubble.shadow)
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        // Sombra inferior
+        ctx.fillRect(bubbleX + px, bubbleY + bubbleHeight + px, bubbleWidth, px);
+        ctx.fillRect(bubbleX + 2 * px, bubbleY + bubbleHeight + 2 * px, bubbleWidth - px, px);
+        // Sombra derecha
+        ctx.fillRect(bubbleX + bubbleWidth + px, bubbleY + px, px, bubbleHeight);
+        ctx.fillRect(bubbleX + bubbleWidth + 2 * px, bubbleY + 2 * px, px, bubbleHeight - px);
+
+        // Fondo base blanco del bocadillo
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
 
-        // Cola del bocadillo hacia la izquierda (apuntando a la boca de AdrianZERO)
-        // Pequeña escalera de píxeles negros para dar sensación 8‑bit
-        const tailBaseX = bubbleX; // lado izquierdo del bocadillo
-        const tailBaseY = textY;   // alineado verticalmente con el texto
-
+        // Borde negro 8‑bit alrededor (aprox. $bubble-border)
         ctx.fillStyle = '#000000';
-        // Tres “escalones” hacia la izquierda
-        ctx.fillRect(tailBaseX - px, tailBaseY - 1 * px, px, px);
-        ctx.fillRect(tailBaseX - 2 * px, tailBaseY, px, px);
-        ctx.fillRect(tailBaseX - 3 * px, tailBaseY + 1 * px, px, px);
+        // Lados rectos
+        ctx.fillRect(bubbleX, bubbleY - px, bubbleWidth, px);                     // arriba
+        ctx.fillRect(bubbleX, bubbleY + bubbleHeight, bubbleWidth, px);           // abajo
+        ctx.fillRect(bubbleX - px, bubbleY, px, bubbleHeight);                    // izquierda
+        ctx.fillRect(bubbleX + bubbleWidth, bubbleY, px, bubbleHeight);           // derecha
+        // Esquinas en “diagonal” para sensación redondeada
+        ctx.fillRect(bubbleX - px, bubbleY - px, px, px);                         // arriba-izq
+        ctx.fillRect(bubbleX + bubbleWidth, bubbleY - px, px, px);                // arriba-der
+        ctx.fillRect(bubbleX - px, bubbleY + bubbleHeight, px, px);               // abajo-izq
+        ctx.fillRect(bubbleX + bubbleWidth, bubbleY + bubbleHeight, px, px);      // abajo-der
 
-        console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
+        // Cola del bocadillo en esquina inferior izquierda (inspirada en .bubble.left/.bottom)
+        const tailBaseX = bubbleX + 2 * px;
+        const tailBaseY = bubbleY + bubbleHeight;
+
+        // Parte negra exterior de la cola
+        ctx.fillRect(tailBaseX, tailBaseY + px, px, px);
+        ctx.fillRect(tailBaseX - px, tailBaseY + 2 * px, px, px);
+        ctx.fillRect(tailBaseX - 2 * px, tailBaseY + 3 * px, px, px);
+
+        // “Relleno” blanco interior para que se funda bien con el bocadillo
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(tailBaseX, tailBaseY, px, px);
+        ctx.fillRect(tailBaseX - px, tailBaseY + px, px, px);
+
+        console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola y sombra: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
         
         // Dibujar texto en negro encima del bocadillo
         ctx.fillStyle = '#000000';
