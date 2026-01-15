@@ -1795,7 +1795,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // ===== PASO MESSAGES: renderizar texto y recuadro estilo cómic =====
+    // ===== PASO MESSAGES: renderizar texto y bocadillo estilo cómic =====
     if (messageText) {
       try {
         console.log('[render] 💬 PASO MESSAGES - Renderizando mensaje estilo cómic');
@@ -1816,19 +1816,84 @@ export default async function handler(req, res) {
         const textMetrics = ctx.measureText(messageText);
         const textWidth = textMetrics.width;
         const textHeight = fontSize * 1.2; // Altura aproximada del texto
+
+        // Altura objetivo del bocadillo (un poco más alta que el texto)
+        const bubbleHeight = textHeight + margin * 2;
+
+        // Cargar bocadillo base y right-cap desde labimages
+        const loadBubbleImage = async (filename) => {
+          try {
+            const svgBuffer = await loadLabimagesAsset(filename);
+            if (!svgBuffer) {
+              console.warn(`[render] 💬 Bocadillo: no se encontró ${filename} en labimages`);
+              return null;
+            }
+
+            const resvg = new Resvg(svgBuffer, {
+              fitTo: {
+                mode: 'width',
+                value: 100 // tamaño base, luego escalamos en drawImage
+              }
+            });
+            const pngBuffer = resvg.render().asPng();
+            return await loadImage(pngBuffer);
+          } catch (err) {
+            console.warn(`[render] 💬 Error cargando bocadillo ${filename}:`, err.message);
+            return null;
+          }
+        };
+
+        const bubbleBaseImage = await loadBubbleImage('bocadillo.svg');
+        const bubbleRightCapImage = await loadBubbleImage('bocadillob.svg');
+
+        if (bubbleBaseImage && bubbleRightCapImage) {
+          // Escalar bocadillo a la altura objetivo
+          const baseScale = bubbleHeight / bubbleBaseImage.height;
+          const rightScale = bubbleHeight / bubbleRightCapImage.height;
+
+          const rightCapWidth = bubbleRightCapImage.width * rightScale;
+
+          // Ancho total del bocadillo = texto + márgenes + right-cap
+          const bubbleWidth = textWidth + margin * 2 + rightCapWidth;
+
+          // Coordenadas del bocadillo (centrado alrededor de textX/textY)
+          const bubbleX = textX - (bubbleWidth - rightCapWidth) / 2;
+          const bubbleY = textY - bubbleHeight / 2;
+
+          const baseWidth = bubbleWidth - rightCapWidth;
+
+          // Dibujar parte izquierda/central del bocadillo estirada
+          ctx.drawImage(
+            bubbleBaseImage,
+            bubbleX,
+            bubbleY,
+            baseWidth,
+            bubbleHeight
+          );
+
+          // Dibujar right-cap al final para cerrar el bocadillo
+          ctx.drawImage(
+            bubbleRightCapImage,
+            bubbleX + baseWidth,
+            bubbleY,
+            rightCapWidth,
+            bubbleHeight
+          );
+
+          console.log(`[render] 💬 Bocadillo renderizado: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
+        } else {
+          // Fallback: usar recuadro blanco antiguo
+          const boxX = textX - (textWidth / 2) - margin;
+          const boxY = textY - (textHeight / 2) - margin;
+          const boxWidth = textWidth + (margin * 2);
+          const boxHeight = textHeight + (margin * 2);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+          console.log(`[render] 💬 Fallback bocadillo: recuadro blanco x=${boxX}, y=${boxY}, w=${boxWidth}, h=${boxHeight}`);
+        }
         
-        // Calcular dimensiones del recuadro blanco
-        const boxX = textX - (textWidth / 2) - margin;
-        const boxY = textY - (textHeight / 2) - margin;
-        const boxWidth = textWidth + (margin * 2);
-        const boxHeight = textHeight + (margin * 2);
-        
-        // Dibujar recuadro blanco primero
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-        console.log(`[render] 💬 Recuadro blanco dibujado: x=${boxX}, y=${boxY}, w=${boxWidth}, h=${boxHeight}`);
-        
-        // Dibujar texto en negro encima del recuadro
+        // Dibujar texto en negro encima del bocadillo
         ctx.fillStyle = '#000000';
         ctx.fillText(messageText, textX, textY);
         console.log(`[render] 💬 Texto renderizado: "${messageText}" en x=${textX}, y=${textY}`);
