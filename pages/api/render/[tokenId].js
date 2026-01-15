@@ -1801,7 +1801,7 @@ export default async function handler(req, res) {
         console.log('[render] 💬 PASO MESSAGES - Renderizando mensaje estilo cómic');
         
         const fontSize = 192; // 4 veces más grande que 48px
-        const margin = 10;
+        const margin = 20; // margen extra para separar mejor texto y bocadillo
         // Posición del texto: centro-derecha del canvas original (x=800, y=400)
         // Pero como el canvas ahora es 3000px, ajustamos a la parte derecha
         const textX = 1400; // 100 píxeles a la izquierda de 1500
