@@ -1813,7 +1813,7 @@ export default async function handler(req, res) {
         }
 
         const fontFamily = useAdrianFont ? 'AdrianZERO' : 'PressStart2P';
-        const fontSize = useAdrianFont ? 182 : 64; // AZ grande, PressStart algo más pequeño
+        const fontSize = useAdrianFont ? 364 : 128; // doble de tamaño anterior para ambos modos
         const margin = 10; // margen estándar alrededor del texto
         // Posición del texto: centro-derecha del canvas original (x=800, y=400)
         // Pero como el canvas ahora es 3000px, ajustamos a la parte derecha
