@@ -1839,17 +1839,17 @@ export default async function handler(req, res) {
         const bubbleY = textY - bubbleHeight / 2;
 
         // Bocadillo estilo pixel-art inspirado en el CSS de referencia:
-        // - Rectángulo con “esquinas redondeadas” a base de píxeles
-        // - Cola en esquina inferior izquierda
+        // - Rectángulo con “esquinas redondeadas” a base de píxeles (efecto escalera)
+        // - Cola más grande en esquina inferior izquierda
         // - Sombra suave debajo/derecha
         const px = 4; // tamaño de pixel base
 
         // Sombra (similar a .bubble.shadow)
         ctx.fillStyle = 'rgba(0,0,0,0.1)';
-        // Sombra inferior
+        // Sombra inferior (dos filas)
         ctx.fillRect(bubbleX + px, bubbleY + bubbleHeight + px, bubbleWidth, px);
         ctx.fillRect(bubbleX + 2 * px, bubbleY + bubbleHeight + 2 * px, bubbleWidth - px, px);
-        // Sombra derecha
+        // Sombra derecha (dos columnas)
         ctx.fillRect(bubbleX + bubbleWidth + px, bubbleY + px, px, bubbleHeight);
         ctx.fillRect(bubbleX + bubbleWidth + 2 * px, bubbleY + 2 * px, px, bubbleHeight - px);
 
@@ -1857,34 +1857,49 @@ export default async function handler(req, res) {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
 
-        // Borde negro 8‑bit alrededor (aprox. $bubble-border)
+        // Borde negro 8‑bit alrededor con efecto “redondeado” en esquinas:
         ctx.fillStyle = '#000000';
-        // Lados rectos
+        // Lados rectos principales
         ctx.fillRect(bubbleX, bubbleY - px, bubbleWidth, px);                     // arriba
         ctx.fillRect(bubbleX, bubbleY + bubbleHeight, bubbleWidth, px);           // abajo
         ctx.fillRect(bubbleX - px, bubbleY, px, bubbleHeight);                    // izquierda
         ctx.fillRect(bubbleX + bubbleWidth, bubbleY, px, bubbleHeight);           // derecha
-        // Esquinas en “diagonal” para sensación redondeada
-        ctx.fillRect(bubbleX - px, bubbleY - px, px, px);                         // arriba-izq
-        ctx.fillRect(bubbleX + bubbleWidth, bubbleY - px, px, px);                // arriba-der
-        ctx.fillRect(bubbleX - px, bubbleY + bubbleHeight, px, px);               // abajo-izq
-        ctx.fillRect(bubbleX + bubbleWidth, bubbleY + bubbleHeight, px, px);      // abajo-der
 
-        // Cola del bocadillo en esquina inferior izquierda (inspirada en .bubble.left/.bottom)
-        const tailBaseX = bubbleX + 2 * px;
+        // Esquinas en escalera (2 niveles) para simular redondeo
+        // Arriba-izquierda
+        ctx.fillRect(bubbleX - px, bubbleY - px, px, px);
+        ctx.fillRect(bubbleX - 2 * px, bubbleY, px, px);
+        ctx.fillRect(bubbleX, bubbleY - 2 * px, px, px);
+        // Arriba-derecha
+        ctx.fillRect(bubbleX + bubbleWidth, bubbleY - px, px, px);
+        ctx.fillRect(bubbleX + bubbleWidth + px, bubbleY, px, px);
+        ctx.fillRect(bubbleX + bubbleWidth - px, bubbleY - 2 * px, px, px);
+        // Abajo-izquierda
+        ctx.fillRect(bubbleX - px, bubbleY + bubbleHeight, px, px);
+        ctx.fillRect(bubbleX - 2 * px, bubbleY + bubbleHeight - px, px, px);
+        ctx.fillRect(bubbleX, bubbleY + bubbleHeight + px, px, px);
+        // Abajo-derecha
+        ctx.fillRect(bubbleX + bubbleWidth, bubbleY + bubbleHeight, px, px);
+        ctx.fillRect(bubbleX + bubbleWidth + px, bubbleY + bubbleHeight - px, px, px);
+        ctx.fillRect(bubbleX + bubbleWidth - px, bubbleY + bubbleHeight + px, px, px);
+
+        // Cola del bocadillo en esquina inferior izquierda (más grande y cohesiva)
+        const tailBaseX = bubbleX + 3 * px;
         const tailBaseY = bubbleY + bubbleHeight;
 
-        // Parte negra exterior de la cola
+        // Parte negra exterior de la cola (4 “escalones”)
         ctx.fillRect(tailBaseX, tailBaseY + px, px, px);
         ctx.fillRect(tailBaseX - px, tailBaseY + 2 * px, px, px);
         ctx.fillRect(tailBaseX - 2 * px, tailBaseY + 3 * px, px, px);
+        ctx.fillRect(tailBaseX - 3 * px, tailBaseY + 4 * px, px, px);
 
-        // “Relleno” blanco interior para que se funda bien con el bocadillo
+        // Relleno blanco interior para integrarlo con el bocadillo
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(tailBaseX, tailBaseY, px, px);
         ctx.fillRect(tailBaseX - px, tailBaseY + px, px, px);
+        ctx.fillRect(tailBaseX - 2 * px, tailBaseY + 2 * px, px, px);
 
-        console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola y sombra: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
+        console.log(`[render] 💬 Bocadillo renderizado (canvas) con cola grande y bordes escalonados: x=${bubbleX}, y=${bubbleY}, w=${bubbleWidth}, h=${bubbleHeight}`);
         
         // Dibujar texto en negro encima del bocadillo
         ctx.fillStyle = '#000000';
