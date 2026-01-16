@@ -193,6 +193,18 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 10017,
+      "name": "YEAR 1",
+      "category": "Floppy discs",
+      "fileName": "10017.gif",
+      "maxSupply": 100,
+      "floppy": "YEAR1",
+      "traitsInside": "TBD",
+      "description": "$ADRIAN first year commemorative Airdrop. Special airdrop sent to AdrianZERO holders to celebrate the first year. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 1123,
       "name": "CensorPack",
       "category": "PACK",
@@ -206,7 +218,7 @@
     }
   ],
   "metadata": {
-    "totalFloppys": 17,
+    "totalFloppys": 18,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
