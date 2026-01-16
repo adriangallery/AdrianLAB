@@ -10,7 +10,8 @@ import { getCachedComponent, setCachedComponent } from '../../../../lib/componen
 import { getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
 import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
 import { getCachedAdrianZeroGif, setCachedAdrianZeroGif, getAdrianZeroRenderTTL } from '../../../../lib/cache.js';
-import { loadLabimagesAsset } from '../../../../lib/github-storage.js';
+import { loadLabimagesAsset, fileExistsInGitHubCustom, getGitHubFileUrlCustom, uploadFileToGitHubCustom } from '../../../../lib/github-storage.js';
+import { generateCustomRenderHash } from '../../../../lib/render-hash.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -699,6 +700,20 @@ export default async function handler(req, res) {
     let finalTraits = { ...currentTraits, ...normalizedCustomTraits };
     console.log('[custom-render] Traits finales (con modificaciones):', finalTraits);
     
+    // ===== GENERAR HASH PARA CACHÉ DE GITHUB =====
+    // Solo usar caché si NO hay closeup ni bounce (se generan de 0)
+    const useHashCache = !isCloseup && !isBounce;
+    let customHash = null;
+    
+    if (useHashCache) {
+      const traitIds = Object.values(finalTraits).filter(id => id && id !== 'None' && id !== '');
+      customHash = generateCustomRenderHash(cleanTokenId, traitIds);
+      console.log(`[custom-render] 🔐 Hash generado para custom render ${cleanTokenId}: ${customHash}`);
+      console.log(`[custom-render] 🔐 Traits incluidos en hash: ${traitIds.join(', ')}`);
+    } else {
+      console.log(`[custom-render] ⚠️ Closeup o bounce activo, omitiendo caché de GitHub (se generará de 0)`);
+    }
+    
     // ===== DETECCIÓN DE TRAITS ANIMADOS =====
     // Obtener lista de traitIds para detectar animados
     const allTraitIds = Object.values(finalTraits).filter(id => id && id !== 'None' && id !== '');
@@ -711,10 +726,39 @@ export default async function handler(req, res) {
         console.log(`[custom-render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
       });
       
-      // Verificar caché de GIF (incluyendo finalTraits en la clave)
+      // Verificar caché de GitHub para GIF (solo si no hay closeup/bounce)
+      if (useHashCache && customHash) {
+        const existsInGitHub = await fileExistsInGitHubCustom(cleanTokenId, customHash, true);
+        if (existsInGitHub) {
+          console.log(`[custom-render] ✅ Custom GIF ${cleanTokenId} existe en GitHub, descargando...`);
+          const githubUrl = getGitHubFileUrlCustom(cleanTokenId, customHash, true);
+          try {
+            const response = await fetch(githubUrl);
+            if (response.ok) {
+              const gifBuffer = Buffer.from(await response.arrayBuffer());
+              setCachedAdrianZeroGif(cleanTokenId, gifBuffer, finalTraits, bounceConfig); // Cache local también
+              const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+              res.setHeader('X-Cache', 'GITHUB');
+              res.setHeader('X-Source', 'github');
+              res.setHeader('Content-Type', 'image/gif');
+              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+              res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED-GITHUB');
+              console.log(`[custom-render] ✅ Custom GIF ${cleanTokenId} servido desde GitHub`);
+              return res.status(200).send(gifBuffer);
+            }
+          } catch (fetchError) {
+            console.error(`[custom-render] ❌ Error descargando Custom GIF desde GitHub:`, fetchError.message);
+            // Fallback a generación si falla la descarga
+          }
+        } else {
+          console.log(`[custom-render] 📤 Custom GIF ${cleanTokenId} no existe en GitHub - Se generará y subirá`);
+        }
+      }
+      
+      // Verificar caché local de GIF (incluyendo finalTraits en la clave)
       const cachedGif = getCachedAdrianZeroGif(cleanTokenId, finalTraits, bounceConfig);
       if (cachedGif) {
-        console.log(`[custom-render] 🎬 CACHE HIT para GIF de token ${cleanTokenId} con traits personalizados`);
+        console.log(`[custom-render] 🎬 CACHE HIT local para GIF de token ${cleanTokenId} con traits personalizados`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('Content-Type', 'image/gif');
@@ -724,6 +768,35 @@ export default async function handler(req, res) {
       }
       
       console.log(`[custom-render] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+    } else {
+      // Para PNG estático, verificar GitHub antes de renderizar (solo si no hay closeup/bounce)
+      if (useHashCache && customHash) {
+        const existsInGitHub = await fileExistsInGitHubCustom(cleanTokenId, customHash, false);
+        if (existsInGitHub) {
+          console.log(`[custom-render] ✅ Custom PNG ${cleanTokenId} existe en GitHub, descargando...`);
+          const githubUrl = getGitHubFileUrlCustom(cleanTokenId, customHash, false);
+          try {
+            const response = await fetch(githubUrl);
+            if (response.ok) {
+              const pngBuffer = Buffer.from(await response.arrayBuffer());
+              const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
+              res.setHeader('X-Cache', 'GITHUB');
+              res.setHeader('X-Source', 'github');
+              res.setHeader('Content-Type', 'image/png');
+              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+              res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-GITHUB');
+              res.setHeader('Content-Length', pngBuffer.length);
+              console.log(`[custom-render] ✅ Custom PNG ${cleanTokenId} servido desde GitHub`);
+              return res.status(200).send(pngBuffer);
+            }
+          } catch (fetchError) {
+            console.error(`[custom-render] ❌ Error descargando Custom PNG desde GitHub:`, fetchError.message);
+            // Fallback a generación si falla la descarga
+          }
+        } else {
+          console.log(`[custom-render] 📤 Custom PNG ${cleanTokenId} no existe en GitHub - Se generará y subirá`);
+        }
+      }
     }
 
     // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
@@ -1729,7 +1802,13 @@ export default async function handler(req, res) {
         
         const gifBuffer = await generateGifFromLayers(gifConfig);
         
-        // Guardar en caché (incluyendo finalTraits en la clave)
+        // Subir a GitHub después de generar (solo si no hay closeup/bounce)
+        if (useHashCache && customHash) {
+          console.log(`[custom-render] 🚀 Iniciando subida a GitHub para Custom GIF ${cleanTokenId} (hash: ${customHash})`);
+          await uploadFileToGitHubCustom(cleanTokenId, gifBuffer, customHash, true);
+        }
+        
+        // Guardar en caché local (incluyendo finalTraits en la clave)
         setCachedAdrianZeroGif(cleanTokenId, gifBuffer, finalTraits, bounceConfig);
         
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
@@ -1796,6 +1875,12 @@ export default async function handler(req, res) {
       } catch (error) {
         console.warn('[custom-render] ⚡ Error aplicando bounce a PNG, continuando sin bounce:', error.message);
       }
+    }
+    
+    // Subir PNG a GitHub después de generar (solo si no hay closeup/bounce y no es GIF)
+    if (useHashCache && customHash && !hasAnimatedTraits) {
+      console.log(`[custom-render] 🚀 Iniciando subida a GitHub para Custom PNG ${cleanTokenId} (hash: ${customHash})`);
+      await uploadFileToGitHubCustom(cleanTokenId, finalBuffer, customHash, false);
     }
     
     // Enviar imagen PNG
