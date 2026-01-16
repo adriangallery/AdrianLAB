@@ -706,7 +706,13 @@ export default async function handler(req, res) {
     let customHash = null;
     
     if (useHashCache) {
-      const traitIds = Object.values(finalTraits).filter(id => id && id !== 'None' && id !== '');
+      // Excluir _T (timestamp) y categorías no visuales del hash
+      const traitIds = Object.entries(finalTraits)
+        .filter(([category, id]) => {
+          // Excluir _T (timestamp de cache busting) y valores vacíos
+          return category !== '_T' && id && id !== 'None' && id !== '';
+        })
+        .map(([category, id]) => id);
       customHash = generateCustomRenderHash(cleanTokenId, traitIds);
       console.log(`[custom-render] 🔐 Hash generado para custom render ${cleanTokenId}: ${customHash}`);
       console.log(`[custom-render] 🔐 Traits incluidos en hash: ${traitIds.join(', ')}`);
