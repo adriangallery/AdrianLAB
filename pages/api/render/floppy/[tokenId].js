@@ -8,8 +8,8 @@ import {
 } from '../../../../lib/cache.js';
 import { isTraitAnimated, getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
 import { generateFloppyGif } from '../../../../lib/gif-generator.js';
-import { generateFloppySimpleHash } from '../../../../lib/render-hash.js';
-import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple } from '../../../../lib/github-storage.js';
+import { generateFloppySimpleHash, generateFloppyGifHash } from '../../../../lib/render-hash.js';
+import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple, fileExistsInGitHubFloppyGif, getGitHubFileUrlFloppyGif, uploadFileToGitHubFloppyGif } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
@@ -301,6 +301,54 @@ export default async function handler(req, res) {
             throw new Error(`No se encontró metadata para token ${tokenIdNum}`);
           }
           
+          // Obtener variantes del trait animado
+          const animTrait = animatedTraits[0];
+          const variants = animTrait.variants || [];
+          
+          // Parámetros fijos para el GIF
+          const width = 768;
+          const height = 1024;
+          const delay = 500;
+          
+          // Generar hash único para el GIF
+          const gifHash = generateFloppyGifHash(tokenIdNum, tokenData, variants, width, height, delay);
+          console.log(`[floppy-render] 🔐 Hash generado para GIF de floppy ${tokenIdNum}: ${gifHash}`);
+          
+          // Verificar si existe en GitHub
+          const existsInGitHub = await fileExistsInGitHubFloppyGif(tokenIdNum, gifHash);
+          if (existsInGitHub) {
+            console.log(`[floppy-render] ✅ GIF de floppy ${tokenIdNum} existe en GitHub, descargando...`);
+            const githubUrl = getGitHubFileUrlFloppyGif(tokenIdNum, gifHash);
+            
+            try {
+              const response = await fetch(githubUrl);
+              if (response.ok) {
+                const gifBuffer = Buffer.from(await response.arrayBuffer());
+                
+                // Guardar en caché local
+                setCachedFloppyGif(tokenIdNum, gifBuffer);
+                
+                const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+                console.log(`[floppy-render] ✅ GIF de floppy ${tokenIdNum} servido desde GitHub`);
+                
+                // Configurar headers para GIF
+                res.setHeader('X-Cache', 'GITHUB');
+                res.setHeader('X-GitHub-Source', 'true');
+                res.setHeader('X-Render-Hash', gifHash);
+                res.setHeader('Content-Type', 'image/gif');
+                res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+                res.setHeader('X-Version', 'FLOPPY-ANIMATED');
+                
+                return res.status(200).send(gifBuffer);
+              }
+            } catch (fetchError) {
+              console.error(`[floppy-render] ❌ Error descargando GIF desde GitHub:`, fetchError.message);
+              // Continuar con generación normal si falla la descarga
+            }
+          } else {
+            console.log(`[floppy-render] 📤 GIF de floppy ${tokenIdNum} no existe en GitHub - Se generará y subirá`);
+          }
+          
           // Obtener totalMinted desde el contrato
           let totalMinted = 0;
           try {
@@ -339,12 +387,16 @@ export default async function handler(req, res) {
             tokenData: tokenData,
             totalMinted: totalMinted,
             rarity: rarity,
-            width: 768,
-            height: 1024,
-            delay: 500
+            width: width,
+            height: height,
+            delay: delay
           });
           
-          // Guardar en caché
+          // Subir a GitHub
+          console.log(`[floppy-render] 🚀 Iniciando subida a GitHub para GIF de floppy ${tokenIdNum} (hash: ${gifHash})`);
+          await uploadFileToGitHubFloppyGif(tokenIdNum, gifBuffer, gifHash);
+          
+          // Guardar en caché local
           setCachedFloppyGif(tokenIdNum, gifBuffer);
           
           const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
@@ -352,6 +404,7 @@ export default async function handler(req, res) {
           
           // Configurar headers para GIF
           res.setHeader('X-Cache', 'MISS');
+          res.setHeader('X-Render-Hash', gifHash);
           res.setHeader('Content-Type', 'image/gif');
           res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
           res.setHeader('X-Version', 'FLOPPY-ANIMATED');
