@@ -1,4 +1,5 @@
 // API endpoint for rendering tokens by tokenId
+// Updated: Banana toggle cache strategy (hybrid approach)
 import path from 'path';
 import fs from 'fs';
 import { createCanvas, loadImage, registerFont } from 'canvas';
