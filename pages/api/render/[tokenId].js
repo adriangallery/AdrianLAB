@@ -404,6 +404,7 @@ export default async function handler(req, res) {
     // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB (SOLO SI TIENE TOGGLE 13) =====
     // ESTRATEGIA HÍBRIDA: Primero verificar nombre fijo (compatibilidad), luego hash (nuevo sistema)
     // Si tiene toggle 13 (banana) activo, verificar si el archivo ya está almacenado en GitHub
+    // DEPLOY: 2025-01-19 - Banana toggle cache fix with hybrid strategy
     // NOTA: Si hay mensaje, NO usar el archivo de banana sin mensaje - debe generar uno nuevo
     if (isBanana && !messageText) {
       const renderType = 'banana'; // Siempre 'banana' cuando tiene toggle 13
