@@ -205,6 +205,18 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 10018,
+      "name": "OG Reward",
+      "category": "OG Reward",
+      "fileName": "10018.gif",
+      "maxSupply": 1000,
+      "floppy": "OG REWARD",
+      "traitsInside": 1,
+      "description": "Each box contains 1 random OG trait from the AdrianPunks collection",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 1123,
       "name": "CensorPack",
       "category": "PACK",
@@ -218,7 +230,7 @@
     }
   ],
   "metadata": {
-    "totalFloppys": 18,
+    "totalFloppys": 19,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
