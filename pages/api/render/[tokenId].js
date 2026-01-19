@@ -401,14 +401,17 @@ export default async function handler(req, res) {
     console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
 
     // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB (SOLO SI TIENE TOGGLE 13) =====
+    // ESTRATEGIA HÍBRIDA: Primero verificar nombre fijo (compatibilidad), luego hash (nuevo sistema)
     // Si tiene toggle 13 (banana) activo, verificar si el archivo ya está almacenado en GitHub
     // NOTA: Si hay mensaje, NO usar el archivo de banana sin mensaje - debe generar uno nuevo
     if (isBanana && !messageText) {
       const renderType = 'banana'; // Siempre 'banana' cuando tiene toggle 13
-      const existsInGitHub = await fileExistsInGitHub(cleanTokenId, renderType);
       
-      if (existsInGitHub) {
-        console.log(`[render] 📦 Archivo ya existe en GitHub para token ${cleanTokenId} (${renderType}) - No se renderizará de nuevo`);
+      // PASO 1: Verificar si existe archivo con nombre fijo (compatibilidad hacia atrás)
+      const existsInGitHubFixedName = await fileExistsInGitHub(cleanTokenId, renderType);
+      
+      if (existsInGitHubFixedName) {
+        console.log(`[render] 📦 Archivo con nombre fijo existe en GitHub para token ${cleanTokenId} (${renderType}) - Usando compatibilidad hacia atrás`);
         
         // Obtener URL del archivo en GitHub
         const githubUrl = getGitHubFileUrl(cleanTokenId, renderType);
@@ -430,6 +433,7 @@ export default async function handler(req, res) {
             const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
             res.setHeader('X-Cache', 'GITHUB');
             res.setHeader('X-GitHub-Source', 'true');
+            res.setHeader('X-Banana-Source', 'fixed-name'); // Indicar que viene de nombre fijo
             res.setHeader('Content-Type', 'image/png');
             res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
             
@@ -444,21 +448,22 @@ export default async function handler(req, res) {
             const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
             
             if (isCloseup) {
-              res.setHeader('X-Version', `ADRIANZERO-CLOSEUP${versionSuffix}-GITHUB`);
+              res.setHeader('X-Version', `ADRIANZERO-CLOSEUP${versionSuffix}-GITHUB-LEGACY`);
               res.setHeader('X-Render-Type', 'closeup');
             } else {
-              res.setHeader('X-Version', `ADRIANZERO${versionSuffix}-GITHUB`);
+              res.setHeader('X-Version', `ADRIANZERO${versionSuffix}-GITHUB-LEGACY`);
               res.setHeader('X-Render-Type', 'full');
             }
             
             return res.status(200).send(buffer);
           }
         } catch (error) {
-          console.error(`[render] ⚠️ Error descargando desde GitHub, continuando con renderizado:`, error.message);
-          // Continuar con el renderizado normal si falla la descarga
+          console.error(`[render] ⚠️ Error descargando desde GitHub (nombre fijo), continuando con verificación de hash:`, error.message);
+          // Continuar con verificación de hash si falla la descarga del nombre fijo
         }
       } else {
-        console.log(`[render] 📤 Archivo no existe en GitHub para token ${cleanTokenId} (${renderType}) - Se renderizará y subirá`);
+        console.log(`[render] 📤 Archivo con nombre fijo no existe en GitHub para token ${cleanTokenId} (${renderType}) - Se verificará con hash después de obtener datos del token`);
+        // Continuar con el flujo normal - la verificación con hash se hará después de generar el hash
       }
     }
 
@@ -1119,8 +1124,11 @@ export default async function handler(req, res) {
     
     console.log(`[render] 🔐 Hash generado: ${renderHash}`);
     
-    // Verificar si el archivo ya existe en GitHub (solo si no es banana, que tiene su propia lógica)
-    if (!isBanana) {
+    // Verificar si el archivo ya existe en GitHub usando hash
+    // Para banana: solo verificar hash si NO se encontró archivo con nombre fijo (ya se verificó antes)
+    // Para otros renders: siempre verificar hash
+    // Si es banana y tiene messageText, no verificar (se renderizará nuevo)
+    if (!isBanana || (isBanana && !messageText)) {
       const existsInGitHub = await fileExistsInGitHubByHash(cleanTokenId, renderHash);
       
       if (existsInGitHub) {
@@ -1157,6 +1165,7 @@ export default async function handler(req, res) {
             if (isBn) versionParts.push('BN');
             if (isUv) versionParts.push('UV');
             if (isBlackout) versionParts.push('BLACKOUT');
+            if (isBanana) versionParts.push('BANANA');
             const versionSuffix = versionParts.length > 0 ? `-${versionParts.join('-')}` : '';
             
             if (isCloseup) {
@@ -2277,6 +2286,7 @@ export default async function handler(req, res) {
     console.log(`[render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${cleanTokenId}`);
 
     // ===== SUBIR A GITHUB SI TIENE TOGGLE 13 (BANANA) ACTIVO =====
+    // ESTRATEGIA HÍBRIDA: Solo subir con hash si NO existe archivo con nombre fijo (compatibilidad)
     // Subir el archivo a GitHub después del renderizado (antes de enviar la respuesta)
     // Solo subir si tiene toggle 13 (banana) activo Y NO hay messageText
     // Si hay messageText, no subir como banana para no sobrescribir el archivo original
@@ -2284,18 +2294,26 @@ export default async function handler(req, res) {
     if (isBanana && !messageText) {
       const renderType = 'banana';
       
-      console.log(`[render] 🚀 Iniciando subida a GitHub para token ${cleanTokenId} (${renderType})`);
-      try {
-        const uploadSuccess = await uploadFileToGitHub(cleanTokenId, finalBuffer, renderType);
-        if (uploadSuccess) {
-          console.log(`[render] ✅ Archivo subido exitosamente a GitHub para token ${cleanTokenId} (${renderType})`);
-        } else {
-          console.error(`[render] ❌ Error subiendo archivo a GitHub para token ${cleanTokenId} (${renderType})`);
+      // Verificar si existe archivo con nombre fijo (compatibilidad hacia atrás)
+      const existsInGitHubFixedName = await fileExistsInGitHub(cleanTokenId, renderType);
+      
+      if (existsInGitHubFixedName) {
+        console.log(`[render] 📦 Archivo con nombre fijo ya existe en GitHub para token ${cleanTokenId} (${renderType}) - No se subirá (manteniendo compatibilidad)`);
+      } else {
+        // No existe archivo con nombre fijo, subir con hash (nuevo sistema)
+        console.log(`[render] 🚀 Iniciando subida a GitHub con hash para token ${cleanTokenId} (hash: ${renderHash})`);
+        try {
+          const uploadSuccess = await uploadFileToGitHubByHash(cleanTokenId, finalBuffer, renderHash);
+          if (uploadSuccess) {
+            console.log(`[render] ✅ Archivo subido exitosamente a GitHub con hash para token ${cleanTokenId} (hash: ${renderHash})`);
+          } else {
+            console.error(`[render] ❌ Error subiendo archivo a GitHub con hash para token ${cleanTokenId} (hash: ${renderHash})`);
+          }
+        } catch (error) {
+          console.error(`[render] ❌ Error subiendo archivo a GitHub con hash:`, error.message);
+          console.error(`[render] ❌ Stack:`, error.stack);
+          // Continuar con el renderizado aunque falle la subida a GitHub
         }
-      } catch (error) {
-        console.error(`[render] ❌ Error subiendo archivo a GitHub:`, error.message);
-        console.error(`[render] ❌ Stack:`, error.stack);
-        // Continuar con el renderizado aunque falle la subida a GitHub
       }
     }
     
