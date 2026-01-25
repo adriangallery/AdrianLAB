@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Voxel Extrude Preview</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; }
+    .row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; }
+    svg, img { image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <h2>Voxel Extrude (Original vs Extruded)</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>15</h3>
+      <div class="row">
+        <div>Original</div>
+        <img src="15.svg" width="256" height="256">
+      </div>
+      <div class="row">
+        <div>Extruded</div>
+        <img src="15_extruded.svg" width="256" height="256">
+      </div>
+    </div>
+    <div class="card">
+      <h3>7</h3>
+      <div class="row">
+        <div>Original</div>
+        <img src="7.svg" width="256" height="256">
+      </div>
+      <div class="row">
+        <div>Extruded</div>
+        <img src="7_extruded.svg" width="256" height="256">
+      </div>
+    </div>
+    <div class="card">
+      <h3>ADRIANGF</h3>
+      <div class="row">
+        <div>Original</div>
+        <img src="ADRIANGF.svg" width="256" height="256">
+      </div>
+      <div class="row">
+        <div>Extruded</div>
+        <img src="ADRIANGF_extruded.svg" width="256" height="256">
+      </div>
+    </div>
+  </div>
+  <p style="opacity:.7;margin-top:20px">
+    Tip: open this file in the same folder as the svgs.
+  </p>
+</body>
+</html>
