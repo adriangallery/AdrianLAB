@@ -28,7 +28,7 @@ function createDisplacementFrameGenerator(config) {
   } = config;
   
   return async (frameIndex, totalFrames) => {
-    console.log(`[displacement] Generando frame ${frameIndex + 1}/${totalFrames}`);
+    console.log(`[displacement] Generando frame ${frameIndex + 1}/${totalFrames} con ${traits.length} traits`);
     
     const frameLayers = [];
     
@@ -51,11 +51,12 @@ function createDisplacementFrameGenerator(config) {
         'ease-out'
       );
       
+      console.log(`[displacement] Trait ${trait.traitId} (${traitIndex + 1}/${traits.length}): x=${explodeTransform.x.toFixed(2)}, y=${explodeTransform.y.toFixed(2)}, scale=${explodeTransform.scale.toFixed(2)}`);
+      
       if (trait.hasDisplacement && trait.layers.backLayer && trait.layers.frontLayer) {
         // Trait con displacement: renderizar back layer con offset adicional, luego front layer
         try {
           // Back layer: offset adicional para efecto 3D (más atrás)
-          const backImg = await loadImage(trait.layers.backLayer);
           const backTransform = {
             x: explodeTransform.x * 0.8, // Back layer se mueve menos
             y: explodeTransform.y * 0.8,
@@ -69,7 +70,6 @@ function createDisplacementFrameGenerator(config) {
           });
           
           // Front layer: posición principal de explosión
-          const frontImg = await loadImage(trait.layers.frontLayer);
           frameLayers.push({
             pngBuffer: trait.layers.frontLayer,
             transform: explodeTransform
@@ -89,6 +89,8 @@ function createDisplacementFrameGenerator(config) {
         }
       }
     }
+    
+    console.log(`[displacement] Frame ${frameIndex + 1}: ${frameLayers.length} capas para componer`);
     
     // Componer todas las capas en un frame
     const compositePng = await compositeLayers(frameLayers, width, height);
@@ -111,8 +113,9 @@ async function compositeLayers(layers, width = DEFAULT_WIDTH, height = DEFAULT_H
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   
-  // Fondo transparente
-  ctx.clearRect(0, 0, width, height);
+  // Fondo blanco (como en el render normal)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
   
   // Dibujar cada capa en orden
   for (let i = 0; i < layers.length; i++) {
@@ -125,6 +128,10 @@ async function compositeLayers(layers, width = DEFAULT_WIDTH, height = DEFAULT_H
     
     try {
       const img = await loadImage(layer.pngBuffer);
+      
+      // Obtener dimensiones reales de la imagen
+      const imgWidth = img.width;
+      const imgHeight = img.height;
       
       // Si hay transformación, aplicarla
       if (layer.transform) {
@@ -143,16 +150,17 @@ async function compositeLayers(layers, width = DEFAULT_WIDTH, height = DEFAULT_H
           ctx.scale(scale, scale);
         }
         
-        // Dibujar centrado
-        ctx.drawImage(img, -width / 2, -height / 2, width, height);
+        // Dibujar centrado usando las dimensiones reales de la imagen
+        ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
         
         ctx.restore();
       } else {
-        // Sin transformación, dibujar normalmente
-        ctx.drawImage(img, 0, 0, width, height);
+        // Sin transformación, dibujar centrado
+        ctx.drawImage(img, (width - imgWidth) / 2, (height - imgHeight) / 2, imgWidth, imgHeight);
       }
     } catch (error) {
       console.error(`[displacement] Error dibujando capa ${i + 1}:`, error.message);
+      console.error(`[displacement] Stack:`, error.stack);
     }
   }
   
@@ -227,6 +235,12 @@ export default async function handler(req, res) {
       
       try {
         const traitLayers = await loadTraitWithDisplacement(traitId, true);
+        console.log(`[displacement] ✅ Trait ${traitId} cargado:`, {
+          hasDisplacement: traitLayers.hasDisplacement || false,
+          hasBackLayer: !!traitLayers.backLayer,
+          hasFrontLayer: !!traitLayers.frontLayer,
+          hasNormalLayer: !!traitLayers.normalLayer
+        });
         traitsWithDisplacement.push({
           traitId,
           category,
@@ -235,6 +249,7 @@ export default async function handler(req, res) {
         });
       } catch (error) {
         console.error(`[displacement] ❌ Error cargando trait ${traitId}:`, error.message);
+        console.error(`[displacement] Stack:`, error.stack);
         // Continuar con los demás traits
       }
     }
@@ -243,7 +258,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'No traits could be loaded' });
     }
     
-    console.log(`[displacement] ✅ ${traitsWithDisplacement.length} traits cargados exitosamente`);
+    console.log(`[displacement] ✅ ${traitsWithDisplacement.length} traits cargados exitosamente de ${traitIds.length} totales`);
     
     // Crear generador de frames personalizado
     const frameGenerator = createDisplacementFrameGenerator({
@@ -263,6 +278,7 @@ export default async function handler(req, res) {
       width: DEFAULT_WIDTH,
       height: DEFAULT_HEIGHT,
       delay: delay,
+      totalFrames: frames, // IMPORTANTE: pasar totalFrames para customFrameGenerator
       customFrameGenerator: frameGenerator
     };
     
