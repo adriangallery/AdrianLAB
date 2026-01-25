@@ -3,25 +3,29 @@
 // like an Apple product reveal showing all pieces separating
 import { getContracts } from '../../../../lib/contracts.js';
 import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
-import { calculateExplodeDisplacement } from '../../../../lib/animation-helpers.js';
+import { calculateExplodeDisplacement, calculateAppleExplodeZ } from '../../../../lib/animation-helpers.js';
 import { loadTraitWithDisplacement } from '../../../../lib/displacement-loader.js';
 import { loadImage } from 'canvas';
 import { createCanvas } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 
-const DEFAULT_FRAMES = 12; // Reducido para evitar timeouts
-const DEFAULT_DELAY = 80; // ms (un poco más lento para mejor visualización)
-const DEFAULT_DISTANCE = 150; // píxeles
+const DEFAULT_FRAMES = 16; // Frames para animación suave con loop
+const DEFAULT_DELAY = 70; // ms (un poco más rápido para loop fluido)
+const DEFAULT_DISTANCE = 80; // píxeles (offset Z simulado más sutil)
 const DEFAULT_SIZE = 500; // Tamaño reducido para mejor rendimiento
 
 // Límites máximos para evitar timeouts y problemas de memoria
-const MAX_FRAMES = 20; // Máximo de frames permitidos
-const MAX_DISTANCE = 300; // Máxima distancia de separación
+const MAX_FRAMES = 24; // Máximo de frames permitidos (más para loop suave)
+const MAX_DISTANCE = 150; // Máxima distancia de separación (más sutil para estilo Apple)
 const MIN_DELAY = 30; // Delay mínimo en ms
 const MAX_DELAY = 200; // Delay máximo en ms
 const MIN_SIZE = 250; // Tamaño mínimo
 const MAX_SIZE = 1000; // Tamaño máximo
+
+// Parámetros para animación estilo Apple
+const DEFAULT_MAX_SCALE = 1.06; // Escala máxima para capas frontales
+const DEFAULT_STAGGER = 1; // Frames de delay entre capas
 
 // Orden de renderizado de traits (igual que adrianzero-renderer)
 const TRAIT_ORDER = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
@@ -83,7 +87,8 @@ function normalizeCategory(category) {
 }
 
 /**
- * Crea un generador de frames personalizado para el efecto de explosión con displacement
+ * Crea un generador de frames para efecto "Apple Exploded View"
+ * Simula separación por eje Z (profundidad) con loop: flat → explode → flat
  * @param {Object} config - Configuración
  * @returns {Function} - Generador de frames (frameIndex, totalFrames) => { pngBuffer, delay }
  */
@@ -93,8 +98,10 @@ async function createDisplacementFrameGenerator(config) {
     width = DEFAULT_SIZE,
     height = DEFAULT_SIZE,
     totalFrames = DEFAULT_FRAMES,
-    distance = DEFAULT_DISTANCE,
-    delay = DEFAULT_DELAY
+    distance = DEFAULT_DISTANCE, // maxZOffset para Apple style
+    delay = DEFAULT_DELAY,
+    maxScale = DEFAULT_MAX_SCALE,
+    staggerFrames = DEFAULT_STAGGER
   } = config;
   
   // OPTIMIZACIÓN: Pre-cargar todas las imágenes una vez
@@ -127,6 +134,21 @@ async function createDisplacementFrameGenerator(config) {
   
   console.log(`[displacement] ✅ ${preloadedImages.size} imágenes pre-cargadas`);
   
+  // Preparar lista de capas para animación (todas excepto BACKGROUND)
+  // El BACKGROUND se mantiene fijo
+  const animatedLayers = [];
+  const fixedLayers = [];
+  
+  traits.forEach((trait, index) => {
+    if (trait.isBackground) {
+      fixedLayers.push({ trait, originalIndex: index });
+    } else {
+      animatedLayers.push({ trait, originalIndex: index });
+    }
+  });
+  
+  console.log(`[displacement] 🎬 Animación estilo Apple: ${animatedLayers.length} capas animadas, ${fixedLayers.length} fijas`);
+  
   return async (frameIndex, totalFrames) => {
     // Log solo cada 5 frames para reducir ruido
     if (frameIndex % 5 === 0 || frameIndex === 0 || frameIndex === totalFrames - 1) {
@@ -135,37 +157,39 @@ async function createDisplacementFrameGenerator(config) {
     
     const frameLayers = [];
     
-    // Contar traits que NO son el skin base (para calcular ángulos uniformemente)
-    const nonBaseSkinTraits = traits.filter(t => !t.isBaseSkin);
-    let nonBaseSkinIndex = 0;
+    // 1. Primero añadir las capas fijas (BACKGROUND) sin transformación
+    for (const { trait } of fixedLayers) {
+      if (trait.layers?.normalLayer) {
+        const img = preloadedImages.get(`${trait.traitId}_normal`);
+        if (img) {
+          frameLayers.push({
+            image: img,
+            transform: { x: 0, y: 0, scale: 1, rotation: 0 }
+          });
+        }
+      }
+    }
     
-    // Para cada trait, calcular posición de explosión y renderizar
-    for (let traitIndex = 0; traitIndex < traits.length; traitIndex++) {
-      const trait = traits[traitIndex];
+    // 2. Luego añadir las capas animadas con efecto Apple Z-explode
+    for (let layerIndex = 0; layerIndex < animatedLayers.length; layerIndex++) {
+      const { trait } = animatedLayers[layerIndex];
       
       if (!trait.layers) {
         continue;
       }
       
-      let explodeTransform;
-      
-      if (trait.isBaseSkin) {
-        // El skin base se queda en el centro (o se mueve muy poco)
-        // Esto crea el efecto "Apple" donde el cuerpo principal se queda y las piezas vuelan
-        explodeTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
-      } else {
-        // Calcular posición de explosión para este trait
-        // Usar índice dentro de los traits no-base para distribuir uniformemente
-        explodeTransform = calculateExplodeDisplacement(
-          frameIndex,
-          totalFrames,
-          nonBaseSkinIndex,
-          nonBaseSkinTraits.length,
-          distance,
-          'ease-out'
-        );
-        nonBaseSkinIndex++;
-      }
+      // Calcular transformación estilo Apple (separación por Z simulado)
+      const appleTransform = calculateAppleExplodeZ({
+        frameIndex,
+        totalFrames,
+        layerIndex,
+        totalLayers: animatedLayers.length,
+        maxZOffset: distance,
+        maxScale: maxScale,
+        staggerFrames: staggerFrames,
+        withOvershoot: true,
+        loopAnimation: true // Loop: explode → reassemble
+      });
       
       if (trait.hasDisplacement && trait.layers.backLayer && trait.layers.frontLayer) {
         // Trait con displacement: renderizar back layer con offset adicional, luego front layer
@@ -173,12 +197,12 @@ async function createDisplacementFrameGenerator(config) {
         const frontImg = preloadedImages.get(`${trait.traitId}_front`);
         
         if (backImg && frontImg) {
-          // Back layer: offset adicional para efecto 3D (más atrás)
+          // Back layer: offset adicional para simular grosor 3D
           const backTransform = {
-            x: explodeTransform.x * 0.8, // Back layer se mueve menos
-            y: explodeTransform.y * 0.8,
-            scale: explodeTransform.scale * 0.95, // Ligeramente más pequeño
-            rotation: explodeTransform.rotation * 0.5 // Menos rotación
+            x: appleTransform.x - 2, // Ligeramente atrás
+            y: appleTransform.y + 3, // Ligeramente abajo (más lejos)
+            scale: appleTransform.scale * 0.98,
+            rotation: appleTransform.rotation * 0.7
           };
           
           frameLayers.push({
@@ -186,10 +210,10 @@ async function createDisplacementFrameGenerator(config) {
             transform: backTransform
           });
           
-          // Front layer: posición principal de explosión
+          // Front layer: posición principal
           frameLayers.push({
             image: frontImg,
-            transform: explodeTransform
+            transform: appleTransform
           });
         }
       } else if (trait.layers.normalLayer) {
@@ -199,7 +223,7 @@ async function createDisplacementFrameGenerator(config) {
         if (normalImg) {
           frameLayers.push({
             image: normalImg,
-            transform: explodeTransform
+            transform: appleTransform
           });
         }
       }
@@ -218,6 +242,7 @@ async function createDisplacementFrameGenerator(config) {
 /**
  * Componer múltiples capas PNG en un solo canvas con transformaciones
  * OPTIMIZADO: Recibe imágenes ya cargadas en lugar de buffers
+ * Estilo Apple: transformaciones suaves con escala y offset
  * @param {Array} layers - Array de capas: [{ image, transform?: { x, y, scale, rotation } }, ...]
  * @param {number} width - Ancho del canvas
  * @param {number} height - Alto del canvas
@@ -231,6 +256,9 @@ async function compositeLayers(layers, width = DEFAULT_SIZE, height = DEFAULT_SI
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
   
+  // Configurar para rendering pixel-perfect (estilo Apple pero sin blur)
+  ctx.imageSmoothingEnabled = false;
+  
   // Dibujar cada capa en orden
   for (let i = 0; i < layers.length; i++) {
     const layer = layers[i];
@@ -242,6 +270,11 @@ async function compositeLayers(layers, width = DEFAULT_SIZE, height = DEFAULT_SI
     const img = layer.image;
     const imgWidth = img.width;
     const imgHeight = img.height;
+    
+    // Calcular escala para ajustar imagen al canvas (mantener proporción)
+    const fitScale = Math.min(width / imgWidth, height / imgHeight);
+    const scaledWidth = imgWidth * fitScale;
+    const scaledHeight = imgHeight * fitScale;
     
     // Si hay transformación, aplicarla
     if (layer.transform) {
@@ -256,17 +289,28 @@ async function compositeLayers(layers, width = DEFAULT_SIZE, height = DEFAULT_SI
         ctx.rotate(rotation * Math.PI / 180);
       }
       
-      if (scale !== 1) {
-        ctx.scale(scale, scale);
-      }
+      // Aplicar escala adicional del efecto (sobre la escala de ajuste)
+      const finalScale = fitScale * scale;
       
-      // Dibujar centrado usando las dimensiones reales de la imagen
-      ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+      // Dibujar centrado con la escala final
+      ctx.drawImage(
+        img,
+        (-imgWidth * finalScale) / 2,
+        (-imgHeight * finalScale) / 2,
+        imgWidth * finalScale,
+        imgHeight * finalScale
+      );
       
       ctx.restore();
     } else {
-      // Sin transformación, dibujar centrado
-      ctx.drawImage(img, (width - imgWidth) / 2, (height - imgHeight) / 2, imgWidth, imgHeight);
+      // Sin transformación, dibujar centrado y escalado para ajustar
+      ctx.drawImage(
+        img,
+        (width - scaledWidth) / 2,
+        (height - scaledHeight) / 2,
+        scaledWidth,
+        scaledHeight
+      );
     }
   }
   
@@ -492,14 +536,16 @@ export default async function handler(req, res) {
     
     console.log(`[displacement] ✅ ${traitsForAnimation.length} capas cargadas para animación (incluyendo skin base)`);
     
-    // Crear generador de frames personalizado (ahora es async para pre-cargar imágenes)
+    // Crear generador de frames personalizado con efecto Apple Z-explode
     const frameGenerator = await createDisplacementFrameGenerator({
       traits: traitsForAnimation,
       width: size,
       height: size,
       totalFrames: frames,
       distance: scaledDistance,
-      delay: delay
+      delay: delay,
+      maxScale: DEFAULT_MAX_SCALE,
+      staggerFrames: Math.max(1, Math.floor(frames / traitsForAnimation.length / 2)) // Stagger adaptativo
     });
     
     // Generar GIF usando el sistema existente
