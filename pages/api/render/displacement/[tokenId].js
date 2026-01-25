@@ -10,22 +10,23 @@ import { createCanvas } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 
-const DEFAULT_FRAMES = 16; // Frames para animación suave con loop
-const DEFAULT_DELAY = 70; // ms (un poco más rápido para loop fluido)
-const DEFAULT_DISTANCE = 80; // píxeles (offset Z simulado más sutil)
+// === CONFIGURACIÓN DEFAULT PARA APPLE EXPLODED VIEW ===
+// Timeline comprimido: spec 4.2s@60fps = 252 frames → adaptado a GIF con ~20 frames
+const DEFAULT_FRAMES = 20; // Frames para timeline de 5 fases
+const DEFAULT_DELAY = 80; // ms por frame (~12.5 fps para GIF suave)
+const DEFAULT_DISTANCE = 60; // Offset Z simulado (píxeles) - sutil según spec
 const DEFAULT_SIZE = 500; // Tamaño reducido para mejor rendimiento
 
-// Límites máximos para evitar timeouts y problemas de memoria
-const MAX_FRAMES = 24; // Máximo de frames permitidos (más para loop suave)
-const MAX_DISTANCE = 150; // Máxima distancia de separación (más sutil para estilo Apple)
-const MIN_DELAY = 30; // Delay mínimo en ms
-const MAX_DELAY = 200; // Delay máximo en ms
-const MIN_SIZE = 250; // Tamaño mínimo
-const MAX_SIZE = 1000; // Tamaño máximo
+// Límites para evitar timeouts
+const MAX_FRAMES = 30; // Max frames para timeline completo
+const MAX_DISTANCE = 120; // Max offset Z (muy sutil según spec)
+const MIN_DELAY = 40; // Min delay para animación legible
+const MAX_DELAY = 150; // Max delay
+const MIN_SIZE = 300; // Min size para calidad
+const MAX_SIZE = 800; // Max size para rendimiento
 
-// Parámetros para animación estilo Apple
-const DEFAULT_MAX_SCALE = 1.06; // Escala máxima para capas frontales
-const DEFAULT_STAGGER = 1; // Frames de delay entre capas
+// Stagger según spec: 45ms entre capas
+const DEFAULT_STAGGER = 1; // Frames de delay (~45ms con delay=45)
 
 // Orden de renderizado de traits (igual que adrianzero-renderer)
 const TRAIT_ORDER = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
@@ -88,19 +89,24 @@ function normalizeCategory(category) {
 
 /**
  * Crea un generador de frames para efecto "Apple Exploded View"
- * Simula separación por eje Z (profundidad) con loop: flat → explode → flat
+ * Timeline de 5 fases: FLAT → PREP → EXPLODE → HOLD → CLOSE
+ * 
+ * RESTRICCIONES (spec):
+ * - NO redibuja traits - usa SVG original
+ * - Solo translate(x,y), rotateZ (max 6°), scale (simula Z)
+ * - Coordenadas redondeadas a enteros (pixel-perfect)
+ * 
  * @param {Object} config - Configuración
  * @returns {Function} - Generador de frames (frameIndex, totalFrames) => { pngBuffer, delay }
  */
 async function createDisplacementFrameGenerator(config) {
   const {
-    traits = [], // Array de { traitId, layers: { backLayer?, frontLayer?, normalLayer? }, hasDisplacement, isBaseSkin }
+    traits = [], // Array de { traitId, category, layers, hasDisplacement, isBaseSkin }
     width = DEFAULT_SIZE,
     height = DEFAULT_SIZE,
     totalFrames = DEFAULT_FRAMES,
-    distance = DEFAULT_DISTANCE, // maxZOffset para Apple style
+    distance = DEFAULT_DISTANCE, // maxZOffset para simular Z
     delay = DEFAULT_DELAY,
-    maxScale = DEFAULT_MAX_SCALE,
     staggerFrames = DEFAULT_STAGGER
   } = config;
   
@@ -179,16 +185,17 @@ async function createDisplacementFrameGenerator(config) {
       }
       
       // Calcular transformación estilo Apple (separación por Z simulado)
+      // Pasar categoría para usar el z-band correcto
       const appleTransform = calculateAppleExplodeZ({
         frameIndex,
         totalFrames,
         layerIndex,
         totalLayers: animatedLayers.length,
+        category: trait.category || 'features', // Usar categoría del trait
         maxZOffset: distance,
-        maxScale: maxScale,
         staggerFrames: staggerFrames,
         withOvershoot: true,
-        loopAnimation: true // Loop: explode → reassemble
+        loopAnimation: false // NO loop - usamos timeline de 5 fases
       });
       
       if (trait.hasDisplacement && trait.layers.backLayer && trait.layers.frontLayer) {
@@ -536,7 +543,12 @@ export default async function handler(req, res) {
     
     console.log(`[displacement] ✅ ${traitsForAnimation.length} capas cargadas para animación (incluyendo skin base)`);
     
-    // Crear generador de frames personalizado con efecto Apple Z-explode
+    // Crear generador de frames con efecto Apple Exploded View (5 fases)
+    // Stagger adaptativo: ~45ms equivalente en frames
+    const staggerMs = 45;
+    const msPerFrame = delay;
+    const staggerFramesCalc = Math.max(1, Math.round(staggerMs / msPerFrame));
+    
     const frameGenerator = await createDisplacementFrameGenerator({
       traits: traitsForAnimation,
       width: size,
@@ -544,8 +556,7 @@ export default async function handler(req, res) {
       totalFrames: frames,
       distance: scaledDistance,
       delay: delay,
-      maxScale: DEFAULT_MAX_SCALE,
-      staggerFrames: Math.max(1, Math.floor(frames / traitsForAnimation.length / 2)) // Stagger adaptativo
+      staggerFrames: staggerFramesCalc
     });
     
     // Generar GIF usando el sistema existente
