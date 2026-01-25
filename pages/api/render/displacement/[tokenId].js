@@ -1,10 +1,14 @@
 // API endpoint for rendering displacement animation with explode effect
+// Renders the complete AdrianZERO character (skin + traits) and animates an "explode" effect
+// like an Apple product reveal showing all pieces separating
 import { getContracts } from '../../../../lib/contracts.js';
 import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
 import { calculateExplodeDisplacement } from '../../../../lib/animation-helpers.js';
 import { loadTraitWithDisplacement } from '../../../../lib/displacement-loader.js';
 import { loadImage } from 'canvas';
 import { createCanvas } from 'canvas';
+import { Resvg } from '@resvg/resvg-js';
+import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
 
 const DEFAULT_FRAMES = 12; // Reducido para evitar timeouts
 const DEFAULT_DELAY = 80; // ms (un poco más lento para mejor visualización)
@@ -19,6 +23,65 @@ const MAX_DELAY = 200; // Delay máximo en ms
 const MIN_SIZE = 250; // Tamaño mínimo
 const MAX_SIZE = 1000; // Tamaño máximo
 
+// Orden de renderizado de traits (igual que adrianzero-renderer)
+const TRAIT_ORDER = ['BEARD', 'EAR', 'GEAR', 'RANDOMSHIT', 'SWAG', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+const TOP_ORDER = ['TOP'];
+
+/**
+ * Carga SVG desde URL y lo convierte a PNG buffer
+ * @param {string} url - URL del SVG
+ * @param {string} cacheKey - Clave para el caché
+ * @returns {Promise<Buffer>} - Buffer PNG
+ */
+async function loadSvgFromUrl(url, cacheKey) {
+  try {
+    console.log(`[displacement] Cargando SVG desde: ${url}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const svgBuffer = await response.arrayBuffer();
+    const svgContent = Buffer.from(svgBuffer).toString();
+    
+    // Verificar caché
+    const cachedPng = getCachedSvgPng(svgContent);
+    if (cachedPng) {
+      console.log(`[displacement] ✅ Cache hit para ${cacheKey}`);
+      return cachedPng;
+    }
+    
+    // Convertir SVG a PNG
+    const resvg = new Resvg(svgContent, {
+      fitTo: {
+        mode: 'width',
+        value: 1000
+      },
+      background: 'rgba(255, 255, 255, 0)' // Transparente
+    });
+    
+    const pngBuffer = resvg.render().asPng();
+    
+    // Guardar en caché
+    setCachedSvgPng(svgContent, pngBuffer);
+    
+    return pngBuffer;
+  } catch (error) {
+    console.error(`[displacement] Error cargando SVG ${url}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Normaliza categoría (igual que adrianzero-renderer)
+ */
+function normalizeCategory(category) {
+  const categoryMap = {
+    'PACKS': 'SWAG'
+  };
+  return categoryMap[category] || category;
+}
+
 /**
  * Crea un generador de frames personalizado para el efecto de explosión con displacement
  * @param {Object} config - Configuración
@@ -26,9 +89,9 @@ const MAX_SIZE = 1000; // Tamaño máximo
  */
 async function createDisplacementFrameGenerator(config) {
   const {
-    traits = [], // Array de { traitId, layers: { backLayer?, frontLayer?, normalLayer? }, hasDisplacement }
-    width = DEFAULT_WIDTH,
-    height = DEFAULT_HEIGHT,
+    traits = [], // Array de { traitId, layers: { backLayer?, frontLayer?, normalLayer? }, hasDisplacement, isBaseSkin }
+    width = DEFAULT_SIZE,
+    height = DEFAULT_SIZE,
     totalFrames = DEFAULT_FRAMES,
     distance = DEFAULT_DISTANCE,
     delay = DEFAULT_DELAY
@@ -72,6 +135,10 @@ async function createDisplacementFrameGenerator(config) {
     
     const frameLayers = [];
     
+    // Contar traits que NO son el skin base (para calcular ángulos uniformemente)
+    const nonBaseSkinTraits = traits.filter(t => !t.isBaseSkin);
+    let nonBaseSkinIndex = 0;
+    
     // Para cada trait, calcular posición de explosión y renderizar
     for (let traitIndex = 0; traitIndex < traits.length; traitIndex++) {
       const trait = traits[traitIndex];
@@ -80,15 +147,25 @@ async function createDisplacementFrameGenerator(config) {
         continue;
       }
       
-      // Calcular posición de explosión para este trait
-      const explodeTransform = calculateExplodeDisplacement(
-        frameIndex,
-        totalFrames,
-        traitIndex,
-        traits.length,
-        distance,
-        'ease-out'
-      );
+      let explodeTransform;
+      
+      if (trait.isBaseSkin) {
+        // El skin base se queda en el centro (o se mueve muy poco)
+        // Esto crea el efecto "Apple" donde el cuerpo principal se queda y las piezas vuelan
+        explodeTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
+      } else {
+        // Calcular posición de explosión para este trait
+        // Usar índice dentro de los traits no-base para distribuir uniformemente
+        explodeTransform = calculateExplodeDisplacement(
+          frameIndex,
+          totalFrames,
+          nonBaseSkinIndex,
+          nonBaseSkinTraits.length,
+          distance,
+          'ease-out'
+        );
+        nonBaseSkinIndex++;
+      }
       
       if (trait.hasDisplacement && trait.layers.backLayer && trait.layers.frontLayer) {
         // Trait con displacement: renderizar back layer con offset adicional, luego front layer
@@ -146,7 +223,7 @@ async function createDisplacementFrameGenerator(config) {
  * @param {number} height - Alto del canvas
  * @returns {Promise<Buffer>} Buffer PNG del resultado
  */
-async function compositeLayers(layers, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT) {
+async function compositeLayers(layers, width = DEFAULT_SIZE, height = DEFAULT_SIZE) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   
@@ -250,9 +327,74 @@ export default async function handler(req, res) {
     console.log(`[displacement] Configuración: frames=${frames}, delay=${delay}ms, distance=${distance}px (scaled: ${scaledDistance}px), size=${size}px`);
     
     // Conectar con los contratos
-    const { core, traitsExtension } = await getContracts();
+    const { core, traitsExtension, serumModule } = await getContracts();
     
-    // Obtener traits equipados del token
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+    
+    // ===== 1. OBTENER DATOS DEL TOKEN (SKIN, GENERACIÓN) =====
+    console.log(`[displacement] Obteniendo datos del token ${cleanTokenId}...`);
+    const tokenData = await core.getTokenData(cleanTokenId);
+    const [generation, mutationLevel, canReplicate, replicationCount, lastReplication, hasBeenModified] = tokenData;
+    const gen = generation.toString();
+    
+    console.log(`[displacement] Token generación: ${gen}`);
+    
+    // Obtener skin del token
+    const tokenSkinData = await core.getTokenSkin(cleanTokenId);
+    const skinId = tokenSkinData[0].toString();
+    const skinName = tokenSkinData[1];
+    
+    console.log(`[displacement] Skin del token: skinId=${skinId}, skinName=${skinName}`);
+    
+    // Determinar el tipo de skin
+    let skinType = "Medium"; // Default
+    let useMannequin = false;
+    
+    if (skinId === "0") {
+      useMannequin = true;
+      console.log('[displacement] Skin no asignado (skinId = 0), usando mannequin');
+    } else if (skinId === "1" || skinName === "Zero") {
+      skinType = "Medium";
+    } else if (skinId === "2" || skinName === "Dark") {
+      skinType = "Dark";
+    } else if (skinId === "3" || skinName === "Alien") {
+      skinType = "Alien";
+    } else if (skinId === "4" || skinName === "Albino") {
+      skinType = "Albino";
+    } else {
+      skinType = skinName || "Medium";
+    }
+    
+    console.log(`[displacement] Tipo de skin resuelto: ${skinType}`);
+    
+    // ===== 2. CARGAR EL SKIN BASE (ADRIAN) =====
+    const traitsForAnimation = [];
+    
+    // Cargar skin base del Adrian
+    let baseImagePath;
+    if (useMannequin) {
+      baseImagePath = `${baseUrl}/traits/ADRIAN/mannequin.svg`;
+    } else {
+      baseImagePath = `${baseUrl}/traits/ADRIAN/GEN${gen}-${skinType}.svg`;
+    }
+    
+    console.log(`[displacement] Cargando skin base: ${baseImagePath}`);
+    const skinPngBuffer = await loadSvgFromUrl(baseImagePath, `skin_${cleanTokenId}`);
+    
+    if (skinPngBuffer) {
+      traitsForAnimation.push({
+        traitId: 'SKIN_BASE',
+        category: 'ADRIAN',
+        layers: { normalLayer: skinPngBuffer, hasDisplacement: false },
+        hasDisplacement: false,
+        isBaseSkin: true // Marcar como skin base (se moverá menos en la explosión)
+      });
+      console.log(`[displacement] ✅ Skin base cargado correctamente`);
+    } else {
+      console.error(`[displacement] ❌ Error cargando skin base`);
+    }
+    
+    // ===== 3. OBTENER TRAITS EQUIPADOS =====
     console.log(`[displacement] Obteniendo traits equipados para token ${cleanTokenId}...`);
     const nested = await traitsExtension.getAllEquippedTraits(cleanTokenId);
     const categories = nested[0];
@@ -260,39 +402,99 @@ export default async function handler(req, res) {
     
     console.log(`[displacement] Traits encontrados: ${traitIds.length} traits`);
     
-    if (traitIds.length === 0) {
-      return res.status(400).json({ error: 'Token has no equipped traits' });
-    }
+    // Crear mapa de traits equipados por categoría
+    const equippedTraits = {};
+    categories.forEach((category, index) => {
+      const normalizedCategory = normalizeCategory(category);
+      const traitId = traitIds[index].toString();
+      equippedTraits[normalizedCategory] = traitId;
+    });
     
-    // Cargar cada trait con displacement
-    const traitsWithDisplacement = [];
-    for (let i = 0; i < traitIds.length; i++) {
-      const traitId = traitIds[i].toString();
-      const category = categories[i];
+    console.log(`[displacement] Traits equipados:`, Object.keys(equippedTraits).join(', '));
+    
+    // ===== 4. CARGAR BACKGROUND SI EXISTE =====
+    if (equippedTraits['BACKGROUND']) {
+      const bgTraitId = equippedTraits['BACKGROUND'];
+      const bgUrl = `${baseUrl}/labimages/${bgTraitId}.svg`;
       
-      try {
-        const traitLayers = await loadTraitWithDisplacement(traitId, true);
-        traitsWithDisplacement.push({
-          traitId,
-          category,
-          layers: traitLayers,
-          hasDisplacement: traitLayers.hasDisplacement || false
+      console.log(`[displacement] Cargando BACKGROUND: ${bgUrl}`);
+      const bgPngBuffer = await loadSvgFromUrl(bgUrl, `bg_${bgTraitId}`);
+      
+      if (bgPngBuffer) {
+        // Insertar al principio (detrás de todo, incluso del skin)
+        traitsForAnimation.unshift({
+          traitId: bgTraitId,
+          category: 'BACKGROUND',
+          layers: { normalLayer: bgPngBuffer, hasDisplacement: false },
+          hasDisplacement: false,
+          isBaseSkin: true, // BACKGROUND también se queda fijo
+          isBackground: true
         });
-      } catch (error) {
-        console.error(`[displacement] ❌ Error cargando trait ${traitId}:`, error.message);
-        // Continuar con los demás traits
+        console.log(`[displacement] ✅ BACKGROUND (${bgTraitId}) cargado`);
       }
     }
     
-    if (traitsWithDisplacement.length === 0) {
+    // ===== 5. CARGAR TRAITS EN ORDEN CORRECTO (como adrianzero-renderer) =====
+    // Los traits normales en orden
+    for (const category of TRAIT_ORDER) {
+      if (equippedTraits[category]) {
+        const traitId = equippedTraits[category];
+        
+        // LÓGICA DE EXCLUSIVIDAD: SERUMS solo si NO hay EYES
+        if (category === 'SERUMS') {
+          const eyesTrait = equippedTraits['EYES'];
+          if (eyesTrait && eyesTrait !== 'None' && eyesTrait !== '') {
+            console.log(`[displacement] 🚫 Saltando SERUMS porque hay EYES activo`);
+            continue;
+          }
+        }
+        
+        try {
+          const traitLayers = await loadTraitWithDisplacement(traitId, true);
+          traitsForAnimation.push({
+            traitId,
+            category,
+            layers: traitLayers,
+            hasDisplacement: traitLayers.hasDisplacement || false,
+            isBaseSkin: false
+          });
+          console.log(`[displacement] ✅ Trait ${category} (${traitId}) cargado`);
+        } catch (error) {
+          console.error(`[displacement] ❌ Error cargando trait ${category} (${traitId}):`, error.message);
+        }
+      }
+    }
+    
+    // ===== 6. CARGAR TOP TRAITS =====
+    for (const category of TOP_ORDER) {
+      if (equippedTraits[category]) {
+        const traitId = equippedTraits[category];
+        
+        try {
+          const traitLayers = await loadTraitWithDisplacement(traitId, true);
+          traitsForAnimation.push({
+            traitId,
+            category,
+            layers: traitLayers,
+            hasDisplacement: traitLayers.hasDisplacement || false,
+            isBaseSkin: false
+          });
+          console.log(`[displacement] ✅ TOP trait ${category} (${traitId}) cargado`);
+        } catch (error) {
+          console.error(`[displacement] ❌ Error cargando TOP trait ${category} (${traitId}):`, error.message);
+        }
+      }
+    }
+    
+    if (traitsForAnimation.length === 0) {
       return res.status(500).json({ error: 'No traits could be loaded' });
     }
     
-    console.log(`[displacement] ✅ ${traitsWithDisplacement.length} traits cargados exitosamente de ${traitIds.length} totales`);
+    console.log(`[displacement] ✅ ${traitsForAnimation.length} capas cargadas para animación (incluyendo skin base)`);
     
     // Crear generador de frames personalizado (ahora es async para pre-cargar imágenes)
     const frameGenerator = await createDisplacementFrameGenerator({
-      traits: traitsWithDisplacement,
+      traits: traitsForAnimation,
       width: size,
       height: size,
       totalFrames: frames,
@@ -322,7 +524,7 @@ export default async function handler(req, res) {
     res.setHeader('X-Displacement-Frames', frames.toString());
     res.setHeader('X-Displacement-Distance', distance.toString());
     res.setHeader('X-Displacement-Size', size.toString());
-    res.setHeader('X-Displacement-Traits', traitsWithDisplacement.length.toString());
+    res.setHeader('X-Displacement-Traits', traitsForAnimation.length.toString());
     
     return res.status(200).send(gifBuffer);
     
