@@ -3,6 +3,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
+  "functions": {
+    "pages/api/render/displacement/[tokenId].js": {
+      "maxDuration": 60
+    }
+  },
   "headers": [
     {
       "source": "/labimages/(.*)",

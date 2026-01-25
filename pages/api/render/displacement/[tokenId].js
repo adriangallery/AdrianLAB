@@ -6,17 +6,18 @@ import { loadTraitWithDisplacement } from '../../../../lib/displacement-loader.j
 import { loadImage } from 'canvas';
 import { createCanvas } from 'canvas';
 
-const DEFAULT_FRAMES = 15; // Reducido para evitar timeouts
-const DEFAULT_DELAY = 50; // ms
-const DEFAULT_DISTANCE = 200; // píxeles
-const DEFAULT_WIDTH = 1000;
-const DEFAULT_HEIGHT = 1000;
+const DEFAULT_FRAMES = 12; // Reducido para evitar timeouts
+const DEFAULT_DELAY = 80; // ms (un poco más lento para mejor visualización)
+const DEFAULT_DISTANCE = 150; // píxeles
+const DEFAULT_SIZE = 500; // Tamaño reducido para mejor rendimiento
 
 // Límites máximos para evitar timeouts y problemas de memoria
 const MAX_FRAMES = 20; // Máximo de frames permitidos
 const MAX_DISTANCE = 300; // Máxima distancia de separación
 const MIN_DELAY = 30; // Delay mínimo en ms
 const MAX_DELAY = 200; // Delay máximo en ms
+const MIN_SIZE = 250; // Tamaño mínimo
+const MAX_SIZE = 1000; // Tamaño máximo
 
 /**
  * Crea un generador de frames personalizado para el efecto de explosión con displacement
@@ -235,13 +236,18 @@ export default async function handler(req, res) {
     let frames = parseInt(req.query.frames) || DEFAULT_FRAMES;
     let delay = parseInt(req.query.delay) || DEFAULT_DELAY;
     let distance = parseInt(req.query.distance) || DEFAULT_DISTANCE;
+    let size = parseInt(req.query.size) || DEFAULT_SIZE;
     
     // Aplicar límites
     frames = Math.min(Math.max(1, frames), MAX_FRAMES);
     delay = Math.min(Math.max(MIN_DELAY, delay), MAX_DELAY);
     distance = Math.min(Math.max(50, distance), MAX_DISTANCE);
+    size = Math.min(Math.max(MIN_SIZE, size), MAX_SIZE);
     
-    console.log(`[displacement] Configuración: frames=${frames}, delay=${delay}ms, distance=${distance}px`);
+    // Ajustar distancia proporcionalmente al tamaño
+    const scaledDistance = Math.round(distance * (size / 1000));
+    
+    console.log(`[displacement] Configuración: frames=${frames}, delay=${delay}ms, distance=${distance}px (scaled: ${scaledDistance}px), size=${size}px`);
     
     // Conectar con los contratos
     const { core, traitsExtension } = await getContracts();
@@ -287,20 +293,20 @@ export default async function handler(req, res) {
     // Crear generador de frames personalizado (ahora es async para pre-cargar imágenes)
     const frameGenerator = await createDisplacementFrameGenerator({
       traits: traitsWithDisplacement,
-      width: DEFAULT_WIDTH,
-      height: DEFAULT_HEIGHT,
+      width: size,
+      height: size,
       totalFrames: frames,
-      distance: distance,
+      distance: scaledDistance,
       delay: delay
     });
     
     // Generar GIF usando el sistema existente
-    console.log(`[displacement] 🎬 Generando GIF con ${frames} frames...`);
+    console.log(`[displacement] 🎬 Generando GIF con ${frames} frames a ${size}x${size}px...`);
     const gifConfig = {
       stableLayers: [], // Todo se mueve, no hay capas estables
       animatedTraits: [],
-      width: DEFAULT_WIDTH,
-      height: DEFAULT_HEIGHT,
+      width: size,
+      height: size,
       delay: delay,
       totalFrames: frames, // IMPORTANTE: pasar totalFrames para customFrameGenerator
       customFrameGenerator: frameGenerator
@@ -308,13 +314,14 @@ export default async function handler(req, res) {
     
     const gifBuffer = await generateGifFromLayers(gifConfig);
     
-    console.log(`[displacement] ✅ GIF generado exitosamente (${gifBuffer.length} bytes)`);
+    console.log(`[displacement] ✅ GIF generado exitosamente (${gifBuffer.length} bytes, ${size}x${size}px)`);
     
     // Headers de respuesta
     res.setHeader('Content-Type', 'image/gif');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache por 1 hora
     res.setHeader('X-Displacement-Frames', frames.toString());
     res.setHeader('X-Displacement-Distance', distance.toString());
+    res.setHeader('X-Displacement-Size', size.toString());
     res.setHeader('X-Displacement-Traits', traitsWithDisplacement.length.toString());
     
     return res.status(200).send(gifBuffer);
