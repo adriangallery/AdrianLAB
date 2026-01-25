@@ -6,11 +6,17 @@ import { loadTraitWithDisplacement } from '../../../../lib/displacement-loader.j
 import { loadImage } from 'canvas';
 import { createCanvas } from 'canvas';
 
-const DEFAULT_FRAMES = 20;
+const DEFAULT_FRAMES = 15; // Reducido para evitar timeouts
 const DEFAULT_DELAY = 50; // ms
 const DEFAULT_DISTANCE = 200; // píxeles
 const DEFAULT_WIDTH = 1000;
 const DEFAULT_HEIGHT = 1000;
+
+// Límites máximos para evitar timeouts y problemas de memoria
+const MAX_FRAMES = 20; // Máximo de frames permitidos
+const MAX_DISTANCE = 300; // Máxima distancia de separación
+const MIN_DELAY = 30; // Delay mínimo en ms
+const MAX_DELAY = 200; // Delay máximo en ms
 
 /**
  * Crea un generador de frames personalizado para el efecto de explosión con displacement
@@ -225,10 +231,15 @@ export default async function handler(req, res) {
     
     console.log(`[displacement] 🎬 Iniciando animación de displacement para token ${cleanTokenId}`);
     
-    // Parámetros opcionales
-    const frames = parseInt(req.query.frames) || DEFAULT_FRAMES;
-    const delay = parseInt(req.query.delay) || DEFAULT_DELAY;
-    const distance = parseInt(req.query.distance) || DEFAULT_DISTANCE;
+    // Parámetros opcionales con límites de seguridad
+    let frames = parseInt(req.query.frames) || DEFAULT_FRAMES;
+    let delay = parseInt(req.query.delay) || DEFAULT_DELAY;
+    let distance = parseInt(req.query.distance) || DEFAULT_DISTANCE;
+    
+    // Aplicar límites
+    frames = Math.min(Math.max(1, frames), MAX_FRAMES);
+    delay = Math.min(Math.max(MIN_DELAY, delay), MAX_DELAY);
+    distance = Math.min(Math.max(50, distance), MAX_DISTANCE);
     
     console.log(`[displacement] Configuración: frames=${frames}, delay=${delay}ms, distance=${distance}px`);
     
@@ -311,6 +322,15 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error(`[displacement] ❌ Error generando animación de displacement:`, error.message);
     console.error(`[displacement] Stack:`, error.stack);
+    
+    // Detectar si es un timeout
+    if (error.message.includes('timeout') || error.message.includes('TIMEOUT') || error.name === 'AbortError') {
+      return res.status(504).json({
+        error: 'Request timeout',
+        message: 'La generación del GIF tomó demasiado tiempo. Intenta con menos frames o menor distancia.',
+        suggestion: `Usa frames=${Math.max(1, Math.floor(frames * 0.7))} o distance=${Math.max(50, Math.floor(distance * 0.7))}`
+      });
+    }
     
     return res.status(500).json({
       error: 'Error generating displacement animation',
