@@ -14872,6 +14872,58 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 1170,
+      "name": "The Bot Formaly Known As Claw pixelated",
+      "category": "HEAD",
+      "fileName": "1170",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1171,
+      "name": "MAC Mini pixelated",
+      "category": "GEAR",
+      "fileName": "1171",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1172,
+      "name": "Claw Background pixelated",
+      "category": "BACKGROUND",
+      "fileName": "1172",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1173,
+      "name": "Claw pixelated",
+      "category": "TOP",
+      "fileName": "1173",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 6001,
       "name": "Text Eyes 6001",
       "category": "EYES",
@@ -15120,7 +15172,7 @@
     }
   ],
   "metadata": {
-    "totalTraits": 1276,
+    "totalTraits": 1280,
     "categories": [
       "BACKGROUND",
       "EAR",
