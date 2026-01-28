@@ -217,6 +217,18 @@
       "external_url": "https://adrianzero.com/"
     },
     {
+      "tokenId": 10019,
+      "name": "Claw Mac Mini",
+      "category": "Floppy discs",
+      "fileName": "10019.png",
+      "maxSupply": 1000,
+      "floppy": "ShitDROP",
+      "traitsInside": 4,
+      "description": "ShitDrop number 6, refers to the massive hype Clawdbot (now renamed Mold because of some pressures) this is Tiger interpretation about it. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": ["Adrian | HalfxTiger"],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
       "tokenId": 1123,
       "name": "CensorPack",
       "category": "PACK",
@@ -230,7 +242,7 @@
     }
   ],
   "metadata": {
-    "totalFloppys": 19,
+    "totalFloppys": 20,
     "description": "Floppy Collection - Base de datos de todos los Floppys disponibles"
   }
 }
