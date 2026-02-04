@@ -2,7 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }
@@ -10,41 +9,19 @@
     "name": "getDupInfo",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "",
+        "name": "duplicated",
         "type": "bool"
       },
       {
+        "name": "info",
+        "type": "tuple",
         "components": [
-          {
-            "internalType": "string",
-            "name": "sourceId",
-            "type": "string"
-          },
-          {
-            "internalType": "uint8",
-            "name": "dupNumber",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint8",
-            "name": "mintKind",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint256",
-            "name": "mintedAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "to",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct DuplicatorMODULE.DupInfo",
-        "name": "",
-        "type": "tuple"
+          { "name": "sourceId", "type": "string" },
+          { "name": "dupNumber", "type": "uint8" },
+          { "name": "mintKind", "type": "uint8" },
+          { "name": "mintedAt", "type": "uint256" },
+          { "name": "to", "type": "address" }
+        ]
       }
     ],
     "stateMutability": "view",
