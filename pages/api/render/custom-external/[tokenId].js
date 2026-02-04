@@ -1,5 +1,5 @@
 // API endpoint for rendering custom tokens with modified traits (EXTERNAL RENDER VERSION)
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import { getContracts } from '../../../../lib/contracts.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
@@ -1324,11 +1324,17 @@ export default async function handler(req, res) {
       console.log('[custom-external] 🏠 Usando renderizado local (fallback)');
     }
 
-    // 1. PRIMERO: Renderizar BACKGROUND si existe
-    if (finalTraits['BACKGROUND']) {
+    // 1. PRIMERO: Renderizar BACKGROUND (forzar #FF3388 si es duplicado, sino usar trait)
+    if (dupInfo && dupInfo.duplicated) {
+      // Token duplicado: forzar background #FF3388
+      ctx.fillStyle = '#FF3388';
+      ctx.fillRect(0, 0, 1000, 1000);
+      console.log('[custom-render] 🔄 DUPLICATOR: Background fijo #FF3388 aplicado');
+      // NO renderizar el BACKGROUND trait aunque esté equipado
+    } else if (finalTraits['BACKGROUND']) {
       const bgPath = `BACKGROUND/${finalTraits['BACKGROUND']}.svg`;
       console.log(`[custom-render] PASO 1 - Cargando background: ${bgPath}`);
-      
+
       // Intentar obtener del caché de componentes primero
       const cachedBackground = getCachedComponent('background', finalTraits['BACKGROUND']);
       if (cachedBackground) {
@@ -1344,10 +1350,10 @@ export default async function handler(req, res) {
           const bgCtx = canvas.getContext('2d');
           bgCtx.drawImage(bgImage, 0, 0, 1000, 1000);
           const bgBuffer = canvas.toBuffer('image/png');
-          
+
           // Guardar en caché de componentes
           setCachedComponent('background', finalTraits['BACKGROUND'], bgBuffer);
-          
+
           ctx.drawImage(bgImage, 0, 0, 1000, 1000);
           console.log('[custom-render] PASO 1 - Background renderizado correctamente');
         }
@@ -1821,12 +1827,39 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== PASO PARENT: Texto "PARENT #X" para tokens duplicados =====
+    if (dupInfo && dupInfo.duplicated && dupInfo.sourceId) {
+      try {
+        // Registrar fuente Press Start 2P si no está registrada
+        try {
+          const pressStartPath = path.join(process.cwd(), 'public', 'fonts', 'retro', 'PressStart2P-Regular.ttf');
+          registerFont(pressStartPath, { family: 'PressStart2P' });
+        } catch (fontError) {
+          // La fuente ya puede estar registrada, ignorar error
+        }
+
+        // Configurar texto
+        ctx.font = 'bold 32px PressStart2P';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
+
+        // Dibujar texto en esquina superior izquierda con padding de 20px
+        const parentText = `PARENT #${dupInfo.sourceId}`;
+        ctx.fillText(parentText, 20, 20);
+
+        console.log(`[custom-render] 🔄 DUPLICATOR: Texto "${parentText}" renderizado`);
+      } catch (e) {
+        console.warn('[custom-render] 🔄 DUPLICATOR: Falló el renderizado del texto PARENT:', e.message);
+      }
+    }
+
     // Configurar headers para evitar cache
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
-    
+
     // ===== LÓGICA CLOSEUP PARA TOKEN 202 =====
     let finalBuffer;
     

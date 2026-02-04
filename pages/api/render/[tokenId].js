@@ -1240,11 +1240,22 @@ export default async function handler(req, res) {
     // Generar PNG estático (eliminada lógica de animaciones)
     console.log('[render] Generando PNG estático...');
 
-    // 1. PRIMERO: Renderizar BACKGROUND si existe
-    if (equippedTraits['BACKGROUND']) {
+    // 1. PRIMERO: Renderizar BACKGROUND (forzar #FF3388 si es duplicado, sino usar trait)
+    if (dupInfo && dupInfo.duplicated) {
+      // Token duplicado: forzar background #FF3388
+      ctx.fillStyle = '#FF3388';
+      if (messageText) {
+        ctx.fillRect(0, 0, 3000, 1000);
+        console.log('[render] 🔄 DUPLICATOR: Background fijo #FF3388 aplicado (3000x1000)');
+      } else {
+        ctx.fillRect(0, 0, 1000, 1000);
+        console.log('[render] 🔄 DUPLICATOR: Background fijo #FF3388 aplicado');
+      }
+      // NO renderizar el BACKGROUND trait aunque esté equipado
+    } else if (equippedTraits['BACKGROUND']) {
       const bgPath = `BACKGROUND/${equippedTraits['BACKGROUND']}.svg`;
       console.log(`[render] PASO 1 - Cargando background: ${bgPath}`);
-      
+
       const bgImage = await loadAndRenderSvg(bgPath);
       if (bgImage) {
         // Si hay mensaje, estirar el background horizontalmente a 3000px
@@ -1968,6 +1979,33 @@ export default async function handler(req, res) {
         
       } catch (e) {
         console.warn('[render] 💬 PASO MESSAGES - Falló el renderizado del mensaje, continuando sin mensaje:', e.message);
+      }
+    }
+
+    // ===== PASO PARENT: Texto "PARENT #X" para tokens duplicados =====
+    if (dupInfo && dupInfo.duplicated && dupInfo.sourceId) {
+      try {
+        // Registrar fuente Press Start 2P si no está registrada
+        try {
+          const pressStartPath = path.join(process.cwd(), 'public', 'fonts', 'retro', 'PressStart2P-Regular.ttf');
+          registerFont(pressStartPath, { family: 'PressStart2P' });
+        } catch (fontError) {
+          // La fuente ya puede estar registrada, ignorar error
+        }
+
+        // Configurar texto
+        ctx.font = 'bold 32px PressStart2P';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
+
+        // Dibujar texto en esquina superior izquierda con padding de 20px
+        const parentText = `PARENT #${dupInfo.sourceId}`;
+        ctx.fillText(parentText, 20, 20);
+
+        console.log(`[render] 🔄 DUPLICATOR: Texto "${parentText}" renderizado`);
+      } catch (e) {
+        console.warn('[render] 🔄 DUPLICATOR: Falló el renderizado del texto PARENT:', e.message);
       }
     }
 
