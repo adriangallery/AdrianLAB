@@ -690,10 +690,28 @@ export default async function handler(req, res) {
         return trait ? trait.name : `#${traitId}`;
       };
 
-      // Obtener historial de serums desde SerumModule
+      // ===== OBTENER INFORMACIÓN DE DUPLICACIÓN (antes de serums) =====
+      let dupInfo = null;
       try {
+        dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
+        if (dupInfo && dupInfo.duplicated) {
+          console.log(`[metadata] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (sourceId=${dupInfo.sourceId}, dupNumber=${dupInfo.dupNumber})`);
+        }
+      } catch (error) {
+        console.error(`[metadata] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
+      }
+
+      // Obtener historial de serums desde SerumModule
+      // Si es duplicado, obtener serum del token padre (sourceId)
+      try {
+        const serumSourceTokenId = (dupInfo && dupInfo.duplicated && dupInfo.sourceId) ? dupInfo.sourceId : cleanTokenId;
+
+        if (dupInfo && dupInfo.duplicated && dupInfo.sourceId) {
+          console.log(`[metadata] 🔄 DUPLICATOR: Obteniendo serum del padre (sourceId=${dupInfo.sourceId})`);
+        }
+
         console.log('[metadata] Llamando a getTokenSerumHistory desde SerumModule...');
-        const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+        const serumHistory = await serumModule.getTokenSerumHistory(serumSourceTokenId);
         console.log('[metadata] Respuesta de getTokenSerumHistory:', {
           history: serumHistory.map(serum => ({
             serumId: serum[0].toString(),
@@ -702,26 +720,26 @@ export default async function handler(req, res) {
             mutation: serum[3]
           }))
         });
-        
+
         // Si hay serums en el historial, agregar el último como atributo
         if (serumHistory && serumHistory.length > 0) {
           const lastSerum = serumHistory[serumHistory.length - 1]; // Último serum aplicado
           const serumSuccess = lastSerum[1];
           const serumMutation = lastSerum[3];
-          
+
           let usedSerumValue;
           if (serumSuccess) {
             usedSerumValue = serumMutation; // "AdrianGF"
           } else {
             usedSerumValue = "FAILED";
           }
-          
+
           baseMetadata.attributes.push({
             trait_type: "UsedSerum",
             value: usedSerumValue
           });
         }
-        
+
       } catch (error) {
         console.log('[metadata] Error obteniendo historial de serums:', error.message);
       }
@@ -746,20 +764,14 @@ export default async function handler(req, res) {
       );
 
       // ===== LÓGICA DUPLICATOR: Añadir atributo DupGeneration si el token está duplicado =====
-      try {
-        const dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
-
-        if (dupInfo && dupInfo.duplicated && dupInfo.dupNumber > 0) {
-          const dupGeneration = getDupGenerationAttribute(dupInfo.dupNumber);
-          baseMetadata.attributes.push({
-            trait_type: "DupGeneration",
-            value: dupGeneration
-          });
-          console.log(`[metadata] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (dupNumber=${dupInfo.dupNumber}), añadiendo DupGeneration=${dupGeneration}`);
-        }
-      } catch (error) {
-        console.error(`[metadata] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
-        // Continuar sin añadir DupGeneration
+      // (dupInfo ya fue obtenido antes de la lógica de serums)
+      if (dupInfo && dupInfo.duplicated && dupInfo.dupNumber > 0) {
+        const dupGeneration = getDupGenerationAttribute(dupInfo.dupNumber);
+        baseMetadata.attributes.push({
+          trait_type: "DupGeneration",
+          value: dupGeneration
+        });
+        console.log(`[metadata] 🔄 DUPLICATOR: Añadiendo DupGeneration=${dupGeneration}`);
       }
 
       // Lógica del skin: 

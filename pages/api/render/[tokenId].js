@@ -1001,14 +1001,23 @@ export default async function handler(req, res) {
     }
 
     // LÓGICA ESPECIAL: Detectar serum aplicado y cambiar skin base
+    // Si es duplicado, obtener serum del token padre (sourceId)
     let appliedSerum = null; // Solo para serums exitosos
     let serumFailed = false;
     let failedSerumType = null; // Nueva variable para el tipo de serum que falló
     let hasAdrianGFSerum = false; // Flag para verificar si el serum es AdrianGF
     let serumHistory = null; // Historial completo para conversiones posteriores
     try {
+      // Determinar de qué token obtener el historial de serums
+      // Si es duplicado, usar el sourceId del padre
+      const serumSourceTokenId = (dupInfo && dupInfo.duplicated && dupInfo.sourceId) ? dupInfo.sourceId : cleanTokenId;
+
+      if (dupInfo && dupInfo.duplicated && dupInfo.sourceId) {
+        console.log(`[render] 🔄 DUPLICATOR: Token duplicado, obteniendo serum del padre (sourceId=${dupInfo.sourceId})`);
+      }
+
       console.log('[render] Verificando si hay serum aplicado...');
-      serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      serumHistory = await serumModule.getTokenSerumHistory(serumSourceTokenId);
       
       if (serumHistory && serumHistory.length > 0) {
         const lastSerum = serumHistory[serumHistory.length - 1];

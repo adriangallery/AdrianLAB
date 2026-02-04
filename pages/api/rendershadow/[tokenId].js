@@ -643,6 +643,12 @@ export default async function handler(req, res) {
       console.error(`[render] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
     }
 
+    // Determinar el tokenId fuente para consultas de serum (duplicados heredan del parent)
+    const serumSourceTokenId = (dupInfo && dupInfo.duplicated && dupInfo.sourceId) ? dupInfo.sourceId : cleanTokenId;
+    if (dupInfo && dupInfo.duplicated) {
+      console.log(`[render] 🔄 DUPLICATOR: Usando sourceId ${serumSourceTokenId} para consulta de serum`);
+    }
+
     // Determinar la imagen base según generación y skin
     // Si el token está duplicado, usar dupNumber como generación efectiva
     const gen = getEffectiveGeneration(dupInfo, generation);
@@ -734,7 +740,7 @@ export default async function handler(req, res) {
     let serumHistory = null; // Historial completo para conversiones posteriores
     try {
       console.log('[render] Verificando si hay serum aplicado...');
-      serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      serumHistory = await serumModule.getTokenSerumHistory(serumSourceTokenId);
       
       if (serumHistory && serumHistory.length > 0) {
         const lastSerum = serumHistory[serumHistory.length - 1];

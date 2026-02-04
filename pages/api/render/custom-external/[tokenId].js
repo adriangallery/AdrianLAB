@@ -599,13 +599,30 @@ export default async function handler(req, res) {
       hasBeenModified
     });
 
+    // ===== OBTENER INFORMACIÓN DE DUPLICACIÓN (antes de serums) =====
+    let dupInfo = null;
+    try {
+      dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
+      if (dupInfo && dupInfo.duplicated) {
+        console.log(`[custom-render] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (sourceId=${dupInfo.sourceId}, dupNumber=${dupInfo.dupNumber})`);
+      }
+    } catch (error) {
+      console.error(`[custom-render] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
+    }
+
+    // Determinar de qué token obtener serums (si es duplicado, usar sourceId del padre)
+    const serumSourceTokenId = (dupInfo && dupInfo.duplicated && dupInfo.sourceId) ? dupInfo.sourceId : cleanTokenId;
+
     // LÓGICA ESPECIAL PARA TRAITLAB: Detectar serum ADRIANGF y cambiar token base
     let baseTokenId = cleanTokenId;
     let appliedSerumForBase = null;
-    
+
     try {
+      if (dupInfo && dupInfo.duplicated) {
+        console.log(`[custom-render] 🔄 DUPLICATOR: Obteniendo serum del padre (sourceId=${dupInfo.sourceId})`);
+      }
       console.log('[custom-render] Verificando si hay serum aplicado para determinar token base...');
-      const serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      const serumHistory = await serumModule.getTokenSerumHistory(serumSourceTokenId);
       
       if (serumHistory && serumHistory.length > 0) {
         const lastSerum = serumHistory[serumHistory.length - 1];
@@ -1068,19 +1085,9 @@ export default async function handler(req, res) {
       }
     };
 
-    // ===== OBTENER INFORMACIÓN DE DUPLICACIÓN =====
-    let dupInfo = null;
-    try {
-      dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
-      if (dupInfo && dupInfo.duplicated) {
-        console.log(`[custom-render] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (dupNumber=${dupInfo.dupNumber})`);
-      }
-    } catch (error) {
-      console.error(`[custom-render] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
-    }
-
     // Determinar la imagen base según generación y skin
     // Si el token está duplicado, usar dupNumber como generación efectiva
+    // (dupInfo ya fue obtenido antes de la lógica de serums)
     const gen = getEffectiveGeneration(dupInfo, generation);
     let baseImagePath;
 
@@ -1134,7 +1141,7 @@ export default async function handler(req, res) {
     let serumHistory = null;
     try {
       console.log('[custom-render] Verificando si hay serum aplicado...');
-      serumHistory = await serumModule.getTokenSerumHistory(cleanTokenId);
+      serumHistory = await serumModule.getTokenSerumHistory(serumSourceTokenId);
       
       if (serumHistory && serumHistory.length > 0) {
         hasSerumHistory = true;
