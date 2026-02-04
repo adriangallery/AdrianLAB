@@ -1,28 +1,14 @@
 [
   {
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{ "name": "tokenId", "type": "uint256" }],
     "name": "getDupInfo",
     "outputs": [
-      {
-        "name": "duplicated",
-        "type": "bool"
-      },
-      {
-        "name": "info",
-        "type": "tuple",
-        "components": [
-          { "name": "sourceId", "type": "string" },
-          { "name": "dupNumber", "type": "uint8" },
-          { "name": "mintKind", "type": "uint8" },
-          { "name": "mintedAt", "type": "uint256" },
-          { "name": "to", "type": "address" }
-        ]
-      }
+      { "name": "duplicated", "type": "bool" },
+      { "name": "sourceId", "type": "uint256" },
+      { "name": "dupNumber", "type": "uint8" },
+      { "name": "mintKind", "type": "uint8" },
+      { "name": "mintedAt", "type": "uint256" },
+      { "name": "to", "type": "address" }
     ],
     "stateMutability": "view",
     "type": "function"
