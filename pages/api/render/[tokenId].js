@@ -844,6 +844,24 @@ export default async function handler(req, res) {
       // Continuar sin info de duplicación
     }
 
+    // ===== HEREDAR SKIN DEL PADRE SI ES DUPLICADO Y NO TIENE SKIN ASIGNADO =====
+    // Los tokens duplicados tienen skinId=0 por defecto, pero deben heredar el skin del padre
+    let effectiveSkinId = skinId;
+    let effectiveSkinName = skinName;
+
+    if (dupInfo && dupInfo.duplicated && skinId.toString() === "0" && dupInfo.sourceId) {
+      try {
+        console.log(`[render] 🔄 DUPLICATOR: Token duplicado sin skin asignado, obteniendo skin del padre (sourceId=${dupInfo.sourceId})`);
+        const parentSkinData = await core.getTokenSkin(parseInt(dupInfo.sourceId));
+        effectiveSkinId = parentSkinData[0].toString();
+        effectiveSkinName = parentSkinData[1];
+        console.log(`[render] 🔄 DUPLICATOR: Skin heredado del padre: skinId=${effectiveSkinId}, skinName=${effectiveSkinName}`);
+      } catch (error) {
+        console.error(`[render] ⚠️ Error obteniendo skin del padre (sourceId=${dupInfo.sourceId}):`, error.message);
+        // Continuar con el skin original (0)
+      }
+    }
+
     // Determinar la imagen base según generación y skin
     // Si el token está duplicado, usar dupNumber como generación efectiva
     const gen = getEffectiveGeneration(dupInfo, generation);
@@ -852,11 +870,12 @@ export default async function handler(req, res) {
     // Mapear skin para determinar la imagen a mostrar
     let skinType;
     let useMannequin = false;
-    
+
     console.log('[render] Analizando skin:', {
-      skinId,
-      skinName,
-      generacion: gen
+      skinId: effectiveSkinId,
+      skinName: effectiveSkinName,
+      generacion: gen,
+      inherited: effectiveSkinId !== skinId
     });
     
     // Lógica del skin basada en el contrato:
@@ -865,24 +884,24 @@ export default async function handler(req, res) {
     // - skinId = 2: Skin "Dark" (usar Dark)
     // - skinId = 3: Skin "Alien" (usar Alien)
     // - skinId = 4: Skin "Albino" (usar Albino)
-    if (skinId.toString() === "0") {
+    if (effectiveSkinId.toString() === "0") {
       useMannequin = true;
       console.log('[render] Skin no asignado detectado (skinId = 0), usando mannequin.svg');
-    } else if (skinId.toString() === "1" || skinName === "Zero") {
+    } else if (effectiveSkinId.toString() === "1" || effectiveSkinName === "Zero") {
       skinType = "Medium";
       console.log('[render] Skin Zero detectado (skinId = 1), usando Medium');
-    } else if (skinId.toString() === "2" || skinName === "Dark") {
+    } else if (effectiveSkinId.toString() === "2" || effectiveSkinName === "Dark") {
       skinType = "Dark";
       console.log('[render] Skin Dark detectado (skinId = 2), usando Dark');
-    } else if (skinId.toString() === "3" || skinName === "Alien") {
+    } else if (effectiveSkinId.toString() === "3" || effectiveSkinName === "Alien") {
       skinType = "Alien";
       console.log('[render] Skin Alien detectado (skinId = 3), usando Alien');
-    } else if (skinId.toString() === "4" || skinName === "Albino") {
+    } else if (effectiveSkinId.toString() === "4" || effectiveSkinName === "Albino") {
       skinType = "Albino";
       console.log('[render] Skin Albino detectado (skinId = 4), usando Albino');
     } else {
-      skinType = skinName || "Medium";
-      console.log(`[render] Skin personalizado detectado: ${skinName} (skinId = ${skinId})`);
+      skinType = effectiveSkinName || "Medium";
+      console.log(`[render] Skin personalizado detectado: ${effectiveSkinName} (skinId = ${effectiveSkinId})`);
     }
 
     // Construir path del Adrian base (solo si no usamos mannequin)
@@ -891,9 +910,10 @@ export default async function handler(req, res) {
     }
     console.log('[render] Path de imagen base:', baseImagePath);
     console.log('[render] Mapeo aplicado:', {
-      skinId,
-      skinName,
-      skinTypeSeleccionado: skinType
+      skinId: effectiveSkinId,
+      skinName: effectiveSkinName,
+      skinTypeSeleccionado: skinType,
+      inheritedFromParent: effectiveSkinId !== skinId
     });
 
     // Crear mapa de traits equipados
