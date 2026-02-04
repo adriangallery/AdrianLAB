@@ -701,6 +701,12 @@ export default async function handler(req, res) {
         console.error(`[metadata] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
       }
 
+      // ===== OVERRIDE DE NOMBRE PARA TOKENS DUPLICADOS (GenZERO) =====
+      if (dupInfo && dupInfo.duplicated) {
+        baseMetadata.name = `GenZERO #${cleanTokenId}`;
+        console.log(`[metadata] 🔄 DUPLICATOR: Nombre sobrescrito a "${baseMetadata.name}" (token duplicado)`);
+      }
+
       // Obtener historial de serums desde SerumModule
       // Si es duplicado, obtener serum del token padre (sourceId)
       try {
