@@ -14,6 +14,7 @@ import {
 import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
 import { loadLabimagesAsset } from '../../../lib/github-storage.js';
+import { getTokenDupInfo, getEffectiveGeneration } from '../../../lib/duplicator-logic.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -305,7 +306,7 @@ export default async function handler(req, res) {
 
     // Conectar con los contratos
     console.log('[render] Conectando con los contratos...');
-    const { core, traitsExtension, patientZero, serumModule } = await getContracts();
+    const { core, traitsExtension, patientZero, serumModule, duplicatorModule } = await getContracts();
 
     // Obtener datos del token
     console.log('[render] Obteniendo datos del token...');
@@ -631,8 +632,20 @@ export default async function handler(req, res) {
       }
     };
 
+    // ===== OBTENER INFORMACIÓN DE DUPLICACIÓN =====
+    let dupInfo = null;
+    try {
+      dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
+      if (dupInfo && dupInfo.duplicated) {
+        console.log(`[render] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (dupNumber=${dupInfo.dupNumber})`);
+      }
+    } catch (error) {
+      console.error(`[render] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
+    }
+
     // Determinar la imagen base según generación y skin
-    const gen = generation.toString();
+    // Si el token está duplicado, usar dupNumber como generación efectiva
+    const gen = getEffectiveGeneration(dupInfo, generation);
     let baseImagePath;
 
     // Mapear skin para determinar la imagen a mostrar

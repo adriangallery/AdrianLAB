@@ -1,5 +1,6 @@
 import { getContracts } from '../../../lib/contracts.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
+import { getTokenDupInfo, getDupGenerationAttribute } from '../../../lib/duplicator-logic.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -469,7 +470,7 @@ export default async function handler(req, res) {
     try {
       // Test de conexión a contratos
       console.log('[metadata] Intentando conectar con los contratos...');
-      const { core, traitsExtension, patientZero, serumModule, adrianNameRegistry } = await getContracts();
+      const { core, traitsExtension, patientZero, serumModule, adrianNameRegistry, duplicatorModule } = await getContracts();
       console.log('[metadata] Contratos conectados:', {
         core: {
           address: core.address,
@@ -727,7 +728,7 @@ export default async function handler(req, res) {
 
       // Añadir atributos base
       let generationValue = tokenData[0].toString();
-      
+
       // Si el token tiene tag SubZERO, sobreescribir Generation
       if (tagInfo.tag === 'SubZERO') {
         const config = (await import('../../../lib/tag-logic.js')).TAG_CONFIGS.SubZERO;
@@ -736,13 +737,30 @@ export default async function handler(req, res) {
           console.log(`[metadata] Token ${cleanTokenId} tiene tag SubZERO, sobreescribiendo Generation a "${generationValue}"`);
         }
       }
-      
+
       baseMetadata.attributes.push(
         {
           trait_type: "Generation",
           value: generationValue
         }
       );
+
+      // ===== LÓGICA DUPLICATOR: Añadir atributo DupGeneration si el token está duplicado =====
+      try {
+        const dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
+
+        if (dupInfo && dupInfo.duplicated && dupInfo.dupNumber > 0) {
+          const dupGeneration = getDupGenerationAttribute(dupInfo.dupNumber);
+          baseMetadata.attributes.push({
+            trait_type: "DupGeneration",
+            value: dupGeneration
+          });
+          console.log(`[metadata] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (dupNumber=${dupInfo.dupNumber}), añadiendo DupGeneration=${dupGeneration}`);
+        }
+      } catch (error) {
+        console.error(`[metadata] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
+        // Continuar sin añadir DupGeneration
+      }
 
       // Lógica del skin: 
       // - skinId = 0: No hay skin asignado (debería mostrar "NOT_ASSIGNED")

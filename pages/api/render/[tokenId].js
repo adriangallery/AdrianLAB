@@ -15,6 +15,7 @@ import {
 import { getCachedSvgPng, setCachedSvgPng } from '../../../lib/svg-png-cache.js';
 import { getCachedComponent, setCachedComponent } from '../../../lib/component-cache.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
+import { getTokenDupInfo, getEffectiveGeneration, getDupSkinPathADRIAN, getDupSkinPathADRIANGF } from '../../../lib/duplicator-logic.js';
 import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl, fileExistsInGitHubByHash, getGitHubFileUrlByHash, uploadFileToGitHubByHash, loadLabimagesAsset } from '../../../lib/github-storage.js';
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
 import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
@@ -481,7 +482,7 @@ export default async function handler(req, res) {
 
     // Conectar con los contratos
     console.log('[render] Conectando con los contratos...');
-    const { core, traitsExtension, patientZero, serumModule } = await getContracts();
+    const { core, traitsExtension, patientZero, serumModule, duplicatorModule } = await getContracts();
 
     // Obtener datos del token
     console.log('[render] Obteniendo datos del token...');
@@ -831,8 +832,21 @@ export default async function handler(req, res) {
       }
     };
 
+    // ===== OBTENER INFORMACIÓN DE DUPLICACIÓN =====
+    let dupInfo = null;
+    try {
+      dupInfo = await getTokenDupInfo(duplicatorModule, cleanTokenId);
+      if (dupInfo && dupInfo.duplicated) {
+        console.log(`[render] 🔄 DUPLICATOR: Token ${cleanTokenId} está duplicado (dupNumber=${dupInfo.dupNumber}, sourceId=${dupInfo.sourceId})`);
+      }
+    } catch (error) {
+      console.error(`[render] ⚠️ Error obteniendo dupInfo para token ${cleanTokenId}:`, error.message);
+      // Continuar sin info de duplicación
+    }
+
     // Determinar la imagen base según generación y skin
-    const gen = generation.toString();
+    // Si el token está duplicado, usar dupNumber como generación efectiva
+    const gen = getEffectiveGeneration(dupInfo, generation);
     let baseImagePath;
 
     // Mapear skin para determinar la imagen a mostrar
@@ -1094,34 +1108,38 @@ export default async function handler(req, res) {
       // Si hay messageText, NO considerar banana en el hash (no se aplicará la transformación)
       banana: isBanana && !messageText,
       messages: messageText,
-      
+
       // Token data
       generation: generation.toString(),
       mutationLevel: mutationLevel.toString(),
       canReplicate,
       hasBeenModified,
-      
+
       // Skin
       skinId: skinId.toString(),
       skinName,
-      
+
       // Traits (usar equippedTraits finales, no los del contrato)
       traitCategories: finalCategories,
       traitIds: finalTraitIds,
-      
+
       // Serum
       appliedSerum,
       serumFailed,
       failedSerumType,
       hasAdrianGFSerum,
       serumHistory,
-      
+
       // SKINTRAIT (incluido por separado, puede ser forzado por tags)
       skintraitId: skintraitId ? skintraitId.toString() : null,
-      
+
       // Tags
       tag: tagInfo.tag,
-      tagIndex
+      tagIndex,
+
+      // Duplicator
+      duplicated: dupInfo ? dupInfo.duplicated : false,
+      dupNumber: dupInfo ? dupInfo.dupNumber : 0
     });
     
     console.log(`[render] 🔐 Hash generado: ${renderHash}`);
