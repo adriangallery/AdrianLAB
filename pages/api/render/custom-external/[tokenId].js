@@ -1236,10 +1236,13 @@ export default async function handler(req, res) {
       return res.status(200).send(cachedImage);
     }
 
-    // ===== INTENTAR RENDERIZADO EXTERNO (solo si NO hay traits animados) =====
+    // ===== INTENTAR RENDERIZADO EXTERNO (solo si NO hay traits animados NI es token duplicado) =====
     // Si hay traits animados, Railway no puede generar GIFs, así que renderizamos directamente en Vercel
+    // Si es token duplicado (GEN), forzar renderizado local para aplicar background #FF3388 y texto PARENT
     if (hasAnimatedTraits) {
       console.log('[custom-external] 🎬 Traits animados detectados - Saltando Railway, renderizando GIF en Vercel');
+    } else if (dupInfo && dupInfo.duplicated) {
+      console.log('[custom-external] 🔄 DUPLICATOR: Token duplicado detectado - Saltando Railway, forzando renderizado local para background #FF3388 y texto PARENT');
     } else {
       console.log('[custom-external] 🚀 Intentando renderizado externo...');
       console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
