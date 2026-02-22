@@ -15176,7 +15176,7 @@
       "category": "TOP",
       "fileName": "1174",
       "maxSupply": 1000,
-      "animated": true,
+      "Type": "Animated",
       "floppy": "ShitDrop",
       "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
       "masterminds": [
