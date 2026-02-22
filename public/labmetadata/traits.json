@@ -15169,10 +15169,24 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1174,
+      "name": "ZeroPunch",
+      "category": "TOP",
+      "fileName": "1174",
+      "maxSupply": 1000,
+      "animated": true,
+      "floppy": "ShitDrop",
+      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1280,
+    "totalTraits": 1281,
     "categories": [
       "BACKGROUND",
       "EAR",

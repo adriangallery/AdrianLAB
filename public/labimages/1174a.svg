@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated from: 1174a.png -->
+<!-- Dimensions: 37x37 pixels (71 merged rects) -->
+<!-- Rect size: 1 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37">
+  <style>
+    rect { shape-rendering: crispEdges; }
+    svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+  </style>
+  <g id="pixels">
+    <rect x="17.00" y="0.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="18.00" y="0.00" width="3.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="7.00" y="1.00" width="2.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="9.00" y="1.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="10.00" y="1.00" width="1.00" height="1" fill="rgba(243,146,0,0.40)"/>
+    <rect x="16.00" y="1.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="17.00" y="1.00" width="1.00" height="1" fill="rgba(214,101,6,1.00)"/>
+    <rect x="18.00" y="1.00" width="1.00" height="1" fill="rgba(141,108,68,1.00)"/>
+    <rect x="19.00" y="1.00" width="1.00" height="1" fill="rgba(157,120,76,1.00)"/>
+    <rect x="20.00" y="1.00" width="1.00" height="1" fill="rgba(175,134,85,1.00)"/>
+    <rect x="21.00" y="1.00" width="1.00" height="1" fill="rgba(237,108,8,1.00)"/>
+    <rect x="6.00" y="2.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="10.00" y="2.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="16.00" y="2.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="17.00" y="2.00" width="1.00" height="1" fill="rgba(157,120,76,1.00)"/>
+    <rect x="18.00" y="2.00" width="1.00" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="19.00" y="2.00" width="1.00" height="1" fill="rgba(141,108,68,1.00)"/>
+    <rect x="20.00" y="2.00" width="1.00" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="21.00" y="2.00" width="1.00" height="1" fill="rgba(237,108,8,1.00)"/>
+    <rect x="6.00" y="3.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="16.00" y="3.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="17.00" y="3.00" width="1.00" height="1" fill="rgba(110,85,53,1.00)"/>
+    <rect x="18.00" y="3.00" width="1.00" height="1" fill="rgba(175,134,85,1.00)"/>
+    <rect x="19.00" y="3.00" width="1.00" height="1" fill="rgba(157,120,76,1.00)"/>
+    <rect x="20.00" y="3.00" width="1.00" height="1" fill="rgba(175,134,85,1.00)"/>
+    <rect x="21.00" y="3.00" width="1.00" height="1" fill="rgba(237,108,8,1.00)"/>
+    <rect x="5.00" y="4.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="6.00" y="4.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="16.00" y="4.00" width="1.00" height="1" fill="rgba(239,123,5,1.00)"/>
+    <rect x="17.00" y="4.00" width="1.00" height="1" fill="rgba(141,108,68,1.00)"/>
+    <rect x="18.00" y="4.00" width="3.00" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="21.00" y="4.00" width="1.00" height="1" fill="rgba(237,108,8,1.00)"/>
+    <rect x="5.00" y="5.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="17.00" y="5.00" width="1.00" height="1" fill="rgba(239,123,5,1.00)"/>
+    <rect x="18.00" y="5.00" width="3.00" height="1" fill="rgba(175,134,85,1.00)"/>
+    <rect x="5.00" y="6.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="12.00" y="6.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="13.00" y="6.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="23.00" y="6.00" width="1.00" height="1" fill="rgba(240,129,4,1.00)"/>
+    <rect x="24.00" y="6.00" width="1.00" height="1" fill="rgba(239,116,6,1.00)"/>
+    <rect x="5.00" y="7.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="11.00" y="7.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="12.00" y="7.00" width="1.00" height="1" fill="rgba(241,130,3,1.00)"/>
+    <rect x="23.00" y="7.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="24.00" y="7.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="5.00" y="8.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="6.00" y="8.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="11.00" y="8.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="12.00" y="8.00" width="1.00" height="1" fill="rgba(240,123,5,1.00)"/>
+    <rect x="13.00" y="8.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="14.00" y="8.00" width="1.00" height="1" fill="rgba(243,146,0,0.30)"/>
+    <rect x="22.00" y="8.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="23.00" y="8.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="6.00" y="9.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="12.00" y="9.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="13.00" y="9.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="14.00" y="9.00" width="1.00" height="1" fill="rgba(242,135,2,1.00)"/>
+    <rect x="15.00" y="9.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="16.00" y="9.00" width="1.00" height="1" fill="rgba(240,123,5,1.00)"/>
+    <rect x="20.00" y="9.00" width="3.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="6.00" y="10.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="7.00" y="10.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="14.00" y="10.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="15.00" y="10.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="21.00" y="10.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="7.00" y="11.00" width="1.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="8.00" y="11.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="11.00" y="11.00" width="1.00" height="1" fill="rgba(243,146,0,1.00)"/>
+    <rect x="8.00" y="12.00" width="1.00" height="1" fill="rgba(238,113,7,1.00)"/>
+    <rect x="9.00" y="12.00" width="2.00" height="1" fill="rgba(234,91,12,1.00)"/>
+    <rect x="11.00" y="12.00" width="1.00" height="1" fill="rgba(234,91,12,0.40)"/>
+  </g>
+</svg>
