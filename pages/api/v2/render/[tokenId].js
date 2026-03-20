@@ -10,7 +10,10 @@
 //   GitHub HIT: ~50ms
 //   Full miss:  200-400ms (1 RPC + PNGs + compose)
 
+import fs from 'fs';
+import path from 'path';
 import { applyCors } from '../../../../lib/v2/shared/cors.js';
+import { SPECIAL_TOKENS } from '../../../../lib/v2/shared/constants.js';
 import { fetchAllTokenData } from '../../../../lib/v2/rpc/token-data-fetcher.js';
 import { compositeToken } from '../../../../lib/v2/render/compositor.js';
 import { generateRenderHash, getRenderFilename } from '../../../../lib/v2/shared/render-hash.js';
@@ -35,6 +38,21 @@ export default async function handler(req, res) {
     const tokenId = parseInt(rawId);
     if (isNaN(tokenId) || tokenId < 0) {
       return res.status(400).json({ error: 'Invalid tokenId' });
+    }
+
+    // === Special 1/1 tokens (serve static GIF) ===
+    const special = SPECIAL_TOKENS[tokenId];
+    if (special) {
+      const gifPath = path.join(process.cwd(), 'public', special.image);
+      try {
+        const gifBuffer = fs.readFileSync(gifPath);
+        res.setHeader('Content-Type', 'image/gif');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('X-Version', 'ADRIANZERO-V2-SPECIAL');
+        return res.status(200).send(gifBuffer);
+      } catch (e) {
+        // GIF not found, fall through to normal render
+      }
     }
 
     // === Parse query params ===
