@@ -10,10 +10,9 @@ const nextConfig = {
         source: '/metadata/:path*',
         destination: '/metadata/:path*.json'
       },
-      // === V2 SWAP: Uncomment these to route V1 traffic to V2 endpoints ===
-      // After validating V2 with scripts/validate-v2.js, uncomment and deploy.
-      // Monitor 48h, then remove V1 endpoints.
-      //
+      // === V2 SWAP: custom-external now routes to V2 ===
+      { source: '/api/render/custom-external/:path*', destination: '/api/v2/render/custom-external/:path*' },
+      // Uncomment these to swap render and metadata too:
       // { source: '/api/render/:path*', destination: '/api/v2/render/:path*' },
       // { source: '/api/metadata/:path*', destination: '/api/v2/metadata/:path*' },
     ]
