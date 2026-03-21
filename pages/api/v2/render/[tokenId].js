@@ -19,7 +19,7 @@ import { compositeToken } from '../../../../lib/v2/render/compositor.js';
 import { generateRenderHash, getRenderFilename } from '../../../../lib/v2/shared/render-hash.js';
 import { kvGetBuffer, kvSetBuffer } from '../../../../lib/v2/cache/kv-client.js';
 import { renderKey, TTL } from '../../../../lib/v2/cache/cache-keys.js';
-import { checkGitHub, downloadFromGitHub, uploadToGitHubAsync } from '../../../../lib/v2/storage/github-uploader.js';
+import { checkGitHub, downloadFromGitHub, uploadToGitHubAsync, uploadToGitHubSync } from '../../../../lib/v2/storage/github-uploader.js';
 import { getTokenToggleEffects } from '../../../../lib/v2/cache/toggle-store.js';
 import { normalizeTraits } from '../../../../lib/v2/render/layer-order.js';
 import { applyBananaTransform } from '../../../../lib/v2/render/banana-pipeline.js';
@@ -146,9 +146,17 @@ export default async function handler(req, res) {
       if (bananaBuffer) finalBuffer = bananaBuffer;
     }
 
-    // === 5. Cache + upload (async, non-blocking) ===
+    // === 5. Cache + upload ===
     kvSetBuffer(kvCacheKey, finalBuffer, TTL.RENDER_PNG).catch(() => {});
-    uploadToGitHubAsync(tokenId, hash, finalBuffer);
+
+    if (isBanana) {
+      // Banana renders are expensive (Gemini API call) — await upload to ensure
+      // they persist to GitHub before Vercel kills the container
+      await uploadToGitHubSync(tokenId, hash, finalBuffer);
+    } else {
+      // Normal renders are cheap to regenerate — fire-and-forget is fine
+      uploadToGitHubAsync(tokenId, hash, finalBuffer);
+    }
 
     return sendPng(res, finalBuffer, 'MISS', hash, tokenId, start);
 
