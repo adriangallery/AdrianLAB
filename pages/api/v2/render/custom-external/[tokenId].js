@@ -17,6 +17,8 @@ import { generateCustomRenderHash } from '../../../../../lib/v2/shared/render-ha
 import { kvGetBuffer, kvSetBuffer } from '../../../../../lib/v2/cache/kv-client.js';
 import { TTL } from '../../../../../lib/v2/cache/cache-keys.js';
 import { CATEGORY_MAP } from '../../../../../lib/v2/shared/constants.js';
+import { getAnimatedTraits } from '../../../../../lib/animated-traits-helper.js';
+import { generateGifFromLayers } from '../../../../../lib/gif-generator.js';
 
 // JSON cache for trait mappings
 const jsonCache = new Map();
@@ -162,13 +164,21 @@ export default async function handler(req, res) {
     // Build sorted trait IDs for cache key
     const allTraitIds = Object.values(mergedTraits).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
 
-    // === Cache key ===
+    // === Detect animated traits ===
+    const animatedTraits = await getAnimatedTraits(allTraitIds);
+    const hasAnimatedTraits = animatedTraits.length > 0;
+    const animatedTraitIdSet = new Set(animatedTraits.map(at => at.baseId));
+
+    // === Cache key (include gif flag for animated) ===
     const hash = generateCustomRenderHash(tokenId, allTraitIds);
-    const cacheKey = `v2:custom:${tokenId}:${hash}`;
+    const cacheKey = `v2:custom:${tokenId}:${hash}${hasAnimatedTraits ? ':gif' : ''}`;
 
     // === KV cache check ===
     const cached = await kvGetBuffer(cacheKey);
     if (cached) {
+      if (hasAnimatedTraits) {
+        return sendGif(res, cached, 'HIT', start);
+      }
       return sendPng(res, cached, 'HIT', start);
     }
 
@@ -182,10 +192,29 @@ export default async function handler(req, res) {
       traitIds: finalTraitIds,
     };
 
-    // === Render ===
+    // === Render PNG base (excluding animated traits) ===
     const { buffer } = await compositeToken(customTokenData, {
       closeup: isCloseup,
+      animatedTraitIds: animatedTraitIdSet,
     });
+
+    // === Generate GIF if animated traits present ===
+    if (hasAnimatedTraits) {
+      try {
+        const gifBuffer = await generateGifFromLayers({
+          stableLayers: [{ pngBuffer: buffer }],
+          animatedTraits,
+          width: 1000,
+          height: 1000,
+          delay: 500,
+        });
+
+        kvSetBuffer(cacheKey, gifBuffer, 600).catch(() => {});
+        return sendGif(res, gifBuffer, 'MISS', start);
+      } catch (gifErr) {
+        console.error('[v2/custom-external] GIF generation failed, falling back to PNG:', gifErr.message);
+      }
+    }
 
     // === Cache (shorter TTL for custom renders) ===
     kvSetBuffer(cacheKey, buffer, 600).catch(() => {}); // 10 min
@@ -205,5 +234,16 @@ function sendPng(res, buffer, cacheStatus, start) {
   res.setHeader('X-Cache', cacheStatus);
   res.setHeader('X-Render-Time', `${elapsed}ms`);
   res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-V2');
+  return res.status(200).send(buffer);
+}
+
+function sendGif(res, buffer, cacheStatus, start) {
+  const elapsed = Date.now() - start;
+  res.setHeader('Content-Type', 'image/gif');
+  res.setHeader('Cache-Control', 'public, max-age=600');
+  res.setHeader('X-Cache', cacheStatus);
+  res.setHeader('X-Render-Time', `${elapsed}ms`);
+  res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-V2-ANIMATED');
+  res.setHeader('Content-Length', buffer.length);
   return res.status(200).send(buffer);
 }
