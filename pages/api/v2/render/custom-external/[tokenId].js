@@ -17,7 +17,6 @@ import { generateCustomRenderHash } from '../../../../../lib/v2/shared/render-ha
 import { kvGetBuffer, kvSetBuffer } from '../../../../../lib/v2/cache/kv-client.js';
 import { TTL } from '../../../../../lib/v2/cache/cache-keys.js';
 import { CATEGORY_MAP } from '../../../../../lib/v2/shared/constants.js';
-import { getAnimatedTraits } from '../../../../../lib/animated-traits-helper.js';
 import { generateGifFromLayers } from '../../../../../lib/gif-generator.js';
 
 // JSON cache for trait mappings
@@ -93,6 +92,44 @@ function loadCombinedTraitsMapping() {
   return mapping;
 }
 
+/**
+ * Detect animated traits using filesystem (no HTTP self-calls).
+ * Checks traits.json for Type:"Animated" and scans /public/labimages/ for variants.
+ */
+function detectAnimatedTraitsFs(traitIds) {
+  const traitsData = loadJsonFile('traits.json');
+  if (!traitsData?.traits) return [];
+
+  const traitIdsNum = traitIds.map(id => parseInt(String(id)));
+  const labimagesDir = path.join(process.cwd(), 'public', 'labimages');
+  const result = [];
+
+  for (const trait of traitsData.traits) {
+    if (!traitIdsNum.includes(trait.tokenId) || trait.Type !== 'Animated') continue;
+
+    const baseId = String(trait.tokenId);
+    const variants = [];
+    for (const letter of 'abcdefghij') {
+      const variantPath = path.join(labimagesDir, `${baseId}${letter}.svg`);
+      if (fs.existsSync(variantPath)) {
+        variants.push(`${baseId}${letter}`);
+      }
+    }
+
+    if (variants.length > 0) {
+      result.push({
+        baseId,
+        name: trait.name,
+        category: trait.category,
+        variants,
+        delay: 500,
+      });
+    }
+  }
+
+  return result;
+}
+
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -164,8 +201,8 @@ export default async function handler(req, res) {
     // Build sorted trait IDs for cache key
     const allTraitIds = Object.values(mergedTraits).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
 
-    // === Detect animated traits ===
-    const animatedTraits = await getAnimatedTraits(allTraitIds);
+    // === Detect animated traits (filesystem-based, no HTTP self-calls) ===
+    const animatedTraits = detectAnimatedTraitsFs(allTraitIds);
     const hasAnimatedTraits = animatedTraits.length > 0;
     const animatedTraitIdSet = new Set(animatedTraits.map(at => at.baseId));
 
