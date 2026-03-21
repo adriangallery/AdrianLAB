@@ -5,7 +5,28 @@
 // Accepts ?trait=340 (or multiple ?trait=340&trait=500) to override equipped traits.
 // Also accepts ?CATEGORY=traitId directly (e.g. ?EYES=151).
 //
-// Reuses the full V2 compositor pipeline with trait overrides.
+// === HYBRID V2/V1 PATTERN ===
+// This endpoint uses V2 for PNG renders (Multicall3, KV cache, compositor)
+// but delegates to V1 for animated GIF renders (proven gif-generator pipeline).
+//
+// Flow:
+//   1. Parse params & resolve custom traits (V2)
+//   2. Detect animated traits via filesystem (no HTTP — Vercel self-calls fail)
+//   3. If animated → dynamic import V1 handler → V1 handles entire GIF pipeline
+//   4. If static  → V2 compositor → KV cache → PNG response
+//
+// IMPORTANT for future V1 edits:
+//   The V1 handler at pages/api/render/custom-external/[tokenId].js is still
+//   actively used for GIF renders. Any changes to V1's GIF pipeline, trait
+//   loading, bounce logic, or animated trait detection MUST be kept working.
+//   V1 receives the original req/res objects unchanged from V2.
+//
+// To fully migrate GIFs to V2:
+//   1. Port generateGifFromLayers() to work in Vercel serverless
+//   2. Use detectAnimatedTraitsFs() (filesystem) instead of detectAnimatedVariants() (HTTP)
+//   3. Pass animatedTraitIds to compositeToken() to exclude from PNG base
+//   4. Generate GIF from base PNG + animated SVG variants
+//   5. Remove V1 delegation and this comment block
 
 import fs from 'fs';
 import path from 'path';
@@ -199,15 +220,6 @@ export default async function handler(req, res) {
 
     // Build sorted trait IDs for cache key
     const allTraitIds = Object.values(mergedTraits).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
-
-    // === Detect animated traits (filesystem-based, no HTTP self-calls) ===
-    const animatedTraits = detectAnimatedTraitsFs(allTraitIds);
-
-    // === If animated traits present, delegate to V1 (proven GIF pipeline) ===
-    if (animatedTraits.length > 0) {
-      const { default: v1Handler } = await import('../../../render/custom-external/[tokenId].js');
-      return v1Handler(req, res);
-    }
 
     // === Cache key ===
     const hash = generateCustomRenderHash(tokenId, allTraitIds);
