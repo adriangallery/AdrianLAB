@@ -11,8 +11,7 @@ const nextConfig = {
         destination: '/metadata/:path*.json'
       },
       // === V2 SWAP: all endpoints routed to V2 ===
-      // custom-external stays on V1 (V2 lacks working GIF animated trait pipeline)
-      { source: '/api/render/custom-external/:path*', destination: '/api/render/custom-external/:path*' },
+      { source: '/api/render/custom-external/:path*', destination: '/api/v2/render/custom-external/:path*' },
       { source: '/api/metadata/:path*', destination: '/api/v2/metadata/:path*' },
       // Exclude V1-only endpoints from V2 rewrite (no V2 handler exists)
       { source: '/api/render/floppy/:path*', destination: '/api/render/floppy/:path*' },
