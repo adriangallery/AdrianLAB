@@ -84,6 +84,8 @@ export default async function handler(req, res) {
       tokenData._samuraiIndex = await getSamuraiIndex(tokenId);
     }
 
+    // === ZEROmovies: movieId already fetched in tokenData ===
+
     // === Build metadata ===
     const metadata = await buildMetadata(tokenData, toggleEffects);
 

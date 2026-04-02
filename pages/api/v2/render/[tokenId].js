@@ -88,6 +88,8 @@ export default async function handler(req, res) {
       tokenData._samuraiIndex = await getSamuraiIndex(tokenId);
     }
 
+    // === ZEROmovies: movieId already fetched in tokenData ===
+
     // === Build render hash ===
     const equippedTraits = normalizeTraits(tokenData.categories, tokenData.traitIds);
     const finalCategories = Object.keys(equippedTraits).filter(c => c !== 'SKINTRAIT').sort();
@@ -107,7 +109,7 @@ export default async function handler(req, res) {
       failedSerumType: tokenData.failedSerumType, hasAdrianGFSerum: tokenData.hasAdrianGFSerum,
       serumHistory: tokenData.serumHistory,
       skintraitId: equippedTraits['SKINTRAIT'] || null,
-      tag: tokenData.tagInfo?.tag, tagIndex: tokenData._samuraiIndex ?? null,
+      tag: tokenData.tagInfo?.tag, tagIndex: tokenData._samuraiIndex ?? null, movieId: tokenData.movieId ?? null,
       duplicated: tokenData.dupInfo?.duplicated || false,
       dupNumber: tokenData.dupInfo?.dupNumber || 0,
     });

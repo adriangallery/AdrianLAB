@@ -1,0 +1,30 @@
+{
+  "movies": {
+    "1":  { "name": "Patrick Bateman", "description": "ZEROmovies Edition — American Psycho", "franchise": "American Psycho", "genre": "Thriller", "year": "2000", "hasAnimation": false },
+    "2":  { "name": "Batman", "description": "ZEROmovies Edition — Batman", "franchise": "Batman", "genre": "Action", "year": "1989", "hasAnimation": false },
+    "3":  { "name": "Beetlejuice (Shrunken Head)", "description": "ZEROmovies Edition — Beetlejuice", "franchise": "Beetlejuice", "genre": "Comedy", "year": "1988", "hasAnimation": false },
+    "4":  { "name": "Beetlejuice", "description": "ZEROmovies Edition — Beetlejuice", "franchise": "Beetlejuice", "genre": "Comedy", "year": "1988", "hasAnimation": false },
+    "5":  { "name": "Darth Vader", "description": "ZEROmovies Edition — Star Wars", "franchise": "Star Wars", "genre": "Sci-Fi", "year": "1977", "hasAnimation": false },
+    "6":  { "name": "Doc Brown", "description": "ZEROmovies Edition — Back to the Future", "franchise": "Back to the Future", "genre": "Sci-Fi", "year": "1985", "hasAnimation": false },
+    "7":  { "name": "Fester Addams", "description": "ZEROmovies Edition — The Addams Family", "franchise": "The Addams Family", "genre": "Comedy", "year": "1991", "hasAnimation": false },
+    "8":  { "name": "Peter Venkman", "description": "ZEROmovies Edition — Ghostbusters", "franchise": "Ghostbusters", "genre": "Comedy", "year": "1984", "hasAnimation": false },
+    "9":  { "name": "Stay Puft", "description": "ZEROmovies Edition — Ghostbusters", "franchise": "Ghostbusters", "genre": "Comedy", "year": "1984", "hasAnimation": false },
+    "10": { "name": "Gremlins", "description": "ZEROmovies Edition — Gremlins", "franchise": "Gremlins", "genre": "Comedy", "year": "1984", "hasAnimation": false },
+    "11": { "name": "Jean-Luc Picard", "description": "ZEROmovies Edition — Star Trek: The Next Generation", "franchise": "Star Trek", "genre": "Sci-Fi", "year": "1987", "hasAnimation": false },
+    "12": { "name": "Jessica Rabbit", "description": "ZEROmovies Edition — Who Framed Roger Rabbit", "franchise": "Who Framed Roger Rabbit", "genre": "Animation", "year": "1988", "hasAnimation": false },
+    "13": { "name": "Princess Leia", "description": "ZEROmovies Edition — Star Wars", "franchise": "Star Wars", "genre": "Sci-Fi", "year": "1977", "hasAnimation": false },
+    "14": { "name": "Leonardo", "description": "ZEROmovies Edition — Teenage Mutant Ninja Turtles", "franchise": "TMNT", "genre": "Action", "year": "1990", "hasAnimation": false },
+    "15": { "name": "Luke Skywalker", "description": "ZEROmovies Edition — Star Wars", "franchise": "Star Wars", "genre": "Sci-Fi", "year": "1977", "hasAnimation": false },
+    "16": { "name": "Marty McFly", "description": "ZEROmovies Edition — Back to the Future", "franchise": "Back to the Future", "genre": "Sci-Fi", "year": "1985", "hasAnimation": false },
+    "17": { "name": "Morpheus", "description": "ZEROmovies Edition — The Matrix", "franchise": "The Matrix", "genre": "Sci-Fi", "year": "1999", "hasAnimation": false },
+    "18": { "name": "Neo", "description": "ZEROmovies Edition — The Matrix", "franchise": "The Matrix", "genre": "Sci-Fi", "year": "1999", "hasAnimation": false },
+    "19": { "name": "Raphael", "description": "ZEROmovies Edition — Teenage Mutant Ninja Turtles", "franchise": "TMNT", "genre": "Action", "year": "1990", "hasAnimation": false },
+    "20": { "name": "Robin", "description": "ZEROmovies Edition — Batman", "franchise": "Batman", "genre": "Action", "year": "1997", "hasAnimation": false },
+    "21": { "name": "Roger Rabbit", "description": "ZEROmovies Edition — Who Framed Roger Rabbit", "franchise": "Who Framed Roger Rabbit", "genre": "Animation", "year": "1988", "hasAnimation": false },
+    "22": { "name": "Hannibal Lecter", "description": "ZEROmovies Edition — The Silence of the Lambs", "franchise": "The Silence of the Lambs", "genre": "Thriller", "year": "1991", "hasAnimation": false },
+    "23": { "name": "Teen Wolf", "description": "ZEROmovies Edition — Teen Wolf", "franchise": "Teen Wolf", "genre": "Comedy", "year": "1985", "hasAnimation": false },
+    "24": { "name": "Terminator", "description": "ZEROmovies Edition — The Terminator", "franchise": "The Terminator", "genre": "Sci-Fi", "year": "1984", "hasAnimation": false },
+    "25": { "name": "The Mask", "description": "ZEROmovies Edition — The Mask", "franchise": "The Mask", "genre": "Comedy", "year": "1994", "hasAnimation": false },
+    "26": { "name": "Wednesday Addams", "description": "ZEROmovies Edition — The Addams Family", "franchise": "The Addams Family", "genre": "Comedy", "year": "1991", "hasAnimation": false }
+  }
+}
