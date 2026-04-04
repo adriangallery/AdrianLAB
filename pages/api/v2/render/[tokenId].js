@@ -122,8 +122,8 @@ export default async function handler(req, res) {
       return sendPng(res, kvBuffer, 'HIT', hash, tokenId, start);
     }
 
-    // === 2. GitHub CDN check ===
-    const gh = await checkGitHub(tokenId, hash);
+    // === 2. GitHub CDN check (includes legacy banana fallback) ===
+    const gh = await checkGitHub(tokenId, hash, { isBanana });
     if (gh.exists && gh.url) {
       const ghBuffer = await downloadFromGitHub(gh.url);
       if (ghBuffer) {
