@@ -765,7 +765,7 @@ export default async function handler(req, res) {
               res.setHeader('X-Cache', 'GITHUB');
               res.setHeader('X-Source', 'github');
               res.setHeader('Content-Type', 'image/gif');
-              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
               res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED-GITHUB');
               console.log(`[custom-render] ✅ Custom GIF ${cleanTokenId} servido desde GitHub`);
               return res.status(200).send(gifBuffer);
@@ -786,7 +786,7 @@ export default async function handler(req, res) {
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('Content-Type', 'image/gif');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
         res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-ANIMATED');
         return res.status(200).send(cachedGif);
       }
@@ -807,7 +807,7 @@ export default async function handler(req, res) {
               res.setHeader('X-Cache', 'GITHUB');
               res.setHeader('X-Source', 'github');
               res.setHeader('Content-Type', 'image/png');
-              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+              res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
               res.setHeader('X-Version', 'ADRIANZERO-CUSTOM-GITHUB');
               res.setHeader('Content-Length', pngBuffer.length);
               console.log(`[custom-render] ✅ Custom PNG ${cleanTokenId} servido desde GitHub`);
@@ -1668,7 +1668,7 @@ export default async function handler(req, res) {
             const gifBuffer = await loadLabimagesAsset('ogpunks/101003.gif');
             if (gifBuffer) {
               res.setHeader('Content-Type', 'image/gif');
-              res.setHeader('Cache-Control', 'public, max-age=3600');
+              res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
               res.send(gifBuffer);
               return;
             }
@@ -1876,7 +1876,7 @@ export default async function handler(req, res) {
         // Configurar headers para GIF
         res.setHeader('X-Cache', 'MISS');
         res.setHeader('Content-Type', 'image/gif');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
         const gifVersionParts = ['ADRIANZERO-CUSTOM-ANIMATED'];
         if (isBounce) {
           gifVersionParts.push('BOUNCE');

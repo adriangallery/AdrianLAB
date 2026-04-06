@@ -348,7 +348,7 @@ export default async function handler(req, res) {
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
       res.setHeader('X-Cache', 'HIT');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/png');
       
       const versionParts = [];
@@ -439,7 +439,7 @@ export default async function handler(req, res) {
             res.setHeader('X-GitHub-Source', 'true');
             res.setHeader('X-Banana-Source', 'fixed-name'); // Indicar que viene de nombre fijo
             res.setHeader('Content-Type', 'image/png');
-            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
             
             const versionParts = [];
             if (isCloseup) versionParts.push('CLOSEUP');
@@ -953,7 +953,7 @@ export default async function handler(req, res) {
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('Content-Type', 'image/gif');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
         res.setHeader('X-Version', 'ADRIANZERO-ANIMATED');
         return res.status(200).send(cachedGif);
       }
@@ -1206,7 +1206,7 @@ export default async function handler(req, res) {
             res.setHeader('X-GitHub-Source', 'true');
             res.setHeader('X-Render-Hash', renderHash);
             res.setHeader('Content-Type', 'image/png');
-            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
             
             const versionParts = [];
             if (isCloseup) versionParts.push('CLOSEUP');
@@ -1589,7 +1589,7 @@ export default async function handler(req, res) {
             const gifBuffer = await loadLabimagesAsset('ogpunks/101003.gif');
             if (gifBuffer) {
               res.setHeader('Content-Type', 'image/gif');
-              res.setHeader('Cache-Control', 'public, max-age=3600');
+              res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
               res.send(gifBuffer);
               return;
             }
@@ -2296,7 +2296,7 @@ export default async function handler(req, res) {
         // Configurar headers para GIF
         res.setHeader('X-Cache', 'MISS');
         res.setHeader('Content-Type', 'image/gif');
-        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
         const gifVersionParts = ['ADRIANZERO-ANIMATED'];
         if (isBounce) {
           gifVersionParts.push('BOUNCE');
@@ -2428,7 +2428,7 @@ export default async function handler(req, res) {
     res.setHeader('X-Cache', 'MISS');
     res.setHeader('X-Render-Hash', renderHash);
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+    res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
     
     const versionParts = [];
     if (isCloseup) versionParts.push('CLOSEUP');

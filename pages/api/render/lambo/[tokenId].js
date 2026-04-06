@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
     // Configurar headers
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     res.setHeader('X-Version', 'LAMBO-ADRIANZERO-RENDERER');
     res.setHeader('X-Lambo-Color', lambo || LAMBO_DEFAULT);
     

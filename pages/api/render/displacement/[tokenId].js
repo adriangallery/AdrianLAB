@@ -577,7 +577,7 @@ export default async function handler(req, res) {
     
     // Headers de respuesta
     res.setHeader('Content-Type', 'image/gif');
-    res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache por 1 hora
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600'); // Cache por 1 hora
     res.setHeader('X-Displacement-Frames', frames.toString());
     res.setHeader('X-Displacement-Distance', distance.toString());
     res.setHeader('X-Displacement-Size', size.toString());

@@ -110,7 +110,7 @@ export default async function handler(req, res) {
     // Configurar headers
     res.setHeader('Content-Type', 'image/gif');
     res.setHeader('Content-Length', gifBuffer.length);
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     res.setHeader('X-Version', 'GIF-RENDERER-v2');
     res.setHeader('X-Render-Source', 'local');
     res.setHeader('X-Frame-Count', framesNum.toString());

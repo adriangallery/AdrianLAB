@@ -124,7 +124,7 @@ export default async function handler(req, res) {
     res.setHeader('X-Transform-Status', transformStatus);
     res.setHeader('X-Original-Size', originalPngBuffer.length.toString());
     res.setHeader('X-Transformed-Size', transformedBuffer.length.toString());
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 horas
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400'); // 24 horas
 
     console.log(`[nanobanana] 🍌 Renderizado Nanobanana completado exitosamente`);
     res.status(200).send(transformedBuffer);

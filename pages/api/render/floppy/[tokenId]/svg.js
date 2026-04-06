@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getFloppySvgTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
       res.setHeader('Content-Type', 'image/svg+xml');
       res.setHeader('X-Version', 'FLOPPY-SVG-OPTIMIZED');
       
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
       // Configurar headers
       res.setHeader('X-Cache', 'MISS');
       res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
       res.setHeader('X-Version', 'FLOPPY-SVG-OPTIMIZED');
       
       // Devolver SVG

@@ -98,7 +98,7 @@ export default async function handler(req, res) {
             res.setHeader('X-Render-Type', 'simple');
             res.setHeader('X-Cache', 'GITHUB');
             res.setHeader('X-Source', 'github');
-            res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora de cache
+            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600'); // 1 hora de cache
             
             console.log(`[floppy-render] ✅ Floppy simple ${tokenIdNum} servido desde GitHub`);
             return res.status(200).send(imageBuffer);
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('X-Version', 'FLOPPY-SIMPLE');
       res.setHeader('X-Render-Type', 'simple');
-      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora de cache
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600'); // 1 hora de cache
       
       console.log(`[floppy-render] 🔍 Simple render completado para token ${tokenIdNum}`);
       return res.status(200).send(pngBuffer);
@@ -153,7 +153,7 @@ export default async function handler(req, res) {
       // Configurar headers de caché
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       res.setHeader('X-Cache', 'HIT');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
       res.setHeader('Content-Type', isGif ? 'image/gif' : 'image/png');
       res.setHeader('X-Version', isSpecificFloppy ? (isPngFloppy ? 'FLOPPY-PNG-CACHED' : 'FLOPPY-GIF-CACHED') : 'FLOPPY-METODO-PERSONALIZADO');
       
@@ -236,7 +236,7 @@ export default async function handler(req, res) {
           // Configurar headers dinámicamente
           res.setHeader('X-Cache', 'MISS');
           res.setHeader('Content-Type', contentType);
-          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
           res.setHeader('X-Version', `FLOPPY-${fileExtension.toUpperCase()}-FALLBACK-INTELIGENTE-REBUILD-${Date.now()}`);
           
           console.log(`[floppy-render] ===== ${fileExtension.toUpperCase()} DE FLOPPY ESPECÍFICO SERVIDO CON FALLBACK INTELIGENTE =====`);
@@ -274,7 +274,7 @@ export default async function handler(req, res) {
             const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
             res.setHeader('X-Cache', 'HIT');
             res.setHeader('Content-Type', 'image/gif');
-            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+            res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
             res.setHeader('X-Version', 'FLOPPY-ANIMATED');
             return res.status(200).send(cachedGif);
           }
@@ -336,7 +336,7 @@ export default async function handler(req, res) {
                 res.setHeader('X-GitHub-Source', 'true');
                 res.setHeader('X-Render-Hash', gifHash);
                 res.setHeader('Content-Type', 'image/gif');
-                res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+                res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
                 res.setHeader('X-Version', 'FLOPPY-ANIMATED');
                 
                 return res.status(200).send(gifBuffer);
@@ -406,7 +406,7 @@ export default async function handler(req, res) {
           res.setHeader('X-Cache', 'MISS');
           res.setHeader('X-Render-Hash', gifHash);
           res.setHeader('Content-Type', 'image/gif');
-          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
           res.setHeader('X-Version', 'FLOPPY-ANIMATED');
           
           return res.status(200).send(gifBuffer);
@@ -430,7 +430,7 @@ export default async function handler(req, res) {
       // Configurar headers según el tipo de imagen
       res.setHeader('X-Cache', 'MISS');
       res.setHeader('Content-Type', isSerum ? 'image/gif' : 'image/png');
-      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
       res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
       
       // Devolver imagen
