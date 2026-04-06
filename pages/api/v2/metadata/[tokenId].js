@@ -110,7 +110,7 @@ export default async function handler(req, res) {
 function sendJson(res, metadata, start, etag = null, cacheStatus = null) {
   const elapsed = Date.now() - start;
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Cache-Control', `public, max-age=${TTL.METADATA_JSON}, stale-while-revalidate=60`);
+  res.setHeader('Cache-Control', `public, max-age=${TTL.METADATA_JSON}, s-maxage=${TTL.METADATA_JSON}, stale-while-revalidate=60`);
   if (etag) res.setHeader('ETag', etag);
   if (cacheStatus) res.setHeader('X-Cache', cacheStatus);
   res.setHeader('X-Response-Time', `${elapsed}ms`);
