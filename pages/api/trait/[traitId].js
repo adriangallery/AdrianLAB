@@ -108,53 +108,33 @@ export default async function handler(req, res) {
     // Clear with transparent background
     ctx.clearRect(0, 0, 500, 500);
     
-    // For this test version, we map names to existing files
-    // In the test naming model, "Blue Sky" maps to "blue.png"
-    let fileName;
-    if (assetInfo.name.includes("Blue")) fileName = "blue.png";
-    else if (assetInfo.name.includes("Green")) fileName = "green.png";
-    else if (assetInfo.name.includes("Red")) fileName = "red.png";
-    else if (assetInfo.name.includes("Normal")) fileName = "normal.png";
-    else if (assetInfo.name.includes("Rare")) fileName = "rare.png";
-    else if (assetInfo.name.includes("Cool")) fileName = "cool.png";
-    else if (assetInfo.name.includes("Laser")) fileName = "laser.png";
-    else if (assetInfo.name.includes("Happy")) fileName = "smile.png";
-    else if (assetInfo.name.includes("Serious")) fileName = "serious.png";
-    else if (assetInfo.name.includes("Surprised")) fileName = "surprised.png";
-    else if (assetInfo.name.includes("Hat")) fileName = "hat.png";
-    else if (assetInfo.name.includes("Cap")) fileName = "cap.png";
-    else if (assetInfo.name.includes("Lab")) fileName = "lab_coat.png";
-    else if (assetInfo.name.includes("Business")) fileName = "suit.png";
-    else if (assetInfo.name.includes("Casual")) fileName = "casual.png";
-    else if (assetInfo.name.includes("Smart")) fileName = "glasses.png";
-    else if (assetInfo.name.includes("Luxury")) fileName = "watch.png";
-    else if (assetInfo.name.includes("None")) fileName = "none.png";
-    else fileName = "normal.png"; // default
-    
-    const imagePath = path.join(process.cwd(), 'public', 'traits', assetInfo.category, fileName);
-    
-    if (fs.existsSync(imagePath)) {
-      const traitImage = await loadImage(imagePath);
+    // Look for the trait SVG file: public/traits/{CATEGORY}/{traitId}.svg
+    const svgPath = path.join(process.cwd(), 'public', 'traits', assetInfo.category, `${traitId}.svg`);
+    // Also try fileName if available: public/traits/{CATEGORY}/{fileName}.svg
+    const fileNamePath = assetInfo.fileName
+      ? path.join(process.cwd(), 'public', 'traits', assetInfo.category, `${assetInfo.fileName}.svg`)
+      : null;
+
+    const resolvedPath = fs.existsSync(svgPath) ? svgPath :
+      (fileNamePath && fs.existsSync(fileNamePath)) ? fileNamePath : null;
+
+    if (resolvedPath) {
+      const svgData = fs.readFileSync(resolvedPath, 'utf8');
+      // Convert SVG to data URL for canvas loading
+      const svgBuffer = Buffer.from(svgData);
+      const traitImage = await loadImage(svgBuffer);
       ctx.drawImage(traitImage, 0, 0, 500, 500);
-      
-      // Add trait name as overlay
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 450, 500, 50);
-      
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 20px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(`${assetInfo.name} #${traitId}`, 250, 480);
     } else {
-      // Fallback: create a colored rectangle with trait name
+      // Fallback: colored rectangle with trait name
       ctx.fillStyle = '#2D3748';
       ctx.fillRect(0, 0, 500, 500);
-      
+
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 24px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(assetInfo.name, 250, 250);
-      ctx.fillText(`#${traitId}`, 250, 280);
+      ctx.fillText(assetInfo.name || `Trait #${traitId}`, 250, 250);
+      ctx.font = '16px Arial';
+      ctx.fillText(`${assetInfo.category} #${traitId}`, 250, 280);
     }
     
     const buffer = canvas.toBuffer('image/png');
