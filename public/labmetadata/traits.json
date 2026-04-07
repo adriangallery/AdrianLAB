@@ -15183,10 +15183,17 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1175,
+      "name": "ZERO-Green",
+      "category": "BACKGROUND",
+      "fileName": "ZERO-Green",
+      "maxSupply": 0
     }
   ],
   "metadata": {
-    "totalTraits": 1281,
+    "totalTraits": 1176,
     "categories": [
       "BACKGROUND",
       "EAR",
