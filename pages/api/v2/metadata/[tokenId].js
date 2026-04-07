@@ -98,8 +98,8 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error(`[v2/metadata] Error:`, err);
     return res.status(200).json({
-      name: `AdrianZero #${req.query.tokenId || '?'}`,
-      description: 'AdrianZERO — Evolving PFP NFT on Base',
+      name: `ZERO #${req.query.tokenId || '?'}`,
+      description: 'ZERO — Evolving PFP NFT on Base',
       image: '',
       metadata_version: '2-error',
       error: err.message,
