@@ -382,7 +382,7 @@ export default async function handler(req, res) {
     const tagInfo = await getTokenTagInfo(cleanTokenId);
     
     // Determinar el nombre base según el tag
-    let tokenName = `AdrianZero #${cleanTokenId}`;
+    let tokenName = `ZERO #${cleanTokenId}`;
     if (tagInfo.tag === 'SubZERO') {
       tokenName = 'SubZERO';
       console.log(`[metadata] Token ${cleanTokenId} tiene tag SubZERO, sobreescribiendo nombre a "SubZERO"`);
@@ -464,7 +464,7 @@ export default async function handler(req, res) {
     
     const baseMetadata = {
       name: tokenName,
-      description: `An AdrianZero from the AdrianLAB collection`,
+      description: `A ZERO from the AdrianLAB collection`,
       image: imageUrl,
       external_url: imageUrl,
       metadata_version: "2",
@@ -569,7 +569,7 @@ export default async function handler(req, res) {
       // 0. SubZERO tag tiene prioridad ABSOLUTA (ya establecido arriba)
       // 1. profileName (PatientZERO) tiene prioridad alta
       // 2. customName (AdrianNameRegistry) tiene prioridad media
-      // 3. "AdrianZero" es el fallback por defecto
+      // 3. "ZERO" es el fallback por defecto
       // Si el token tiene tag SubZERO, el nombre ya fue establecido arriba, no sobrescribir
       if (tagInfo.tag === 'SubZERO') {
         // El nombre ya fue establecido como "SubZERO" arriba, mantenerlo
@@ -581,7 +581,7 @@ export default async function handler(req, res) {
         baseMetadata.name = `${customName} #${cleanTokenId}`;
         console.log(`[metadata] Nombre personalizado aplicado (prioridad media): ${baseMetadata.name}`);
       } else {
-        baseMetadata.name = `AdrianZero #${cleanTokenId}`;
+        baseMetadata.name = `ZERO #${cleanTokenId}`;
         console.log(`[metadata] Nombre por defecto aplicado: ${baseMetadata.name}`);
       }
  
@@ -1003,8 +1003,8 @@ export default async function handler(req, res) {
     console.error('[metadata] Stack trace:', error.stack);
     
     return res.status(200).json({
-      name: `AdrianZero #${req.query.tokenId || 'Unknown'}`,
-      description: `An AdrianZero from the AdrianLAB collection (Error Mode)`,
+      name: `ZERO #${req.query.tokenId || 'Unknown'}`,
+      description: `A ZERO from the AdrianLAB collection (Error Mode)`,
       image: `https://adrianlab.vercel.app/api/render/${req.query.tokenId || 1}.png?v=${Date.now()}`,
       external_url: `https://adrianlab.vercel.app/token/${req.query.tokenId || 1}`,
       metadata_version: "2-error",
