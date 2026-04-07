@@ -13,6 +13,9 @@ const nextConfig = {
       // === V2 SWAP: all endpoints routed to V2 ===
       // custom-external stays on V1 (has working GIF animated trait pipeline)
       { source: '/api/render/custom-external/:path*', destination: '/api/render/custom-external/:path*' },
+      // Floppy metadata stays on V1 (handles .json extension, traits 1-9999, floppies, serums, packs)
+      { source: '/api/metadata/floppy/:id.json', destination: '/api/metadata/floppy/:id.json' },
+      { source: '/api/metadata/floppy/:id', destination: '/api/metadata/floppy/:id' },
       { source: '/api/metadata/:path*', destination: '/api/v2/metadata/:path*' },
       // Exclude V1-only endpoints from V2 rewrite (no V2 handler exists)
       { source: '/api/render/floppy/:path*', destination: '/api/render/floppy/:path*' },
