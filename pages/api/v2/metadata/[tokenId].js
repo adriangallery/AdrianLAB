@@ -56,8 +56,11 @@ export default async function handler(req, res) {
       }
     }
 
+    // === Force refresh (skip cache) ===
+    const forceRefresh = req.query.refresh === 'true';
+
     // === KV cache check with ETag ===
-    const cached = await getCachedMetadata(tokenId);
+    const cached = !forceRefresh && await getCachedMetadata(tokenId);
     if (cached) {
       const { metadata, etag } = cached;
 
