@@ -631,6 +631,50 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading OGPUNKS metadata' });
       }
 
+    } else if (tokenIdNum >= 20000 && tokenIdNum <= 20099) {
+      // ===== ZEROADVENTURE ACHIEVEMENT BADGES =====
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para ACHIEVEMENT BADGE`);
+
+      const achPath = path.join(process.cwd(), 'public', 'labmetadata', 'achievements.json');
+      try {
+        const achBuffer = fs.readFileSync(achPath);
+        const achData = JSON.parse(achBuffer.toString());
+        const badge = achData.achievements.find(a => a.tokenId === tokenIdNum);
+
+        if (!badge) {
+          return res.status(404).json({ error: `Achievement badge ${tokenIdNum} not found` });
+        }
+
+        const imageUrl = `${baseUrl}/labimages/${badge.image}?v=${version}`;
+        const metadata = {
+          name: badge.name,
+          description: badge.description,
+          image: imageUrl,
+          external_url: badge.external_url || 'https://zeroadventure.vercel.app/',
+          attributes: [
+            { trait_type: 'Category', value: 'ACHIEVEMENTS' },
+            { trait_type: 'Type', value: 'Achievement Badge' },
+            { trait_type: 'Game', value: 'ZEROadventure II' },
+            { trait_type: 'Max Supply', value: badge.maxSupply || 0 }
+          ],
+          properties: {
+            files: [{ uri: imageUrl, type: 'image/png' }],
+            category: 'image',
+            creators: ['Adrian | HalfxTiger']
+          }
+        };
+
+        setCachedFloppyMetadata(tokenIdNum, metadata);
+        const ttlSeconds = 3600; // 1 hour cache
+        res.setHeader('X-Cache', 'MISS');
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+        return res.status(200).json(metadata);
+      } catch (err) {
+        console.error('[floppy-metadata] Error loading achievements:', err.message);
+        return res.status(500).json({ error: 'Error loading achievement metadata' });
+      }
+
     } else if (tokenIdNum === 1123 || tokenIdNum >= 10000) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS/PACKS (1123 o 10000+)`);
       
