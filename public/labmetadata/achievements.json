@@ -1,0 +1,139 @@
+{
+  "achievements": [
+    {
+      "tokenId": 20001,
+      "name": "Breaking & Entering",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Completed Chapter 1: Found the code and entered AdrianLAB",
+      "image": "achievements/ch1_complete.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20002,
+      "name": "The Receptionist",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Completed Chapter 2: Explored the trading floor and rooftop",
+      "image": "achievements/ch2_complete.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20003,
+      "name": "Below the Surface",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Completed Chapter 3: Discovered the basement and server room",
+      "image": "achievements/ch3_complete.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20004,
+      "name": "The Mountain Path",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Completed Chapter 4: Reached the clinic and met Dr. Satoshi",
+      "image": "achievements/ch4_complete.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20005,
+      "name": "Patient Zero",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Identity revealed: You found the truth about Patient Zero",
+      "image": "achievements/patient_zero.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20006,
+      "name": "ZEROadventure II Complete",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Completed the entire game: The ecosystem is saved",
+      "image": "achievements/game_complete.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20010,
+      "name": "VIP Floppy Disc",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — AdrianZERO holder reward: Received the VIP floppy",
+      "image": "achievements/holder_vip_floppy.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20011,
+      "name": "VIP Access",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Used the holder-only shortcut to the basement",
+      "image": "achievements/vip_access.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20012,
+      "name": "Archivist",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — CRT monitors recognized your Floppy collection",
+      "image": "achievements/archivist.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20013,
+      "name": "Alpha Leak",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Found Adrian's backup trading strategies",
+      "image": "achievements/alpha_leak.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20014,
+      "name": "Genesis Miner",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Activated the mining rig's original config",
+      "image": "achievements/genesis_miner.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20015,
+      "name": "Sector Zero",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Unlocked Adrian's hidden floppy message",
+      "image": "achievements/sector_zero.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20016,
+      "name": "Medical Records",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Decrypted the patient database",
+      "image": "achievements/medical_records.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20017,
+      "name": "Preserved",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Your floppies hold the story of Patient Zero",
+      "image": "achievements/preserved.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    },
+    {
+      "tokenId": 20020,
+      "name": "Signal Boost",
+      "category": "ACHIEVEMENTS",
+      "description": "ZEROadventure II — Salvaged the rooftop antenna",
+      "image": "achievements/signal_boost.png",
+      "maxSupply": 0,
+      "external_url": "https://zeroadventure.vercel.app/"
+    }
+  ]
+}
