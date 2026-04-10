@@ -645,7 +645,9 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: `Achievement badge ${tokenIdNum} not found` });
         }
 
-        const imageUrl = `${baseUrl}/labimages/${badge.image}?v=${version}`;
+        const ghRawBase = 'https://raw.githubusercontent.com/adriangallery/AdrianAdventure/main/assets/sprites/badges';
+        const imageUrl = `${ghRawBase}/${badge.image.replace('achievements/', '')}`;
+
         const metadata = {
           name: badge.name,
           description: badge.description,

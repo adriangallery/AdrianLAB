@@ -165,9 +165,8 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
     // Procesar tokens 1-9999 (traits), 262144-262147 (serums), 30000-35000 (T-shirts personalizados) y 10000-10100 (floppys)
-    // ===== ACHIEVEMENT BADGES (20000-20099): serve static images =====
+    // ===== ACHIEVEMENT BADGES (20000-20099): redirect to GitHub raw =====
     if (tokenIdNum >= 20000 && tokenIdNum <= 20099) {
-      console.log(`[floppy-render] Achievement badge ${tokenIdNum} - serving static image`);
       try {
         const achPath = path.join(process.cwd(), 'public', 'labmetadata', 'achievements.json');
         const achData = JSON.parse(fs.readFileSync(achPath).toString());
@@ -175,17 +174,12 @@ export default async function handler(req, res) {
         if (!badge) {
           return res.status(404).json({ error: `Achievement ${tokenIdNum} not found` });
         }
-        const imgPath = path.join(process.cwd(), 'public', 'labimages', badge.image);
-        if (fs.existsSync(imgPath)) {
-          const imgBuffer = fs.readFileSync(imgPath);
-          res.setHeader('Content-Type', 'image/png');
-          res.setHeader('Cache-Control', 'public, max-age=86400');
-          return res.status(200).send(imgBuffer);
-        }
-        // Fallback: placeholder
-        return res.status(404).json({ error: `Achievement image not found: ${badge.image}` });
+        const filename = badge.image.replace('achievements/', '');
+        const ghUrl = `https://raw.githubusercontent.com/adriangallery/AdrianAdventure/main/assets/sprites/badges/${filename}`;
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.redirect(302, ghUrl);
       } catch (err) {
-        return res.status(500).json({ error: 'Error loading achievement image' });
+        return res.status(500).json({ error: 'Error loading achievement data' });
       }
     }
 
