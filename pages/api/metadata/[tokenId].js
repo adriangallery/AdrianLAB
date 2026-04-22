@@ -34,6 +34,10 @@ const SPECIAL_TOKENS = {
   740: {
     image: '/labimages/specials/740.gif',
     name: 'ChuckZERO'
+  },
+  805: {
+    image: '/labimages/specials/805.png',
+    name: 'WakaZERO'
   }
 };
 
