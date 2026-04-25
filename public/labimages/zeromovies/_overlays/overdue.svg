@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" shape-rendering="crispEdges">
+  <!-- ZEROmovies OVERDUE overlay
+       Renders on top of the movie image when rentedAt + keepThreshold < now.
+       Day counter is drawn separately in compositor.js via Canvas.fillText
+       (PressStart2P font). Reserved area: bottom strip 760-880px. -->
+
+  <!-- Faded red wash -->
+  <rect x="0" y="0" width="1000" height="1000" fill="#ff0033" fill-opacity="0.10"/>
+
+  <!-- Top stamp band (rotated) -->
+  <g transform="translate(80,160) rotate(-12)">
+    <!-- Stamp outer border -->
+    <rect x="0" y="0" width="840" height="180" fill="none" stroke="#a8001f" stroke-width="14"/>
+    <!-- Inner double border -->
+    <rect x="14" y="14" width="812" height="152" fill="none" stroke="#a8001f" stroke-width="6"/>
+    <!-- OVERDUE text — rasterized as path so it doesn't depend on system fonts -->
+    <text x="420" y="124" font-family="Impact, 'Arial Black', sans-serif"
+          font-size="120" font-weight="900" letter-spacing="14"
+          text-anchor="middle" fill="#a8001f" stroke="#a8001f" stroke-width="3">OVERDUE</text>
+  </g>
+
+  <!-- Tape-eaten edges (corners): pixelated rectangles to simulate VHS damage -->
+  <g fill="#000" fill-opacity="0.55">
+    <rect x="0"   y="0"   width="60" height="20"/>
+    <rect x="0"   y="20"  width="40" height="20"/>
+    <rect x="0"   y="40"  width="20" height="20"/>
+    <rect x="940" y="0"   width="60" height="20"/>
+    <rect x="960" y="20"  width="40" height="20"/>
+    <rect x="980" y="40"  width="20" height="20"/>
+    <rect x="0"   y="980" width="60" height="20"/>
+    <rect x="0"   y="960" width="40" height="20"/>
+    <rect x="940" y="980" width="60" height="20"/>
+    <rect x="960" y="960" width="40" height="20"/>
+  </g>
+
+  <!-- Bottom strip background — Canvas draws "OVERDUE N DAYS" text here -->
+  <rect x="0" y="760" width="1000" height="200" fill="#000" fill-opacity="0.82"/>
+  <rect x="0" y="760" width="1000" height="6"   fill="#a8001f"/>
+  <rect x="0" y="954" width="1000" height="6"   fill="#a8001f"/>
+
+  <!-- "RETURN THIS TAPE" sub-message -->
+  <text x="500" y="910" font-family="Impact, 'Arial Black', sans-serif"
+        font-size="32" font-weight="900" letter-spacing="4"
+        text-anchor="middle" fill="#ff3344">RETURN THIS TAPE TO THE VIDEOCLUB</text>
+</svg>

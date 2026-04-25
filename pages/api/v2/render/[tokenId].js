@@ -110,6 +110,7 @@ export default async function handler(req, res) {
       serumHistory: tokenData.serumHistory,
       skintraitId: equippedTraits['SKINTRAIT'] || null,
       tag: tokenData.tagInfo?.tag, tagIndex: tokenData._samuraiIndex ?? null, movieId: tokenData.movieId ?? null,
+      overdueState: buildOverdueState(tokenData.movieRental),
       duplicated: tokenData.dupInfo?.duplicated || false,
       dupNumber: tokenData.dupInfo?.dupNumber || 0,
     });
@@ -166,6 +167,25 @@ export default async function handler(req, res) {
     console.error(`[v2/render] Error:`, err);
     return res.status(500).json({ error: 'Render failed', message: err.message });
   }
+}
+
+// Discretize rental state into a cache-key-friendly string.
+// Buckets daysOverdue at 0/1/3/7/14/30/60+ so renders aren't regenerated daily
+// for tapes that have been overdue for months — only on meaningful transitions.
+function buildOverdueState(movieRental) {
+  if (!movieRental) return '';
+  if (movieRental.permanent) return 'perm';
+  if (!movieRental.isOverdue) return 'active';
+  const d = movieRental.daysOverdue || 0;
+  let bucket;
+  if (d < 1) bucket = '0';
+  else if (d < 3) bucket = '1';
+  else if (d < 7) bucket = '3';
+  else if (d < 14) bucket = '7';
+  else if (d < 30) bucket = '14';
+  else if (d < 60) bucket = '30';
+  else bucket = '60';
+  return `od-${bucket}`;
 }
 
 function sendPng(res, buffer, cacheStatus, hash, tokenId, start) {
