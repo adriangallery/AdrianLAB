@@ -172,6 +172,10 @@ export default async function handler(req, res) {
 // Discretize rental state into a cache-key-friendly string.
 // Buckets daysOverdue at 0/1/3/7/14/30/60+ so renders aren't regenerated daily
 // for tapes that have been overdue for months — only on meaningful transitions.
+//
+// Prefix `od2-` (bumped from `od-`) busts the v1 cached PNGs that were stored
+// before the OVERDUE stamp text was rasterized via Canvas. Bump again if the
+// overlay artwork or text rendering changes in a visible way.
 function buildOverdueState(movieRental) {
   if (!movieRental) return '';
   if (movieRental.permanent) return 'perm';
@@ -185,7 +189,7 @@ function buildOverdueState(movieRental) {
   else if (d < 30) bucket = '14';
   else if (d < 60) bucket = '30';
   else bucket = '60';
-  return `od-${bucket}`;
+  return `od2-${bucket}`;
 }
 
 function sendPng(res, buffer, cacheStatus, hash, tokenId, start) {

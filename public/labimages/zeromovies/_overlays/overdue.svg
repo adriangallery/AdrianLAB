@@ -8,16 +8,12 @@
   <!-- Faded red wash -->
   <rect x="0" y="0" width="1000" height="1000" fill="#ff0033" fill-opacity="0.10"/>
 
-  <!-- Top stamp band (rotated) -->
+  <!-- Top stamp band (rotated). The "OVERDUE" text is drawn by the compositor
+       on Canvas using PressStart2P, because Resvg in the Vercel runtime has no
+       Impact/Arial Black available — any <text> here would render as empty. -->
   <g transform="translate(80,160) rotate(-12)">
-    <!-- Stamp outer border -->
     <rect x="0" y="0" width="840" height="180" fill="none" stroke="#a8001f" stroke-width="14"/>
-    <!-- Inner double border -->
     <rect x="14" y="14" width="812" height="152" fill="none" stroke="#a8001f" stroke-width="6"/>
-    <!-- OVERDUE text — rasterized as path so it doesn't depend on system fonts -->
-    <text x="420" y="124" font-family="Impact, 'Arial Black', sans-serif"
-          font-size="120" font-weight="900" letter-spacing="14"
-          text-anchor="middle" fill="#a8001f" stroke="#a8001f" stroke-width="3">OVERDUE</text>
   </g>
 
   <!-- Tape-eaten edges (corners): pixelated rectangles to simulate VHS damage -->
