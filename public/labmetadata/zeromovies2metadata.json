@@ -1,0 +1,30 @@
+{
+  "season": 2,
+  "tagline": "Return of the Pixel",
+  "movies": {
+    "27": { "name": "Leeloo", "description": "ZEROmovies S2 — The Fifth Element", "franchise": "The Fifth Element", "genre": "Sci-Fi", "year": "1997", "hasAnimation": false },
+    "28": { "name": "Bruce Lee", "description": "ZEROmovies S2 — Enter the Dragon", "franchise": "Enter the Dragon", "genre": "Martial Arts", "year": "1973", "hasAnimation": false },
+    "29": { "name": "Cruella", "description": "ZEROmovies S2 — 101 Dalmatians", "franchise": "101 Dalmatians", "genre": "Comedy", "year": "1996", "hasAnimation": false },
+    "30": { "name": "Donatello", "description": "ZEROmovies S2 — Teenage Mutant Ninja Turtles", "franchise": "TMNT", "genre": "Action", "year": "1990", "hasAnimation": false },
+    "31": { "name": "Ivan Drago", "description": "ZEROmovies S2 — Rocky IV", "franchise": "Rocky", "genre": "Sports", "year": "1985", "hasAnimation": false },
+    "32": { "name": "Elwood Blues", "description": "ZEROmovies S2 — The Blues Brothers", "franchise": "The Blues Brothers", "genre": "Comedy", "year": "1980", "hasAnimation": false },
+    "33": { "name": "Harley Quinn", "description": "ZEROmovies S2 — Suicide Squad", "franchise": "DC", "genre": "Action", "year": "2016", "hasAnimation": false },
+    "34": { "name": "Holly Golightly", "description": "ZEROmovies S2 — Breakfast at Tiffany's", "franchise": "Breakfast at Tiffany's", "genre": "Romance", "year": "1961", "hasAnimation": false },
+    "35": { "name": "Indiana Jones", "description": "ZEROmovies S2 — Raiders of the Lost Ark", "franchise": "Indiana Jones", "genre": "Adventure", "year": "1981", "hasAnimation": false },
+    "36": { "name": "Jake Blues", "description": "ZEROmovies S2 — The Blues Brothers", "franchise": "The Blues Brothers", "genre": "Comedy", "year": "1980", "hasAnimation": false },
+    "37": { "name": "John Rambo", "description": "ZEROmovies S2 — First Blood", "franchise": "Rambo", "genre": "Action", "year": "1982", "hasAnimation": false },
+    "38": { "name": "Joker", "description": "ZEROmovies S2 — The Dark Knight", "franchise": "DC", "genre": "Thriller", "year": "2008", "hasAnimation": false },
+    "39": { "name": "The Bride", "description": "ZEROmovies S2 — Kill Bill", "franchise": "Kill Bill", "genre": "Action", "year": "2003", "hasAnimation": false },
+    "40": { "name": "Lara Croft", "description": "ZEROmovies S2 — Tomb Raider", "franchise": "Tomb Raider", "genre": "Adventure", "year": "2001", "hasAnimation": false },
+    "41": { "name": "Luke, C-3PO & R2-D2", "description": "ZEROmovies S2 — Star Wars", "franchise": "Star Wars", "genre": "Sci-Fi", "year": "1977", "hasAnimation": false },
+    "42": { "name": "Major Dutch Schaefer", "description": "ZEROmovies S2 — Predator", "franchise": "Predator", "genre": "Sci-Fi", "year": "1987", "hasAnimation": true, "animatedPath": "/labimages/zeromovies2/animated/42.gif" },
+    "43": { "name": "Maverick", "description": "ZEROmovies S2 — Top Gun", "franchise": "Top Gun", "genre": "Action", "year": "1986", "hasAnimation": false },
+    "44": { "name": "Michelangelo", "description": "ZEROmovies S2 — Teenage Mutant Ninja Turtles", "franchise": "TMNT", "genre": "Action", "year": "1990", "hasAnimation": false },
+    "45": { "name": "Obi-Wan Kenobi", "description": "ZEROmovies S2 — Star Wars", "franchise": "Star Wars", "genre": "Sci-Fi", "year": "1977", "hasAnimation": false },
+    "46": { "name": "The Predator", "description": "ZEROmovies S2 — Predator", "franchise": "Predator", "genre": "Sci-Fi", "year": "1987", "hasAnimation": false },
+    "47": { "name": "Rocky Balboa", "description": "ZEROmovies S2 — Rocky", "franchise": "Rocky", "genre": "Sports", "year": "1976", "hasAnimation": false },
+    "48": { "name": "Spider-Man", "description": "ZEROmovies S2 — Spider-Man", "franchise": "Marvel", "genre": "Action", "year": "2002", "hasAnimation": false },
+    "49": { "name": "Superman", "description": "ZEROmovies S2 — Superman", "franchise": "DC", "genre": "Action", "year": "1978", "hasAnimation": false },
+    "50": { "name": "Topper Harley", "description": "ZEROmovies S2 — Hot Shots!", "franchise": "Hot Shots!", "genre": "Comedy", "year": "1991", "hasAnimation": false }
+  }
+}
