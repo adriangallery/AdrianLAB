@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated from: Golden_Shuriken.svg (recolored gold → steel/iron) -->
+<!-- Dimensions: 37x37 pixels (34 merged rects) -->
+<!-- Rect size: 1 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37">
+  <style>
+    rect { shape-rendering: crispEdges; }
+    svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+  </style>
+  <g id="pixels">
+    <rect x="31.00" y="1.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="30.00" y="2.00" width="1.00" height="1" fill="rgba(108,114,126,1.00)"/>
+    <rect x="31.00" y="2.00" width="1.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="32.00" y="2.00" width="1.00" height="1" fill="rgba(232,236,244,1.00)"/>
+    <rect x="30.00" y="3.00" width="1.00" height="1" fill="rgba(90,96,108,1.00)"/>
+    <rect x="31.00" y="3.00" width="1.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="32.00" y="3.00" width="1.00" height="1" fill="rgba(208,214,224,1.00)"/>
+    <rect x="28.00" y="4.00" width="1.00" height="1" fill="rgba(232,236,244,1.00)"/>
+    <rect x="29.00" y="4.00" width="1.00" height="1" fill="rgba(208,214,224,1.00)"/>
+    <rect x="30.00" y="4.00" width="1.00" height="1" fill="rgba(192,198,210,1.00)"/>
+    <rect x="31.00" y="4.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="32.00" y="4.00" width="1.00" height="1" fill="rgba(192,198,210,1.00)"/>
+    <rect x="33.00" y="4.00" width="1.00" height="1" fill="rgba(72,78,90,1.00)"/>
+    <rect x="34.00" y="4.00" width="1.00" height="1" fill="rgba(106,112,124,1.00)"/>
+    <rect x="27.00" y="5.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="28.00" y="5.00" width="2.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="30.00" y="5.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="32.00" y="5.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="33.00" y="5.00" width="2.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="35.00" y="5.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="28.00" y="6.00" width="1.00" height="1" fill="rgba(106,112,124,1.00)"/>
+    <rect x="29.00" y="6.00" width="1.00" height="1" fill="rgba(72,78,90,1.00)"/>
+    <rect x="30.00" y="6.00" width="1.00" height="1" fill="rgba(192,198,210,1.00)"/>
+    <rect x="31.00" y="6.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+    <rect x="32.00" y="6.00" width="1.00" height="1" fill="rgba(176,182,196,1.00)"/>
+    <rect x="33.00" y="6.00" width="1.00" height="1" fill="rgba(208,214,224,1.00)"/>
+    <rect x="34.00" y="6.00" width="1.00" height="1" fill="rgba(232,236,244,1.00)"/>
+    <rect x="30.00" y="7.00" width="1.00" height="1" fill="rgba(208,214,224,1.00)"/>
+    <rect x="31.00" y="7.00" width="1.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="32.00" y="7.00" width="1.00" height="1" fill="rgba(72,78,90,1.00)"/>
+    <rect x="30.00" y="8.00" width="1.00" height="1" fill="rgba(232,236,244,1.00)"/>
+    <rect x="31.00" y="8.00" width="1.00" height="1" fill="rgba(154,160,172,1.00)"/>
+    <rect x="32.00" y="8.00" width="1.00" height="1" fill="rgba(106,112,124,1.00)"/>
+    <rect x="31.00" y="9.00" width="1.00" height="1" fill="rgba(132,138,150,1.00)"/>
+  </g>
+</svg>
