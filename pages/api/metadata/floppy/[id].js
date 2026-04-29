@@ -677,6 +677,77 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading achievement metadata' });
       }
 
+    } else if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+      // ===== T-SHIT STUDIO (SWAG, 30000..35000) =====
+      // V1 legacy ids 30000..30013 are real (their entries live in studio.json).
+      // Pre-registered slots 30014..30149 may also have entries. V2 ids minted
+      // through TShitMintFacet (>=30150 going forward, plus the 30301 smoke
+      // test orphan) often won't have a studio.json entry yet — synthesize a
+      // minimal SWAG metadata object on the fly so OpenSea has something to
+      // show immediately.
+      console.log(`[floppy-metadata] Token ${tokenIdNum} - SWAG branch (T-Shit Studio)`);
+
+      let swagEntry = null;
+      try {
+        const studioPath = path.join(process.cwd(), 'public', 'labmetadata', 'studio.json');
+        const studioBuffer = fs.readFileSync(studioPath);
+        const studioData = JSON.parse(studioBuffer.toString());
+        swagEntry = studioData[String(tokenIdNum)] || null;
+      } catch (err) {
+        console.warn('[floppy-metadata] studio.json read failed, will synthesise:', err.message);
+      }
+
+      const ordinal = tokenIdNum - 30000 + 1;
+      const tokenData = swagEntry || {
+        name: `Studio T-Shit #${ordinal}`,
+        category: 'SWAG',
+        rarity: 'n/a',
+        maxSupply: 1,
+        description: 'BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger',
+        external_url: 'https://adrianzero.com',
+        masterminds: ['Community'],
+      };
+
+      // totalMintedPerAsset on AdrianTraitsCore (best-effort)
+      let totalMinted = 0;
+      try {
+        const { traitsCore } = await getContracts();
+        const minted = await traitsCore.totalMintedPerAsset(tokenIdNum);
+        totalMinted = minted.toNumber ? minted.toNumber() : Number(minted);
+      } catch (err) {
+        console.warn(`[floppy-metadata] totalMintedPerAsset failed for ${tokenIdNum}:`, err.message);
+      }
+
+      // V2 designs are 1/1 — render via the v2 endpoint which knows how to
+      // resolve the on-chain designURI for ids minted through TShitMintFacet.
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+      const imageUrl = `${baseUrl}/api/v2/render/${tokenIdNum}.png`;
+
+      const metadata = {
+        name: tokenData.name || `Studio T-Shit #${ordinal}`,
+        description: tokenData.description || 'BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger',
+        image: imageUrl,
+        external_url: tokenData.external_url || 'https://adrianzero.com',
+        attributes: [
+          { trait_type: 'Category', value: 'SWAG' },
+          { trait_type: 'Type', value: 'T-Shit Studio' },
+          { trait_type: 'Max Supply', value: tokenData.maxSupply ?? 1 },
+          { trait_type: 'Total Minted', value: totalMinted },
+        ],
+        properties: {
+          files: [{ uri: imageUrl, type: 'image/png' }],
+          category: 'image',
+          creators: tokenData.masterminds || ['Adrian | HalfxTiger'],
+        },
+      };
+
+      setCachedFloppyMetadata(tokenIdNum, metadata);
+      const ttlSeconds = 3600;
+      res.setHeader('X-Cache', 'MISS');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
+      return res.status(200).json(metadata);
+
     } else if (tokenIdNum === 1123 || tokenIdNum >= 10000) {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS/PACKS (1123 o 10000+)`);
       
