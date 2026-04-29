@@ -15216,6 +15216,20 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1178,
+      "name": "Phoenix Crown",
+      "category": "TOP",
+      "fileName": "1178",
+      "maxSupply": 1000,
+      "Type": "Animated",
+      "floppy": "$ZERO",
+      "description": "Phoenix Milestone — minted to every $ZERO holder above the threshold the moment cumulative burn crossed 10,000,000. From the ashes. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
