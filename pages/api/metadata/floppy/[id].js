@@ -718,10 +718,13 @@ export default async function handler(req, res) {
         console.warn(`[floppy-metadata] totalMintedPerAsset failed for ${tokenIdNum}:`, err.message);
       }
 
-      // V2 designs are 1/1 — render via the v2 endpoint which knows how to
-      // resolve the on-chain designURI for ids minted through TShitMintFacet.
+      // Use the full trait-card render (rarity tag + name banner + AdrianLAB
+      // watermark) so the listing image matches the rest of the SWAG/floppy
+      // collection on OpenSea. The endpoint internally pulls the user's design
+      // SVG from raw.githubusercontent.com (V1 ids 30000-30300) or from the
+      // on-chain designURI / Vercel Blob (V2 ids 30301+).
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-      const imageUrl = `${baseUrl}/api/v2/render/${tokenIdNum}.png`;
+      const imageUrl = `${baseUrl}/api/render/floppy/${tokenIdNum}`;
 
       const metadata = {
         name: tokenData.name || `Studio T-Shit #${ordinal}`,
