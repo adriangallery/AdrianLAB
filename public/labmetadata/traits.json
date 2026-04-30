@@ -15230,6 +15230,19 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1179,
+      "name": "Birthday Fren Hat",
+      "category": "HEAD",
+      "fileName": "1179",
+      "maxSupply": 1,
+      "floppy": "$ZERO",
+      "description": "happy bday fren",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
