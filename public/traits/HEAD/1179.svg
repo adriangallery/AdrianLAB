@@ -2,7 +2,7 @@
 <!-- Generated from: 1179_birthday_fren.png -->
 <!-- Dimensions: 37x37 pixels (40 merged rects) -->
 <!-- Rect size: 1 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37">
+<svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37">
   <style>
     rect { shape-rendering: crispEdges; }
     svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
