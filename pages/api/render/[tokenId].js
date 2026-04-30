@@ -24,6 +24,7 @@ import { generateRenderHash } from '../../../lib/render-hash.js';
 import { getAnimatedTraits } from '../../../lib/animated-traits-helper.js';
 import { generateGifFromLayers } from '../../../lib/gif-generator.js';
 import { getCachedAdrianZeroGif, setCachedAdrianZeroGif } from '../../../lib/cache.js';
+import { isTShitV2, resolveTShitUri } from '../../../lib/v2/rpc/tshit-resolver.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -261,6 +262,47 @@ export default async function handler(req, res) {
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
       console.error(`[render] Token ID inválido: ${cleanTokenId}`);
       return res.status(400).json({ error: 'Invalid token ID' });
+    }
+
+    // ===== FAST-PATH: Studio T-Shit standalone render =====
+    // Tokens 30014..35000 are user-minted 1/1 designs. Their SVG URL lives
+    // on-chain (tshitGetDesignURI). When the renderer is asked for the trait
+    // by itself (e.g. /api/render/30301.png from the trait inventory), we
+    // resolve the URI, fetch the SVG, rasterise to PNG and return it directly.
+    // This bypasses all AdrianZero composition logic.
+    {
+      const numId = parseInt(cleanTokenId, 10);
+      if (isTShitV2(numId)) {
+        try {
+          const designUri = await resolveTShitUri(numId);
+          if (designUri) {
+            const designResp = await fetch(designUri);
+            if (designResp.ok) {
+              const svgBuf = Buffer.from(await designResp.arrayBuffer());
+              const cachedPng = getCachedSvgPng(svgBuf.toString());
+              let pngBuffer;
+              if (cachedPng) {
+                pngBuffer = cachedPng;
+              } else {
+                const resvg = new Resvg(svgBuf, { fitTo: { mode: 'width', value: 1000 } });
+                pngBuffer = resvg.render().asPng();
+                setCachedSvgPng(svgBuf.toString(), pngBuffer);
+              }
+              res.setHeader('Content-Type', 'image/png');
+              res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+              res.setHeader('X-Render-Type', 'studio-tshit');
+              return res.status(200).send(pngBuffer);
+            }
+            console.warn(`[render] Studio ${numId}: designUri fetch failed (${designResp.status})`);
+          } else {
+            console.warn(`[render] Studio ${numId}: no on-chain designUri (unminted?)`);
+          }
+        } catch (err) {
+          console.error(`[render] Studio ${numId} fast-path error:`, err.message);
+        }
+        // Fall through to generic flow if anything failed — the trait will
+        // surface as a placeholder rather than 500.
+      }
     }
 
     // ===== LÓGICA ESPECIAL BANANA (TOGGLE 13) =====
@@ -759,17 +801,28 @@ export default async function handler(req, res) {
     };
 
     // NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
+    // V1 (30000..30013): legacy hardcoded path adrianzero.com/designs/<id>.svg
+    // V2 (30014..35000): on-chain URI via TShitMintFacet.tshitGetDesignURI
     const loadExternalTrait = async (traitId) => {
       try {
-        const baseUrl = 'https://adrianzero.com/designs';
-        const imageUrl = `${baseUrl}/${traitId}.svg`;
-        console.log(`[render] 🌐 Cargando trait ${traitId} desde URL externa: ${imageUrl}`);
+        const traitNum = parseInt(traitId, 10);
+        let imageUrl;
+        if (isTShitV2(traitNum)) {
+          imageUrl = await resolveTShitUri(traitNum);
+          if (!imageUrl) {
+            throw new Error(`No on-chain designUri for V2 token ${traitNum}`);
+          }
+          console.log(`[render] 🌐 Studio V2 trait ${traitNum} → on-chain URI: ${imageUrl}`);
+        } else {
+          imageUrl = `https://adrianzero.com/designs/${traitId}.svg`;
+          console.log(`[render] 🌐 Cargando trait ${traitId} desde URL externa (V1 legacy): ${imageUrl}`);
+        }
 
         const response = await fetch(imageUrl);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const svgBuffer = await response.arrayBuffer();
         console.log(`[render] 🌐 SVG cargado, tamaño: ${svgBuffer.byteLength} bytes`);
         
