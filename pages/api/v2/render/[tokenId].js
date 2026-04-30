@@ -14,6 +14,8 @@ import fs from 'fs';
 import path from 'path';
 import { applyCors } from '../../../../lib/v2/shared/cors.js';
 import { SPECIAL_TOKENS } from '../../../../lib/v2/shared/constants.js';
+import { isTShitV2, resolveTShitUri } from '../../../../lib/v2/rpc/tshit-resolver.js';
+import { Resvg } from '@resvg/resvg-js';
 import { fetchAllTokenData } from '../../../../lib/v2/rpc/token-data-fetcher.js';
 import { compositeToken } from '../../../../lib/v2/render/compositor.js';
 import { generateRenderHash, getRenderFilename } from '../../../../lib/v2/shared/render-hash.js';
@@ -38,6 +40,37 @@ export default async function handler(req, res) {
     const tokenId = parseInt(rawId);
     if (isNaN(tokenId) || tokenId < 0) {
       return res.status(400).json({ error: 'Invalid tokenId' });
+    }
+
+    // === Studio T-Shit standalone fast-path (30014..35000) ===
+    // User-minted 1/1 designs whose SVG lives on-chain via tshitGetDesignURI.
+    // When the renderer is asked for the trait by itself (e.g. the inventory
+    // thumbnail), we skip the AdrianZero composition flow and return the
+    // rasterised on-chain SVG directly.
+    if (isTShitV2(tokenId)) {
+      try {
+        const designUri = await resolveTShitUri(tokenId);
+        if (designUri) {
+          const designResp = await fetch(designUri, { signal: AbortSignal.timeout(5000) });
+          if (designResp.ok) {
+            const svgBuf = Buffer.from(await designResp.arrayBuffer());
+            const pngBuffer = new Resvg(svgBuf, { fitTo: { mode: 'width', value: 1000 } }).render().asPng();
+            res.setHeader('Content-Type', 'image/png');
+            res.setHeader('Cache-Control', `public, max-age=${TTL.RENDER_PNG}`);
+            res.setHeader('X-Render-Type', 'studio-tshit');
+            res.setHeader('X-Version', 'ADRIANZERO-V2-STUDIO');
+            res.setHeader('X-Render-Time', `${Date.now() - start}ms`);
+            return res.status(200).send(pngBuffer);
+          }
+          console.warn(`[v2/render] Studio ${tokenId}: designUri fetch ${designResp.status}`);
+        } else {
+          console.warn(`[v2/render] Studio ${tokenId}: no on-chain designUri`);
+        }
+      } catch (err) {
+        console.error(`[v2/render] Studio ${tokenId} fast-path error:`, err.message);
+      }
+      // Fall through to generic flow if anything failed (renders blank tshirt
+      // template rather than 500 — same behavior as before this fast-path).
     }
 
     // === Special 1/1 tokens (serve static GIF) ===
