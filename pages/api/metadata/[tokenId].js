@@ -396,25 +396,26 @@ export default async function handler(req, res) {
     if (tagInfo.tag === 'SamuraiZERO') {
       try {
         const { getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../lib/tag-logic.js');
+        const { getTokenHonor } = await import('../../../lib/contracts.js');
         const samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
-        
+
         if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
           console.log(`[metadata] 🥷 Token ${cleanTokenId} es SamuraiZERO con índice ${samuraiIndex}`);
-          
+
           // Cargar samuraimetadata.json
           const samuraiMetadataPath = path.join(process.cwd(), 'public', 'labmetadata', 'samuraimetadata.json');
           const samuraiMetadataContent = fs.readFileSync(samuraiMetadataPath, 'utf8');
           const samuraiMetadata = JSON.parse(samuraiMetadataContent);
-          
+
           // Obtener la entrada correspondiente
           const samuraiEntry = samuraiMetadata.collection[samuraiIndex];
-          
+
           if (samuraiEntry) {
             // Extraer nombre base y reemplazar número con tokenId real
             const nameMatch = samuraiEntry.name.match(/^(.+?)\s*#\d+$/);
             const baseName = nameMatch ? nameMatch[1] : samuraiEntry.name.split('#')[0].trim();
             const finalName = `${baseName} #${cleanTokenId}`;
-            
+
             // Construir URL de imagen (usar endpoint de renderizado normal)
             const urlParams = [];
             if (isCloseupToken) urlParams.push('closeup=true');
@@ -426,7 +427,13 @@ export default async function handler(req, res) {
             if (isBananaToken) urlParams.push('banana=true');
             const paramsString = urlParams.length > 0 ? `?${urlParams.join('&')}&v=${version}` : `?v=${version}`;
             const samuraiImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png${paramsString}`;
-            
+
+            // Read persistent Honor from SamuraiDojo (Diamond). Hidden when 0 to mirror UI.
+            const honor = await getTokenHonor(cleanTokenId);
+            const honorAttribute = honor > 0
+              ? [{ trait_type: "Honor (名誉)", value: honor, display_type: "number" }]
+              : [];
+
             // Construir metadata completo
             const samuraiMetadataResult = {
               name: finalName,
@@ -439,7 +446,8 @@ export default async function handler(req, res) {
                   trait_type: "Generation",
                   value: TAG_CONFIGS.SamuraiZERO.metadataGenOverride
                 },
-                ...(samuraiEntry.attributes || [])
+                ...(samuraiEntry.attributes || []),
+                ...honorAttribute
               ]
             };
             
