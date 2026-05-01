@@ -30,11 +30,19 @@ const normalizeCategory = (category) => {
 // NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
 // V1 (30000..30013): legacy hardcoded path adrianzero.com/designs/<id>.svg
 // V2 (30014..35000): on-chain URI via TShitMintFacet.tshitGetDesignURI
+//
+// V2 SVGs embed the t-shirt template as a 148×148 PNG via <image> + draw the
+// user's pixels with <rect>. Resvg interpolates the embedded PNG when scaling
+// 148→1000 so the t-shirt comes out blurry. We split the layers: rasterise
+// the embedded PNG with canvas nearest-neighbor, render the rest (vectors
+// only) via Resvg, then compose. This keeps both the t-shirt template and
+// the user's pixel-art crisp in the final 1000×1000 PNG.
 const loadExternalTrait = async (traitId) => {
   try {
     const traitNum = parseInt(traitId, 10);
     let externalUrl;
-    if (isTShitV2(traitNum)) {
+    const isV2 = isTShitV2(traitNum);
+    if (isV2) {
       externalUrl = await resolveTShitUri(traitNum);
       if (!externalUrl) {
         throw new Error(`No on-chain designUri for V2 token ${traitNum}`);
@@ -49,21 +57,43 @@ const loadExternalTrait = async (traitId) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    const svgBuffer = await response.arrayBuffer();
-    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: SVG descargado desde URL externa, tamaño: ${svgBuffer.byteLength} bytes`);
-    
-    // Renderizar SVG a PNG
-    const resvg = new Resvg(Buffer.from(svgBuffer), {
-      fitTo: {
-        mode: 'width',
-        value: 1000
+
+    const svgBuffer = Buffer.from(await response.arrayBuffer());
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: SVG descargado, tamaño: ${svgBuffer.byteLength} bytes`);
+
+    if (isV2) {
+      // Pixel-perfect rasterisation for Studio V2.
+      const svgText = svgBuffer.toString('utf8');
+      const imgMatch = svgText.match(/<image[^>]*href="(data:image\/png;base64,[^"]+)"[^/]*\/>/);
+
+      const composed = createCanvas(1000, 1000);
+      const cctx = composed.getContext('2d');
+      cctx.imageSmoothingEnabled = false;
+
+      if (imgMatch) {
+        // Layer 1: embedded t-shirt template PNG, scaled with nearest-neighbor.
+        const tplImg = await loadImage(imgMatch[1]);
+        cctx.drawImage(tplImg, 0, 0, 1000, 1000);
       }
+      // Layer 2: the rest of the SVG (vector rects of user pixels + text glyphs)
+      // rendered via Resvg — vectors stay crisp since there's no raster scaling.
+      const svgWithoutImage = imgMatch ? svgText.replace(imgMatch[0], '') : svgText;
+      const overlayPng = new Resvg(svgWithoutImage, { fitTo: { mode: 'width', value: 1000 } }).render().asPng();
+      const overlayImg = await loadImage(overlayPng);
+      cctx.drawImage(overlayImg, 0, 0, 1000, 1000);
+
+      const finalBuffer = composed.toBuffer('image/png');
+      console.log(`[custom-render] 🌐 LÓGICA EXTERNA: V2 trait ${traitId} compuesto pixel-perfect, tamaño: ${finalBuffer.length} bytes`);
+      return await loadImage(finalBuffer);
+    }
+
+    // V1 legacy: simple Resvg (no embedded raster, vectors only).
+    const resvg = new Resvg(svgBuffer, {
+      fitTo: { mode: 'width', value: 1000 }
     });
-    
     const pngBuffer = resvg.render().asPng();
-    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: PNG generado desde URL externa, tamaño: ${pngBuffer.length} bytes`);
-    
+    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: V1 PNG generado, tamaño: ${pngBuffer.length} bytes`);
+
     const image = await loadImage(pngBuffer);
     console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Trait ${traitId} cargado exitosamente desde URL externa`);
     return image;

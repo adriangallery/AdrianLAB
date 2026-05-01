@@ -15,7 +15,7 @@ import path from 'path';
 import { applyCors } from '../../../../lib/v2/shared/cors.js';
 import { SPECIAL_TOKENS } from '../../../../lib/v2/shared/constants.js';
 import { isTShitV2, resolveTShitUri } from '../../../../lib/v2/rpc/tshit-resolver.js';
-import { Resvg } from '@resvg/resvg-js';
+import { rasteriseStudioSvg } from '../../../../lib/v2/render/studio-rasterizer.js';
 import { fetchAllTokenData } from '../../../../lib/v2/rpc/token-data-fetcher.js';
 import { compositeToken } from '../../../../lib/v2/render/compositor.js';
 import { generateRenderHash, getRenderFilename } from '../../../../lib/v2/shared/render-hash.js';
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
           const designResp = await fetch(designUri, { signal: AbortSignal.timeout(5000) });
           if (designResp.ok) {
             const svgBuf = Buffer.from(await designResp.arrayBuffer());
-            const pngBuffer = new Resvg(svgBuf, { fitTo: { mode: 'width', value: 1000 } }).render().asPng();
+            const pngBuffer = await rasteriseStudioSvg(svgBuf);
             res.setHeader('Content-Type', 'image/png');
             res.setHeader('Cache-Control', `public, max-age=${TTL.RENDER_PNG}`);
             res.setHeader('X-Render-Type', 'studio-tshit');
