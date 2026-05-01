@@ -1252,10 +1252,15 @@ export default async function handler(req, res) {
     // ===== INTENTAR RENDERIZADO EXTERNO (solo si NO hay traits animados NI es token duplicado) =====
     // Si hay traits animados, Railway no puede generar GIFs, así que renderizamos directamente en Vercel
     // Si es token duplicado (GEN), forzar renderizado local para aplicar background #FF3388 y texto PARENT
+    // Si hay traits Studio V2 (30014..35000), el SVG vive on-chain y Railway no sabe resolverlo;
+    // forzamos render local para que loadExternalTrait use el resolver de tshit.
+    const hasStudioV2Trait = Object.values(finalTraits).some(id => isTShitV2(parseInt(id, 10)));
     if (hasAnimatedTraits) {
       console.log('[custom-external] 🎬 Traits animados detectados - Saltando Railway, renderizando GIF en Vercel');
     } else if (dupInfo && dupInfo.duplicated) {
       console.log('[custom-external] 🔄 DUPLICATOR: Token duplicado detectado - Saltando Railway, forzando renderizado local para background #FF3388 y texto PARENT');
+    } else if (hasStudioV2Trait) {
+      console.log('[custom-external] 🌐 Studio V2 trait detectado - Saltando Railway, render local con on-chain SVG');
     } else {
       console.log('[custom-external] 🚀 Intentando renderizado externo...');
       console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
