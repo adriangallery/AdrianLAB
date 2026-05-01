@@ -113,7 +113,14 @@ export default async function handler(req, res) {
 function sendJson(res, metadata, start, etag = null, cacheStatus = null) {
   const elapsed = Date.now() - start;
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Cache-Control', `public, max-age=${TTL.METADATA_JSON}, s-maxage=${TTL.METADATA_JSON}, stale-while-revalidate=60`);
+  // Two-tier caching:
+  //   max-age=60   → browsers/OpenSea cache 1 min (cheap, always close to fresh)
+  //   s-maxage=300 → Vercel Edge CDN serves for 5 min, then revalidates against origin
+  //   SWR=600      → during revalidation, Edge can serve stale up to 10 min
+  // Origin (this function) hits KV which keeps the durable 24h TTL — so the function
+  // is still O(KV) even at high traffic, but new metadata (e.g. honor after Budokai
+  // resolves) propagates within minutes instead of 24h.
+  res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
   if (etag) res.setHeader('ETag', etag);
   if (cacheStatus) res.setHeader('X-Cache', cacheStatus);
   res.setHeader('X-Response-Time', `${elapsed}ms`);
