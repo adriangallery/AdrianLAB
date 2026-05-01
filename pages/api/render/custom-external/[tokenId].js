@@ -13,6 +13,7 @@ import { loadLabimagesAsset } from '../../../../lib/github-storage.js';
 import { getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
 import { generateGifFromLayers } from '../../../../lib/gif-generator.js';
 import { getTokenDupInfo, getEffectiveGeneration } from '../../../../lib/duplicator-logic.js';
+import { isTShitV2, resolveTShitUri } from '../../../../lib/v2/rpc/tshit-resolver.js';
 
 // Función para normalizar categorías a mayúsculas
 const normalizeCategory = (category) => {
@@ -27,11 +28,23 @@ const normalizeCategory = (category) => {
 };
 
 // NUEVA FUNCIÓN: Cargar trait desde URL externa para tokens 30000-35000
+// V1 (30000..30013): legacy hardcoded path adrianzero.com/designs/<id>.svg
+// V2 (30014..35000): on-chain URI via TShitMintFacet.tshitGetDesignURI
 const loadExternalTrait = async (traitId) => {
   try {
-    const externalUrl = `https://adrianzero.com/designs/${traitId}.svg`;
-    console.log(`[custom-render] 🌐 LÓGICA EXTERNA: Cargando trait ${traitId} desde URL externa: ${externalUrl}`);
-    
+    const traitNum = parseInt(traitId, 10);
+    let externalUrl;
+    if (isTShitV2(traitNum)) {
+      externalUrl = await resolveTShitUri(traitNum);
+      if (!externalUrl) {
+        throw new Error(`No on-chain designUri for V2 token ${traitNum}`);
+      }
+      console.log(`[custom-render] 🌐 Studio V2 trait ${traitNum} → on-chain URI: ${externalUrl}`);
+    } else {
+      externalUrl = `https://adrianzero.com/designs/${traitId}.svg`;
+      console.log(`[custom-render] 🌐 LÓGICA EXTERNA (V1 legacy): Cargando trait ${traitId} desde URL externa: ${externalUrl}`);
+    }
+
     const response = await fetch(externalUrl);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
