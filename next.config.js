@@ -24,6 +24,7 @@ const nextConfig = {
       { source: '/api/render/lambo/:path*', destination: '/api/render/lambo/:path*' },
       { source: '/api/render/nanobanana/:path*', destination: '/api/render/nanobanana/:path*' },
       { source: '/api/render/test-external/:path*', destination: '/api/render/test-external/:path*' },
+      { source: '/api/render/floppy-v4/:path*', destination: '/api/render/floppy-v4/:path*' },
       { source: '/api/render/gif', destination: '/api/render/gif' },
       // Catch-all: everything else goes to V2
       { source: '/api/render/:path*', destination: '/api/v2/render/:path*' },
