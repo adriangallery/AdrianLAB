@@ -26,6 +26,25 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
+// ---------- env loader (.env.local then .env) ----------
+// No dotenv dep — keep it dependency-free. Existing process.env wins.
+function loadEnvFile(absPath) {
+  if (!fs.existsSync(absPath)) return;
+  const raw = fs.readFileSync(absPath, 'utf8');
+  for (const line of raw.split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/i);
+    if (!m) continue;
+    const key = m[1];
+    let val = m[2].trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = val;
+  }
+}
+loadEnvFile(path.join(ROOT, '.env.local'));
+loadEnvFile(path.join(ROOT, '.env'));
+
 // ---------- config ----------
 const CONTRACT_ADDRESS = '0x90546848474FB3c9fda3fdAd887969bB244E7e58'; // AdrianTraitsCore on Base
 const CHAIN = 'base';
