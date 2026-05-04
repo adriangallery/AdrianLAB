@@ -4,6 +4,17 @@ const nextConfig = {
   images: {
     domains: []
   },
+  // Keep historical render snapshots in /public (served via CDN) but out of
+  // each serverless function bundle — they push the lambda over Vercel's
+  // 250 MB uncompressed limit when many GIF auto-uploads accumulate.
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': [
+        'public/rendered-toggles/**',
+        'public/rendered-traits/**',
+      ],
+    },
+  },
   async rewrites() {
     return [
       {
