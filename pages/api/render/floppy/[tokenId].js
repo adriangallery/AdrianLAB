@@ -1,18 +1,37 @@
 import { FloppyRenderer } from '../../../../lib/renderers/floppy-renderer.js';
-import { 
-  getCachedFloppyRender, 
-  setCachedFloppyRender, 
+import { renderV4CardPng } from '../../../../lib/renderers/card-v4-renderer.js';
+import {
+  getCachedFloppyRender,
+  setCachedFloppyRender,
   getFloppyRenderTTL,
   getCachedFloppyGif,
   setCachedFloppyGif
 } from '../../../../lib/cache.js';
 import { isTraitAnimated, getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
-import { generateFloppyGif } from '../../../../lib/gif-generator.js';
+import { generateFloppyGif, generateFloppyGifV4 } from '../../../../lib/gif-generator.js';
 import { generateFloppySimpleHash, generateFloppyGifHash } from '../../../../lib/render-hash.js';
 import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple, fileExistsInGitHubFloppyGif, getGitHubFileUrlFloppyGif, uploadFileToGitHubFloppyGif } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
+
+async function getTotalMintedV4(tokenIdNum, fallback) {
+  try {
+    const { getContracts } = await import('../../../../lib/contracts.js');
+    const { traitsCore } = await Promise.race([
+      getContracts(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getContracts timeout 8000ms')), 8000)),
+    ]);
+    const minted = await Promise.race([
+      traitsCore.totalMintedPerAsset(tokenIdNum),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('totalMintedPerAsset timeout 5000ms')), 5000)),
+    ]);
+    return minted.toNumber();
+  } catch (err) {
+    console.warn(`[floppy-render/v4] totalMinted fallback for ${tokenIdNum}: ${err.message}`);
+    return fallback;
+  }
+}
 
 export default async function handler(req, res) {
   // 🔄 REBUILD FORZADO: ${new Date().toISOString()} - Forzando rebuild completo de Next.js
@@ -367,47 +386,14 @@ export default async function handler(req, res) {
             console.log(`[floppy-render] 📤 GIF de floppy ${tokenIdNum} no existe en GitHub - Se generará y subirá`);
           }
           
-          // Obtener totalMinted desde el contrato
-          let totalMinted = 0;
-          try {
-            const { getContracts } = await import('../../../../lib/contracts.js');
-            const contracts = getContracts();
-            const floppyContract = contracts.floppy;
-            if (floppyContract) {
-              const totalSupply = await floppyContract.totalSupply(tokenIdNum);
-              totalMinted = totalSupply.toNumber();
-            }
-          } catch (e) {
-            console.warn(`[floppy-render] No se pudo obtener totalMinted: ${e.message}`);
-          }
-          
-          // Calcular rarity (mismo método que FloppyRenderer)
-          const maxSupply = tokenData.maxSupply || 100;
-          const rarityMap = {
-            1: { tag: 'LEGENDARY', bg: '#ff6b00' },
-            5: { tag: 'EPIC', bg: '#9b59b6' },
-            10: { tag: 'RARE', bg: '#3498db' },
-            50: { tag: 'UNCOMMON', bg: '#2ecc71' },
-            100: { tag: 'COMMON', bg: '#95a5a6' }
-          };
-          
-          let rarity = rarityMap[100];
-          for (const [supply, r] of Object.entries(rarityMap)) {
-            if (maxSupply <= parseInt(supply)) {
-              rarity = r;
-              break;
-            }
-          }
-          
-          // Generar GIF con todos los elementos
-          const gifBuffer = await generateFloppyGif({
+          // Obtener totalMinted on-chain (v4 path)
+          const totalMinted = await getTotalMintedV4(tokenIdNum, tokenData.maxSupply || 0);
+
+          // Generar GIF v4 (Gemini layout, animated frames)
+          const gifBuffer = await generateFloppyGifV4({
             traitId: tokenIdNum,
             tokenData: tokenData,
             totalMinted: totalMinted,
-            rarity: rarity,
-            width: width,
-            height: height,
-            delay: delay
           });
           
           // Subir a GitHub
@@ -435,13 +421,33 @@ export default async function handler(req, res) {
         }
       }
       
-      // Usar la nueva clase FloppyRenderer para PNG normal
-      const renderer = new FloppyRenderer();
-      const imageBuffer = await renderer.generatePNG(tokenId);
+      // V4 swap: para traits 1-9999 (no animados, no serums) usar el renderer Gemini-style.
+      // Serums, T-shirts y OGPUNKS TOPs siguen con FloppyRenderer (diseños propios).
+      const isV4Trait = !isSerum && tokenIdNum >= 1 && tokenIdNum <= 9999;
+
+      let imageBuffer;
+      let xVersion;
+      if (isV4Trait) {
+        const traitsPath = path.join(process.cwd(), 'public/labmetadata/traits.json');
+        const traitsJson = JSON.parse(fs.readFileSync(traitsPath, 'utf8'));
+        const v4TokenData = traitsJson.traits.find((t) => t.tokenId === tokenIdNum) || {
+          name: `TRAIT #${tokenIdNum}`,
+          category: 'UNKNOWN',
+          maxSupply: 100,
+          floppy: 'OG',
+        };
+        const totalMinted = await getTotalMintedV4(tokenIdNum, v4TokenData.maxSupply || 0);
+        imageBuffer = renderV4CardPng({ tokenIdNum, tokenData: v4TokenData, totalMinted });
+        xVersion = 'FLOPPY-V4-PNG';
+      } else {
+        const renderer = new FloppyRenderer();
+        imageBuffer = await renderer.generatePNG(tokenId);
+        xVersion = 'FLOPPY-METODO-PERSONALIZADO';
+      }
 
       // ===== GUARDAR EN CACHÉ Y RETORNAR =====
       setCachedFloppyRender(tokenIdNum, imageBuffer);
-      
+
       const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
       console.log(`[floppy-render] ✅ Imagen cacheada por ${ttlSeconds}s (${Math.floor(ttlSeconds/3600)}h) para token ${tokenIdNum}`);
 
@@ -449,8 +455,8 @@ export default async function handler(req, res) {
       res.setHeader('X-Cache', 'MISS');
       res.setHeader('Content-Type', isSerum ? 'image/gif' : 'image/png');
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
-      res.setHeader('X-Version', 'FLOPPY-METODO-PERSONALIZADO');
-      
+      res.setHeader('X-Version', xVersion);
+
       // Devolver imagen
       console.log(`[floppy-render] ===== RENDERIZADO SVG COMPLETO FINALIZADO =====`);
       res.status(200).send(imageBuffer);
