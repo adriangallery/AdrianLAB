@@ -78,6 +78,7 @@ export default async function handler(req, res) {
   try {
     let { tokenId } = req.query;
     const isSimple = req.query.simple === 'true';
+    const skipCache = req.query.refresh === '1' || req.query.nocache === '1';
     
     if (tokenId && tokenId.endsWith('.png')) {
       tokenId = tokenId.replace('.png', '');
@@ -158,8 +159,10 @@ export default async function handler(req, res) {
     }
 
     // ===== SISTEMA DE CACHÉ PARA FLOPPY RENDER =====
-    const cachedImage = getCachedFloppyRender(tokenIdNum);
-    
+    // ?refresh=1 / ?nocache=1 skip the in-memory lambda cache so a swapped
+    // render (e.g. v4 hash bump) doesn't get masked by a warm-lambda buffer.
+    const cachedImage = skipCache ? null : getCachedFloppyRender(tokenIdNum);
+
     if (cachedImage) {
       console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
@@ -304,8 +307,8 @@ export default async function handler(req, res) {
           animatedTraits = await getAnimatedTraits([tokenIdNum]);
           console.log(`[floppy-render] 🎬 Trait animado detectado: ${tokenIdNum} (${animatedTraits[0]?.variants.length || 0} variantes)`);
           
-          // Verificar caché de GIF
-          const cachedGif = getCachedFloppyGif(tokenIdNum);
+          // Verificar caché de GIF (skip si refresh=1)
+          const cachedGif = skipCache ? null : getCachedFloppyGif(tokenIdNum);
           if (cachedGif) {
             console.log(`[floppy-render] 🎬 CACHE HIT para GIF de trait ${tokenIdNum}`);
             const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
