@@ -30,3 +30,4 @@ yarn-error.log*
 .vercel 
 .vercel
 token1_*.png
+.refresh-progress.json
