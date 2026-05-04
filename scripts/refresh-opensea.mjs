@@ -52,7 +52,9 @@ const VERCEL_BASE = 'https://adrianlab.vercel.app';
 const PROGRESS_FILE = path.join(ROOT, '.refresh-progress.json');
 
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || '';
-const DELAY_MS = OPENSEA_API_KEY ? 80 : 280; // 4req/s without key, ~12 req/s with
+// Conservative defaults: with prewarm, latency naturally throttles us;
+// without prewarm we'd hit 4 RPS so stay under it (300ms = 3.3 RPS).
+const DELAY_MS = parseInt(process.env.REFRESH_DELAY_MS || '', 10) || (OPENSEA_API_KEY ? 250 : 350);
 const VERCEL_TIMEOUT_MS = 60_000;            // GIFs can take 12s; allow margin
 const OPENSEA_TIMEOUT_MS = 15_000;
 
@@ -147,12 +149,25 @@ async function prewarmVercel(tokenId) {
   return { ct, xv, len };
 }
 
-async function refreshOpenSea(tokenId) {
+async function refreshOpenSea(tokenId, attempt = 1) {
   const url = `https://api.opensea.io/api/v2/chain/${CHAIN}/contract/${CONTRACT_ADDRESS}/nfts/${tokenId}/refresh`;
   const headers = { 'Accept': 'application/json' };
   if (OPENSEA_API_KEY) headers['X-API-KEY'] = OPENSEA_API_KEY;
   const res = await withTimeout(fetch(url, { method: 'POST', headers }), OPENSEA_TIMEOUT_MS, 'opensea');
   const body = await res.text().catch(() => '');
+
+  // Rate limit / transient errors: backoff + retry up to 4 attempts
+  if ((res.status === 429 || res.status >= 500) && attempt < 4) {
+    const retryAfterHeader = res.headers.get('retry-after');
+    const retryAfterSec = retryAfterHeader ? parseInt(retryAfterHeader, 10) : null;
+    const backoffMs = retryAfterSec
+      ? retryAfterSec * 1000
+      : Math.min(30_000, 1000 * Math.pow(2, attempt)); // 2s, 4s, 8s
+    console.warn(`  ↻ opensea ${res.status} — sleeping ${backoffMs}ms (attempt ${attempt}/4)`);
+    await sleep(backoffMs);
+    return refreshOpenSea(tokenId, attempt + 1);
+  }
+
   if (!res.ok) throw new Error(`opensea HTTP ${res.status}${body ? ` — ${body.slice(0, 120)}` : ''}`);
   return body;
 }
