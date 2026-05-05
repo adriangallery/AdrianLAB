@@ -99,7 +99,11 @@ async function loadOgCoverSvgBuffer(tokenIdNum) {
 }
 
 function svgBufferToB64Png(buf, width = V4_HS) {
-  const png = new Resvg(buf, { fitTo: { mode: 'width', value: width } }).render().asPng();
+  // Convert to string explicitly — resvg-js sometimes rejects Buffers that
+  // cross package boundaries (Vercel runtime quirk: "Value is non of these
+  // types String, Vec<u8>"). Plain string always works.
+  const svgStr = Buffer.isBuffer(buf) ? buf.toString('utf8') : String(buf);
+  const png = new Resvg(svgStr, { fitTo: { mode: 'width', value: width } }).render().asPng();
   return `data:image/png;base64,${png.toString('base64')}`;
 }
 
