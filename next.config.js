@@ -14,6 +14,15 @@ const nextConfig = {
         'public/rendered-traits/**',
       ],
     },
+    // Force-include directories that are read via dynamic process.cwd() paths
+    // (Next's Node File Tracer can't follow those statically).
+    outputFileTracingIncludes: {
+      '/api/**': [
+        'public/labmetadata/**',
+        'public/labimages/ogpunks/**',
+        'public/fonts/**',
+      ],
+    },
   },
   async rewrites() {
     return [
