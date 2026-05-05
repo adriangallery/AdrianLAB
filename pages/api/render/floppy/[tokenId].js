@@ -85,10 +85,17 @@ async function loadTshitDesignSvgBuffer(tokenIdNum) {
   return Buffer.from(await r.arrayBuffer());
 }
 
-function loadOgCoverSvgBuffer(tokenIdNum) {
-  const p = path.join(process.cwd(), 'public/labimages/ogpunks', `${tokenIdNum}.svg`);
-  if (!fs.existsSync(p)) throw new Error(`OG cover SVG missing: ${p}`);
-  return fs.readFileSync(p);
+async function loadOgCoverSvgBuffer(tokenIdNum) {
+  // Try local first, then fall back to GitHub raw via the same loader other
+  // renderers use. Vercel's File Tracer doesn't follow process.cwd() reads,
+  // so the local file may be absent from the lambda bundle even though it
+  // exists in the repo — the GitHub fallback covers that case.
+  const local = path.join(process.cwd(), 'public/labimages/ogpunks', `${tokenIdNum}.svg`);
+  if (fs.existsSync(local)) return fs.readFileSync(local);
+  const { loadLabimagesAsset } = await import('../../../../lib/github-storage.js');
+  const buf = await loadLabimagesAsset(`ogpunks/${tokenIdNum}.svg`);
+  if (!buf) throw new Error(`OG cover SVG missing locally and on GitHub: ${tokenIdNum}`);
+  return buf;
 }
 
 function svgBufferToB64Png(buf, width = V4_HS) {
