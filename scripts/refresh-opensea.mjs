@@ -60,7 +60,11 @@ const OPENSEA_TIMEOUT_MS = 15_000;
 
 // ---------- args ----------
 function parseArgs(argv) {
-  const args = { ids: null, range: null, all: false, dryRun: false, prewarm: true, reset: false };
+  const args = {
+    ids: null, range: null, all: false,
+    floppies: false, serums: false, ogcovers: false, tshits: false, allTypes: false,
+    dryRun: false, prewarm: true, reset: false,
+  };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--ids') { args.ids = (argv[++i] || '').split(',').map((x) => parseInt(x.trim(), 10)).filter(Number.isFinite); }
@@ -69,6 +73,11 @@ function parseArgs(argv) {
       if (m) args.range = [parseInt(m[1], 10), parseInt(m[2], 10)];
     }
     else if (a === '--all') args.all = true;
+    else if (a === '--floppies') args.floppies = true;
+    else if (a === '--serums') args.serums = true;
+    else if (a === '--ogcovers') args.ogcovers = true;
+    else if (a === '--tshits') args.tshits = true;
+    else if (a === '--all-types') args.allTypes = true;
     else if (a === '--dry-run') args.dryRun = true;
     else if (a === '--no-prewarm') args.prewarm = false;
     else if (a === '--reset') args.reset = true;
@@ -79,39 +88,80 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`refresh-opensea.mjs — refresh AdrianLAB traits on OpenSea + Vercel
+  console.log(`refresh-opensea.mjs — refresh AdrianLAB items on OpenSea + Vercel
 
-Options:
+Selection (combinable):
   --ids 1,2,3        explicit list of token ids
   --range A-B        inclusive range
-  --all              every tokenId present in public/labmetadata/traits.json
+  --all              every tokenId present in traits.json (1-9999)
+  --floppies         floppies / packs (10000-10100, from floppy.json)
+  --serums           serums (262144-262147, from serums.json)
+  --ogcovers         OG covers (100001-101003, from ogpunks.json)
+  --tshits           T-Shits Studio (30000-35000, from studio.json)
+  --all-types        --all + --floppies + --serums + --ogcovers + --tshits
+
+Behavior:
   --dry-run          print actions, no HTTP
   --no-prewarm       skip the Vercel ?refresh=1 step (only call OpenSea)
   --reset            wipe .refresh-progress.json before starting
   --help
 
 Env:
-  OPENSEA_API_KEY    if set, throttle relaxed; otherwise 280ms between calls
+  OPENSEA_API_KEY    if set, throttle relaxed
+  REFRESH_DELAY_MS   override delay between calls (default 250 with key, 350 without)
 `);
 }
 
-function buildIdList({ ids, range, all }) {
-  if (ids) return ids;
-  if (range) {
-    const out = [];
-    for (let i = range[0]; i <= range[1]; i++) out.push(i);
-    return out;
+function readJsonSafe(rel) {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); }
+  catch (e) { console.warn(`[refresh] could not read ${rel}: ${e.message}`); return null; }
+}
+
+function buildIdList(args) {
+  const out = new Set();
+  if (args.ids) args.ids.forEach((x) => out.add(x));
+  if (args.range) {
+    for (let i = args.range[0]; i <= args.range[1]; i++) out.add(i);
   }
-  if (all) {
-    const traitsPath = path.join(ROOT, 'public/labmetadata/traits.json');
-    const traits = JSON.parse(fs.readFileSync(traitsPath, 'utf8'));
-    return traits.traits
-      .map((t) => t.tokenId)
-      .filter((id) => Number.isFinite(id) && id >= 1 && id <= 9999)
-      .sort((a, b) => a - b);
+  const wantAllTraits = args.all || args.allTypes;
+  const wantFloppies  = args.floppies || args.allTypes;
+  const wantSerums    = args.serums   || args.allTypes;
+  const wantOgcovers  = args.ogcovers || args.allTypes;
+  const wantTshits    = args.tshits   || args.allTypes;
+
+  if (wantAllTraits) {
+    const t = readJsonSafe('public/labmetadata/traits.json');
+    (t?.traits || []).forEach((x) => {
+      if (Number.isFinite(x.tokenId) && x.tokenId >= 1 && x.tokenId <= 9999) out.add(x.tokenId);
+    });
   }
-  console.error('Need one of: --ids, --range, --all');
-  process.exit(1);
+  if (wantFloppies) {
+    const f = readJsonSafe('public/labmetadata/floppy.json');
+    (f?.floppys || []).forEach((x) => { if (Number.isFinite(x.tokenId)) out.add(x.tokenId); });
+  }
+  if (wantSerums) {
+    const s = readJsonSafe('public/labmetadata/serums.json');
+    (s?.serums || []).forEach((x) => { if (Number.isFinite(x.tokenId)) out.add(x.tokenId); });
+  }
+  if (wantOgcovers) {
+    const o = readJsonSafe('public/labmetadata/ogpunks.json');
+    (o?.traits || []).forEach((x) => { if (Number.isFinite(x.tokenId)) out.add(x.tokenId); });
+  }
+  if (wantTshits) {
+    const studio = readJsonSafe('public/labmetadata/studio.json');
+    if (studio) {
+      Object.keys(studio).forEach((k) => {
+        const id = parseInt(k, 10);
+        if (Number.isFinite(id)) out.add(id);
+      });
+    }
+  }
+
+  if (out.size === 0) {
+    console.error('Need one of: --ids, --range, --all, --floppies, --serums, --ogcovers, --tshits, --all-types');
+    process.exit(1);
+  }
+  return [...out].sort((a, b) => a - b);
 }
 
 // ---------- progress ----------
