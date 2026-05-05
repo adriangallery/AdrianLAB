@@ -85,17 +85,29 @@ async function loadTshitDesignSvgBuffer(tokenIdNum) {
   return Buffer.from(await r.arrayBuffer());
 }
 
-async function loadOgCoverSvgBuffer(tokenIdNum) {
-  // Try local first, then fall back to GitHub raw via the same loader other
-  // renderers use. Vercel's File Tracer doesn't follow process.cwd() reads,
-  // so the local file may be absent from the lambda bundle even though it
-  // exists in the repo — the GitHub fallback covers that case.
-  const local = path.join(process.cwd(), 'public/labimages/ogpunks', `${tokenIdNum}.svg`);
-  if (fs.existsSync(local)) return fs.readFileSync(local);
-  const { loadLabimagesAsset } = await import('../../../../lib/github-storage.js');
-  const buf = await loadLabimagesAsset(`ogpunks/${tokenIdNum}.svg`);
-  if (!buf) throw new Error(`OG cover SVG missing locally and on GitHub: ${tokenIdNum}`);
-  return buf;
+async function loadOgCoverSvgString(tokenIdNum) {
+  // Returns the SVG as a string (Resvg accepts strings cross-runtime; Buffers
+  // sometimes fail with "Value is non of these types String, Vec<u8>" or
+  // "SVG data parsing failed" on Vercel hobby lambdas).
+  // Try local FS first; fall back to GitHub raw (Vercel File Tracer doesn't
+  // bundle process.cwd() dynamic reads, so the local path may be missing).
+  const localPath = path.join(process.cwd(), 'public/labimages/ogpunks', `${tokenIdNum}.svg`);
+  if (fs.existsSync(localPath)) {
+    const txt = fs.readFileSync(localPath, 'utf8');
+    if (txt.includes('<svg')) return txt;
+    console.warn(`[floppy-render/v4] OG cover ${tokenIdNum}: local file exists but content invalid, falling back to GitHub`);
+  }
+  const url = `https://raw.githubusercontent.com/adriangallery/AdrianLAB/main/public/labimages/ogpunks/${tokenIdNum}.svg`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`OG cover GitHub raw fetch ${url} → ${r.status}`);
+  const txt = await r.text();
+  if (!txt.includes('<svg')) throw new Error(`OG cover GitHub returned invalid SVG (first 80 chars: ${txt.slice(0, 80)})`);
+  return txt;
+}
+
+function svgStringToB64Png(svgStr, width = V4_HS) {
+  const png = new Resvg(svgStr, { fitTo: { mode: 'width', value: width } }).render().asPng();
+  return `data:image/png;base64,${png.toString('base64')}`;
 }
 
 function svgBufferToB64Png(buf, width = V4_HS) {
@@ -410,8 +422,8 @@ export default async function handler(req, res) {
         try {
           const tokenData = loadTokenDataForV4(tokenIdNum);
           const totalMinted = tokenData.maxSupply || 1;
-          const svgBuf = loadOgCoverSvgBuffer(tokenIdNum);
-          const traitB64 = svgBufferToB64Png(svgBuf, V4_HS);
+          const svgStr = await loadOgCoverSvgString(tokenIdNum);
+          const traitB64 = svgStringToB64Png(svgStr, V4_HS);
           const outBuffer = renderV4CardPng({
             tokenIdNum,
             tokenData,
