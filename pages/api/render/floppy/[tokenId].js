@@ -1,5 +1,5 @@
 import { FloppyRenderer } from '../../../../lib/renderers/floppy-renderer.js';
-import { renderV4CardPng } from '../../../../lib/renderers/card-v4-renderer.js';
+import { renderV4CardPng, V4_HS } from '../../../../lib/renderers/card-v4-renderer.js';
 import {
   getCachedFloppyRender,
   setCachedFloppyRender,
@@ -8,12 +8,93 @@ import {
   setCachedFloppyGif
 } from '../../../../lib/cache.js';
 import { isTraitAnimated, getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
-import { generateFloppyGif, generateFloppyGifV4 } from '../../../../lib/gif-generator.js';
+import { generateFloppyGif, generateFloppyGifV4, generateStandaloneAnimatedV4 } from '../../../../lib/gif-generator.js';
 import { generateFloppySimpleHash, generateFloppyGifHash } from '../../../../lib/render-hash.js';
 import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple, fileExistsInGitHubFloppyGif, getGitHubFileUrlFloppyGif, uploadFileToGitHubFloppyGif } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
+
+// ===== V4 helpers =====
+// Loads token metadata from the right JSON depending on the id range.
+// Used by the v4 swap paths (floppy/serum/tshit/ogcover/trait).
+function loadTokenDataForV4(tokenIdNum) {
+  const ROOT = process.cwd();
+  const readJson = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
+  // Floppy / pack / 1123 legacy 1/1
+  if ((tokenIdNum >= 10000 && tokenIdNum <= 10100) || tokenIdNum === 1123) {
+    const f = readJson('public/labmetadata/floppy.json');
+    return f.floppys.find((x) => x.tokenId === tokenIdNum)
+      || { tokenId: tokenIdNum, name: `Floppy #${tokenIdNum}`, category: 'Floppy discs', maxSupply: 1, floppy: 'OG' };
+  }
+  // Serums
+  if (tokenIdNum >= 262144 && tokenIdNum <= 262147) {
+    const s = readJson('public/labmetadata/serums.json');
+    return (s.serums || []).find((x) => x.tokenId === tokenIdNum)
+      || { tokenId: tokenIdNum, name: `Serum #${tokenIdNum}`, category: 'Serum', maxSupply: 1, floppy: 'SERUM' };
+  }
+  // T-Shits (V1 + V2)
+  if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+    const studio = readJson('public/labmetadata/studio.json');
+    const entry = studio[String(tokenIdNum)];
+    if (entry) return { tokenId: tokenIdNum, ...entry, floppy: 'STUDIO' };
+    return { tokenId: tokenIdNum, name: `Studio T-Shit #${tokenIdNum - 30000 + 1}`, category: 'SWAG', maxSupply: 1, floppy: 'STUDIO' };
+  }
+  // OG covers
+  if (tokenIdNum >= 100001 && tokenIdNum <= 101003) {
+    const o = readJson('public/labmetadata/ogpunks.json');
+    return o.traits.find((x) => x.tokenId === tokenIdNum)
+      || { tokenId: tokenIdNum, name: 'OGcover', category: 'TOP', maxSupply: 1, floppy: 'OG' };
+  }
+  // Traits 1-9999
+  const t = readJson('public/labmetadata/traits.json');
+  return t.traits.find((x) => x.tokenId === tokenIdNum) || {
+    tokenId: tokenIdNum, name: `TRAIT #${tokenIdNum}`, category: 'UNKNOWN', maxSupply: 100, floppy: 'OG',
+  };
+}
+
+// Fetches the raw floppy/serum asset (.gif preferred, .png fallback).
+// IMPORTANT: this is the source artwork — the v4 handler then embeds it
+// inside the v4 card frame (instead of returning the raw bytes as before).
+async function loadFloppyArtBuffer(tokenIdNum, baseUrl) {
+  const tryFetch = async (ext) => {
+    const r = await fetch(`${baseUrl}/labimages/${tokenIdNum}.${ext}`);
+    if (!r.ok) return null;
+    return Buffer.from(await r.arrayBuffer());
+  };
+  const gif = await tryFetch('gif');
+  if (gif) return { buffer: gif, ext: 'gif' };
+  const png = await tryFetch('png');
+  if (png) return { buffer: png, ext: 'png' };
+  throw new Error(`No .gif or .png in /labimages/ for ${tokenIdNum}`);
+}
+
+// Resolves the T-Shit design SVG URL (V1 GitHub raw or V2 on-chain URI),
+// fetches it, and returns the SVG buffer.
+async function loadTshitDesignSvgBuffer(tokenIdNum) {
+  const { isTShitV2, resolveTShitUri } = await import('../../../../lib/v2/rpc/tshit-resolver.js');
+  let url;
+  if (isTShitV2(tokenIdNum)) {
+    url = await resolveTShitUri(tokenIdNum);
+    if (!url) throw new Error(`No on-chain designURI for T-Shit V2 ${tokenIdNum}`);
+  } else {
+    url = `https://raw.githubusercontent.com/adriangallery/adrianzero/main/designs/${tokenIdNum}.svg`;
+  }
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`T-Shit design fetch ${url} → ${r.status}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+
+function loadOgCoverSvgBuffer(tokenIdNum) {
+  const p = path.join(process.cwd(), 'public/labimages/ogpunks', `${tokenIdNum}.svg`);
+  if (!fs.existsSync(p)) throw new Error(`OG cover SVG missing: ${p}`);
+  return fs.readFileSync(p);
+}
+
+function svgBufferToB64Png(buf, width = V4_HS) {
+  const png = new Resvg(buf, { fitTo: { mode: 'width', value: width } }).render().asPng();
+  return `data:image/png;base64,${png.toString('base64')}`;
+}
 
 async function getTotalMintedV4(tokenIdNum, fallback) {
   try {
@@ -213,11 +294,143 @@ export default async function handler(req, res) {
       tokenIdNum === 1123 ||
       ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003))
     ) {
-      
-      // LÓGICA ESPECIAL: Si es un floppy específico (10000+ o 1123), buscar archivo con fallback inteligente
-      // ESTRATEGIA: Buscar .gif primero, si no existe, buscar .png como fallback
-      // 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo
-      if ((tokenIdNum >= 10000 && tokenIdNum <= 10100) || tokenIdNum === 1123) {
+
+      // ============================================================
+      // V4 SWAP — special-range items now embed inside the v4 card
+      // ============================================================
+      // BEHAVIORAL CHANGE: floppies/packs/serums used to return the raw
+      // .gif / .png bytes from /public/labimages directly. They now go
+      // through the v4 card frame (animated GIF or PNG, depending on the
+      // source asset). T-Shits and OG covers also rendered legacy via
+      // FloppyRenderer; both now use the v4 card too.
+      //
+      // To revert any of these to legacy: comment out the matching block
+      // and let it fall through to the FloppyRenderer path further below.
+      // ============================================================
+      const isSpecialFloppyAsset = (tokenIdNum >= 10000 && tokenIdNum <= 10100) || tokenIdNum === 1123;
+      const isSerumRange         = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      const isTshitRange         = tokenIdNum >= 30000 && tokenIdNum <= 35000;
+      const isOgCoverRange       = tokenIdNum >= 100001 && tokenIdNum <= 101003;
+
+      // ----- Floppies / packs / serums: source asset → v4 card frame -----
+      if (isSpecialFloppyAsset || isSerumRange) {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+          const tokenData = loadTokenDataForV4(tokenIdNum);
+          const totalMinted = tokenData.maxSupply || 1; // floppies/serums have no on-chain totalMintedPerAsset
+
+          const { buffer: srcBuf, ext } = await loadFloppyArtBuffer(tokenIdNum, baseUrl);
+          console.log(`[floppy-render/v4] ${tokenIdNum} source: ${ext.toUpperCase()} ${srcBuf.length}b`);
+
+          let outBuffer;
+          let contentType;
+          let xVersion;
+          if (ext === 'gif') {
+            outBuffer = await generateStandaloneAnimatedV4({
+              sourceGifBuffer: srcBuf,
+              tokenIdNum,
+              tokenData,
+              totalMinted,
+            });
+            contentType = 'image/gif';
+            xVersion = isSerumRange ? 'SERUM-V4-GIF' : 'FLOPPY-V4-GIF';
+          } else {
+            const traitB64 = `data:image/png;base64,${srcBuf.toString('base64')}`;
+            outBuffer = renderV4CardPng({
+              tokenIdNum,
+              tokenData,
+              totalMinted,
+              traitB64Override: traitB64,
+              skipMannequin: true,
+            });
+            contentType = 'image/png';
+            xVersion = isSerumRange ? 'SERUM-V4-PNG' : 'FLOPPY-V4-PNG-STANDALONE';
+          }
+
+          setCachedFloppyRender(tokenIdNum, outBuffer);
+          const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
+          res.setHeader('X-Version', xVersion);
+          console.log(`[floppy-render/v4] ${tokenIdNum} ✓ ${xVersion} ${outBuffer.length}b`);
+          return res.status(200).send(outBuffer);
+        } catch (err) {
+          console.error(`[floppy-render/v4] ${tokenIdNum} FAIL:`, err.message);
+          return res.status(500).json({
+            error: `v4 render failed for ${tokenIdNum}`,
+            details: err.message,
+            tokenId: tokenIdNum,
+          });
+        }
+      }
+
+      // ----- T-Shits: design SVG (V1 GitHub raw / V2 on-chain) → v4 card with mannequin -----
+      if (isTshitRange) {
+        try {
+          const tokenData = loadTokenDataForV4(tokenIdNum);
+          const totalMinted = tokenData.maxSupply || 1;
+          const designSvg = await loadTshitDesignSvgBuffer(tokenIdNum);
+          const traitB64 = svgBufferToB64Png(designSvg, V4_HS);
+          const outBuffer = renderV4CardPng({
+            tokenIdNum,
+            tokenData,
+            totalMinted,
+            traitB64Override: traitB64,
+            skipMannequin: false, // T-Shit designs overlay on top of the standard mannequin
+          });
+
+          setCachedFloppyRender(tokenIdNum, outBuffer);
+          const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('Content-Type', 'image/png');
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
+          res.setHeader('X-Version', 'TSHIT-V4-PNG');
+          console.log(`[floppy-render/v4] T-Shit ${tokenIdNum} ✓ ${outBuffer.length}b`);
+          return res.status(200).send(outBuffer);
+        } catch (err) {
+          console.error(`[floppy-render/v4] T-Shit ${tokenIdNum} FAIL:`, err.message);
+          return res.status(500).json({ error: `T-Shit v4 render failed`, details: err.message, tokenId: tokenIdNum });
+        }
+      }
+
+      // ----- OG covers: SVG already complete → v4 card standalone -----
+      if (isOgCoverRange) {
+        try {
+          const tokenData = loadTokenDataForV4(tokenIdNum);
+          const totalMinted = tokenData.maxSupply || 1;
+          const svgBuf = loadOgCoverSvgBuffer(tokenIdNum);
+          const traitB64 = svgBufferToB64Png(svgBuf, V4_HS);
+          const outBuffer = renderV4CardPng({
+            tokenIdNum,
+            tokenData,
+            totalMinted,
+            traitB64Override: traitB64,
+            skipMannequin: true, // OG cover SVG already contains the full body — no mannequin underneath
+          });
+
+          setCachedFloppyRender(tokenIdNum, outBuffer);
+          const ttlSeconds = Math.floor(getFloppyRenderTTL(tokenIdNum) / 1000);
+          res.setHeader('X-Cache', 'MISS');
+          res.setHeader('Content-Type', 'image/png');
+          res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
+          res.setHeader('X-Version', 'OGCOVER-V4-PNG');
+          console.log(`[floppy-render/v4] OG cover ${tokenIdNum} ✓ ${outBuffer.length}b`);
+          return res.status(200).send(outBuffer);
+        } catch (err) {
+          console.error(`[floppy-render/v4] OG cover ${tokenIdNum} FAIL:`, err.message);
+          return res.status(500).json({ error: `OG cover v4 render failed`, details: err.message, tokenId: tokenIdNum });
+        }
+      }
+
+      // ============================================================
+      // (Legacy block kept for safety — only reachable if a token id
+      // somehow falls into the outer `if` but doesn't match any of the
+      // v4 paths above. The `if` outer guard below also matches the
+      // 1-9999 trait range which we still want to render with v4.)
+      // ============================================================
+      // LEGACY (DEAD CODE for floppies/packs — kept for reference / quick rollback)
+      if (false /* disabled by v4 swap */) {
         console.log(`[floppy-render] 🔄 REBUILD FORZADO: Lógica actualizada para forzar rebuild completo`);
         console.log(`[floppy-render] 🎯 LÓGICA ESPECIAL: Floppy específico ${tokenIdNum} detectado, buscando con fallback inteligente`);
         
