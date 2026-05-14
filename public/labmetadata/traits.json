@@ -15243,10 +15243,23 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1180,
+      "name": "Happy Filthy BDAY",
+      "category": "TOP",
+      "fileName": "1180",
+      "maxSupply": 1,
+      "floppy": "$ZERO",
+      "description": "Happy Filthy BDAY",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
-    "totalTraits": 1177,
+    "totalTraits": 1178,
     "categories": [
       "BACKGROUND",
       "EAR",
