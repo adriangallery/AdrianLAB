@@ -291,6 +291,31 @@ export default async function handler(req, res) {
     console.log(`[floppy-render] Token ID: ${tokenId}`);
 
     // Procesar tokens 1-9999 (traits), 262144-262147 (serums), 30000-35000 (T-shirts personalizados) y 10000-10100 (floppys)
+
+    // ===== PAGERS / ACTION PACKS / McORDER DASH (15000-15014): serve static image from /labimages/ =====
+    // These tokens have pre-rendered static assets. The metadata handler returns animation_url for 15014.
+    // The render endpoint just serves the cover image (PNG or GIF) directly from /public/labimages/.
+    if (tokenIdNum >= 15000 && tokenIdNum <= 15014) {
+      const tryExtensions = ['gif', 'png'];
+      for (const ext of tryExtensions) {
+        const localPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.${ext}`);
+        if (fs.existsSync(localPath)) {
+          const buf = fs.readFileSync(localPath);
+          const contentType = ext === 'gif' ? 'image/gif' : 'image/png';
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+          res.setHeader('X-Version', 'PAGER-STATIC');
+          console.log(`[floppy-render] pager/game ${tokenIdNum}: served ${ext.toUpperCase()} from local fs`);
+          return res.status(200).send(buf);
+        }
+      }
+      // Fallback: static URL redirect if the file is not in the lambda bundle
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
+      // Try GIF first, fall back to PNG via redirect
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.redirect(302, `${baseUrl}/labimages/${tokenIdNum}.png`);
+    }
+
     // ===== ACHIEVEMENT BADGES (20000-20099): redirect to GitHub raw =====
     if (tokenIdNum >= 20000 && tokenIdNum <= 20099) {
       try {

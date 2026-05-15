@@ -66,8 +66,8 @@ export default async function handler(req, res) {
         name: "McORDER DASH",
         description: "An interactive minigame NFT from AdrianLAB. Play McORDER DASH and experience the AdrianZero universe through this unique interactive experience. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
         image: imageUrl,
-        external_url: imageUrl,
-        animation_url: "https://adrianzero.com/mcinteractive/",
+        external_url: "https://mcorder-dash.vercel.app/",
+        animation_url: "https://mcorder-dash.vercel.app/",
         attributes: [
           {
             trait_type: "Type",
