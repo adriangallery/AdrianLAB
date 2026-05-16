@@ -1,44 +1,1000 @@
 {
   "gums": [
     {
-      "tokenId": 324,
-      "name": "Gummy",
-      "traits": "[1,23,45,268]",
-      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "tokenId": 9001,
+      "name": "GumballZERO #1",
+      "traits": "[715,128,353]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 325,
-      "name": "Gummy",
-      "traits": "[1,23,45,268]",
-      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "tokenId": 9002,
+      "name": "GumballZERO #2",
+      "traits": "[854,844]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 326,
-      "name": "Gummy",
-      "traits": "[1,23,45,47,520,]",
-      "description": "BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "tokenId": 9003,
+      "name": "GumballZERO #3",
+      "traits": "[1175,1080,486]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
     },
     {
-      "tokenId": 262147,
-      "name": "GOLD Serum",
-      "category": "SERUMS",
-      "fileName": "GOLD-33",
-      "maxSupply": 43,
-      "successRatio": 33,
-      "floppy": "Serum",
-      "description": "GOLD Serum - Success Ratio 33% | AdrianLAB by HalfxTiger",
+      "tokenId": 9004,
+      "name": "GumballZERO #4",
+      "traits": "[750,480]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9005,
+      "name": "GumballZERO #5",
+      "traits": "[51,458,437]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9006,
+      "name": "GumballZERO #6",
+      "traits": "[699,97,744]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9007,
+      "name": "GumballZERO #7",
+      "traits": "[1118,46]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9008,
+      "name": "GumballZERO #8",
+      "traits": "[762,133]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9009,
+      "name": "GumballZERO #9",
+      "traits": "[51,117]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9010,
+      "name": "GumballZERO #10",
+      "traits": "[1175,1109,412,565,271]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9011,
+      "name": "GumballZERO #11",
+      "traits": "[854,89,1057]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9012,
+      "name": "GumballZERO #12",
+      "traits": "[678,471,1072]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9013,
+      "name": "GumballZERO #13",
+      "traits": "[699,1058]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9014,
+      "name": "GumballZERO #14",
+      "traits": "[859,141]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9015,
+      "name": "GumballZERO #15",
+      "traits": "[57,107,630]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9016,
+      "name": "GumballZERO #16",
+      "traits": "[699,723]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9017,
+      "name": "GumballZERO #17",
+      "traits": "[854,97]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9018,
+      "name": "GumballZERO #18",
+      "traits": "[57,88,416]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9019,
+      "name": "GumballZERO #19",
+      "traits": "[699,80,342]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9020,
+      "name": "GumballZERO #20",
+      "traits": "[1151,1059]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9021,
+      "name": "GumballZERO #21",
+      "traits": "[716,1002,600,1057]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9022,
+      "name": "GumballZERO #22",
+      "traits": "[1175,830,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9023,
+      "name": "GumballZERO #23",
+      "traits": "[1175,449,375]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9024,
+      "name": "GumballZERO #24",
+      "traits": "[715,131,73]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9025,
+      "name": "GumballZERO #25",
+      "traits": "[658,137,406]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9026,
+      "name": "GumballZERO #26",
+      "traits": "[1116,117,772]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9027,
+      "name": "GumballZERO #27",
+      "traits": "[51,1113,1028,72]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9028,
+      "name": "GumballZERO #28",
+      "traits": "[1172,819]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9029,
+      "name": "GumballZERO #29",
+      "traits": "[732,464]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9030,
+      "name": "GumballZERO #30",
+      "traits": "[797,459]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9031,
+      "name": "GumballZERO #31",
+      "traits": "[716,111,652]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9032,
+      "name": "GumballZERO #32",
+      "traits": "[862,759]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9033,
+      "name": "GumballZERO #33",
+      "traits": "[853,793,1149]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9034,
+      "name": "GumballZERO #34",
+      "traits": "[794,43,1067,824,72,1005]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9035,
+      "name": "GumballZERO #35",
+      "traits": "[754,457,380,345]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9036,
+      "name": "GumballZERO #36",
+      "traits": "[836,793]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9037,
+      "name": "GumballZERO #37",
+      "traits": "[1118,349,361]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9038,
+      "name": "GumballZERO #38",
+      "traits": "[781,844]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9039,
+      "name": "GumballZERO #39",
+      "traits": "[773,96,430,381,30,670]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9040,
+      "name": "GumballZERO #40",
+      "traits": "[717,116,243]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9041,
+      "name": "GumballZERO #41",
+      "traits": "[762,474]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9042,
+      "name": "GumballZERO #42",
+      "traits": "[855,133]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9043,
+      "name": "GumballZERO #43",
+      "traits": "[1175,758,433,570,682,1171,270]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9044,
+      "name": "GumballZERO #44",
+      "traits": "[1175,106]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9045,
+      "name": "GumballZERO #45",
+      "traits": "[55,101,60]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9046,
+      "name": "GumballZERO #46",
+      "traits": "[762,706]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9047,
+      "name": "GumballZERO #47",
+      "traits": "[754,477,765,772]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9048,
+      "name": "GumballZERO #48",
+      "traits": "[1172,464,786,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9049,
+      "name": "GumballZERO #49",
+      "traits": "[1175,100]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9050,
+      "name": "GumballZERO #50",
+      "traits": "[678,132]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9051,
+      "name": "GumballZERO #51",
+      "traits": "[55,440]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9052,
+      "name": "GumballZERO #52",
+      "traits": "[773,99,615]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9053,
+      "name": "GumballZERO #53",
+      "traits": "[847,350,1075]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9054,
+      "name": "GumballZERO #54",
+      "traits": "[371,1071,424]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9055,
+      "name": "GumballZERO #55",
+      "traits": "[866,457,674,417]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9056,
+      "name": "GumballZERO #56",
+      "traits": "[713,446,482]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9057,
+      "name": "GumballZERO #57",
+      "traits": "[973,43,1084]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9058,
+      "name": "GumballZERO #58",
+      "traits": "[57,460]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9059,
+      "name": "GumballZERO #59",
+      "traits": "[762,830]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9060,
+      "name": "GumballZERO #60",
+      "traits": "[1175,478,622,490,654]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9061,
+      "name": "GumballZERO #61",
+      "traits": "[714,456]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9062,
+      "name": "GumballZERO #62",
+      "traits": "[986,455,612,1124]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9063,
+      "name": "GumballZERO #63",
+      "traits": "[717,813,529]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9064,
+      "name": "GumballZERO #64",
+      "traits": "[990,843]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9065,
+      "name": "GumballZERO #65",
+      "traits": "[862,97]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9066,
+      "name": "GumballZERO #66",
+      "traits": "[658,480,425]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9067,
+      "name": "GumballZERO #67",
+      "traits": "[1129,457]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9068,
+      "name": "GumballZERO #68",
+      "traits": "[855,464]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9069,
+      "name": "GumballZERO #69",
+      "traits": "[713,350,710]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9070,
+      "name": "GumballZERO #70",
+      "traits": "[1175,116]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9071,
+      "name": "GumballZERO #71",
+      "traits": "[1116,112]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9072,
+      "name": "GumballZERO #72",
+      "traits": "[795,1147,806,497]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9073,
+      "name": "GumballZERO #73",
+      "traits": "[781,558]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9074,
+      "name": "GumballZERO #74",
+      "traits": "[860,656,1063,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9075,
+      "name": "GumballZERO #75",
+      "traits": "[1004,455,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9076,
+      "name": "GumballZERO #76",
+      "traits": "[1172,1122,1057]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9077,
+      "name": "GumballZERO #77",
+      "traits": "[859,1109]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9078,
+      "name": "GumballZERO #78",
+      "traits": "[757,97,406]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9079,
+      "name": "GumballZERO #79",
+      "traits": "[854,463,1057]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9080,
+      "name": "GumballZERO #80",
+      "traits": "[977,90]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9081,
+      "name": "GumballZERO #81",
+      "traits": "[773,1110]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9082,
+      "name": "GumballZERO #82",
+      "traits": "[52,822,825,833,1045,1057]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9083,
+      "name": "GumballZERO #83",
+      "traits": "[699,1146]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9084,
+      "name": "GumballZERO #84",
+      "traits": "[665,827]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9085,
+      "name": "GumballZERO #85",
+      "traits": "[658,349,587]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9086,
+      "name": "GumballZERO #86",
+      "traits": "[1118,1054,1027]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9087,
+      "name": "GumballZERO #87",
+      "traits": "[57,663,788,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9088,
+      "name": "GumballZERO #88",
+      "traits": "[732,452,534]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9089,
+      "name": "GumballZERO #89",
+      "traits": "[51,1002]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9090,
+      "name": "GumballZERO #90",
+      "traits": "[52,465]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9091,
+      "name": "GumballZERO #91",
+      "traits": "[860,474,770]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9092,
+      "name": "GumballZERO #92",
+      "traits": "[1160,1122]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9093,
+      "name": "GumballZERO #93",
+      "traits": "[56,1087,593]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9094,
+      "name": "GumballZERO #94",
+      "traits": "[990,89,243]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9095,
+      "name": "GumballZERO #95",
+      "traits": "[754,475,770]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9096,
+      "name": "GumballZERO #96",
+      "traits": "[1172,1146,557]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9097,
+      "name": "GumballZERO #97",
+      "traits": "[57,90,744]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9098,
+      "name": "GumballZERO #98",
+      "traits": "[867,118,782]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9099,
+      "name": "GumballZERO #99",
+      "traits": "[860,457]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 9100,
+      "name": "GumballZERO #100",
+      "traits": "[664,458]",
+      "description": "BE REAL | BE ADRIAN | GumballZERO by HalfxTiger",
       "masterminds": [
         "Adrian | HalfxTiger"
       ],
@@ -46,7 +1002,41 @@
     }
   ],
   "metadata": {
-    "totalSerums": 4,
-    "description": "Serums Collection - Base de datos de todos los Serums disponibles"
+    "collection": "GumballZERO",
+    "description": "Serie cerrada 100 NFTs GumballZERO — todos generation=0, skinName=Light",
+    "totalSupply": 100,
+    "tokenIdRange": {
+      "PLACEHOLDER": true,
+      "note": "RECONCILIAR POST-PREMINT",
+      "start": 9001,
+      "end": 9100
+    },
+    "seed": "20260516_GUMBALL_V8",
+    "generatedAt": "2026-05-16T20:38:15.274Z",
+    "fixedGeneration": 0,
+    "fixedSkinName": "Light",
+    "caveats": [
+      "v8: COLECCIÓN LIMPIA. Common 70%=2t / 30%=3t. Uncommon 3t. Rare 4-5t. Legendary 5-6t.",
+      "BG sólido ≥80%. Patterned cap=15. Stacking solo en Rare/Legendary.",
+      "Bubble-gum 557+1057 ≥10 tokens. GEAR 2Leg+3Rare. TOP 270/271 1/1.",
+      "Compositor v7 intacto (traits.json-driven). Sin GUMBALL_CAT_MAP.",
+      "GEN0-Light fijo. Sin 240/272/300/1168/1180. Tiers 60/28/10/2."
+    ],
+    "poolSizes": {
+      "BACKGROUND": 93,
+      "SOLID_BG": 63,
+      "PATTERNED_BG": 30,
+      "SWAG": 173,
+      "HAIR": 114,
+      "HEAD": 159,
+      "EYES": 134,
+      "MOUTH": 52,
+      "BEARD": 39,
+      "NECK": 20,
+      "GEAR": 37
+    },
+    "masterminds": [
+      "Adrian | HalfxTiger"
+    ]
   }
-} 
+}
