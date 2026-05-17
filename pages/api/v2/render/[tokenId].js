@@ -20,12 +20,18 @@ import { fetchAllTokenData } from '../../../../lib/v2/rpc/token-data-fetcher.js'
 import { compositeToken } from '../../../../lib/v2/render/compositor.js';
 import { generateRenderHash, getRenderFilename } from '../../../../lib/v2/shared/render-hash.js';
 import { kvGetBuffer, kvSetBuffer } from '../../../../lib/v2/cache/kv-client.js';
-import { renderKey, TTL } from '../../../../lib/v2/cache/cache-keys.js';
+import { renderKey, renderGifKey, TTL } from '../../../../lib/v2/cache/cache-keys.js';
 import { checkGitHub, downloadFromGitHub, uploadToGitHubAsync, uploadToGitHubSync } from '../../../../lib/v2/storage/github-uploader.js';
 import { getTokenToggleEffects } from '../../../../lib/v2/cache/toggle-store.js';
 import { normalizeTraits } from '../../../../lib/v2/render/layer-order.js';
 import { applyBananaTransform } from '../../../../lib/v2/render/banana-pipeline.js';
-import { getSamuraiIndex } from '../../../../lib/v2/tags/tag-resolver.js';
+import { getSamuraiIndex, getGumballIndex } from '../../../../lib/v2/tags/tag-resolver.js';
+import { detectAnimatedTraits } from '../../../../lib/v2/render/gif-pipeline.js';
+import {
+  generateGifFromLayers,
+  createBounceOnlyFrameGenerator,
+  createBounceSquashFrameGenerator,
+} from '../../../../lib/gif-generator.js';
 
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
@@ -100,6 +106,22 @@ export default async function handler(req, res) {
     const messageText = req.query.messages || null;
     const useAdrianFont = req.query.AZ === 'true' || req.query.az === 'true' || req.query.font === 'AZ';
 
+    // === Bounce on-demand (GIF output) ===
+    const isBounce = qBool('bounce');
+    const bounceConfig = isBounce ? {
+      enabled: true,
+      direction: req.query.bounceDir || 'y',
+      distance: parseFloat(req.query.bounceDist) || 30,
+      bounces: parseInt(req.query.bounceCount) || 2,
+      frames: parseInt(req.query.bounceFrames) || 12,
+      delay: parseInt(req.query.bounceDelay) || 1,
+      squash: req.query.squash !== undefined ? parseFloat(req.query.squash) : 0.12,
+      stretch: req.query.stretch !== undefined ? parseFloat(req.query.stretch) : 0.06,
+      anchorY: req.query.anchorY !== undefined ? parseFloat(req.query.anchorY) : 0.92,
+      frameMs: parseInt(req.query.bounceFrameMs) || 80,
+      perCategoryDelay: req.query.bouncePerCategory !== 'false',
+    } : null;
+
     // === Apply toggle effects ===
     const toggleEffects = await getTokenToggleEffects(tokenId);
     if (toggleEffects.closeup) isCloseup = true;
@@ -119,6 +141,13 @@ export default async function handler(req, res) {
     // === SamuraiZERO index ===
     if (tokenData.tagInfo?.tag === 'SamuraiZERO') {
       tokenData._samuraiIndex = await getSamuraiIndex(tokenId);
+    }
+
+    // === GumballZERO index ===
+    // Ordinal position in sorted ascending list of all GumballZERO tokenIds.
+    // Maps to collection[index] in gums.json — same pattern as _samuraiIndex.
+    if (tokenData.tagInfo?.tag === 'GumballZERO') {
+      tokenData._gumballIndex = await getGumballIndex(tokenId);
     }
 
     // === ZEROmovies: movieId already fetched in tokenData ===
@@ -142,47 +171,129 @@ export default async function handler(req, res) {
       failedSerumType: tokenData.failedSerumType, hasAdrianGFSerum: tokenData.hasAdrianGFSerum,
       serumHistory: tokenData.serumHistory,
       skintraitId: equippedTraits['SKINTRAIT'] || null,
-      tag: tokenData.tagInfo?.tag, tagIndex: tokenData._samuraiIndex ?? null, movieId: tokenData.movieId ?? null,
+      tag: tokenData.tagInfo?.tag, tagIndex: tokenData._samuraiIndex ?? null, gumballIndex: tokenData._gumballIndex ?? null, movieId: tokenData.movieId ?? null,
       overdueState: buildOverdueState(tokenData.movieRental),
       duplicated: tokenData.dupInfo?.duplicated || false,
       dupNumber: tokenData.dupInfo?.dupNumber || 0,
+      bounce: bounceConfig,
     });
 
+    // Detectar traits animados secuenciales (1165a/1165b/...). El compositor
+    // los excluye del PNG base; el GIF generator los reinyecta frame a frame.
+    // Closeup no soporta GIF, así que skipeamos la detección.
+    let animatedTraits = [];
+    let animatedTraitIdsSet = new Set();
+    if (!isCloseup) {
+      const allEquippedIds = Object.values(equippedTraits).filter(id => id && id !== 'None' && id !== '');
+      animatedTraits = await detectAnimatedTraits(allEquippedIds);
+      animatedTraitIdsSet = new Set(animatedTraits.map(at => String(at.baseId)));
+    }
+    const shouldEmitGif = !isCloseup && (animatedTraits.length > 0 || isBounce);
+
     const kvCacheKey = renderKey(tokenId, hash);
+    const kvGifKey = renderGifKey(tokenId, hash);
 
     // === 1. KV cache check ===
-    const kvBuffer = await kvGetBuffer(kvCacheKey);
-    if (kvBuffer) {
-      return sendPng(res, kvBuffer, 'HIT', hash, tokenId, start);
-    }
+    if (shouldEmitGif) {
+      const kvGifBuffer = await kvGetBuffer(kvGifKey);
+      if (kvGifBuffer) {
+        return sendGif(res, kvGifBuffer, 'HIT', hash, tokenId, start, isBounce);
+      }
+    } else {
+      const kvBuffer = await kvGetBuffer(kvCacheKey);
+      if (kvBuffer) {
+        return sendPng(res, kvBuffer, 'HIT', hash, tokenId, start);
+      }
 
-    // === 2. GitHub CDN check (includes legacy banana fallback) ===
-    const gh = await checkGitHub(tokenId, hash, { isBanana });
-    if (gh.exists && gh.url) {
-      const ghBuffer = await downloadFromGitHub(gh.url);
-      if (ghBuffer) {
-        // Persist to KV for next time
-        kvSetBuffer(kvCacheKey, ghBuffer, TTL.RENDER_PNG).catch(() => {});
-        return sendPng(res, ghBuffer, 'GITHUB', hash, tokenId, start);
+      // === 2. GitHub CDN check (PNG only — banana etc) ===
+      const gh = await checkGitHub(tokenId, hash, { isBanana });
+      if (gh.exists && gh.url) {
+        const ghBuffer = await downloadFromGitHub(gh.url);
+        if (ghBuffer) {
+          kvSetBuffer(kvCacheKey, ghBuffer, TTL.RENDER_PNG).catch(() => {});
+          return sendPng(res, ghBuffer, 'GITHUB', hash, tokenId, start);
+        }
       }
     }
 
-    // === 3. Render ===
-    const { buffer } = await compositeToken(tokenData, {
+    // === 3. Render PNG base ===
+    // Si la salida final es un GIF, dile al compositor que omita los traits
+    // animados (los re-añadirá el GIF generator frame a frame). Para bounce
+    // pedimos también el split del background así el bg queda fijo en el GIF.
+    const composite = await compositeToken(tokenData, {
       closeup: isCloseup, shadow: isShadow, glow: isGlow,
       bn: isBn, uv: isUv, blackout: isBlackout,
       messageText, useAdrianFont,
+      animatedTraitIds: animatedTraitIdsSet,
+      splitBackground: isBounce && !isCloseup,
     });
+    const { buffer, backgroundBuffer, characterBuffer } = composite;
 
     let finalBuffer = buffer;
 
     // === 4. Banana transform (if active) ===
-    if (isBanana) {
+    if (isBanana && !shouldEmitGif) {
+      // Banana es incompatible con GIF (transforma raster vía Gemini)
       const bananaBuffer = await applyBananaTransform(buffer, tokenId);
       if (bananaBuffer) finalBuffer = bananaBuffer;
     }
 
-    // === 5. Cache + upload ===
+    // === 4.5. GIF branch ===
+    if (shouldEmitGif) {
+      try {
+        const frameMs = bounceConfig?.frameMs || 80;
+        let customGen;
+
+        if (isBounce) {
+          // Capa 0 estática: background (no rebota).
+          // Capa 1+ con bounce: el personaje (sin bg) y, si los hay, traits animados.
+          const bounceLayers = [];
+          if (backgroundBuffer) {
+            bounceLayers.push({ pngBuffer: backgroundBuffer, isStatic: true, category: 'BACKGROUND' });
+          }
+          if (characterBuffer) {
+            bounceLayers.push({ pngBuffer: characterBuffer, category: 'BODY' });
+          } else {
+            // Fallback: si por alguna razón no tenemos split, todo el buffer rebota
+            bounceLayers.push({ pngBuffer: finalBuffer, category: 'BODY' });
+          }
+
+          customGen = createBounceSquashFrameGenerator({
+            layers: bounceLayers,
+            animatedTraits,
+            bounceConfig,
+            width: 1000,
+            height: 1000,
+            delay: frameMs,
+          });
+        }
+
+        const gifBuffer = isBounce
+          ? await generateGifFromLayers({
+              stableLayers: [],
+              animatedTraits: [],
+              width: 1000, height: 1000,
+              delay: frameMs,
+              customFrameGenerator: customGen,
+              totalFrames: bounceConfig.frames,
+            })
+          : await generateGifFromLayers({
+              stableLayers: [{ pngBuffer: finalBuffer }],
+              animatedTraits,
+              width: 1000, height: 1000,
+              delay: 500,
+            });
+
+        kvSetBuffer(kvGifKey, gifBuffer, TTL.RENDER_GIF).catch(() => {});
+        return sendGif(res, gifBuffer, 'MISS', hash, tokenId, start, isBounce);
+      } catch (err) {
+        console.error(`[v2/render] GIF generation failed for ${tokenId}:`, err.message);
+        console.error(err.stack);
+        // Caemos a PNG estático abajo
+      }
+    }
+
+    // === 5. Cache + upload (PNG path) ===
     kvSetBuffer(kvCacheKey, finalBuffer, TTL.RENDER_PNG).catch(() => {});
 
     if (isBanana) {
@@ -233,5 +344,22 @@ function sendPng(res, buffer, cacheStatus, hash, tokenId, start) {
   res.setHeader('X-Render-Hash', hash);
   res.setHeader('X-Render-Time', `${elapsed}ms`);
   res.setHeader('X-Version', 'ADRIANZERO-V2');
+  return res.status(200).send(buffer);
+}
+
+function sendGif(res, buffer, cacheStatus, hash, tokenId, start, isBounce) {
+  const elapsed = Date.now() - start;
+  res.setHeader('Content-Type', 'image/gif');
+  res.setHeader('Cache-Control', `public, max-age=${TTL.RENDER_GIF}`);
+  res.setHeader('Content-Length', buffer.length);
+  res.setHeader('X-Cache', cacheStatus);
+  res.setHeader('X-Render-Hash', hash);
+  res.setHeader('X-Render-Time', `${elapsed}ms`);
+  const versionParts = ['ADRIANZERO-V2-ANIMATED'];
+  if (isBounce) {
+    versionParts.push('BOUNCE');
+    res.setHeader('X-Bounce', 'enabled');
+  }
+  res.setHeader('X-Version', versionParts.join('-'));
   return res.status(200).send(buffer);
 }
