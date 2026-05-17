@@ -25,7 +25,7 @@ import { checkGitHub, downloadFromGitHub, uploadToGitHubAsync, uploadToGitHubSyn
 import { getTokenToggleEffects } from '../../../../lib/v2/cache/toggle-store.js';
 import { normalizeTraits } from '../../../../lib/v2/render/layer-order.js';
 import { applyBananaTransform } from '../../../../lib/v2/render/banana-pipeline.js';
-import { getSamuraiIndex, getGumballIndex } from '../../../../lib/v2/tags/tag-resolver.js';
+import { getSamuraiIndex, getGumballIndex, resolveGumballForToken } from '../../../../lib/v2/tags/tag-resolver.js';
 import { detectAnimatedTraits } from '../../../../lib/v2/render/gif-pipeline.js';
 import {
   generateGifFromLayers,
@@ -143,11 +143,17 @@ export default async function handler(req, res) {
       tokenData._samuraiIndex = await getSamuraiIndex(tokenId);
     }
 
-    // === GumballZERO index ===
-    // Ordinal position in sorted ascending list of all GumballZERO tokenIds.
-    // Maps to collection[index] in gums.json — same pattern as _samuraiIndex.
-    if (tokenData.tagInfo?.tag === 'GumballZERO') {
-      tokenData._gumballIndex = await getGumballIndex(tokenId);
+    // === GumballZERO (robust detection) ===
+    // parseTagInfo's multicall detection is unreliable for GumballMintFacet
+    // (its own tag registry; the shared getTokensByTag belongs to SamuraiMint).
+    // Resolve directly via the gumball reader — the same proven path the
+    // metadata endpoint uses — and force tag + ordinal index here.
+    {
+      const _g = await resolveGumballForToken(tokenId);
+      if (_g.isGumball) {
+        tokenData.tagInfo = { ...(tokenData.tagInfo || {}), tag: 'GumballZERO' };
+        tokenData._gumballIndex = _g.index ?? 0;
+      }
     }
 
     // === ZEROmovies: movieId already fetched in tokenData ===
