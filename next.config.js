@@ -37,17 +37,9 @@ const nextConfig = {
       { source: '/api/metadata/floppy/:id.json', destination: '/api/metadata/floppy/:id.json' },
       { source: '/api/metadata/floppy/:id', destination: '/api/metadata/floppy/:id' },
       { source: '/api/metadata/:path*', destination: '/api/v2/metadata/:path*' },
-      // Exclude V1-only endpoints from V2 rewrite (no V2 handler exists)
-      { source: '/api/render/floppy/:path*', destination: '/api/render/floppy/:path*' },
-      { source: '/api/render/custom/:path*', destination: '/api/render/custom/:path*' },
-      { source: '/api/render/displacement/:path*', destination: '/api/render/displacement/:path*' },
-      { source: '/api/render/lambo/:path*', destination: '/api/render/lambo/:path*' },
-      { source: '/api/render/nanobanana/:path*', destination: '/api/render/nanobanana/:path*' },
-      { source: '/api/render/test-external/:path*', destination: '/api/render/test-external/:path*' },
-      { source: '/api/render/floppy-v4/:path*', destination: '/api/render/floppy-v4/:path*' },
-      { source: '/api/render/gif', destination: '/api/render/gif' },
-      // Catch-all: everything else goes to V2
-      { source: '/api/render/:path*', destination: '/api/v2/render/:path*' },
+      // V1 render is canonical — no catch-all redirect to v2.
+      // All /api/render/* paths are served by v1 (pages/api/render/).
+      // The v2 render endpoint (/api/v2/render/*) is still accessible directly.
     ]
   },
   webpack(config) {
