@@ -473,7 +473,48 @@ export default async function handler(req, res) {
         // Continuar con lógica normal si hay error
       }
     }
-    
+
+    // ===== LÓGICA ESPECIAL GUMBALLZERO (mint-on-demand, render por índice ordinal) =====
+    // GumballZERO no usa el tag-system v1 (lib/tag-logic); se detecta on-chain
+    // vía el reader propio del GumballMintFacet. La imagen la sirve el render v2
+    // (única ruta con composición GumballZERO); el v1 /api/render no la tiene.
+    try {
+      const { resolveGumballForToken } = await import('../../../lib/v2/tags/tag-resolver.js');
+      const gum = await resolveGumballForToken(cleanTokenId);
+      if (gum.isGumball && gum.entry) {
+        const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+        const traitsArr = JSON.parse(fs.readFileSync(traitsPath, 'utf8')).traits || [];
+        const traitAttributes = [];
+        for (const tid of (gum.entry.traitIds || [])) {
+          const t = traitsArr.find(x => parseInt(x.tokenId) === parseInt(tid));
+          if (t) traitAttributes.push({ trait_type: t.category, value: t.name });
+        }
+        const gumballImageUrl = `${baseUrl}/api/v2/render/${cleanTokenId}.png?v=${version}`;
+        const gNameMatch = (gum.entry.name || '').match(/^(.+?)\s*#\d+$/);
+        const gBaseName = gNameMatch ? gNameMatch[1] : 'GumballZERO';
+        const gumballMetadataResult = {
+          name: `${gBaseName} #${cleanTokenId}`,
+          description: gum.entry.description || 'BE REAL | BE ADRIAN | GumballZERO by HalfxTiger',
+          image: gumballImageUrl,
+          external_url: gum.entry.external_url || 'https://adrianzero.com/',
+          metadata_version: '2',
+          masterminds: gum.entry.masterminds || ['Adrian | HalfxTiger'],
+          attributes: [
+            { trait_type: 'Generation', value: 'GumballZERO' },
+            { trait_type: 'Skin', value: 'Light' },
+            ...traitAttributes,
+          ],
+        };
+        console.log(`[metadata] 🎰 GumballZERO metadata generado: ${gumballMetadataResult.name} (idx ${gum.index})`);
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('X-Version', 'GUMBALLZERO');
+        return res.status(200).json(gumballMetadataResult);
+      }
+    } catch (error) {
+      console.error(`[metadata] 🎰 Error procesando GumballZERO ${cleanTokenId}:`, error.message);
+      // Continuar con lógica normal si hay error
+    }
+
     const baseMetadata = {
       name: tokenName,
       description: `A ZERO from the AdrianLAB collection`,
