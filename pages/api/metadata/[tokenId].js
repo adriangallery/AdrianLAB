@@ -476,8 +476,8 @@ export default async function handler(req, res) {
 
     // ===== LÓGICA ESPECIAL GUMBALLZERO (mint-on-demand, render por índice ordinal) =====
     // GumballZERO no usa el tag-system v1 (lib/tag-logic); se detecta on-chain
-    // vía el reader propio del GumballMintFacet. La imagen la sirve el render v2
-    // (única ruta con composición GumballZERO); el v1 /api/render no la tiene.
+    // vía el reader propio del GumballMintFacet. La imagen la sirve el render v1
+    // (/api/render) que ahora tiene rama GumballZERO completa.
     try {
       const { resolveGumballForToken } = await import('../../../lib/v2/tags/tag-resolver.js');
       const gum = await resolveGumballForToken(cleanTokenId);
@@ -489,7 +489,7 @@ export default async function handler(req, res) {
           const t = traitsArr.find(x => parseInt(x.tokenId) === parseInt(tid));
           if (t) traitAttributes.push({ trait_type: t.category, value: t.name });
         }
-        const gumballImageUrl = `${baseUrl}/api/v2/render/${cleanTokenId}.png?v=${version}`;
+        const gumballImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png?v=${version}`;
         const gNameMatch = (gum.entry.name || '').match(/^(.+?)\s*#\d+$/);
         const gBaseName = gNameMatch ? gNameMatch[1] : 'GumballZERO';
         const gumballMetadataResult = {

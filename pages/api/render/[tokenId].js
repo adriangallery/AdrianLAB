@@ -340,10 +340,19 @@ export default async function handler(req, res) {
     const bounceConfig = isBounce ? {
       enabled: true,
       direction: req.query.bounceDir || 'y',
-      distance: parseFloat(req.query.bounceDist) || 50,
-      bounces: parseInt(req.query.bounceCount) || 3,
+      distance: parseFloat(req.query.bounceDist) || 30,
+      bounces: parseInt(req.query.bounceCount) || 2,
       frames: parseInt(req.query.bounceFrames) || 12,
-      delay: parseInt(req.query.bounceDelay) || 2
+      delay: parseInt(req.query.bounceDelay) || 1,
+      // Squash & stretch (Phase 3) — 0 desactiva el efecto
+      squash: req.query.squash !== undefined ? parseFloat(req.query.squash) : 0.12,
+      stretch: req.query.stretch !== undefined ? parseFloat(req.query.stretch) : 0.06,
+      // Anclaje del pivote (0..1 del canvas). 0.92 = pies cerca del borde inferior
+      anchorY: req.query.anchorY !== undefined ? parseFloat(req.query.anchorY) : 0.92,
+      // Velocidad: ms por frame del GIF (default 80ms ≈ 12.5fps)
+      frameMs: parseInt(req.query.bounceFrameMs) || 80,
+      // Delay por categoría (Phase 2). Solo aplica cuando hay capas separadas.
+      perCategoryDelay: req.query.bouncePerCategory !== 'false',
     } : null;
     
     if (isCloseup) {
@@ -991,27 +1000,39 @@ export default async function handler(req, res) {
     const animatedTraits = await getAnimatedTraits(allTraitIds);
     const hasAnimatedTraits = animatedTraits.length > 0;
     
-    if (hasAnimatedTraits) {
-      console.log(`[render] 🎬 Traits animados detectados: ${animatedTraits.length}`);
-      animatedTraits.forEach((at, i) => {
-        console.log(`[render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
-      });
-      
-      // Verificar caché de GIF (usando equippedTraits, que se modificará después si es necesario)
-      // Nota: equippedTraits puede modificarse después (SubZERO, SamuraiZERO), pero la detección de animados
-      // se hace antes. El caché se actualizará con equippedTraits final cuando se guarde.
+    // Cualquier camino animado: traits secuenciales o bounce on-demand. Ambos sirven GIF.
+    // (Closeup mantiene PNG, así que bounce+closeup queda fuera de esta rama.)
+    const wantsAnimatedOutput = (hasAnimatedTraits || (isBounce && !isCloseup));
+
+    if (wantsAnimatedOutput) {
+      if (hasAnimatedTraits) {
+        console.log(`[render] 🎬 Traits animados detectados: ${animatedTraits.length}`);
+        animatedTraits.forEach((at, i) => {
+          console.log(`[render] 🎬   Animated ${i + 1}: ${at.baseId} (${at.variants.length} variantes)`);
+        });
+      }
+      if (isBounce) {
+        console.log(`[render] ⚡ Bounce solicitado: dir=${bounceConfig.direction}, dist=${bounceConfig.distance}, bounces=${bounceConfig.bounces}, frames=${bounceConfig.frames}, squash=${bounceConfig.squash}, stretch=${bounceConfig.stretch}, anchorY=${bounceConfig.anchorY}`);
+      }
+
+      // Verificar caché de GIF (incluye hash de bounceConfig si está activo)
       const cachedGif = getCachedAdrianZeroGif(cleanTokenId, equippedTraits, bounceConfig);
       if (cachedGif) {
-        console.log(`[render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}`);
+        console.log(`[render] 🎬 CACHE HIT para GIF de token ${cleanTokenId}${isBounce ? ' (BOUNCE)' : ''}`);
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('Content-Type', 'image/gif');
         res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
-        res.setHeader('X-Version', 'ADRIANZERO-ANIMATED');
+        const cachedVersion = ['ADRIANZERO-ANIMATED'];
+        if (isBounce) {
+          cachedVersion.push('BOUNCE');
+          res.setHeader('X-Bounce', 'enabled');
+        }
+        res.setHeader('X-Version', cachedVersion.join('-'));
         return res.status(200).send(cachedGif);
       }
-      
-      console.log(`[render] 🎬 CACHE MISS para GIF - Generando GIF animado...`);
+
+      console.log(`[render] 🎬 CACHE MISS para GIF - Generando GIF animado${isBounce ? '+bounce' : ''}...`);
     }
 
     // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
@@ -1042,20 +1063,71 @@ export default async function handler(req, res) {
     let samuraiIndex = null; // Variable para almacenar el índice y reutilizarlo después
     if (tagInfo.tag === 'SamuraiZERO') {
       console.log(`[render] 🥷 Token ${cleanTokenId} tiene tag SamuraiZERO - Aplicando lógica especial`);
-      
+
       samuraiIndex = await getSamuraiZEROIndex(cleanTokenId);
-      
+
       if (samuraiIndex !== null && samuraiIndex >= 0 && samuraiIndex < 600) {
         const imageIndex = TAG_CONFIGS.SamuraiZERO.imageBaseIndex + samuraiIndex;
         console.log(`[render] 🥷 SamuraiZERO token ${cleanTokenId} tiene índice ${samuraiIndex}, usando imagen ${imageIndex}.svg como TOP`);
-        
+
         // Forzar trait TOP con la imagen de SamuraiZERO
         equippedTraits['TOP'] = imageIndex.toString();
-        
+
         console.log(`[render] 🥷 SamuraiZERO: TOP ${imageIndex} forzado, se renderizará sobre todo lo demás`);
       } else {
         console.error(`[render] 🥷 SamuraiZERO token ${cleanTokenId} tiene índice inválido: ${samuraiIndex}`);
       }
+    }
+
+    // ===== LÓGICA ESPECIAL GUMBALLZERO =====
+    // GumballZERO: detection via on-chain gumballWasMintedHere reader (GumballMintFacet
+    // owns its own LibGumball slot — not in the shared tag registry). Traits come from
+    // gums.json (ordinal-indexed), generation is forced to 0, skin forced to Light.
+    // This replaces whatever equippedTraits/generation/skin the contract returned.
+    try {
+      const { resolveGumballForToken } = await import('../../../lib/v2/tags/tag-resolver.js');
+      const gum = await resolveGumballForToken(cleanTokenId);
+      if (gum.isGumball && gum.entry) {
+        console.log(`[render] 🎰 Token ${cleanTokenId} es GumballZERO idx=${gum.index} - Aplicando lógica especial`);
+
+        // Rebuild equippedTraits from gums.json traitIds using traits.json for categories.
+        // Mirrors compositor.js buildGumballTraits + normalizeTraits logic.
+        const traitsFilePath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+        const traitsArr = JSON.parse(fs.readFileSync(traitsFilePath, 'utf8')).traits || [];
+        const traitMap = new Map();
+        for (const t of traitsArr) {
+          let cat = t.category;
+          if (cat === 'Eyes') cat = 'EYES';
+          if (cat === 'Beard') cat = 'BEARD';
+          traitMap.set(parseInt(t.tokenId), cat);
+        }
+
+        // Clear and rebuild equippedTraits from gums.json
+        Object.keys(equippedTraits).forEach(k => delete equippedTraits[k]);
+        for (const tid of gum.entry.traitIds) {
+          let cat = traitMap.get(parseInt(tid));
+          if (!cat) {
+            console.warn(`[render] 🎰 GumballZERO: traitId ${tid} no encontrado en traits.json, omitiendo`);
+            continue;
+          }
+          // Apply HEAD→HAIR remapping
+          if (cat === 'HEAD' && shouldRenderAsHair(tid)) cat = 'HAIR';
+          // Apply category corrections
+          cat = correctCategory(cat, tid);
+          equippedTraits[cat] = String(tid);
+        }
+
+        // Force GEN0 + Light skin — override whatever the contract returned
+        baseImagePath = 'ADRIAN/GEN0-Light.svg';
+        useMannequin = false;
+        skinType = 'Light';
+
+        console.log(`[render] 🎰 GumballZERO equippedTraits:`, equippedTraits);
+        console.log(`[render] 🎰 GumballZERO baseImagePath forzado: ${baseImagePath}`);
+      }
+    } catch (gumErr) {
+      console.error(`[render] 🎰 Error procesando GumballZERO ${cleanTokenId}:`, gumErr.message);
+      // Continue with normal flow if gumball detection fails
     }
 
     // Verificar si hay un trait de skin excepcional
@@ -2305,48 +2377,67 @@ export default async function handler(req, res) {
       finalBuffer = (finalCanvas || canvas).toBuffer('image/png');
     }
 
-    // ===== GENERAR GIF SI HAY TRAITS ANIMADOS =====
-    if (hasAnimatedTraits && animatedTraits.length > 0) {
+    // ===== GENERAR GIF (TRAITS ANIMADOS y/o BOUNCE ON-DEMAND) =====
+    const shouldEmitGif = (hasAnimatedTraits && animatedTraits.length > 0) ||
+                          (isBounce && bounceConfig && bounceConfig.enabled && !isCloseup);
+
+    if (shouldEmitGif) {
       try {
-        console.log('[render] 🎬 Generando GIF con traits animados...');
-        
-        // El finalBuffer contiene el PNG base sin los traits animados
-        // Generar GIF añadiendo los traits animados frame por frame
-        let gifConfig = {
-          stableLayers: [
-            { pngBuffer: finalBuffer } // PNG base sin traits animados
-          ],
-          animatedTraits: animatedTraits,
-          width: 1000,
-          height: 1000,
-          delay: 500
-        };
-        
-        // Aplicar bounce si está configurado
-        if (bounceConfig && bounceConfig.enabled) {
-          const { createBounceFrameGenerator } = await import('../../../lib/gif-generator.js');
-          gifConfig.customFrameGenerator = createBounceFrameGenerator({
-            stableLayers: gifConfig.stableLayers,
-            animatedTraits: gifConfig.animatedTraits,
-            bounceConfig: bounceConfig,
-            width: gifConfig.width,
-            height: gifConfig.height,
-            delay: gifConfig.delay
+        const frameMs = bounceConfig?.frameMs || 500;
+        let gifBuffer;
+
+        if (isBounce && bounceConfig && bounceConfig.enabled) {
+          // Camino bounce: squash & stretch + delay por categoría
+          const { createBounceOnlyFrameGenerator, createBounceSquashFrameGenerator } = await import('../../../lib/gif-generator.js');
+
+          let customGen;
+          if (hasAnimatedTraits && animatedTraits.length > 0) {
+            console.log('[render] ⚡ Generando GIF bounce + traits animados...');
+            customGen = createBounceSquashFrameGenerator({
+              layers: [{ pngBuffer: finalBuffer, category: 'BODY' }], // base ya compuesta
+              animatedTraits,
+              bounceConfig,
+              width: 1000,
+              height: 1000,
+              delay: frameMs,
+            });
+          } else {
+            console.log('[render] ⚡ Generando GIF bounce-only sobre PFP compuesto...');
+            customGen = createBounceOnlyFrameGenerator({
+              baseBuffer: finalBuffer,
+              bounceConfig,
+              width: 1000,
+              height: 1000,
+              delay: frameMs,
+            });
+          }
+
+          gifBuffer = await generateGifFromLayers({
+            stableLayers: [],
+            animatedTraits: [],
+            width: 1000,
+            height: 1000,
+            delay: frameMs,
+            customFrameGenerator: customGen,
+            totalFrames: bounceConfig.frames,
           });
-          // Limpiar stableLayers y animatedTraits ya que se manejan en customFrameGenerator
-          gifConfig.stableLayers = [];
-          gifConfig.animatedTraits = [];
+        } else {
+          // Camino animado clásico (sin bounce): trait variants frame a frame
+          console.log('[render] 🎬 Generando GIF con traits animados (sin bounce)...');
+          gifBuffer = await generateGifFromLayers({
+            stableLayers: [{ pngBuffer: finalBuffer }],
+            animatedTraits,
+            width: 1000,
+            height: 1000,
+            delay: 500,
+          });
         }
-        
-        const gifBuffer = await generateGifFromLayers(gifConfig);
-        
-        // Guardar en caché (usando equippedTraits final después de todas las modificaciones)
+
         setCachedAdrianZeroGif(cleanTokenId, gifBuffer, equippedTraits, bounceConfig);
-        
+
         const ttlSeconds = Math.floor(getAdrianZeroRenderTTL(cleanTokenId) / 1000);
-        console.log(`[render] 🎬 GIF generado y cacheado por ${ttlSeconds}s`);
-        
-        // Configurar headers para GIF
+        console.log(`[render] 🎬 GIF generado y cacheado por ${ttlSeconds}s (${gifBuffer.length} bytes)`);
+
         res.setHeader('X-Cache', 'MISS');
         res.setHeader('Content-Type', 'image/gif');
         res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}`);
@@ -2357,7 +2448,7 @@ export default async function handler(req, res) {
         }
         res.setHeader('X-Version', gifVersionParts.join('-'));
         res.setHeader('Content-Length', gifBuffer.length);
-        
+
         return res.status(200).send(gifBuffer);
       } catch (error) {
         console.error('[render] 🎬 Error generando GIF, continuando con PNG:', error.message);
@@ -2530,43 +2621,9 @@ export default async function handler(req, res) {
       res.setHeader('X-Bounce', 'enabled');
     }
     
-    // ===== APLICAR BOUNCE A PNG SI ESTÁ CONFIGURADO =====
-    if (bounceConfig && bounceConfig.enabled && !hasAnimatedTraits) {
-      try {
-        const { calculateBounceWithDelay } = await import('../../../lib/animation-helpers.js');
-        // Para PNG estático, usar frame 0 del ciclo de bounce
-        const bounceTransform = calculateBounceWithDelay(
-          0,
-          bounceConfig.frames,
-          bounceConfig.direction,
-          bounceConfig.distance,
-          bounceConfig.bounces,
-          0
-        );
-        
-        // Aplicar transformación de bounce al PNG
-        const canvas = createCanvas(1000, 1000);
-        const ctx = canvas.getContext('2d');
-        const img = await loadImage(finalBuffer);
-        
-        ctx.save();
-        ctx.translate(1000 / 2 + bounceTransform.x, 1000 / 2 + bounceTransform.y);
-        if (bounceTransform.rotation !== 0) {
-          ctx.rotate(bounceTransform.rotation * Math.PI / 180);
-        }
-        if (bounceTransform.scale !== 1) {
-          ctx.scale(bounceTransform.scale, bounceTransform.scale);
-        }
-        ctx.drawImage(img, -1000 / 2, -1000 / 2, 1000, 1000);
-        ctx.restore();
-        
-        finalBuffer = canvas.toBuffer('image/png');
-        console.log('[render] ⚡ Bounce aplicado a PNG estático');
-      } catch (error) {
-        console.warn('[render] ⚡ Error aplicando bounce a PNG, continuando sin bounce:', error.message);
-      }
-    }
-    
+    // (Bounce ahora siempre se sirve como GIF en la rama "shouldEmitGif" arriba.
+    //  Si fallara la generación, caemos aquí y devolvemos PNG sin bounce.)
+
     res.setHeader('Content-Length', finalBuffer.length);
     res.send(finalBuffer);
 
