@@ -1,4 +1,4 @@
-import { getContracts } from '../../../lib/contracts.js';
+import { getContracts, getTokenMovieId, getMovie2Info } from '../../../lib/contracts.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
 import { getTokenDupInfo, getDupGenerationAttribute } from '../../../lib/duplicator-logic.js';
 import fs from 'fs';
@@ -513,6 +513,117 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error(`[metadata] 🎰 Error procesando GumballZERO ${cleanTokenId}:`, error.message);
       // Continuar con lógica normal si hay error
+    }
+
+    // ===== LÓGICA ESPECIAL ZEROmovies S2 (tag 'ZEROmovies2') =====
+    // S2 prefixed selectors: movies2WasMintedHere / movies2GetTokenMovie / getMovie2RentalInfo
+    // Detected via tag 'ZEROmovies2' added to getTokenTag by the v1 port.
+    // Must run BEFORE S1 check (same as v2 fetcher order).
+    if (tagInfo.tag === 'ZEROmovies2') {
+      try {
+        const movie2Info = await getMovie2Info(cleanTokenId);
+        if (movie2Info && movie2Info.movieId > 0) {
+          const { movieId, isOverdue, daysOverdue } = movie2Info;
+          const moviesData = JSON.parse(
+            fs.readFileSync(path.join(process.cwd(), 'public', 'labmetadata', 'zeromovies2metadata.json'), 'utf8')
+          );
+          const movieEntry = moviesData?.movies?.[String(movieId)];
+          const movieName = movieEntry?.name || `Movie #${movieId}`;
+          const description = movieEntry?.description || `ZEROmovies S2 — ${movieName}`;
+          const movieImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png?v=${version}`;
+
+          const attributes = [
+            { trait_type: 'Generation', value: 'ZEROmovies S2' },
+            { trait_type: 'Season', value: 'Return of the Pixel' },
+            { trait_type: 'Movie', value: movieName },
+          ];
+          if (movieEntry?.franchise) attributes.push({ trait_type: 'Franchise', value: movieEntry.franchise });
+          if (movieEntry?.genre) attributes.push({ trait_type: 'Genre', value: movieEntry.genre });
+          if (movieEntry?.year) attributes.push({ trait_type: 'Year', value: String(movieEntry.year) });
+          if (movieEntry?.hasAnimation) attributes.push({ trait_type: 'Format', value: 'Animated' });
+          if (isOverdue) {
+            attributes.push({ trait_type: 'Status', value: 'OVERDUE' });
+            attributes.push({ trait_type: 'Days Overdue', value: String(daysOverdue || 0) });
+          }
+
+          const movies2Metadata = {
+            name: `ZEROmovies S2: ${movieName} #${cleanTokenId}`,
+            description,
+            image: movieImageUrl,
+            external_url: movieImageUrl,
+            metadata_version: '2',
+            attributes,
+          };
+
+          if (movieEntry?.hasAnimation) {
+            const gifPath = movieEntry.animatedPath || `/labimages/zeromovies2/animated/${movieId}.gif`;
+            movies2Metadata.animation_url = `${baseUrl}${gifPath}`;
+          }
+
+          console.log(`[metadata] 🎬 ZEROmovies S2 metadata generado: ${movies2Metadata.name}`);
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('X-Version', 'ZEROMOVIES2');
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          res.setHeader('Surrogate-Control', 'no-store');
+          return res.status(200).json(movies2Metadata);
+        }
+      } catch (error) {
+        console.error(`[metadata] 🎬 Error procesando ZEROmovies S2 ${cleanTokenId}:`, error.message);
+        // Continuar con lógica normal si hay error
+      }
+    }
+
+    // ===== LÓGICA ESPECIAL ZEROmovies S1 (tag 'ZEROmovies') =====
+    // Uses getTokenMovie(tokenId) → movieId (1-26), then loads zeromoviesmetadata.json.
+    // Mirrors buildZEROmoviesMetadata from lib/v2/metadata/builder.js.
+    if (tagInfo.tag === 'ZEROmovies') {
+      try {
+        const movieId = await getTokenMovieId(cleanTokenId);
+        if (movieId && movieId > 0) {
+          const moviesData = JSON.parse(
+            fs.readFileSync(path.join(process.cwd(), 'public', 'labmetadata', 'zeromoviesmetadata.json'), 'utf8')
+          );
+          const movieEntry = moviesData?.movies?.[String(movieId)];
+          const movieName = movieEntry?.name || `Movie #${movieId}`;
+          const description = movieEntry?.description || `ZEROmovies Edition — ${movieName}`;
+          const movieImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png?v=${version}`;
+
+          const attributes = [
+            { trait_type: 'Generation', value: 'ZEROmovies' },
+            { trait_type: 'Movie', value: movieName },
+          ];
+          if (movieEntry?.franchise) attributes.push({ trait_type: 'Franchise', value: movieEntry.franchise });
+          if (movieEntry?.genre) attributes.push({ trait_type: 'Genre', value: movieEntry.genre });
+          if (movieEntry?.year) attributes.push({ trait_type: 'Year', value: String(movieEntry.year) });
+
+          const movies1Metadata = {
+            name: `ZEROmovies: ${movieName} #${cleanTokenId}`,
+            description,
+            image: movieImageUrl,
+            external_url: movieImageUrl,
+            metadata_version: '2',
+            attributes,
+          };
+
+          if (movieEntry?.hasAnimation) {
+            movies1Metadata.animation_url = `${baseUrl}/labimages/zeromovies/animated/${movieId}.gif`;
+          }
+
+          console.log(`[metadata] 🎬 ZEROmovies S1 metadata generado: ${movies1Metadata.name}`);
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('X-Version', 'ZEROMOVIES');
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          res.setHeader('Surrogate-Control', 'no-store');
+          return res.status(200).json(movies1Metadata);
+        }
+      } catch (error) {
+        console.error(`[metadata] 🎬 Error procesando ZEROmovies S1 ${cleanTokenId}:`, error.message);
+        // Continuar con lógica normal si hay error
+      }
     }
 
     const baseMetadata = {
