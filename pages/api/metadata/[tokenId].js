@@ -530,7 +530,10 @@ export default async function handler(req, res) {
           const movieEntry = moviesData?.movies?.[String(movieId)];
           const movieName = movieEntry?.name || `Movie #${movieId}`;
           const description = movieEntry?.description || `ZEROmovies S2 — ${movieName}`;
-          const movieImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png?v=${version}`;
+          // ZEROmovies art (static frame + dynamic OVERDUE stamp + S2 animation)
+          // is only rendered by the v2 render endpoint; v1 /api/render has no
+          // movies branch and would return a blank wireframe. Route to v2.
+          const movieImageUrl = `${baseUrl}/api/v2/render/${cleanTokenId}.png?v=${version}`;
 
           const attributes = [
             { trait_type: 'Generation', value: 'ZEROmovies S2' },
@@ -588,7 +591,10 @@ export default async function handler(req, res) {
           const movieEntry = moviesData?.movies?.[String(movieId)];
           const movieName = movieEntry?.name || `Movie #${movieId}`;
           const description = movieEntry?.description || `ZEROmovies Edition — ${movieName}`;
-          const movieImageUrl = `${baseUrl}/api/render/${cleanTokenId}.png?v=${version}`;
+          // ZEROmovies art (static frame + dynamic OVERDUE stamp + S2 animation)
+          // is only rendered by the v2 render endpoint; v1 /api/render has no
+          // movies branch and would return a blank wireframe. Route to v2.
+          const movieImageUrl = `${baseUrl}/api/v2/render/${cleanTokenId}.png?v=${version}`;
 
           const attributes = [
             { trait_type: 'Generation', value: 'ZEROmovies' },
