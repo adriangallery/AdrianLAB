@@ -1038,7 +1038,20 @@ export default async function handler(req, res) {
     // ===== LÓGICA DE TAGS (SubZERO, SamuraiZERO, etc.) - ANTES de cualquier lógica de skin =====
     const { getTokenTagInfo, filterEyesForTag, forceSkinTraitForTag, getSamuraiZEROIndex, TAG_CONFIGS } = await import('../../../lib/tag-logic.js');
     const tagInfo = await getTokenTagInfo(cleanTokenId);
-    
+
+    // ===== ZEROmovies S1/S2: movie art (static frame + dynamic OVERDUE stamp +
+    // S2 animation) is ONLY composed by the v2 render endpoint. v1 has no movies
+    // branch and would composite the token's raw on-chain traits (wrong character).
+    // Redirect so the raw /api/render/<movie> is correct too, not just metadata. =====
+    if (tagInfo.tag === 'ZEROmovies' || tagInfo.tag === 'ZEROmovies2') {
+      const qs = req.url && req.url.includes('?') ? '?' + req.url.split('?')[1] : '';
+      const target = `/api/v2/render/${cleanTokenId}.png${qs}`;
+      console.log(`[render] 🎬 Token ${cleanTokenId} es ${tagInfo.tag} - redirigiendo a v2 render: ${target}`);
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.writeHead(302, { Location: target });
+      return res.end();
+    }
+
     if (tagInfo.tag === 'SubZERO') {
       console.log(`[render] 🏷️ Token ${cleanTokenId} tiene tag SubZERO - Aplicando lógica especial`);
       console.log(`[render] 🏷️ SubZERO: Traits antes de aplicar lógica:`, equippedTraits);
