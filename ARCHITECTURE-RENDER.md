@@ -122,11 +122,12 @@ Para cada tipo de colección, los archivos exactos donde tocar metadata Y render
 
 | Capa | Archivo | Función/sección |
 |------|---------|-----------------|
-| **Metadata v1** | `pages/api/metadata/[tokenId].js` | `SPECIAL_TOKENS` const inline líneas ~9-41 (IDs: 302, 441, 442, 445, 454, 459, 740, 815); check líneas ~1099-1116 |
-| **Metadata v2** | `lib/v2/metadata/special-tokens.js` | `getSpecialTokenMetadata` (línea 14); `SPECIAL_TOKENS` importado de `lib/v2/shared/constants.js:105` (incluye ID 750 TAXreaper — **ausente en v1**) |
+| **Metadata v1** | `pages/api/metadata/[tokenId].js` | `SPECIAL_TOKENS` **importado de `lib/v2/shared/constants.js`** (commit c33b0a33 — ya no inline); check líneas ~1099-1116 |
+| **Metadata v2** | `lib/v2/metadata/special-tokens.js` | `getSpecialTokenMetadata` (línea 14); `SPECIAL_TOKENS` importado de `lib/v2/shared/constants.js:105` |
+| **FUENTE ÚNICA** | `lib/v2/shared/constants.js` | `SPECIAL_TOKENS` (IDs: 302, 441, 442, 445, 454, 459, 740, **750 TAXreaper**, 815). Para añadir un nuevo special editar SOLO aquí. |
 | **Render v2** | `pages/api/v2/render/[tokenId].js` | Líneas ~83-95: sirve GIF estático desde `public/labimages/specials/{id}.gif` |
 | **Assets** | `public/labimages/specials/{302|441|442|445|454|459|740|750|815}.gif/.png` | — |
-| **DIVERGENCIA** | — | v1 metadata (`pages/api/metadata/[tokenId].js`) no tiene token 750 en su SPECIAL_TOKENS inline. v2 constants sí. Para añadir un nuevo special hay que editar AMBOS. |
+| **DIVERGENCIA** | — | ✅ RESUELTO (commit c33b0a33). v1 metadata ahora importa de `constants.js`. Token 750 verificado en vivo: `/api/metadata/750` → `TAXreaper #750`. |
 
 ### ActionPacks (15008-15010)
 
@@ -365,17 +366,11 @@ Ver sección AdrianZERO — GEN especiales arriba. La rama de duplicados en rend
 | `pages/api/render/displacement/[tokenId].js` | Sin referencias de producción encontradas. Podría ser llamado por alguna DApp directamente. Verificar logs. |
 | `pages/api/render/nanobanana/[tokenId].js` | Sin referencias encontradas. Verificar si está deprecado vs el toggle 13 en v1 render. |
 
-### Divergencia SPECIAL_TOKENS v1 vs v2 (bug latente)
+### Divergencia SPECIAL_TOKENS v1 vs v2 — ✅ RESUELTO (commit c33b0a33)
 
-`pages/api/metadata/[tokenId].js` tiene SPECIAL_TOKENS inline (líneas 9-41) con IDs: 302, 441, 442, 445, 454, 459, 740, 815.
+**Era:** `pages/api/metadata/[tokenId].js` tenía SPECIAL_TOKENS inline (líneas 9-41) sin el ID 750 (TAXreaper), que sí estaba en `lib/v2/shared/constants.js`. `/api/metadata/750` (canónico) lo servía como AdrianZERO normal.
 
-`lib/v2/shared/constants.js:105` tiene además el ID 750 (TAXreaper).
-
-`pages/api/v2/render/[tokenId].js:83` sirve el GIF estático para SPECIAL_TOKENS del v2 (incluye 750).
-
-Si alguien llama `/api/metadata/750` → v1 metadata → no tiene token 750 en SPECIAL_TOKENS → procesará como AdrianZERO normal → resultado erróneo. El render `/api/render/750` → v1 render → tampoco tiene rama especial → composita desde on-chain.
-
-**El token 750 solo funciona correctamente si se llama a v2 metadata (`/api/v2/metadata/750`) o v2 render (`/api/v2/render/750`)**, que no son los endpoints canónicos.
+**Fix:** v1 metadata ahora hace `import { SPECIAL_TOKENS } from '../../../lib/v2/shared/constants.js'`. Fuente única. Verificado en vivo cache-bust (`x-vercel-cache: MISS`): `750 → TAXreaper #750 / specials/750.png`; `815 → WakaZERO #815` (sin regresión). Para añadir un nuevo special editar SOLO `lib/v2/shared/constants.js`.
 
 ---
 
@@ -385,19 +380,19 @@ Solo propuesta. No ejecutar en Fase 1.
 
 ### A. Eliminar código muerto confirmado (Fase 2)
 
-Orden seguro:
-1. Eliminar `pages/api/v2/metadata/[tokenId].js` + `lib/v2/metadata/builder.js` + `lib/v2/metadata/name-resolver.js` + `lib/v2/metadata/special-tokens.js` + `lib/v2/cache/metadata-cache.js` + `scripts/validate-v2.js`
+**Estado:** ✅ HECHO (commit a46862b4) — 20 archivos `*.backup*` + `scripts/validate-v2.js` + `scripts/parity-c2.mjs` eliminados. ⏳ DIFERIDO por decisión del usuario ("solo lo seguro"): el árbol v2-metadata sigue en sitio.
+
+Orden seguro (pendiente):
+1. Eliminar `pages/api/v2/metadata/[tokenId].js` + `lib/v2/metadata/builder.js` + `lib/v2/metadata/name-resolver.js` + `lib/v2/metadata/special-tokens.js` + `lib/v2/cache/metadata-cache.js`
 2. Eliminar `pages/api/v2/render/custom-external/[tokenId].js`
 3. Eliminar `pages/api/rendershadow/[tokenId].js` (tras verificar logs)
 4. Eliminar `lib/v2/cache/trait-png-store.js` + `scripts/prerender-traits.js` si no se usan
 
 **Riesgo**: Bajo si se verifica 0 tráfico en logs primero. El directorio `lib/v2/metadata/` quedaría vacío — borrar.
 
-### B. Consolidar SPECIAL_TOKENS (Fase 2)
+### B. Consolidar SPECIAL_TOKENS (Fase 2) — ✅ HECHO (commit c33b0a33)
 
-Mover `SPECIAL_TOKENS` inline de `pages/api/metadata/[tokenId].js` a importar desde `lib/v2/shared/constants.js`. Así ambos v1 metadata y v2 render usan la misma fuente.
-
-**Rompe**: nada (solo editar el import en metadata v1).
+`SPECIAL_TOKENS` inline de `pages/api/metadata/[tokenId].js` reemplazado por `import { SPECIAL_TOKENS } from '../../../lib/v2/shared/constants.js'`. v1 metadata y v2 usan la misma fuente. Build verde, verificado en vivo. No rompió nada.
 
 ### C. Renombrar para claridad
 
