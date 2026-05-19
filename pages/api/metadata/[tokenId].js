@@ -1,45 +1,14 @@
 import { getContracts, getTokenMovieId, getMovie2Info } from '../../../lib/contracts.js';
 import { updateTogglesIfNeeded, hasToggleActive } from '../../../lib/toggle-cache.js';
 import { getTokenDupInfo, getDupGenerationAttribute } from '../../../lib/duplicator-logic.js';
+import { SPECIAL_TOKENS } from '../../../lib/v2/shared/constants.js';
 import fs from 'fs';
 import path from 'path';
 
 // ===== TOKENS ESPECIALES CON IMAGEN Y/O NOMBRE ESPECÍFICO =====
-// Objeto constante en memoria para máximo rendimiento (lookup O(1))
-const SPECIAL_TOKENS = {
-  302: {
-    image: '/labimages/specials/302.gif',
-    name: null // null = usar nombre por defecto desde contratos
-  },
-  441: {
-    image: '/labimages/specials/441.gif',
-    name: 'DRACULA' // Hello-WEN '25 first prize
-  },
-  442: {
-    image: '/labimages/specials/442.gif',
-    name: 'NEO-ZERO' // DropShit #1 first prize
-  },
-  445: {
-    image: '/labimages/specials/445.gif',
-    name: 'THE MANAGER'
-  },
-  454: {
-    image: '/labimages/specials/454.gif',
-    name: 'Adrian McOrder Dash'
-  },
-  459: {
-    image: '/labimages/specials/459.gif',
-    name: 'AdrianSensai'
-  },
-  740: {
-    image: '/labimages/specials/740.gif',
-    name: 'ChuckZERO'
-  },
-  815: {
-    image: '/labimages/specials/815.png',
-    name: 'WakaZERO'
-  }
-};
+// SPECIAL_TOKENS es la FUENTE ÚNICA en lib/v2/shared/constants.js, compartida
+// con el render v2. NO redefinir inline aquí: el token 750 (TAXreaper) se
+// servía como AdrianZERO normal por culpa de esa divergencia. Lookup O(1).
 
 export default async function handler(req, res) {
   // Configurar CORS - Permitir múltiples orígenes
