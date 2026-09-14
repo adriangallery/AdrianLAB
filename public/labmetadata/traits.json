@@ -15282,6 +15282,20 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1183,
+      "name": "Freed Soul",
+      "category": "GEAR",
+      "fileName": "1183",
+      "maxSupply": 161,
+      "floppy": "Cubist Souls",
+      "description": "A freed Cubist Soul, framed. Only for the 161 Cubist Souls holders who claimed their $ZERO. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Cubist Souls"
+      ],
+      "external_url": "https://adrianzero.com/claim"
     }
   ],
   "metadata": {

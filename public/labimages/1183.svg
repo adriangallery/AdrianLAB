@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Freed Soul · trait GEAR exclusivo del claim de Cubist Souls → $ZERO · 7x8 sin reborde (14-sep, feedback Adrián) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37">
+  <style>
+    rect { shape-rendering: crispEdges; }
+    svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+  </style>
+  <g id="pixels">
+    <rect x="29" y="1" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="1" width="1" height="1" fill="rgba(240,191,70,1.000)"/>
+    <rect x="31" y="1" width="1" height="1" fill="rgba(240,191,70,1.000)"/>
+    <rect x="32" y="1" width="1" height="1" fill="rgba(240,191,70,1.000)"/>
+    <rect x="33" y="1" width="1" height="1" fill="rgba(240,191,70,1.000)"/>
+    <rect x="34" y="1" width="1" height="1" fill="rgba(240,191,70,1.000)"/>
+    <rect x="35" y="1" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="2" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="2" width="1" height="1" fill="rgba(228,76,168,1.000)"/>
+    <rect x="31" y="2" width="1" height="1" fill="rgba(142,68,200,1.000)"/>
+    <rect x="32" y="2" width="1" height="1" fill="rgba(228,76,168,1.000)"/>
+    <rect x="33" y="2" width="1" height="1" fill="rgba(142,68,200,1.000)"/>
+    <rect x="34" y="2" width="1" height="1" fill="rgba(228,76,168,1.000)"/>
+    <rect x="35" y="2" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="3" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="3" width="1" height="1" fill="rgba(10,166,160,1.000)"/>
+    <rect x="31" y="3" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="32" y="3" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="33" y="3" width="1" height="1" fill="rgba(246,176,48,1.000)"/>
+    <rect x="34" y="3" width="1" height="1" fill="rgba(246,176,48,1.000)"/>
+    <rect x="35" y="3" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="4" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="4" width="1" height="1" fill="rgba(64,88,210,1.000)"/>
+    <rect x="31" y="4" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="32" y="4" width="1" height="1" fill="rgba(246,246,240,1.000)"/>
+    <rect x="33" y="4" width="1" height="1" fill="rgba(16,30,48,1.000)"/>
+    <rect x="34" y="4" width="1" height="1" fill="rgba(246,176,48,1.000)"/>
+    <rect x="35" y="4" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="5" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="5" width="1" height="1" fill="rgba(10,166,160,1.000)"/>
+    <rect x="31" y="5" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="32" y="5" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="33" y="5" width="1" height="1" fill="rgba(246,176,48,1.000)"/>
+    <rect x="34" y="5" width="1" height="1" fill="rgba(10,166,160,1.000)"/>
+    <rect x="35" y="5" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="6" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="6" width="1" height="1" fill="rgba(8,120,118,1.000)"/>
+    <rect x="31" y="6" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="32" y="6" width="1" height="1" fill="rgba(232,70,110,1.000)"/>
+    <rect x="33" y="6" width="1" height="1" fill="rgba(232,70,110,1.000)"/>
+    <rect x="34" y="6" width="1" height="1" fill="rgba(246,176,48,1.000)"/>
+    <rect x="35" y="6" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="7" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="30" y="7" width="1" height="1" fill="rgba(10,166,160,1.000)"/>
+    <rect x="31" y="7" width="1" height="1" fill="rgba(8,120,118,1.000)"/>
+    <rect x="32" y="7" width="1" height="1" fill="rgba(236,112,32,1.000)"/>
+    <rect x="33" y="7" width="1" height="1" fill="rgba(8,120,118,1.000)"/>
+    <rect x="34" y="7" width="1" height="1" fill="rgba(10,166,160,1.000)"/>
+    <rect x="35" y="7" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="29" y="8" width="1" height="1" fill="rgba(168,118,26,1.000)"/>
+    <rect x="30" y="8" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="31" y="8" width="1" height="1" fill="rgba(168,118,26,1.000)"/>
+    <rect x="32" y="8" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="33" y="8" width="1" height="1" fill="rgba(168,118,26,1.000)"/>
+    <rect x="34" y="8" width="1" height="1" fill="rgba(224,165,32,1.000)"/>
+    <rect x="35" y="8" width="1" height="1" fill="rgba(168,118,26,1.000)"/>
+  </g>
+</svg>
