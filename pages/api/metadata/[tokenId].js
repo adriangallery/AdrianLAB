@@ -267,11 +267,7 @@ export default async function handler(req, res) {
             { trait_type: 'PackId', value: tokenIdNum.toString() },
             { trait_type: 'TraitsCount', value: (pack.traits ? pack.traits.length : 0).toString() },
             { trait_type: 'Traits', value: (pack.traits && pack.traits.length > 0) ? pack.traits.join(',') : 'None' }
-          ],
-          debug: {
-            source: 'ActionPacks.json',
-            pack
-          }
+          ]
         };
 
         // No cache agresivo para permitir iteración rápida
@@ -610,6 +606,9 @@ export default async function handler(req, res) {
       attributes: []
     };
     
+    // H3 (14-sep): distinguir «el token no existe» (revert de getTokenData) de
+    // fallos posteriores (nombre, skin, traits…) y de caídas de RPC.
+    let tokenDataLoaded = false;
     try {
       // Test de conexión a contratos
       console.log('[metadata] Intentando conectar con los contratos...');
@@ -728,6 +727,7 @@ export default async function handler(req, res) {
       // Obtener datos del token
       console.log('[metadata] Llamando a getTokenData...');
       const tokenData = await core.getTokenData(tokenId);
+      tokenDataLoaded = true;
       console.log('[metadata] Respuesta de getTokenData:', {
         result: tokenData.map(v => v.toString())
       });
@@ -990,73 +990,21 @@ export default async function handler(req, res) {
         console.log(`[metadata] Toggle añadido: ${activeToggles.join(', ')}`);
       }
 
-      // Añadir información de debug
-      baseMetadata.debug = {
-        contracts: {
-          core: {
-            address: core.address,
-            functions: {
-              getTokenData: {
-                called: true,
-                result: tokenData.map(v => v.toString())
-              },
-              getTokenSkin: {
-                called: true,
-                result: {
-                  skinId: skinId.toString(),
-                  skinName: skinName
-                }
-              }
-            }
-          },
-          traitsExtension: {
-            address: traitsExtension.address,
-            functionCalled: 'getAllEquippedTraits',
-            result: {
-              categories,
-              traitIds: traitIds.map(id => id.toString()),
-              traitNames: categories.map((category, index) => ({
-                category,
-                traitId: traitIds[index].toString(),
-                traitName: getTraitName(traitIds[index].toString())
-              }))
-            }
-          },
-          patientZero: {
-            address: patientZero.address,
-            functions: {
-              getTokenStatus: {
-                called: true,
-                result: {
-                  status: baseMetadata.status,
-                  profileName: baseMetadata.profileName
-                }
-              }
-            }
-          },
-          serumModule: {
-            address: serumModule.address,
-            functions: {
-              getTokenSerumHistory: {
-                called: true,
-                result: baseMetadata.attributes.find(attr => attr.trait_type === "UsedSerum") ? 
-                  baseMetadata.attributes.find(attr => attr.trait_type === "UsedSerum").value : "No serums found"
-              }
-            }
-          }
-        },
-        timestamp: new Date().toISOString()
-      };
-
     } catch (error) {
       console.error('[metadata] Error:', error);
       console.error('[metadata] Stack trace:', error.stack);
-      
-      baseMetadata.debug = {
-        error: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString()
-      };
+      if (!tokenDataLoaded) {
+        res.setHeader('Cache-Control', 'no-store');
+        // ethers v5: revert del contrato → CALL_EXCEPTION. Antes se devolvía 200
+        // con metadata inventada y la traza de ethers en `debug` (H3).
+        if (error && error.code === 'CALL_EXCEPTION') {
+          return res.status(404).json({ error: 'Token not found' });
+        }
+        // Caída de RPC: 503 para que OpenSea reintente en vez de cachear datos falsos.
+        res.setHeader('Retry-After', '60');
+        return res.status(503).json({ error: 'Temporarily unavailable, try again shortly' });
+      }
+      // Fallo parcial tras cargar el token: se sirve lo que hay, sin datos internos.
     }
 
     // Configurar headers para evitar cache
@@ -1126,36 +1074,12 @@ export default async function handler(req, res) {
       res.setHeader('X-Blackout', 'enabled');
     }
     
-    // ===== PRUEBA PUNTUAL: Token 682 - animation_url =====
-    // TODO: ELIMINAR ESTA SECCIÓN DESPUÉS DE LA PRUEBA
-    // Este es un test temporal para añadir animation_url al token 682
-    // Para revertir: simplemente eliminar este bloque if completo
-    if (tokenIdNum === 682) {
-      baseMetadata.animation_url = 'https://adrianzero.com/mcinteractive/';
-      console.log(`[metadata] 🧪 TEST: animation_url añadido para token 682 → ${baseMetadata.animation_url}`);
-    }
-    // ===== FIN PRUEBA PUNTUAL =====
     
     return res.status(200).json(baseMetadata);
   } catch (error) {
     console.error('[metadata] Error general:', error);
     console.error('[metadata] Stack trace:', error.stack);
-    
-    return res.status(200).json({
-      name: `ZERO #${req.query.tokenId || 'Unknown'}`,
-      description: `A ZERO from the AdrianLAB collection (Error Mode)`,
-      image: `https://adrianlab.vercel.app/api/render/${req.query.tokenId || 1}.png?v=${Date.now()}`,
-      external_url: `https://adrianlab.vercel.app/token/${req.query.tokenId || 1}`,
-      metadata_version: "2-error",
-      attributes: [
-        { trait_type: "Status", value: "Error Mode" },
-        { trait_type: "Error", value: error.message }
-      ],
-      debug: {
-        error: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString()
-      }
-    });
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(500).json({ error: 'Internal error' });
   }
 }
