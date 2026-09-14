@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --test lib/__tests__/",
     "prerender-traits": "node scripts/prerender-traits.js"
   },
   "dependencies": {
