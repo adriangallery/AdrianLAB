@@ -164,7 +164,18 @@
     </div>
 
     <script>
-        const API_BASE = 'https://adrianlab-6sutu5mv4-adrianlab.vercel.app/api/admin/floppy-cache';
+        // Ruta relativa: antes apuntaba a un deploy concreto de Vercel que ya no existe
+        const API_BASE = '/api/admin/floppy-cache';
+
+        // L5: los endpoints de admin exigen ADMIN_API_KEY; se pide una vez por pestaña y no se guarda en el repo
+        function adminHeaders(extra = {}) {
+            let key = sessionStorage.getItem('adrianlabAdminKey');
+            if (!key) {
+                key = prompt('ADMIN_API_KEY') || '';
+                if (key) sessionStorage.setItem('adrianlabAdminKey', key);
+            }
+            return { ...extra, 'Authorization': `Bearer ${key}` };
+        }
 
         // Ver estado del caché de un token específico
         async function getCacheStatus() {
@@ -175,7 +186,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}?tokenId=${tokenId}`);
+                const response = await fetch(`${API_BASE}?tokenId=${tokenId}`, { headers: adminHeaders() });
                 const data = await response.json();
                 
                 if (response.ok) {
@@ -198,7 +209,7 @@ Estado del Caché para Token ${data.tokenId}:
         // Ver estadísticas generales del caché
         async function getCacheStats() {
             try {
-                const response = await fetch(API_BASE);
+                const response = await fetch(API_BASE, { headers: adminHeaders() });
                 const data = await response.json();
                 
                 if (response.ok) {
@@ -232,9 +243,7 @@ Estadísticas Generales del Caché:
             try {
                 const response = await fetch(API_BASE, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: adminHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({
                         tokenId: parseInt(tokenId),
                         action: 'clear'
@@ -269,7 +278,8 @@ Caché Limpiado Exitosamente:
 
             try {
                 const response = await fetch(`${API_BASE}?confirm=true`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: adminHeaders()
                 });
                 
                 const data = await response.json();

@@ -1,3 +1,4 @@
+import { requireAdmin } from '../../../lib/admin-auth.js';
 import { getCachedAdrianZeroRender, getCachedFloppyRender } from '../../../lib/cache.js';
 import { createCanvas, loadImage } from 'canvas';
 
@@ -5,13 +6,16 @@ export default async function handler(req, res) {
   // Configurar CORS para administración
   res.setHeader('Access-Control-Allow-Origin', 'https://adrianlab.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
+
+  // L5: los endpoints de admin exigen ADMIN_API_KEY (fail closed)
+  if (!requireAdmin(req, res)) return;
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });

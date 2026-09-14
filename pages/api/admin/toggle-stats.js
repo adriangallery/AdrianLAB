@@ -1,3 +1,4 @@
+import { requireAdmin } from '../../../lib/admin-auth.js';
 // API endpoint para estadísticas de toggles
 import { getToggleCacheStats, getAllTokensWithToggles, clearToggleCache, forceUpdateToggles } from '../../../lib/toggle-cache.js';
 import { getContracts } from '../../../lib/contracts.js';
@@ -6,12 +7,15 @@ export default async function handler(req, res) {
   // Configurar CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
+
+  // L5: los endpoints de admin exigen ADMIN_API_KEY (fail closed)
+  if (!requireAdmin(req, res)) return;
 
   try {
     if (req.method === 'GET') {
