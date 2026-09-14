@@ -10,6 +10,7 @@ import {
 import { isTraitAnimated, getAnimatedTraits } from '../../../../lib/animated-traits-helper.js';
 import { generateFloppyGif, generateFloppyGifV4, generateStandaloneAnimatedV4 } from '../../../../lib/gif-generator.js';
 import { generateFloppySimpleHash, generateFloppyGifHash } from '../../../../lib/render-hash.js';
+import { classifyFloppyMetadataToken } from '../../../../lib/floppy-metadata-routing.js';
 import { fileExistsInGitHubFloppySimple, getGitHubFileUrlFloppySimple, uploadFileToGitHubFloppySimple, fileExistsInGitHubFloppyGif, getGitHubFileUrlFloppyGif, uploadFileToGitHubFloppyGif } from '../../../../lib/github-storage.js';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
@@ -27,8 +28,8 @@ function loadTokenDataForV4(tokenIdNum) {
     return f.floppys.find((x) => x.tokenId === tokenIdNum)
       || { tokenId: tokenIdNum, name: `Floppy #${tokenIdNum}`, category: 'Floppy discs', maxSupply: 1, floppy: 'OG' };
   }
-  // Serums
-  if (tokenIdNum >= 262144 && tokenIdNum <= 262147) {
+  // Serums (262144–262147 y cualquier serum nuevo de serums.json, L4)
+  if (classifyFloppyMetadataToken(tokenIdNum) === 'serum') {
     const s = readJson('public/labmetadata/serums.json');
     return (s.serums || []).find((x) => x.tokenId === tokenIdNum)
       || { tokenId: tokenIdNum, name: `Serum #${tokenIdNum}`, category: 'Serum', maxSupply: 1, floppy: 'SERUM' };
@@ -271,7 +272,7 @@ export default async function handler(req, res) {
       console.log(`[floppy-render] 🎯 CACHE HIT para token ${tokenIdNum}`);
       
       // Determinar si es un serum (GIF), floppy específico (GIF/PNG) o trait (PNG)
-      const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      const isSerum = classifyFloppyMetadataToken(tokenIdNum) === 'serum';
       const isSpecificFloppy = tokenIdNum >= 10000 && tokenIdNum <= 10100;
       const isPngFloppy = tokenIdNum === 10006;
       const isGif = isSerum || (isSpecificFloppy && !isPngFloppy);
@@ -295,7 +296,8 @@ export default async function handler(req, res) {
     // ===== PAGERS / ACTION PACKS / McORDER DASH (15000-15014): serve static image from /labimages/ =====
     // These tokens have pre-rendered static assets. The metadata handler returns animation_url for 15014.
     // The render endpoint just serves the cover image (PNG or GIF) directly from /public/labimages/.
-    if (tokenIdNum >= 15000 && tokenIdNum <= 15014) {
+    const coverKind = classifyFloppyMetadataToken(tokenIdNum);
+    if ((tokenIdNum >= 15000 && tokenIdNum <= 15014) || coverKind === 'actionPack' || coverKind === 'pager') {
       const tryExtensions = ['gif', 'png'];
       for (const ext of tryExtensions) {
         const localPath = path.join(process.cwd(), 'public', 'labimages', `${tokenIdNum}.${ext}`);
@@ -336,7 +338,7 @@ export default async function handler(req, res) {
 
     if (
       (tokenIdNum >= 1 && tokenIdNum <= 9999) ||
-      (tokenIdNum >= 262144 && tokenIdNum <= 262147) ||
+      classifyFloppyMetadataToken(tokenIdNum) === 'serum' ||
       (tokenIdNum >= 30000 && tokenIdNum <= 35000) ||
       (tokenIdNum >= 10000 && tokenIdNum <= 10100) ||
       tokenIdNum === 1123 ||
@@ -356,7 +358,7 @@ export default async function handler(req, res) {
       // and let it fall through to the FloppyRenderer path further below.
       // ============================================================
       const isSpecialFloppyAsset = (tokenIdNum >= 10000 && tokenIdNum <= 10100) || tokenIdNum === 1123;
-      const isSerumRange         = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      const isSerumRange         = classifyFloppyMetadataToken(tokenIdNum) === 'serum';
       const isTshitRange         = tokenIdNum >= 30000 && tokenIdNum <= 35000;
       const isOgCoverRange       = tokenIdNum >= 100001 && tokenIdNum <= 101003;
 
@@ -557,7 +559,7 @@ export default async function handler(req, res) {
       }
       
       // Determinar si es un serum (GIF) o trait (PNG)
-      const isSerum = tokenIdNum >= 262144 && tokenIdNum <= 262147;
+      const isSerum = classifyFloppyMetadataToken(tokenIdNum) === 'serum';
       
       // Detectar si el trait es animado (solo para traits, no serums)
       let isAnimatedTrait = false;

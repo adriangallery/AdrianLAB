@@ -6,6 +6,7 @@ import {
   setCachedFloppyMetadata, 
   getFloppyMetadataTTL 
 } from '../../../../lib/cache.js';
+import { classifyFloppyMetadataToken } from '../../../../lib/floppy-metadata-routing.js';
 
 export default async function handler(req, res) {
   // ===== CONFIGURACIÓN CORS =====
@@ -131,7 +132,9 @@ export default async function handler(req, res) {
 
     // DETERMINAR TIPO DE TOKEN
     // LÓGICA ESPECIAL: 1123 es un pack, debe tratarse como floppy
-    if ((tokenIdNum >= 1 && tokenIdNum <= 9999) && tokenIdNum !== 1123) {
+    // Rama según el tipo de token; serums, action packs y pagers nuevos se reconocen por su JSON (L4)
+    const tokenKind = classifyFloppyMetadataToken(tokenIdNum);
+    if (tokenKind === 'trait') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para TRAITS (1-9999)`);
       
       // Cargar datos de labmetadata
@@ -263,7 +266,7 @@ export default async function handler(req, res) {
       console.log(`[floppy-metadata] ===== METADATA TRAIT GENERADA EXITOSAMENTE =====`);
       res.status(200).json(metadata);
 
-    } else if (tokenIdNum >= 262144 && tokenIdNum <= 262147) {
+    } else if (tokenKind === 'serum') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para SERUM (262144-262147)`);
       
       // Cargar datos de serums.json
@@ -386,7 +389,7 @@ export default async function handler(req, res) {
       res.status(200).json(metadata);
 
     // ===== NUEVA RAMA: ACTION PACKS (15008-15010) =====
-    } else if (tokenIdNum >= 15008 && tokenIdNum <= 15010) {
+    } else if (tokenKind === 'actionPack') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para ACTION PACK`);
 
       try {
@@ -466,7 +469,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Action Pack metadata' });
       }
 
-    } else if (tokenIdNum >= 15000 && tokenIdNum <= 15013) {
+    } else if (tokenKind === 'pager') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para PAGERS (15000-15013)`);
 
       try {
@@ -565,7 +568,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading Pagers metadata' });
       }
 
-    } else if ((tokenIdNum >= 100001 && tokenIdNum <= 101003) || (tokenIdNum >= 101001 && tokenIdNum <= 101003)) {
+    } else if (tokenKind === 'ogpunk') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para OGPUNKS (100001-101003)`);
       try {
         const ogpunksPath = path.join(process.cwd(), 'public', 'labmetadata', 'ogpunks.json');
@@ -631,7 +634,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading OGPUNKS metadata' });
       }
 
-    } else if (tokenIdNum >= 20000 && tokenIdNum <= 20099) {
+    } else if (tokenKind === 'achievement') {
       // ===== ZEROADVENTURE ACHIEVEMENT BADGES =====
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para ACHIEVEMENT BADGE`);
 
@@ -677,7 +680,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error loading achievement metadata' });
       }
 
-    } else if (tokenIdNum >= 30000 && tokenIdNum <= 35000) {
+    } else if (tokenKind === 'studio') {
       // ===== T-SHIT STUDIO (SWAG, 30000..35000) =====
       // V1 legacy ids 30000..30013 are real (their entries live in studio.json).
       // Pre-registered slots 30014..30149 may also have entries. V2 ids minted
@@ -751,7 +754,7 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', `public, max-age=${ttlSeconds}`);
       return res.status(200).json(metadata);
 
-    } else if (tokenIdNum === 1123 || tokenIdNum >= 10000) {
+    } else if (tokenKind === 'floppy') {
       console.log(`[floppy-metadata] Token ${tokenIdNum} - Generando metadata para FLOPPYS/PACKS (1123 o 10000+)`);
       
       // Cargar datos de floppy.json
@@ -923,6 +926,9 @@ export default async function handler(req, res) {
       // Devolver metadata
       console.log(`[floppy-metadata] ===== METADATA FLOPPY GENERADA EXITOSAMENTE =====`);
       res.status(200).json(metadata);
+    } else {
+      // Antes no había rama para ids <= 0 y la petición se quedaba sin respuesta
+      return res.status(404).json({ error: 'Token not found' });
     }
 
   } catch (error) {
