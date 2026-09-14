@@ -1,12 +1,64 @@
 /**
- * Endpoint simplificado para probar bounce animation
- * Separado del builder complejo para evitar conflictos
+ * Endpoint simplificado para probar bounce animation con squash & stretch
+ * y delay por categoría. Aislado del render principal — útil para iterar
+ * en el editor /admin/bounce-builder.html sin tocar tokens reales.
+ *
+ * Query params:
+ *  - base               skin base ('medium' | 'zero' | 'dark' | 'alien' | 'albino' | 'blankmannequin' | 'mannequin')
+ *  - fixed              csv de traitIds (e.g. "12,247,1058")
+ *  - bounce=true        REQUERIDO
+ *  - bounceDir          'y' (default) | 'x' | 'both'
+ *  - bounceDist         píxeles (default 30)
+ *  - bounceCount        número de botes (default 2)
+ *  - bounceFrames       frames totales del GIF (default 12)
+ *  - bounceDelay        unidad de delay entre categorías en frames (default 1)
+ *  - bounceFrameMs      ms por frame del GIF (default 80)
+ *  - squash             squash en impacto, 0..0.3 (default 0.12)
+ *  - stretch            stretch en cumbre, 0..0.2 (default 0.06)
+ *  - anchorY            pivote Y del scale, 0..1 (default 0.92)
+ *  - perCategory        'false' para desactivar delay por categoría (default true)
+ *  - width / height     px del lienzo (default 400 — sirve para preview rápido)
  */
 
 import { Resvg } from '@resvg/resvg-js';
-import { createCanvas, loadImage } from 'canvas';
-import { calculateBounceWithDelay } from '../../lib/animation-helpers.js';
-import { generateGifFromLayers } from '../../lib/gif-generator.js';
+import { createBounceSquashFrameGenerator, generateGifFromLayers } from '../../lib/gif-generator.js';
+import fs from 'fs';
+import path from 'path';
+
+let traitsIndexCache = null;
+function loadTraitsIndex() {
+  if (traitsIndexCache) return traitsIndexCache;
+  try {
+    const file = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
+    const raw = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    const index = new Map();
+    for (const t of raw.traits || []) {
+      index.set(String(t.tokenId), t.category || null);
+    }
+    traitsIndexCache = index;
+    return index;
+  } catch (err) {
+    console.warn('[bounce-test] No se pudo leer traits.json:', err.message);
+    traitsIndexCache = new Map();
+    return traitsIndexCache;
+  }
+}
+
+function categoryForTraitId(traitId) {
+  const idx = loadTraitsIndex();
+  return idx.get(String(traitId)) || 'TOP'; // default a TOP (delay máximo)
+}
+
+const baseSkinMap = {
+  medium: { url: '/traits/ADRIAN/GEN0-Medium.svg', category: 'SKIN' },
+  zero: { url: '/traits/ADRIAN/GEN0-Medium.svg', category: 'SKIN' },
+  dark: { url: '/traits/ADRIAN/GEN0-Dark.svg', category: 'SKIN' },
+  darkadrian: { url: '/traits/ADRIAN/GEN0-Dark.svg', category: 'SKIN' },
+  alien: { url: '/traits/ADRIAN/GEN0-Alien.svg', category: 'SKIN' },
+  albino: { url: '/traits/ADRIAN/GEN0-Albino.svg', category: 'SKIN' },
+  blankmannequin: { url: '/labimages/blankmannequin.svg', category: 'BODY' },
+  mannequin: { url: '/labimages/mannequin.svg', category: 'BODY' },
+};
 
 export default async function handler(req, res) {
   try {
@@ -14,22 +66,27 @@ export default async function handler(req, res) {
       base = 'medium',
       fixed = '',
       bounceDir = 'y',
-      bounceDist = 50,
-      bounceCount = 3,
-      bounceFrames = 12,
-      bounceDelay = 2,
+      bounceDist,
+      bounceCount,
+      bounceFrames,
+      bounceDelay,
+      bounceFrameMs,
+      squash,
+      stretch,
+      anchorY,
+      perCategory,
       width = 400,
-      height = 400
+      height = 400,
     } = req.query;
 
-    const isBounce = req.query.bounce === 'true';
-    
-    if (!isBounce) {
+    if (req.query.bounce !== 'true') {
       return res.status(400).json({ error: 'bounce=true is required' });
     }
 
-    const fixedIds = fixed ? fixed.split(',').map(id => id.trim()).filter(id => id) : [];
-    
+    const fixedIds = fixed
+      ? fixed.split(',').map(id => id.trim()).filter(Boolean)
+      : [];
+
     if (fixedIds.length === 0) {
       return res.status(400).json({ error: 'At least one fixed trait is required' });
     }
@@ -37,173 +94,86 @@ export default async function handler(req, res) {
     const bounceConfig = {
       enabled: true,
       direction: bounceDir,
-      distance: parseFloat(bounceDist) || 50,
-      bounces: parseInt(bounceCount) || 3,
+      distance: parseFloat(bounceDist) || 30,
+      bounces: parseInt(bounceCount) || 2,
       frames: parseInt(bounceFrames) || 12,
-      delay: parseInt(bounceDelay) || 2
+      delay: parseInt(bounceDelay) || 1,
+      squash: squash !== undefined ? parseFloat(squash) : 0.12,
+      stretch: stretch !== undefined ? parseFloat(stretch) : 0.06,
+      anchorY: anchorY !== undefined ? parseFloat(anchorY) : 0.92,
+      frameMs: parseInt(bounceFrameMs) || 80,
+      perCategoryDelay: perCategory !== 'false',
     };
 
-    const totalFrames = parseInt(bounceFrames) || 12;
     const canvasWidth = parseInt(width) || 400;
     const canvasHeight = parseInt(height) || 400;
 
-    console.log(`[bounce-test] Generando GIF con bounce:`);
-    console.log(`[bounce-test] - Base: ${base}`);
-    console.log(`[bounce-test] - Fixed traits: ${fixedIds.join(', ')}`);
-    console.log(`[bounce-test] - Bounce config:`, bounceConfig);
-    console.log(`[bounce-test] - Total frames: ${totalFrames}`);
+    console.log('[bounce-test] config:', { base, fixedIds, bounceConfig, canvasWidth });
 
-    // Mapeo de skins base a sus rutas (igual que test-gif-simple-v3.js)
-    const baseSkinMap = {
-      'medium': '/traits/ADRIAN/GEN0-Medium.svg',
-      'zero': '/traits/ADRIAN/GEN0-Medium.svg',
-      'dark': '/traits/ADRIAN/GEN0-Dark.svg',
-      'darkadrian': '/traits/ADRIAN/GEN0-Dark.svg',
-      'alien': '/traits/ADRIAN/GEN0-Alien.svg',
-      'albino': '/traits/ADRIAN/GEN0-Albino.svg',
-      'blankmannequin': '/labimages/blankmannequin.svg',
-      'mannequin': '/labimages/mannequin.svg'
-    };
-
-    // Función para convertir SVG a PNG
-    const svgToPng = async (id, w = canvasWidth) => {
+    // SVG → PNG buffer
+    const svgToPng = async (svgUrl) => {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
-      let url;
-      
-      // Mapear skins base a sus rutas correctas
-      if (baseSkinMap[id]) {
-        url = `${baseUrl}${baseSkinMap[id]}`;
-      } else {
-        // Traits normales
-        url = `${baseUrl}/labimages/${id}.svg`;
-      }
-      
-      console.log(`[bounce-test] Cargando: ${url}`);
-      
-      const response = await fetch(url);
+      const fullUrl = svgUrl.startsWith('http') ? svgUrl : `${baseUrl}${svgUrl}`;
+      const response = await fetch(fullUrl);
       if (!response.ok) {
-        throw new Error(`Failed to load ${id}: ${response.status} (${url})`);
+        throw new Error(`Failed to load ${fullUrl}: ${response.status}`);
       }
-      
       const svgContent = await response.text();
       const resvg = new Resvg(Buffer.from(svgContent), {
-        fitTo: { mode: 'width', value: w },
-        background: 'rgba(255, 255, 255, 0)'
+        fitTo: { mode: 'width', value: canvasWidth },
+        background: 'rgba(255, 255, 255, 0)',
       });
-      
       return resvg.render().asPng();
     };
 
-    // Pre-cargar todas las imágenes
-    const basePng = base ? await svgToPng(base, canvasWidth) : null;
-    const fixedPngs = await Promise.all(
-      fixedIds.map(id => svgToPng(id, canvasWidth))
-    );
+    // Construir capas con su categoría asociada (para delay por categoría)
+    const layers = [];
 
-    // Crear customFrameGenerator que aplica bounce por capas
-    const customFrameGenerator = async (frameIndex, totalFrames) => {
-      console.log(`[bounce-test] Generando frame ${frameIndex}/${totalFrames}`);
-      
-      const layers = [];
-      
-      // 1. Base/Skin - con bounce SIN delay
-      if (basePng) {
-        const bounceTransform = calculateBounceWithDelay(
-          frameIndex,
-          totalFrames,
-          bounceConfig.direction,
-          bounceConfig.distance,
-          bounceConfig.bounces,
-          0 // Sin delay para skin
-        );
-        
-        console.log(`[bounce-test] Frame ${frameIndex}: Skin bounce transform:`, bounceTransform);
-        
-        layers.push({
-          pngBuffer: basePng,
-          transform: bounceTransform
-        });
-      }
-      
-      // 2. Fixed traits - con bounce CON delay
-      for (let i = 0; i < fixedIds.length; i++) {
-        const bounceTransform = calculateBounceWithDelay(
-          frameIndex,
-          totalFrames,
-          bounceConfig.direction,
-          bounceConfig.distance,
-          bounceConfig.bounces,
-          bounceConfig.delay // Delay para traits
-        );
-        
-        console.log(`[bounce-test] Frame ${frameIndex}: Trait ${fixedIds[i]} bounce transform:`, bounceTransform);
-        
-        layers.push({
-          pngBuffer: fixedPngs[i],
-          transform: bounceTransform
-        });
-      }
-      
-      // Componer todas las capas
-      const canvas = createCanvas(canvasWidth, canvasHeight);
-      const ctx = canvas.getContext('2d');
-      
-      for (const layer of layers) {
-        const img = await loadImage(layer.pngBuffer);
-        
-        if (layer.transform) {
-          const { x = 0, y = 0, scale = 1, rotation = 0 } = layer.transform;
-          
-          ctx.save();
-          ctx.translate(canvasWidth / 2 + x, canvasHeight / 2 + y);
-          
-          if (rotation !== 0) {
-            ctx.rotate(rotation * Math.PI / 180);
-          }
-          
-          if (scale !== 1) {
-            ctx.scale(scale, scale);
-          }
-          
-          ctx.drawImage(img, -canvasWidth / 2, -canvasHeight / 2, canvasWidth, canvasHeight);
-          ctx.restore();
-        } else {
-          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-        }
-      }
-      
-      return {
-        pngBuffer: canvas.toBuffer('image/png'),
-        delay: 500
-      };
-    };
+    if (base) {
+      const baseInfo = baseSkinMap[base];
+      const url = baseInfo ? baseInfo.url : `/labimages/${base}.svg`;
+      const category = baseInfo ? baseInfo.category : 'SKIN';
+      const png = await svgToPng(url);
+      layers.push({ pngBuffer: png, category });
+    }
 
-    // Generar GIF usando generateGifFromLayers
-    // IMPORTANTE: Pasar totalFrames explícitamente para que customFrameGenerator lo use correctamente
+    for (const traitId of fixedIds) {
+      const png = await svgToPng(`/labimages/${traitId}.svg`);
+      const category = categoryForTraitId(traitId);
+      layers.push({ pngBuffer: png, category });
+      console.log(`[bounce-test] trait ${traitId} → categoría ${category}`);
+    }
+
+    const customGen = createBounceSquashFrameGenerator({
+      layers,
+      animatedTraits: [],
+      bounceConfig,
+      width: canvasWidth,
+      height: canvasHeight,
+      delay: bounceConfig.frameMs,
+    });
+
     const gifBuffer = await generateGifFromLayers({
       stableLayers: [],
       animatedTraits: [],
       width: canvasWidth,
       height: canvasHeight,
-      delay: 500,
-      customFrameGenerator: customFrameGenerator,
-      totalFrames: totalFrames // Pasar totalFrames explícitamente
+      delay: bounceConfig.frameMs,
+      customFrameGenerator: customGen,
+      totalFrames: bounceConfig.frames,
     });
 
     console.log(`[bounce-test] GIF generado: ${gifBuffer.length} bytes`);
-
     res.setHeader('Content-Type', 'image/gif');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.setHeader('X-Bounce', 'enabled');
     res.status(200).send(gifBuffer);
-
   } catch (error) {
     console.error('[bounce-test] Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Error generating bounce GIF',
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
   }
 }
-
