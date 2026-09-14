@@ -1,3 +1,4 @@
+import { requireAdmin } from '../../../lib/admin-auth.js';
 import {
   clearDuplicatorCache,
   getDuplicatorCacheStats,
@@ -14,6 +15,9 @@ export default async function handler(req, res) {
     res.status(200).end();
     return;
   }
+
+  // L5: los endpoints de admin exigen ADMIN_API_KEY (fail closed)
+  if (!requireAdmin(req, res)) return;
 
   // Verificar método HTTP
   if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'DELETE') {

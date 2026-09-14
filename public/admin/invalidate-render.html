@@ -204,8 +204,8 @@
       </div>
       
       <div class="form-group">
-        <label for="apiKey">API Key (opcional, si está configurada):</label>
-        <input type="password" id="apiKey" name="apiKey" placeholder="Dejar vacío si no está configurada">
+        <label for="apiKey">API Key (obligatoria, ADMIN_API_KEY de Vercel):</label>
+        <input type="password" id="apiKey" name="apiKey" placeholder="ADMIN_API_KEY" required>
       </div>
       
       <button type="submit" id="submitBtn">Invalidar Render</button>

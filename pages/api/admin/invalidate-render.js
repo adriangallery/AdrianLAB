@@ -1,9 +1,8 @@
+import { requireAdmin } from '../../../lib/admin-auth.js';
 // API endpoint para invalidar renders guardados en GitHub
 // Permite eliminar archivos de GitHub para forzar un nuevo renderizado
 import { deleteAllRendersForToken, deleteFileFromGitHub } from '../../../lib/github-storage.js';
 import { getRenderFilename, getTraitFilename, getFloppySimpleFilename, generateTraitHash, generateFloppySimpleHash } from '../../../lib/render-hash.js';
-
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY || process.env.VERCEL_ADMIN_API_KEY;
 
 export default async function handler(req, res) {
   // Configurar CORS
@@ -16,25 +15,15 @@ export default async function handler(req, res) {
     return;
   }
 
+  // L5: los endpoints de admin exigen ADMIN_API_KEY (fail closed)
+  if (!requireAdmin(req, res)) return;
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Verificar autenticación (opcional, pero recomendado)
-    if (ADMIN_API_KEY) {
-      const authHeader = req.headers.authorization;
-      const apiKey = authHeader?.replace('Bearer ', '') || req.body.apiKey;
-      
-      if (apiKey !== ADMIN_API_KEY) {
-        return res.status(401).json({ 
-          error: 'Unauthorized',
-          message: 'API key inválida o no proporcionada'
-        });
-      }
-    }
-
-    const { tokenId, renderType, hash, traitId, floppySimple } = req.body;
+        const { tokenId, renderType, hash, traitId, floppySimple } = req.body;
 
     if (!tokenId && !traitId) {
       return res.status(400).json({ 
