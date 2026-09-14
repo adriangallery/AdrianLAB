@@ -477,13 +477,6 @@ export default function Home() {
                 example: '/api/trait/18'
               },
               {
-                name: 'Trait Metadata',
-                url: '/api/trait/metadata/18',
-                description: 'Metadata simplificada de trait',
-                tags: ['traits', 'metadata'],
-                example: '/api/trait/metadata/18'
-              },
-              {
                 name: 'Test Simple',
                 url: '/api/test-simple/18',
                 description: 'Endpoint de prueba simplificado',

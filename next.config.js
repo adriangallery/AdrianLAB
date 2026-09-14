@@ -24,6 +24,17 @@ const nextConfig = {
       ],
     },
   },
+  // L2 (plan AdrianZERO 2026-09): la metadata de traits/floppies tiene UNA fuente, la que devuelve
+  // uri() de AdrianTraitsCore (/api/metadata/floppy/<id>.json). Las rutas duplicadas antiguas
+  // redirigen ahí en vez de servir otro payload con URLs de un deploy concreto (VERCEL_URL).
+  async redirects() {
+    return [
+      { source: '/api/floppy/metadata/:id(\\d+).json', destination: '/api/metadata/floppy/:id.json', permanent: true },
+      { source: '/api/floppy/metadata/:id(\\d+)', destination: '/api/metadata/floppy/:id.json', permanent: true },
+      { source: '/api/trait/metadata/:id(\\d+).json', destination: '/api/metadata/floppy/:id.json', permanent: true },
+      { source: '/api/trait/metadata/:id(\\d+)', destination: '/api/metadata/floppy/:id.json', permanent: true },
+    ]
+  },
   async rewrites() {
     return [
       {
