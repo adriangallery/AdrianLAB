@@ -31,3 +31,9 @@ yarn-error.log*
 .vercel
 token1_*.png
 .refresh-progress.json
+
+# Artefactos locales de previsualización de renders (H1, 14-sep-2026): no se versionan
+/preview-card-*
+/preview-v4-*
+/tmp-*/
+/.vscode/
