@@ -27,7 +27,8 @@ jobs:
         with:
           node-version: 22
       # Los tests de lib/__tests__ no necesitan node_modules (canvas/sharp pesan y no hacen falta)
-      - run: node --test lib/__tests__/
+      # Node 22 ya no acepta un directorio suelto en --test: se pasan los ficheros
+      - run: node --test lib/__tests__/*.test.js
 
   smoke:
     if: >-
