@@ -66,23 +66,8 @@ Los que realmente se usan en producción:
 | `/api/render/custom/[tokenId]` | 28900+ | Render con traits custom via query — muy grande |
 | `/api/render/custom-external/[tokenId]` | 29633+ | Test de traits externos |
 | `/api/render/test-external/[tokenId]` | 653 | Test render |
-| `/api/debug-floppy/[tokenId]` | — | Debug |
-| `/api/debug-paths/[tokenId]` | — | Debug paths |
-| `/api/debug-svg/[tokenId]` | — | Debug SVG |
-| `/api/debug-svg-text/[tokenId]` | — | Debug SVG text |
-| `/api/debug-svg-fonts/[tokenId]` | — | Debug fonts |
-| `/api/debug/render-custom` | — | Debug custom |
 | `/api/test-gif-simple` (v1-v4) | — | 4 versiones de test GIF |
-| `/api/test-gif-funcional` | — | Test GIF |
-| `/api/test-image/[tokenId]` | — | Test imagen |
-| `/api/test-text/[tokenId]` | — | Test texto |
-| `/api/test-text-to-svg/[tokenId]` | — | Test text→SVG |
 | `/api/test-simple/[tokenId]` | — | Test simple |
-| `/api/test-renderers/[tokenId]` | — | Test renderers |
-| `/api/test-retro-fonts/[tokenId]` | — | Test fuentes |
-| `/api/test-animation/[tokenId]` | — | Test animación |
-| `/api/test-deployment/[tokenId]` | — | Test deploy |
-| `/api/test-railway-health` | — | Health check Railway |
 | `/api/bounce-test` | — | Test bounce |
 | `/api/adrianmoves/[tokenId]` | 206 | Experimental — overlay GIF |
 
