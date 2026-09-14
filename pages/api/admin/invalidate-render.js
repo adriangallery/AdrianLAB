@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   }
 
   try {
-        const { tokenId, renderType, hash, traitId, floppySimple } = req.body;
+    const { tokenId, renderType, hash, traitId, floppySimple } = req.body;
 
     if (!tokenId && !traitId) {
       return res.status(400).json({ 
