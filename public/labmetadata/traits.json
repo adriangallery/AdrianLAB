@@ -15269,6 +15269,19 @@
         "Adrian | HalfxTiger"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1182,
+      "name": "Beta Tester Cap",
+      "category": "HAT",
+      "fileName": "1182",
+      "maxSupply": 10,
+      "floppy": "Test Drop",
+      "description": "Given to the first testers of the new AdrianZERO drops. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
