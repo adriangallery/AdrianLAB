@@ -1,0 +1,46 @@
+# AdrianLAB (plan AdrianZERO L6):
+#  - unit: `npm test` (node --test, sin dependencias) en cada PR.
+#  - smoke: scripts/smoke.mjs contra el deploy de Vercel en cuanto termina bien
+#    (preview de cada rama y producción). Vercel publica el `deployment_status` en GitHub.
+name: smoke
+
+on:
+  pull_request:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'URL a probar (por defecto producción)'
+        required: false
+        default: 'https://adrianlab.vercel.app'
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Los tests de lib/__tests__ no necesitan node_modules (canvas/sharp pesan y no hacen falta)
+      # Node 22 ya no acepta un directorio suelto en --test: se pasan los ficheros
+      - run: node --test lib/__tests__/*.test.js
+
+  smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Smoke tests
+        run: node scripts/smoke.mjs
+        env:
+          BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url || inputs.base_url }}
