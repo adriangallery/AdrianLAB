@@ -1,0 +1,14 @@
+# Temporal (L9): regenera package-lock.json sin las devDependencies de TypeScript. Se borra en el mismo PR.
+name: regen-lock-tmp
+on: { workflow_dispatch: {} }
+permissions: { contents: read }
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm uninstall typescript @types/node @types/react @types/react-dom --package-lock-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with: { name: lock, path: "package.json\npackage-lock.json" }
