@@ -1,0 +1,29 @@
+# AdrianLAB en el mini (mudanza de ZERO al mini, fases 2 y 3: metadata y render).
+# Se construye en GitHub Actions (.github/workflows/build-mini-image.yml) y el mini solo descarga
+# la imagen: nunca se compila en el mini. Las variables de servidor (RPC, Upstash, GitHub…) son
+# variables de entorno de la app en Dokku, no van en la imagen. Sin NEXT_PUBLIC_BASE_URL las URLs
+# absolutas siguen siendo https://adrianlab.vercel.app, que es lo que hay grabado on-chain.
+FROM node:22-slim AS build
+WORKDIR /app
+# Por si canvas no encuentra binario precompilado y tiene que compilar
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3 make g++ pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npx next build
+
+FROM node:22-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates fontconfig fonts-dejavu-core \
+      libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libjpeg62-turbo libgif7 librsvg2-2 \
+    && rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production PORT=5000 HOSTNAME=0.0.0.0 NEXT_TELEMETRY_DISABLED=1
+COPY --from=build /app ./
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
+EXPOSE 5000
+CMD ["node_modules/.bin/next", "start", "-p", "5000"]

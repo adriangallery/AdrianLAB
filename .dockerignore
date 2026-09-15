@@ -1,0 +1,12 @@
+.git
+node_modules
+.next
+.vercel
+.env
+.env.*
+docs
+*.md
+test-*.png
+test-*.json
+test-*.js
+debug-*.svg
