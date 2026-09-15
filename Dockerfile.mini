@@ -13,6 +13,10 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Mudanza fase 4: dominio canónico propio. Next hornea NEXT_PUBLIC_* en el build, así que las URLs de
+# `image` de la metadata y las llamadas internas del render salen con lab.adrianzero.com y no con Vercel.
+ARG NEXT_PUBLIC_BASE_URL=https://lab.adrianzero.com
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 RUN npx next build
 
 FROM node:22-slim
