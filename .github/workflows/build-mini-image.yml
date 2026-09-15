@@ -1,0 +1,61 @@
+# Imagen de AdrianLAB para el mini (mudanza de ZERO al mini, fases 2 y 3). Next se construye aquí y
+# el mini solo hace docker pull + git:from-image (Beauty primero: nada de builds en el mini).
+# No lleva secretos: la configuración de servidor son variables de entorno de la app en Dokku.
+name: build-mini-image
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'public/rendered-*/**'
+      - 'rendered-images/**'
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - 'public/rendered-*/**'
+      - 'rendered-images/**'
+      - '**/*.md'
+  workflow_dispatch: {}
+
+concurrency:
+  group: build-mini-image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push adrianlab
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.mini
+          push: true
+          # El docker/containerd viejo del mini no sabe leer attestations de buildx.
+          provenance: false
+          sbom: false
+          build-args: |
+            GIT_SHA=${{ env.IMAGE_SHA }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/adrianlab:${{ env.IMAGE_SHA }}
+            ${{ github.ref == 'refs/heads/main' && format('ghcr.io/{0}/adrianlab:latest', github.repository_owner) || '' }}
+          cache-from: type=gha,scope=adrianlab-mini
+          cache-to: type=gha,mode=max,scope=adrianlab-mini
