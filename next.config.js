@@ -39,10 +39,15 @@ const nextConfig = {
     // Mudanza de ZERO al mini, fase 2: en Vercel la metadata se reenvía al mini (lab.adrianzero.com) sin
     // tocar las URLs on-chain. Solo en el build de Vercel (VERCEL=1): el mini construye sin esa variable y
     // así nunca se reenvía a sí mismo. Interruptor de emergencia: LAB_METADATA_ON_MINI=0 y redeploy.
-    const metadataOnMini = process.env.VERCEL === '1' && process.env.LAB_METADATA_ON_MINI !== '0'
-    const beforeFiles = metadataOnMini
-      ? [{ source: '/api/metadata/:path*', destination: 'https://lab.adrianzero.com/api/metadata/:path*' }]
-      : []
+    // Fase 3: los renders (/api/render/*, a donde apunta el `image` de la metadata) también salen del mini.
+    // Interruptor propio: LAB_RENDER_ON_MINI=0 y redeploy.
+    const onVercel = process.env.VERCEL === '1'
+    const metadataOnMini = onVercel && process.env.LAB_METADATA_ON_MINI !== '0'
+    const renderOnMini = onVercel && process.env.LAB_RENDER_ON_MINI !== '0'
+    const beforeFiles = [
+      ...(metadataOnMini ? [{ source: '/api/metadata/:path*', destination: 'https://lab.adrianzero.com/api/metadata/:path*' }] : []),
+      ...(renderOnMini ? [{ source: '/api/render/:path*', destination: 'https://lab.adrianzero.com/api/render/:path*' }] : []),
+    ]
     return { beforeFiles, afterFiles: [
       {
         source: '/metadata/:path*',
