@@ -9,6 +9,7 @@ import { loadImage } from 'canvas';
 import { createCanvas } from 'canvas';
 import { Resvg } from '@resvg/resvg-js';
 import { getCachedSvgPng, setCachedSvgPng } from '../../../../lib/svg-png-cache.js';
+import { GEAR_BEHIND_BODY } from '../../../../lib/v2/shared/constants.js';
 
 // === CONFIGURACIÓN DEFAULT PARA APPLE EXPLODED VIEW ===
 // Timeline comprimido: spec 4.2s@60fps = 252 frames → adaptado a GIF con ~20 frames
@@ -484,12 +485,30 @@ export default async function handler(req, res) {
         console.log(`[displacement] ✅ BACKGROUND (${bgTraitId}) cargado`);
       }
     }
+
+    // ===== 4.5. GEAR «COLGADO EN LA PARED» (Freed Soul): capa fija justo después del fondo, detrás del cuerpo =====
+    if (equippedTraits['GEAR'] && GEAR_BEHIND_BODY.has(parseInt(equippedTraits['GEAR']))) {
+      const wallTraitId = equippedTraits['GEAR'];
+      const wallPngBuffer = await loadSvgFromUrl(`${baseUrl}/labimages/${wallTraitId}.svg`, `wall_${wallTraitId}`);
+      if (wallPngBuffer) {
+        const bgIndex = traitsForAnimation.findIndex((t) => t.isBackground);
+        traitsForAnimation.splice(bgIndex + 1, 0, {
+          traitId: wallTraitId,
+          category: 'GEAR',
+          layers: { normalLayer: wallPngBuffer, hasDisplacement: false },
+          hasDisplacement: false,
+          isBaseSkin: true, // fija, como el fondo
+        });
+        console.log(`[displacement] ✅ GEAR ${wallTraitId} en la pared (detrás del cuerpo)`);
+      }
+    }
     
     // ===== 5. CARGAR TRAITS EN ORDEN CORRECTO (como adrianzero-renderer) =====
     // Los traits normales en orden
     for (const category of TRAIT_ORDER) {
       if (equippedTraits[category]) {
         const traitId = equippedTraits[category];
+        if (category === 'GEAR' && GEAR_BEHIND_BODY.has(parseInt(traitId))) continue; // ya va en la pared (4.5)
         
         // LÓGICA DE EXCLUSIVIDAD: SERUMS solo si NO hay EYES
         if (category === 'SERUMS') {
