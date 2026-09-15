@@ -208,7 +208,8 @@ export default async function handler(req, res) {
     const tokenIdNum = parseInt(cleanTokenId);
 
     // Build base URL for images
-    const baseUrl = 'https://adrianlab.vercel.app';
+    // Mudanza fase 4: en el mini NEXT_PUBLIC_BASE_URL = https://lab.adrianzero.com (horneado en Dockerfile.mini)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
     const version = Date.now();
 
     // ===== LÓGICA ESPECIAL: SAMURAIZERO (500-1099) - REEMPLAZADA POR LÓGICA BASADA EN TAGS =====
