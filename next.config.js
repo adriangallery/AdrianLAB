@@ -27,6 +27,16 @@ const nextConfig = {
   // L2 (plan AdrianZERO 2026-09): la metadata de traits/floppies tiene UNA fuente, la que devuelve
   // uri() de AdrianTraitsCore (/api/metadata/floppy/<id>.json). Las rutas duplicadas antiguas
   // redirigen ahí en vez de servir otro payload con URLs de un deploy concreto (VERCEL_URL).
+  // Mudanza fase 4: las cabeceras CORS de vercel.json solo se aplican en Vercel; en el mini (`next start`)
+  // hay que declararlas aquí para que el TraitLab pueda seguir leyendo assets desde otro origen.
+  async headers() {
+    const cors = [
+      { key: 'Access-Control-Allow-Origin', value: '*' },
+      { key: 'Access-Control-Allow-Methods', value: 'GET, OPTIONS' },
+      { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
+    ]
+    return ['/labimages/:path*', '/labmetadata/:path*', '/traits/:path*', '/fonts/:path*'].map((source) => ({ source, headers: cors }))
+  },
   async redirects() {
     return [
       { source: '/api/floppy/metadata/:id(\\d+).json', destination: '/api/metadata/floppy/:id.json', permanent: true },
