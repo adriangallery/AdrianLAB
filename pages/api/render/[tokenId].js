@@ -21,6 +21,7 @@ import { fileExistsInGitHub, uploadFileToGitHub, getRenderType, getGitHubFileUrl
 import { transformWithNanoBanana } from '../../../lib/nanobanana-transformer.js';
 import { buildNanobananaPrompt } from '../../../lib/nanobanana-prompt.js';
 import { generateRenderHash } from '../../../lib/render-hash.js';
+import { GEAR_BEHIND_BODY } from '../../../lib/v2/shared/constants.js';
 import { getAnimatedTraits } from '../../../lib/animated-traits-helper.js';
 import { generateGifFromLayers } from '../../../lib/gif-generator.js';
 import { getCachedAdrianZeroGif, setCachedAdrianZeroGif } from '../../../lib/cache.js';
@@ -1408,6 +1409,15 @@ export default async function handler(req, res) {
       }
     }
 
+    // 1.5. GEAR «colgado en la pared» (Freed Soul): encima del fondo y por debajo de todo lo demás
+    if (equippedTraits['GEAR'] && GEAR_BEHIND_BODY.has(parseInt(equippedTraits['GEAR']))) {
+      const wallTraitImage = await loadTraitFromLabimages(equippedTraits['GEAR']);
+      if (wallTraitImage) {
+        ctx.drawImage(wallTraitImage, 0, 0, 1000, 1000);
+        console.log(`[render] PASO 1.5 - GEAR ${equippedTraits['GEAR']} renderizado en la pared (detrás del cuerpo)`);
+      }
+    }
+
     // 2. SEGUNDO: Renderizar el SKIN (Adrian base, excepción o serum)
     console.log('[render] PASO 2 - Iniciando carga del skin');
     
@@ -1648,6 +1658,9 @@ export default async function handler(req, res) {
           continue;
         }
         // LÓGICA ESPECIAL: Saltar GEAR 721 y 726 si ya se renderizaron antes de SWAG
+        if (category === 'GEAR' && GEAR_BEHIND_BODY.has(parseInt(equippedTraits['GEAR']))) {
+          continue; // ya se pintó en la pared (PASO 1.5)
+        }
         if (category === 'GEAR' && (equippedTraits['GEAR'] === '721' || equippedTraits['GEAR'] === '726')) {
           console.log(`[render] PASO 3 - 🎯 LÓGICA ESPECIAL: Saltando GEAR ${equippedTraits['GEAR']} porque ya se renderizó antes de SWAG`);
           continue;
