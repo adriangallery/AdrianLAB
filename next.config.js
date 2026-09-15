@@ -36,7 +36,14 @@ const nextConfig = {
     ]
   },
   async rewrites() {
-    return [
+    // Mudanza de ZERO al mini, fase 2: en Vercel la metadata se reenvía al mini (lab.adrianzero.com) sin
+    // tocar las URLs on-chain. Solo en el build de Vercel (VERCEL=1): el mini construye sin esa variable y
+    // así nunca se reenvía a sí mismo. Interruptor de emergencia: LAB_METADATA_ON_MINI=0 y redeploy.
+    const metadataOnMini = process.env.VERCEL === '1' && process.env.LAB_METADATA_ON_MINI !== '0'
+    const beforeFiles = metadataOnMini
+      ? [{ source: '/api/metadata/:path*', destination: 'https://lab.adrianzero.com/api/metadata/:path*' }]
+      : []
+    return { beforeFiles, afterFiles: [
       {
         source: '/metadata/:path*',
         destination: '/metadata/:path*.json'
@@ -51,7 +58,7 @@ const nextConfig = {
       // V1 render is canonical — no catch-all redirect to v2.
       // All /api/render/* paths are served by v1 (pages/api/render/).
       // The v2 render endpoint (/api/v2/render/*) is still accessible directly.
-    ]
+    ] }
   },
   webpack(config) {
     config.module.rules.push({
