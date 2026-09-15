@@ -47,6 +47,8 @@ const nextConfig = {
     const beforeFiles = [
       ...(metadataOnMini ? [{ source: '/api/metadata/:path*', destination: 'https://lab.adrianzero.com/api/metadata/:path*' }] : []),
       ...(renderOnMini ? [{ source: '/api/render/:path*', destination: 'https://lab.adrianzero.com/api/render/:path*' }] : []),
+      // Render v2 (ZEROmovies S1/S2: el v1 redirige ahí con una URL relativa, y la usa el TraitLab)
+      ...(renderOnMini ? [{ source: '/api/v2/render/:path*', destination: 'https://lab.adrianzero.com/api/v2/render/:path*' }] : []),
     ]
     return { beforeFiles, afterFiles: [
       {
