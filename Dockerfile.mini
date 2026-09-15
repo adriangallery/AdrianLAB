@@ -26,7 +26,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libjpeg62-turbo libgif7 librsvg2-2 \
     && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production PORT=5000 HOSTNAME=0.0.0.0 NEXT_TELEMETRY_DISABLED=1
-COPY --from=build /app ./
+# Capas separadas, de lo que menos cambia a lo que más: con la caché de GHCR, `public/` (~840 MB) y
+# `node_modules` conservan su digest entre despliegues y el mini solo descarga lo que cambió
+# (antes cada deploy bajaba ~1,5 GB y la ventana de despliegue se alargaba).
+COPY --from=build /app/public ./public
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json /app/next.config.js ./
+COPY --from=build /app/abis ./abis
+COPY --from=build /app/fonts ./fonts
+COPY --from=build /app/lib ./lib
+COPY --from=build /app/.next ./.next
 ARG GIT_SHA=unknown
 ENV GIT_SHA=$GIT_SHA
 EXPOSE 5000
