@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated from: typing (drawn in code, PROMPTED pack) -->
+<!-- Dimensions: 37x37 pixels (23 merged rects) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37">
+  <style>
+    rect { shape-rendering: crispEdges; }
+    svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+  </style>
+  <g id="pixels">
+    <rect x="28" y="14" width="7" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="27" y="15" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="28" y="15" width="7" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="35" y="15" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="27" y="16" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="28" y="16" width="1" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="29" y="16" width="1" height="1" fill="rgba(80,80,92,1.00)"/>
+    <rect x="30" y="16" width="1" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="31" y="16" width="1" height="1" fill="rgba(135,135,148,1.00)"/>
+    <rect x="32" y="16" width="1" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="33" y="16" width="1" height="1" fill="rgba(195,195,205,1.00)"/>
+    <rect x="34" y="16" width="1" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="35" y="16" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="27" y="17" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="28" y="17" width="7" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="35" y="17" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="26" y="18" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="27" y="18" width="8" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="35" y="18" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="25" y="19" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="26" y="19" width="1" height="1" fill="rgba(255,255,255,1.00)"/>
+    <rect x="27" y="19" width="8" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="26" y="20" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+  </g>
+</svg>

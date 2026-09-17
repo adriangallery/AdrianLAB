@@ -15296,6 +15296,146 @@
         "Cubist Souls"
       ],
       "external_url": "https://adrianzero.com/claim"
+    },
+    {
+      "tokenId": 1184,
+      "name": "Thinking Cap",
+      "category": "HAT",
+      "fileName": "1184",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Spin up the propeller before every big prompt. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1185,
+      "name": "Neural Visor",
+      "category": "EYES",
+      "fileName": "1185",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "See the world one token at a time. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1186,
+      "name": "Hallucination Shades",
+      "category": "EYES",
+      "fileName": "1186",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Confidently wrong, beautifully rendered. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1187,
+      "name": "Typing...",
+      "category": "MOUTH",
+      "fileName": "1187",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "The three dots that mean the answer is coming. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1188,
+      "name": "Context Halo",
+      "category": "HEAD",
+      "fileName": "1188",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "A glowing reminder of everything it still remembers. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1189,
+      "name": "API Key Lanyard",
+      "category": "NECK",
+      "fileName": "1189",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Never commit it. Never paste it in the chat. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1190,
+      "name": "Prompt Engineer Hoodie",
+      "category": "SWAG",
+      "fileName": "1190",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Standard issue for people who talk to machines for a living. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1191,
+      "name": "Rubber Duck",
+      "category": "GEAR",
+      "fileName": "1191",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Explain the bug out loud. The duck already knows. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1192,
+      "name": "Terminal",
+      "category": "BACKGROUND",
+      "fileName": "1192",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Where every AdrianLAB launch actually happens. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1193,
+      "name": "Not A Robot",
+      "category": "TOP",
+      "fileName": "1193",
+      "maxSupply": 100,
+      "floppy": "PROMPTED",
+      "description": "Checked. Probably. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {

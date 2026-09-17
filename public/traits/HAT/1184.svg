@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated from: thinking-cap (drawn in code, PROMPTED pack) -->
+<!-- Dimensions: 37x37 pixels (30 merged rects) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37">
+  <style>
+    rect { shape-rendering: crispEdges; }
+    svg { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
+  </style>
+  <g id="pixels">
+    <rect x="15" y="1" width="7" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="14" y="2" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="15" y="2" width="3" height="1" fill="rgba(80,220,240,1.00)"/>
+    <rect x="18" y="2" width="1" height="1" fill="rgba(150,150,160,1.00)"/>
+    <rect x="19" y="2" width="3" height="1" fill="rgba(240,90,200,1.00)"/>
+    <rect x="22" y="2" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="15" y="3" width="7" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="16" y="4" width="2" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="18" y="4" width="1" height="1" fill="rgba(120,120,130,1.00)"/>
+    <rect x="19" y="4" width="2" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="14" y="5" width="2" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="16" y="5" width="1" height="1" fill="rgba(253,203,60,1.00)"/>
+    <rect x="17" y="5" width="1" height="1" fill="rgba(255,240,170,1.00)"/>
+    <rect x="18" y="5" width="3" height="1" fill="rgba(253,203,60,1.00)"/>
+    <rect x="21" y="5" width="2" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="13" y="6" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="14" y="6" width="1" height="1" fill="rgba(214,48,49,1.00)"/>
+    <rect x="15" y="6" width="1" height="1" fill="rgba(255,150,150,1.00)"/>
+    <rect x="16" y="6" width="5" height="1" fill="rgba(253,203,60,1.00)"/>
+    <rect x="21" y="6" width="2" height="1" fill="rgba(45,110,220,1.00)"/>
+    <rect x="23" y="6" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="12" y="7" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="13" y="7" width="3" height="1" fill="rgba(160,30,35,1.00)"/>
+    <rect x="16" y="7" width="5" height="1" fill="rgba(205,150,25,1.00)"/>
+    <rect x="21" y="7" width="3" height="1" fill="rgba(28,72,160,1.00)"/>
+    <rect x="24" y="7" width="2" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="11" y="8" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="12" y="8" width="14" height="1" fill="rgba(40,170,90,1.00)"/>
+    <rect x="26" y="8" width="1" height="1" fill="rgba(0,0,0,1.00)"/>
+    <rect x="12" y="9" width="14" height="1" fill="rgba(0,0,0,1.00)"/>
+  </g>
+</svg>
