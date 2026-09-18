@@ -419,7 +419,7 @@ const loadCombinedTraitsMapping = async (tokenId) => {
 // =============================================
 
 // Categorías que solo sabe pintar el render local (ver hasLocalOnlyTrait).
-const LOCAL_ONLY_CATEGORIES = new Set(['ARMOUR', 'MASK', 'WEAPON', 'KIMONO', 'GI', '3D']);
+const LOCAL_ONLY_CATEGORIES = new Set(['ARMOUR', 'MASK', 'WEAPON', 'KIMONO', 'GI', '3D', 'BASESKIN']);
 
 // Mapeo de excepciones para traits de skin
 const SKIN_TRAIT_EXCEPTIONS = {
@@ -1158,6 +1158,15 @@ export default async function handler(req, res) {
       skinType = skinName || "Medium";
     }
 
+    // TraitLab ilimitado (18-sep-2026): ?baseskin=N prueba otra piel base solo en el preview.
+    // Numérico a propósito: el bucle de query lo guarda como categoría BASESKIN en finalTraits,
+    // así entra en la clave de caché del render y no se mezclan pieles.
+    const BASESKIN_TYPES = { 1: 'Medium', 2: 'Dark', 3: 'Alien', 4: 'Albino', 5: 'Light' };
+    if (BASESKIN_TYPES[finalTraits['BASESKIN']]) {
+      skinType = BASESKIN_TYPES[finalTraits['BASESKIN']];
+      console.log(`[custom-render] Piel base forzada por query: ${skinType}`);
+    }
+
     // Construir path del Adrian base
     baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
     console.log('[custom-render] Path de imagen base:', baseImagePath);
@@ -1290,7 +1299,8 @@ export default async function handler(req, res) {
     // forzamos render local para que loadExternalTrait use el resolver de tshit.
     const hasStudioV2Trait = Object.values(finalTraits).some(id => isTShitV2(parseInt(id, 10)));
     // 18-sep-2026 (TraitLab ilimitado): el servicio externo no pinta las categorías samurái ni el 3D
-    // (no están en su traitOrder) y los OG Punks (TOP 100001–101003) le salen en blanco → render local.
+    // (no están en su traitOrder), los OG Punks (TOP 100001–101003) le salen en blanco y no sabe de
+    // ?baseskin → render local.
     const topId = parseInt(finalTraits['TOP'], 10);
     const hasLocalOnlyTrait = Object.keys(finalTraits).some(c => LOCAL_ONLY_CATEGORIES.has(c)) ||
       (topId >= 100001 && topId <= 101003);
