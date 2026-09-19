@@ -418,6 +418,9 @@ const loadCombinedTraitsMapping = async (tokenId) => {
 // SECCIÓN DE EXCEPCIONES ESPECIALES
 // =============================================
 
+// Categorías que solo sabe pintar el render local (ver hasLocalOnlyTrait).
+const LOCAL_ONLY_CATEGORIES = new Set(['ARMOUR', 'MASK', 'WEAPON', 'KIMONO', 'GI', '3D', 'BASESKIN']);
+
 // Mapeo de excepciones para traits de skin
 const SKIN_TRAIT_EXCEPTIONS = {
   // Trait ID 37 (Normal)
@@ -1155,6 +1158,15 @@ export default async function handler(req, res) {
       skinType = skinName || "Medium";
     }
 
+    // TraitLab ilimitado (18-sep-2026): ?baseskin=N prueba otra piel base solo en el preview.
+    // Numérico a propósito: el bucle de query lo guarda como categoría BASESKIN en finalTraits,
+    // así entra en la clave de caché del render y no se mezclan pieles.
+    const BASESKIN_TYPES = { 1: 'Medium', 2: 'Dark', 3: 'Alien', 4: 'Albino', 5: 'Light' };
+    if (BASESKIN_TYPES[finalTraits['BASESKIN']]) {
+      skinType = BASESKIN_TYPES[finalTraits['BASESKIN']];
+      console.log(`[custom-render] Piel base forzada por query: ${skinType}`);
+    }
+
     // Construir path del Adrian base
     baseImagePath = `ADRIAN/GEN${gen}-${skinType}.svg`;
     console.log('[custom-render] Path de imagen base:', baseImagePath);
@@ -1286,12 +1298,20 @@ export default async function handler(req, res) {
     // Si hay traits Studio V2 (30014..35000), el SVG vive on-chain y Railway no sabe resolverlo;
     // forzamos render local para que loadExternalTrait use el resolver de tshit.
     const hasStudioV2Trait = Object.values(finalTraits).some(id => isTShitV2(parseInt(id, 10)));
+    // 18-sep-2026 (TraitLab ilimitado): el servicio externo no pinta las categorías samurái ni el 3D
+    // (no están en su traitOrder), los OG Punks (TOP 100001–101003) le salen en blanco y no sabe de
+    // ?baseskin → render local.
+    const topId = parseInt(finalTraits['TOP'], 10);
+    const hasLocalOnlyTrait = Object.keys(finalTraits).some(c => LOCAL_ONLY_CATEGORIES.has(c)) ||
+      (topId >= 100001 && topId <= 101003);
     if (hasAnimatedTraits) {
       console.log('[custom-external] 🎬 Traits animados detectados - Saltando Railway, renderizando GIF en Vercel');
     } else if (dupInfo && dupInfo.duplicated) {
       console.log('[custom-external] 🔄 DUPLICATOR: Token duplicado detectado - Saltando Railway, forzando renderizado local para background #FF3388 y texto PARENT');
     } else if (hasStudioV2Trait) {
       console.log('[custom-external] 🌐 Studio V2 trait detectado - Saltando Railway, render local con on-chain SVG');
+    } else if (hasLocalOnlyTrait) {
+      console.log('[custom-external] 🥷 Samurái/3D/OG Punk detectado - Saltando Railway, render local');
     } else {
       console.log('[custom-external] 🚀 Intentando renderizado externo...');
       console.log('[custom-external] 📋 finalTraits que se enviarán al servicio externo:', JSON.stringify(finalTraits, null, 2));
@@ -1685,7 +1705,9 @@ export default async function handler(req, res) {
     }
     
     // Ajuste: HEAD por encima de HAIR, GEAR después de SWAG (excepto 721 y 726 que ya se renderizaron)
-    const traitOrder = ['BEARD', 'EAR', 'RANDOMSHIT', 'SWAG', 'GEAR', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'FLOPPY DISCS', 'PAGERS'];
+    // Samurái (18-sep-2026): GI/KIMONO/ARMOUR son ropa (encima de SWAG); MASK y WEAPON van sobre la cara;
+    // 3D es un filtro que va encima de todo salvo TOP.
+    const traitOrder = ['BEARD', 'EAR', 'RANDOMSHIT', 'SWAG', 'GI', 'KIMONO', 'ARMOUR', 'GEAR', 'HAIR', 'HAT', 'HEAD', 'SKIN', 'SERUMS', 'EYES', 'MOUTH', 'NECK', 'NOSE', 'MASK', 'WEAPON', 'FLOPPY DISCS', 'PAGERS', '3D'];
 
     for (const category of traitOrder) {
       if (finalTraits[category]) {
