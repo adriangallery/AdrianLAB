@@ -294,6 +294,21 @@
       ],
       "external_url": "https://adrianzero.com/",
       "traitsInside": 3
+    },
+    {
+      "tokenId": 10021,
+      "name": "FREE TIER",
+      "category": "Floppy discs",
+      "fileName": "10021.gif",
+      "maxSupply": 300,
+      "floppy": "FREE TIER",
+      "description": "The free plan, imagined and drawn in code by an AI. 10 traits about life on the free tier, 5 per floppy. Free, up to 5 per wallet. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/",
+      "traitsInside": 5
     }
   ],
   "metadata": {

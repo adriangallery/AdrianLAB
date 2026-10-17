@@ -15436,6 +15436,146 @@
         "Claude"
       ],
       "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1194,
+      "name": "Rate Limit Beanie",
+      "category": "HAT",
+      "fileName": "1194",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Too many requests. Please try again later. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1195,
+      "name": "Low-Res Glasses",
+      "category": "EYES",
+      "fileName": "1195",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Full resolution is a Pro feature. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1196,
+      "name": "Loading Eyes",
+      "category": "EYES",
+      "fileName": "1196",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Still thinking. Please don't refresh. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1197,
+      "name": "Sponsored",
+      "category": "MOUTH",
+      "fileName": "1197",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "This message was brought to you by our sponsors. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1198,
+      "name": "Trial Countdown",
+      "category": "HEAD",
+      "fileName": "1198",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Your free trial ends soon. Upgrade to keep your face. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1199,
+      "name": "100% Off Coupon",
+      "category": "NECK",
+      "fileName": "1199",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Nothing costs less than nothing. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1200,
+      "name": "Freemium Hoodie",
+      "category": "SWAG",
+      "fileName": "1200",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Same hoodie as the Pro plan. Minus the color. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1201,
+      "name": "Waiting Room",
+      "category": "BACKGROUND",
+      "fileName": "1201",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "You are #4,821 in line. Thanks for your patience. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1202,
+      "name": "Priority Queue",
+      "category": "BACKGROUND",
+      "fileName": "1202",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "You are #99 in line. Priority support is a Pro feature. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
+    },
+    {
+      "tokenId": 1203,
+      "name": "Watermark",
+      "category": "TOP",
+      "fileName": "1203",
+      "maxSupply": 165,
+      "floppy": "FREE TIER",
+      "description": "Unlicensed copy. Buy the full version to remove. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/"
     }
   ],
   "metadata": {
