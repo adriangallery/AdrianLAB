@@ -1,0 +1,49 @@
+# AdrianLAB (plan AdrianZERO L6), en la Forja del iMac (runner «imac») desde el 25-oct-2026.
+#  - unit: `node --test` (sin dependencias) en cada PR y en cada push a main.
+#  - smoke: scripts/smoke.mjs contra producción (https://lab.adrianzero.com) a mano
+#    (workflow_dispatch). El disparo por `deployment_status` de Vercel ya no existe: Vercel es
+#    legacy, AdrianLAB se sirve desde el mini.
+name: smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'public/rendered-*/**'
+      - 'rendered-images/**'
+      - '**/*.md'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'URL a probar (por defecto producción)'
+        required: false
+        default: 'https://lab.adrianzero.com'
+
+jobs:
+  unit:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: imac
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Los tests de lib/__tests__ no necesitan node_modules (canvas/sharp pesan y no hacen falta).
+      # Node 22 ya no acepta un directorio suelto en --test: se pasan los ficheros.
+      - run: node --test lib/__tests__/*.test.js
+
+  smoke:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: imac
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Smoke tests
+        run: node scripts/smoke.mjs
+        env:
+          BASE_URL: ${{ inputs.base_url || 'https://lab.adrianzero.com' }}

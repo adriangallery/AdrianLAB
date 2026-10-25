@@ -1,0 +1,82 @@
+# Imagen de AdrianLAB para el mini (mudanza de ZERO al mini, fases 2 y 3). Next se construye
+# aquí y el mini solo hace docker pull + git:from-image (Beauty primero: nada de builds en el mini).
+# No lleva secretos: la configuración de servidor son variables de entorno de la app en Dokku.
+#
+# 25-oct-2026 — MUDANZA A LA FORJA (Forgejo en el iMac, runner «imac», modo host). Equivale a
+# .github/workflows/build-mini-image.yml (GitHub Actions + GHCR), que queda en GitHub como respaldo
+# APAGADO. La imagen va al registro de la Forja: imac.taild648fa.ts.net:3443/adriangallery/adrianlab:<sha>
+# (y :latest en main). El mini la descarga desde ahí (~/mini-ops/deploy-app.sh, clase image, con
+# marcha atrás a GHCR) cuando la Forja le avisa del push por webhook.
+#
+# ⚠️ La rama `renders` NO vive en la Forja: la escribe la propia app (lib/github-storage.js) en
+# GitHub y de ahí sirve las imágenes por raw.githubusercontent.com. El push mirror a GitHub solo
+# empuja las ramas de código (filtro de ramas), nunca `renders`.
+name: build-mini-image
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'public/rendered-*/**'
+      - 'rendered-images/**'
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - 'public/rendered-*/**'
+      - 'rendered-images/**'
+      - '**/*.md'
+  workflow_dispatch: {}
+
+concurrency:
+  group: build-mini-image-${{ github.ref }}
+  # En main NO se cancela: un build cancelado dejaba SHAs sin imagen y el webhook del mini se
+  # quedaba esperando una imagen que no iba a llegar (bloqueando la cola 20 min).
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  REGISTRY: imac.taild648fa.ts.net:3443/adriangallery
+
+jobs:
+  build:
+    runs-on: imac
+    timeout-minutes: 75
+    env:
+      IMAGE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login al registro de la Forja
+        env:
+          FORJA_TOKEN: ${{ secrets.FORJA_TOKEN }}
+        run: |
+          # DOCKER_CONFIG propio del job: la credencial no queda en el home del runner.
+          DC=$(mktemp -d /var/tmp/forja-docker-XXXXXX)
+          echo "DOCKER_CONFIG=$DC" >> "$GITHUB_ENV"
+          printf '%s' "$FORJA_TOKEN" | DOCKER_CONFIG=$DC docker login imac.taild648fa.ts.net:3443 -u adrian --password-stdin
+
+      - name: Build & push adrianlab
+        env:
+          IS_MAIN: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          # Builder «forja» (driver docker-container, BuildKit en su propio contenedor con la CA de
+          # la Forja en /opt/forgejo-runner/buildkitd.toml). NO el BuildKit interno del dockerd del
+          # iMac (atascado desde el 25-oct). BUILDX_CONFIG fijo porque el DOCKER_CONFIG del job es
+          # temporal (y buildx guarda ahí sus builders).
+          export BUILDX_CONFIG=/opt/forgejo-runner/.docker/buildx
+          if ! docker buildx inspect forja >/dev/null 2>&1; then
+            docker buildx create --name forja --driver docker-container \
+              --driver-opt image=moby/buildkit:v0.26.2,network=host \
+              --buildkitd-config /opt/forgejo-runner/buildkitd.toml --bootstrap
+          fi
+          tags=(-t "$REGISTRY/adrianlab:$IMAGE_SHA")
+          [ "$IS_MAIN" = "true" ] && tags+=(-t "$REGISTRY/adrianlab:latest")
+          # provenance/sbom OFF: el docker/containerd viejo del mini no sabe leer attestations.
+          # Caché = la del builder «forja» (volumen local del iMac, persistente entre builds).
+          timeout 60m docker buildx build --builder forja --push --provenance=false --sbom=false \
+            -f Dockerfile.mini --build-arg "GIT_SHA=$IMAGE_SHA" "${tags[@]}" .
+          docker manifest inspect "$REGISTRY/adrianlab:$IMAGE_SHA" >/dev/null && echo "publicada $REGISTRY/adrianlab:$IMAGE_SHA"
+
+      - name: Logout
+        if: always()
+        run: |
+          [ -n "${DOCKER_CONFIG:-}" ] && [ -d "$DOCKER_CONFIG" ] && { docker logout imac.taild648fa.ts.net:3443 >/dev/null 2>&1 || true; rm -rf "$DOCKER_CONFIG"; } || true
