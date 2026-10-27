@@ -259,6 +259,27 @@ export default async function handler(req, res) {
     const cleanTokenId = tokenId.toString().replace(/\.(png|gif)$/, '');
     console.log(`[render] Iniciando renderizado para token ${cleanTokenId}`);
 
+    // ===== AZOMBIE (ZombieMintFacet) — ANTES QUE CUALQUIER OTRA LÓGICA =====
+    // Vía rápida delante de las cachés: positivo en memoria o lista global de minteados
+    // (1 eth_call/min para todo el proceso). La comprobación por token va en el probe
+    // del CACHE MISS (más abajo), que sustituye a la llamada de gumball existente.
+    const renderStart = Date.now();
+    const zombieMod = /^\d+$/.test(cleanTokenId)
+      ? await import('../../../lib/v2/zombie/zombie-resolver.js').catch(() => null)
+      : null;
+    if (zombieMod) {
+      try {
+        const zEarly = await zombieMod.resolveZombieEarly(cleanTokenId);
+        if (zEarly) {
+          const { sendZombieRender } = await import('../../../lib/v2/zombie/zombie-render.js');
+          console.log(`[render] 🧟 Token ${cleanTokenId} es AZombie (early)`);
+          return await sendZombieRender(res, cleanTokenId, zEarly, renderStart);
+        }
+      } catch (zErr) {
+        console.error(`[render] 🧟 Error AZombie early ${cleanTokenId}:`, zErr.message);
+      }
+    }
+
     // Verify that tokenId is valid
     if (!cleanTokenId || isNaN(parseInt(cleanTokenId))) {
       console.error(`[render] Token ID inválido: ${cleanTokenId}`);
@@ -454,6 +475,23 @@ export default async function handler(req, res) {
     }
 
     console.log(`[render] 💾 CACHE MISS para token ${cleanTokenId} - Generando imagen...`);
+
+    // ===== AZOMBIE: comprobación autoritativa por token (mismo multicall que gumball) =====
+    let facetProbe = null;
+    if (zombieMod) {
+      facetProbe = await zombieMod.probeMintFacets(cleanTokenId);
+      if (facetProbe?.zombie) {
+        const { sendZombieRender } = await import('../../../lib/v2/zombie/zombie-render.js');
+        console.log(`[render] 🧟 Token ${cleanTokenId} es AZombie`);
+        return await sendZombieRender(res, cleanTokenId, facetProbe.zombie, renderStart);
+      }
+      if (facetProbe?.zombieMintedNoData) {
+        // Minteado por la faceta pero sin datos: no renderizar (ni cachear) un AdrianZERO genérico
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('Retry-After', '30');
+        return res.status(503).json({ error: 'AZombie data temporarily unavailable' });
+      }
+    }
 
     // ===== VERIFICAR SI EL ARCHIVO YA EXISTE EN GITHUB (SOLO SI TIENE TOGGLE 13) =====
     // ESTRATEGIA HÍBRIDA: Primero verificar nombre fijo (compatibilidad), luego hash (nuevo sistema)
@@ -1100,7 +1138,7 @@ export default async function handler(req, res) {
     // This replaces whatever equippedTraits/generation/skin the contract returned.
     try {
       const { resolveGumballForToken } = await import('../../../lib/v2/tags/tag-resolver.js');
-      const gum = await resolveGumballForToken(cleanTokenId);
+      const gum = await resolveGumballForToken(cleanTokenId, { gumballMinted: facetProbe?.ok ? facetProbe.gumballMinted : null });
       if (gum.isGumball && gum.entry) {
         console.log(`[render] 🎰 Token ${cleanTokenId} es GumballZERO idx=${gum.index} - Aplicando lógica especial`);
 

@@ -20,6 +20,7 @@ const nextConfig = {
       '/api/**': [
         'public/labmetadata/**',
         'public/labimages/ogpunks/**',
+        'public/labimages/azombie/**',
         'public/fonts/**',
       ],
     },

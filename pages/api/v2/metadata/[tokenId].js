@@ -22,6 +22,7 @@ import {
   checkConditional,
 } from '../../../../lib/v2/cache/metadata-cache.js';
 import { getSamuraiIndex } from '../../../../lib/v2/tags/tag-resolver.js';
+import { isListedZombie } from '../../../../lib/v2/zombie/zombie-resolver.js';
 import { TTL } from '../../../../lib/v2/cache/cache-keys.js';
 import fs from 'fs';
 import path from 'path';
@@ -60,7 +61,12 @@ export default async function handler(req, res) {
     const forceRefresh = req.query.refresh === 'true';
 
     // === KV cache check with ETag ===
-    const cached = !forceRefresh && await getCachedMetadata(tokenId);
+    let cached = !forceRefresh && await getCachedMetadata(tokenId);
+    // AZombie: a non-zombie entry cached before the ZombieMintFacet saw the token
+    // must not survive 24 h. Global minted list = 1 eth_call/min, no per-token RPC.
+    if (cached && cached.metadata?.attributes?.[0]?.value !== 'AZombie' && await isListedZombie(tokenId)) {
+      cached = null;
+    }
     if (cached) {
       const { metadata, etag } = cached;
 

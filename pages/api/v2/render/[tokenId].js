@@ -27,6 +27,7 @@ import { normalizeTraits } from '../../../../lib/v2/render/layer-order.js';
 import { applyBananaTransform } from '../../../../lib/v2/render/banana-pipeline.js';
 import { getSamuraiIndex, getGumballIndex, resolveGumballForToken } from '../../../../lib/v2/tags/tag-resolver.js';
 import { detectAnimatedTraits } from '../../../../lib/v2/render/gif-pipeline.js';
+import { sendZombieRender } from '../../../../lib/v2/zombie/zombie-render.js';
 import {
   generateGifFromLayers,
   createBounceOnlyFrameGenerator,
@@ -137,6 +138,11 @@ export default async function handler(req, res) {
 
     // === Fetch all on-chain data (1 Multicall3 RPC) ===
     const tokenData = await fetchAllTokenData(tokenId);
+
+    // === AZombie (ZombieMintFacet) — on-chain art, overrides traits/serums/skins ===
+    if (tokenData.zombie) {
+      return sendZombieRender(res, tokenId, tokenData.zombie, start);
+    }
 
     // === SamuraiZERO index ===
     if (tokenData.tagInfo?.tag === 'SamuraiZERO') {

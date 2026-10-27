@@ -54,7 +54,19 @@ export default async function handler(req, res) {
     const { tokenId } = req.query;
     const cleanTokenId = tokenId.toString().replace(/\.(png|gif)$/, '');
     console.log(`[metadata] Iniciando request para token ${cleanTokenId}`);
-    
+
+    // ===== AZOMBIE + GUMBALL PROBE (1 multicall, lanzado ya en paralelo con los toggles) =====
+    // gumballWasMintedHere + zombieWasMintedHere + zombieGetData. Sustituye a la llamada
+    // de gumball que ya se hacía por petición, así que no añade ningún round trip.
+    // Mientras ZombieMintFacet no esté en el Diamond los selectores zombie* revierten
+    // y el resultado es «no es zombie». Nunca se cachea un negativo.
+    const probeId = cleanTokenId.replace(/\.json$/i, '');
+    const facetProbePromise = /^\d+$/.test(probeId)
+      ? import('../../../lib/v2/zombie/zombie-resolver.js')
+          .then(m => m.probeMintFacets(probeId))
+          .catch(() => null)
+      : Promise.resolve(null);
+
     // ===== LÓGICA ESPECIAL CLOSEUP, SHADOW, GLOW, BN, UV, BLACKOUT Y BANANA (SISTEMA DE TOGGLES) =====
     // Los toggles se determinan por el estado del contrato
     // IDs de toggles:
@@ -211,6 +223,26 @@ export default async function handler(req, res) {
     // Mudanza fase 4: en el mini NEXT_PUBLIC_BASE_URL = https://lab.adrianzero.com (horneado en Dockerfile.mini)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://adrianlab.vercel.app';
     const version = Date.now();
+
+    // ===== LÓGICA ESPECIAL AZOMBIE (ZombieMintFacet) — ANTES QUE CUALQUIER OTRA =====
+    // Datos 100 % on-chain (máscara + traits + variante + índice). Ignora traits
+    // equipados, serums, skins y toggles del core.
+    const facetProbe = await facetProbePromise;
+    if (facetProbe?.zombie) {
+      const { buildZombieMetadata } = await import('../../../lib/v2/zombie/zombie-core.js');
+      const zombieMetadata = buildZombieMetadata(tokenIdNum, facetProbe.zombie, baseUrl);
+      console.log(`[metadata] 🧟 AZombie metadata generado: ${zombieMetadata.name}`);
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Version', 'AZOMBIE');
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300');
+      return res.status(200).json(zombieMetadata);
+    }
+    if (facetProbe?.zombieMintedNoData) {
+      // Minteado por la faceta pero zombieGetData falló: no servir un AdrianZERO genérico.
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Retry-After', '30');
+      return res.status(503).json({ error: 'AZombie data temporarily unavailable' });
+    }
 
     // ===== LÓGICA ESPECIAL: SAMURAIZERO (500-1099) - REEMPLAZADA POR LÓGICA BASADA EN TAGS =====
     // El código antiguo basado en rango ha sido reemplazado por lógica basada en tags del contrato
@@ -446,7 +478,7 @@ export default async function handler(req, res) {
     // (/api/render) que ahora tiene rama GumballZERO completa.
     try {
       const { resolveGumballForToken } = await import('../../../lib/v2/tags/tag-resolver.js');
-      const gum = await resolveGumballForToken(cleanTokenId);
+      const gum = await resolveGumballForToken(cleanTokenId, { gumballMinted: facetProbe?.ok ? facetProbe.gumballMinted : null });
       if (gum.isGumball && gum.entry) {
         const traitsPath = path.join(process.cwd(), 'public', 'labmetadata', 'traits.json');
         const traitsArr = JSON.parse(fs.readFileSync(traitsPath, 'utf8')).traits || [];
