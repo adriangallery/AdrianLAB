@@ -309,6 +309,21 @@
       ],
       "external_url": "https://adrianzero.com/",
       "traitsInside": 5
+    },
+    {
+      "tokenId": 10022,
+      "name": "ZOMBIE",
+      "category": "Floppy discs",
+      "fileName": "10022.gif",
+      "maxSupply": 500,
+      "floppy": "ZOMBIE",
+      "description": "17 bloody zombie traits from the AZombie lab, 3 per floppy. Arm your zombie, or turn your AdrianZERO. BE REAL | BE ADRIAN | AdrianLAB by HalfxTiger",
+      "masterminds": [
+        "Adrian | HalfxTiger",
+        "Claude"
+      ],
+      "external_url": "https://adrianzero.com/",
+      "traitsInside": 3
     }
   ],
   "metadata": {
